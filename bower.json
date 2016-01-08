@@ -1,0 +1,30 @@
+{
+  "name": "meditations",
+  "authors": [
+    "Phil <ioddly@ioddly.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "Private",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "assets/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "html5shiv": "~3.7.3",
+    "respond": "~1.4.2",
+    "riot": "~2.3.12",
+    "moment": "~2.11.0",
+    "octicons": "~3.3.0",
+    "roboto-fontface": "~0.4.3",
+    "RiotControl": "riotcontrol#*"
+  }
+}
