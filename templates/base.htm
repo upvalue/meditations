@@ -4,35 +4,43 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} | {{ SiteTitle }}</title>
 
-    <title>{% block title %}{% endblock %} | Meditations</title>
+    <link href="/assets/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/assets/site/site.css" />
-
-    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="/assets/vendor/html5shiv/dist/html5shiv.min.js"></script>
+      <script src="/assets/vendor/respond/dest/respond.min.js"></script>
+    <![endif]-->
   </head>
   <body>
-    <div id="custom-menu-wrapper-wrapper">
-      <div class="custom-menu-wrapper">
-        <div class="pure-menu custom-menu custom-menu-top">
-          <a href="#" class="pure-menu-heading custom-menu-brand">Meditations</a>
-          <a href="#" class="custom-menu-toggle" id="toggle"><s class="bar"></s><s class="bar"></s></a>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">{{SiteTitle}}</a>
         </div>
-        <div class="pure-menu pure-menu-horizontal pure-menu-scrollable custom-menu custom-menu-bottom custom-menu-tucked" id="tuckedMenu">
-          <div class="custom-menu-screen"></div>
-          <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="/habits" class="pure-menu-link">Habits</a></li>
-            <li class="pure-menu-item"><a href="/journal" class="pure-menu-link">Journal</a></li>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="#">Habits</a></li>
+            <li><a href="#">Journal</a></li>
           </ul>
         </div>
       </div>
-    </div>
-    
-    <div id=content>
-    {% block content %}{% endblock %}
+    </nav>
+    <div class="container-fluid">
+      {% block content %}{% endblock %}
     </div>
 
-    <script src="/assets/site/site.js"></script>
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
     {% block script %}{% endblock %}
   </body>
 </html>
