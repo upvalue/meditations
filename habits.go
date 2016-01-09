@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/now"
-	"github.com/macaron-gonic/macaron"
 
 	"gopkg.in/macaron.v1"
 )
@@ -35,9 +34,11 @@ const (
 )
 
 type Task struct {
-	ID             int         `sql:"AUTO_INCREMENT" json:"id"`
-	Name           string      `json:"name" form:"name"`
-	CreatedAt      time.Time   `json:"created_at"`
+	ID        int       `sql:"AUTO_INCREMENT" json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	Name      string    `json:"name" form:"name"`
+	// The actual date of the task, regardless of when it was created
+	Date           time.Time   `json:"date"`
 	Status         int         `json:"status" form:"status"`
 	Scope          int         `json:"scope" form:"scope"`
 	Order          int         `json:"order" form:"order"`
@@ -47,8 +48,8 @@ type Task struct {
 
 type TaskComment struct {
 	ID        int       `sql:"AUTO_INCREMENT" json:"id"`
-	Body      string    `json:"body"`
 	CreatedAt time.Time `json:"created_at"`
+	Body      string    `json:"body"`
 	// Comments can be either under a scope (e.g. a given day or month) or under a specific task
 	Scope  int `json:"scope"`
 	TaskID int `json:"task_id"`
@@ -58,13 +59,13 @@ type TaskComment struct {
 func between(start time.Time, scope int, from *time.Time, to *time.Time) {
 	switch scope {
 	case ScopeDay:
-		*from = now.New(start).BemacaronningOfDay()
+		*from = now.New(start).BeginningOfDay()
 		*to = (*from).AddDate(0, 0, 1)
 	case ScopeMonth:
-		*from = now.New(start).BemacaronningOfMonth()
+		*from = now.New(start).BeginningOfMonth()
 		*to = (*from).AddDate(0, 1, 0)
 	case ScopeYear:
-		*from = now.New(start).BemacaronningOfYear()
+		*from = now.New(start).BeginningOfYear()
 		*to = (*from).AddDate(1, 0, 0)
 	case ScopeBucket:
 		*from = time.Date(2000, 0, 0, 0, 0, 0, 0, time.Now().Location())
@@ -87,7 +88,7 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 
 // Find TASKS in the same scope as TASK
 func tasksNear(task Task, tasks *[]Task) {
-	tasksInScope(tasks, task.Scope, task.CreatedAt)
+	tasksInScope(tasks, task.Scope, task.Date)
 }
 
 // Given a yearly or monthly task, calculate the completion rate of all tasks in daily scopes with the same name
@@ -95,7 +96,7 @@ func completionRate(task Task) float64 {
 	var from, to time.Time
 	var tasks []Task
 
-	between(task.CreatedAt, task.Scope, &from, &to)
+	between(task.Date, task.Scope, &from, &to)
 
 	DB.Where("created_at BETWEEN ? and ? and scope = 0 and name = ?", from.Format("2006-01-02"),
 		to.Format("2006-01-02"), task.Name).Find(&tasks)

@@ -12,6 +12,9 @@
       <script src="/assets/vendor/html5shiv/dist/html5shiv.min.js"></script>
       <script src="/assets/vendor/respond/dest/respond.min.js"></script>
     <![endif]-->
+    
+    <link href="/assets/site/site.css" rel=stylesheet>
+    {% block style %}{% endblock %}
   </head>
   <body>
     <nav class="navbar navbar-default">
@@ -23,7 +26,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">{{SiteTitle}}</a>
+          <a class="navbar-brand" href="#">{{SiteTitle}}</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -39,7 +42,6 @@
     </div>
 
     <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
     {% block script %}{% endblock %}
   </body>
