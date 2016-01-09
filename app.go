@@ -10,6 +10,8 @@ import (
 func App() *macaron.Macaron {
 	m := macaron.Classic()
 
+	DBOpen()
+
 	m.Use(session.Sessioner())
 	m.Use(csrf.Csrfer())
 	m.Use(pongo2.Pongoer(pongo2.Options{
@@ -26,8 +28,12 @@ func App() *macaron.Macaron {
 	})
 
 	m.Get("/", func(c *macaron.Context) {
-		//c.PlainText(200, []byte("Hello"))
-		c.HTML(200, "index")
+		//c.HTML(200, "index")
+		c.Redirect("/habits")
+	})
+
+	m.Group("/habits", func() {
+		habitsInit(m)
 	})
 
 	return m
