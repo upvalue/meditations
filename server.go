@@ -9,24 +9,6 @@ import (
 	"github.com/tylerb/graceful"
 )
 
-type Configuration struct {
-	Port      int
-	DBPath    string
-	DBLog     bool
-	Host      string
-	SiteTitle string
-	Encrypted bool
-}
-
-var Config = Configuration{
-	Host:      "",
-	Port:      8080,
-	DBPath:    "development.sqlite3",
-	DBLog:     false,
-	SiteTitle: "meditations",
-	Encrypted: false,
-}
-
 func Server() *graceful.Server {
 	server := &graceful.Server{
 		Timeout: 10 * time.Second,

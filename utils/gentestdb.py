@@ -5,14 +5,15 @@ from datetime import datetime, timedelta
 
 import bcrypt
 
+TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 def now():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime(TIME_FORMAT)
 
 SCOPE_DAY = 0
 SCOPE_MONTH = 1
 SCOPE_YEAR = 2
-SCOPE_UNSET = 3
-SCOPE_BUCKET = 4
+SCOPE_BUCKET = 3
 
 STATUS_UNSET = 0
 STATUS_COMPLETE = 1
@@ -27,7 +28,9 @@ class Task(object):
 
         self.name = name
         self.created_at = now()
-        self.date = date
+
+        self.date = (date - timedelta(0, seconds = date.second, minutes=date.minute, hours=date.hour)).strftime(TIME_FORMAT)
+
         self.status = status
         self.scope = scope
         self.order = order
@@ -54,15 +57,22 @@ def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
-def gen_tasks(name, days=60, scope = SCOPE_DAY):
+def gen_tasks(name, days=90, day_order=0):
     end = datetime.now()
     "Generate months worth of example tasks"
+    month = None
     for date in daterange(end - timedelta(days), end):
-        task = Task(name, date, STATUS_UNSET, scope, 0)
+        task = Task(name, date, STATUS_UNSET, SCOPE_DAY, day_order)
+        if not month:
+            month = date
+            yield Task(name, date, STATUS_UNSET, SCOPE_MONTH, 0)
+        elif month.month != date.month or month.year != date.year:
+            month = None
+            yield Task(name, date, STATUS_UNSET, SCOPE_YEAR, 0)
         yield task
 
 # TODO: Generate tasks for months, years
 print('BEGIN TRANSACTION;')
 [print(task) for task in gen_tasks("Exercise")]
-[print(task) for task in gen_tasks("Diet")]
+[print(task) for task in gen_tasks("Diet", day_order = 1)]
 print('END TRANSACTION;')

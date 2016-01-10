@@ -12,8 +12,11 @@ func DBOpen() {
 	db, err := gorm.Open("sqlite3", Config.DBPath)
 	checkErr(err)
 	DB = &db
-	DB.AutoMigrate(&Task{})
-	DB.AutoMigrate(&TaskComment{})
+	DB.LogMode(Config.DBLog)
+}
+
+func DBMigrate() {
+	DB.AutoMigrate(&Task{}, &Comment{})
 }
 
 func DBClose() {

@@ -1,5 +1,26 @@
 @import url("/assets/vendor/roboto-fontface/css/roboto-fontface.css");
+@import url("/assets/vendor/octicons/octicons/octicons.css");
 
 body {
   font-family: Roboto, sans-serif;
 }
+
+/**** HABITS */
+
+.scope-title {
+  display: inline;
+}
+
+section.scope {
+  padding: 0 .25em .50em .25em;
+}
+
+section.scope task:first-of-type .entry {
+  padding-top:1em;
+}
+
+section.scope task .entry {
+  padding-bottom: .15em;
+}
+
+input.form-control[type=text] { height:1.5em; }

@@ -1,11 +1,46 @@
 package main
 
 import (
+	"log"
+
+	"github.com/BurntSushi/toml"
+	"github.com/codegangsta/cli"
 	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/pongo2"
 	"github.com/go-macaron/session"
 	"gopkg.in/macaron.v1"
 )
+
+type Configuration struct {
+	Port      int
+	DBPath    string
+	DBLog     bool
+	Host      string
+	SiteTitle string
+	Encrypted bool
+}
+
+var Config = Configuration{
+	Host:      "",
+	Port:      8080,
+	DBPath:    "development.sqlite3",
+	DBLog:     false,
+	SiteTitle: "meditations",
+	Encrypted: false,
+}
+
+func loadConfig(c *cli.Context) {
+	if len(c.Args()) > 0 {
+		config_path := c.Args()[0]
+		_, err := toml.DecodeFile(config_path, &Config)
+		checkErr(err)
+		log.Printf("loaded configuration from %s %+v\n", config_path, Config)
+	}
+
+	if c.IsSet("db-log") == true {
+		Config.DBLog = c.Bool("db-log")
+	}
+}
 
 func App() *macaron.Macaron {
 	m := macaron.Classic()

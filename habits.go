@@ -36,15 +36,15 @@ type Task struct {
 	CreatedAt time.Time `json:"created_at"`
 	Name      string    `json:"name" form:"name"`
 	// The actual date of the task, regardless of when it was created
-	Date           time.Time   `json:"date"`
-	Status         int         `json:"status" form:"status"`
-	Scope          int         `json:"scope" form:"scope"`
-	Order          int         `json:"order" form:"order"`
-	Comment        TaskComment `json:"comment"`
-	CompletionRate float64     `json:"completion_rate" sql:"-"`
+	Date           time.Time `json:"date"`
+	Status         int       `json:"status" form:"status"`
+	Scope          int       `json:"scope" form:"scope"`
+	Order          int       `json:"order" form:"order"`
+	Comment        Comment   `json:"comment"`
+	CompletionRate float64   `json:"completion_rate" sql:"-"`
 }
 
-type TaskComment struct {
+type Comment struct {
 	ID        int       `sql:"AUTO_INCREMENT" json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	Body      string    `json:"body"`
@@ -77,8 +77,8 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 	} else {
 		between(start, scope, &from, &to)
 
-		DB.Where("created_at BETWEEN ? and ? and scope = ?", from.Format("2006-01-02"), to.Format("2006-01-02"), scope).Order("`order` asc").
-			Preload("Comment").Find(tasks)
+		DB.Where("date BETWEEN ? and ? and scope = ?", from.Format("2006-01-02"), to.Format("2006-01-02"), scope).Order("`order` asc").
+			Find(tasks)
 	}
 }
 
@@ -92,10 +92,12 @@ func completionRate(task Task) float64 {
 	var from, to time.Time
 	var tasks []Task
 
+	return 0
+
 	between(task.Date, task.Scope, &from, &to)
 
-	DB.Where("created_at BETWEEN ? and ? and scope = 0 and name = ?", from.Format("2006-01-02"),
-		to.Format("2006-01-02"), task.Name).Find(&tasks)
+	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"),
+		to.Format("2006-01-02"), ScopeDay, task.Name).Find(&tasks)
 
 	count := float64(len(tasks))
 
@@ -155,4 +157,6 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "habits")
 	})
+
+	m.Get("/task/in-year", tasksInYear)
 }

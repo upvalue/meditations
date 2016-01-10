@@ -29,7 +29,7 @@ class TaskStore
       when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
       when Scope.bucket then ["bucket", fetch_date, "#scope-bucket"]
 
-    $.get "/habits/tasks/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
+    $.get "/habits/task/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
       tasks = tasks or []
       title = switch
         when scope == Scope.day then date.format('Do')
@@ -61,48 +61,51 @@ class TaskStore
     self.on 'task-order-up', remount('/habits/task/order-up')
     self.on 'task-update', remount('/habits/task/update')
 
-main = () ->
-  console.log 'Initializing main habits page'
-
+# Navigation
+initialize = () ->
+  console.log 'Habits: initializing'
   if html5?
-    html5.addElements('scope task')
+    html5.addElements('scope task scope-days')
 
   task_store = window.task_store = new TaskStore()
   RiotControl.addStore(task_store)
 
+browse_from = (from) ->
+  console.log('Browsing from', from)
+  today = moment()
+  from = moment(from, 'YYYY-MM')
+  document.title = "#{from.format('MMM YYYY')} / habits"
+  current_date = from.clone()
+
+  #task_store.mount_scope Scope.month, from
+  task_store.mount_scope Scope.year, from
+  #task_store.mount_scope Scope.bucket, from
+
+  # Allow days up to the current date
+  # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
+  ###riot.mount("scope-days", {
+    thunk: () ->
+      date = 1
+      while date <= from.daysInMonth()
+        next = from.clone().date(date)
+        if next > today
+          check = next.clone()
+          unless check.subtract(4, 'hours') < today 
+            break
+        #task_store.mount_scope Scope.day, next
+        date += 1
+  })###
+RiotControl.on "change-date", (forward, scope) ->
+  riot.route.exec (action, date) ->
+    date = scope.date.clone().date(1)
+    date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
+    riot.route "from/#{date.format('YYYY-MM')}"
+
+main = () ->
+  console.log 'Habits: installing router'
+
+  initialize()
   current_date = false
-
-  # Navigation
-  browse_from = (from) ->
-    console.log('Browsing from', from)
-    today = moment()
-    from = moment(from, 'YYYY-MM')
-    document.title = "#{from.format('MMM YYYY')} / habits"
-    current_date = from.clone()
-
-    task_store.mount_scope Scope.month, from
-    task_store.mount_scope Scope.year, from
-    task_store.mount_scope Scope.bucket, from
-
-    # Allow days up to the current date
-    # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
-    riot.mount("scope-days", {
-      thunk: () ->
-        date = 1
-        while date <= from.daysInMonth()
-          next = from.clone().date(date)
-          if next > today
-            check = next.clone()
-            unless check.subtract(4, 'hours') < today 
-              break
-          task_store.mount_scope Scope.day, next
-          date += 1
-    })
-  RiotControl.on "change-date", (forward, scope) ->
-    riot.route.exec (action, date) ->
-      date = scope.date.clone().date(1)
-      date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-      riot.route "from/#{date.format('YYYY-MM')}"
 
   # Handle routes
   riot.route((action, rest) ->
@@ -112,6 +115,7 @@ main = () ->
 
   riot.route "from/#{moment().format('YYYY-MM')}"
   
+  ### Setup websocket
   task_near = (task, date2) ->
     date1 = moment.utc(task.created_at)
     # only compare down to months because that's what we browse
@@ -121,7 +125,6 @@ main = () ->
       (task.scope == Scope.year and date1.year() == date2.year()) or
       task.scope == Scope.bucket
 
-  ### Setup websocket
   socket = false
   make_socket = () ->
     socket = new WebSocket("ws://#{window.location.hostname}:#{window.location.port}/update-subscribe")
@@ -148,4 +151,5 @@ window.Habits =
   Scope: Scope,
   Status: Status,
   TaskStore: TaskStore,
+  initialize: initialize,
   main: main

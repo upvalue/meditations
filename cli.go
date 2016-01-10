@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/BurntSushi/toml"
 	"github.com/codegangsta/cli"
 )
 
@@ -12,19 +11,39 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "meditations"
 
-	app.Action = func(c *cli.Context) {
-		if len(c.Args()) > 0 {
-			config_path := c.Args()[0]
-			_, err := toml.DecodeFile(config_path, &Config)
-			checkErr(err)
-			log.Printf("loaded configuration from %s\n", config_path)
-		}
+	flags := []cli.Flag{
+		cli.BoolFlag{
+			Name:  "db-log",
+			Usage: "verbosely log SQL",
+		},
+	}
 
-		log.Printf("running with configuration %+v\n", Config)
-		log.Printf("starting server")
-		server := Server()
-		err := server.ListenAndServe()
-		log.Printf("%v", err)
+	app.Commands = []cli.Command{
+		{
+			Name:  "migrate",
+			Usage: "database migrations",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				loadConfig(c)
+				Config.DBLog = true
+				DBOpen()
+				DBMigrate()
+				DBClose()
+			},
+		},
+		{
+			Name:  "serve",
+			Usage: "start server",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				loadConfig(c)
+				log.Printf("running with configuration %+v\n", Config)
+				log.Printf("starting server")
+				server := Server()
+				err := server.ListenAndServe()
+				log.Printf("%v", err)
+			},
+		},
 	}
 
 	app.Run(os.Args)

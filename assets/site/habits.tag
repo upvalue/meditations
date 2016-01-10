@@ -1,16 +1,16 @@
 <scope>
   <section class="scope">
-    <h3>{opts.date}</h3>
+    <h3 class=scope-title>{opts.date}</h3>
     <span class="pull-right">
-      <form class="pure-form pure-form-stacked">
-        <input type="text" size="15"/>
-        <button type="submit" class="pure-button octicon octicon-plus" onclick={new_task}></button>
-      </form>
-      <span if={opts.scope == window.Scope.month || opts.scope == window.Scope.year}>
-        <button class="pure-button octicon octicon-chevron-left" onclick={nav_left}></button>
-        <button class="pure-button octicon octicon-chevron-right" onclick={nav_right}></button>
+      <form class=form-inline>
+        <input type="text" size="15" class="form-control " />
+        <button type="submit" class="btn btn-xs btn-default octicon octicon-plus" onclick={new_task}></button>
+      <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
+        <button class="btn btn-xs btn-default octicon octicon-chevron-left" onclick={nav_left}></button>
+        <button class="btn btn-xs btn-default octicon octicon-chevron-right" onclick={nav_right}></button>
       </span>
-      <button class="pure-button octicon octicon-comment" onclick={comment}></button>
+      <button class="btn btn-xs btn-default octicon octicon-comment" onclick={comment}></button>
+      </form>
     </span>
     <task each={opts.tasks} />
     <br/>
@@ -113,16 +113,17 @@
 
 <task>
   <section class="entry">
-    <button class="pure-button {task-complete: status == Status.complete} {task-incomplete: status == Status.incomplete}" onclick={change_status}>
+    <button class="btn btn-sm btn-default {task-complete: status == Status.complete} {task-incomplete: status == Status.incomplete}" onclick={change_status}>
       {name}
-      <span if={ (scope == window.Scope.month || scope == window.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
+      <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
+    <br />
     <span class="pull-right">
-      <button class="pure-button octicon octicon-trashcan" onclick={delete}></button>
-      <button class="pure-button octicon octicon-chevron-up" onclick={up}></button>
-      <button class="pure-button octicon octicon-chevron-down" onclick={down}></button>
-      <button class="pure-button octicon octicon-comment" onclick={edit_comment}></button>
-      <button if={ (scope == window.Scope.month || scope == window.Scope.year)} class="pure-button octicon octicon-clippy" onclick={copy}></button>
+      <button class="btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
+      <button class="btn btn-xs btn-default octicon octicon-chevron-up" onclick={up}></button>
+      <button class="btn btn-xs btn-default octicon octicon-chevron-down" onclick={down}></button>
+      <button class="btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
+      <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
     </span>
     <span class="comment" id="comment-{id}" onblur={comment_unfocus} onfocus={comment_focus} contenteditable="{false: !comment.body}">{comment.body}</comment>
   </section>
@@ -153,7 +154,7 @@
 
   change_status(e) {
     var task = self._item;
-    task.status = (task.status + 1) % window.Status.wrap;
+    task.status = (task.status + 1) % window.Habits.Status.wrap;
     RiotControl.trigger('task-update', task);
   }
 
@@ -182,9 +183,9 @@
     var scope = self._item.scope - 1
     var date = moment(self._item.created_at).utc()
     // Create task on current day from monthly task
-    if(scope == window.Scope.day) {
+    if(scope == window.Habits.Scope.day) {
       date.date(moment().date())
-    } else if(scope == window.Scope.month) {
+    } else if(scope == window.Habits.Scope.month) {
       date.month(moment().month());
       date.date(moment().date());
     }
