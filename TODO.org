@@ -1,2 +1,6 @@
 * Habits
-** Display & navigation
+** TODO Display & navigation
+* Journal
+** TODO Tagging
+* Wiki
+** TODO Tagging

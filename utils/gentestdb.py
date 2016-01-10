@@ -22,8 +22,9 @@ class Task(object):
     COUNT = 1
 
     def __init__(self, name, date, status, scope, order):
-        self.id = Task.COUNT + 1
+        self.id = Task.COUNT
         Task.COUNT += 1
+
         self.name = name
         self.created_at = now()
         self.date = date
@@ -49,4 +50,19 @@ class TaskComment(object):
     def __repr__(self):
         return('INSERT INTO "taskcomments" VALUES({0.id}, "{0.created_at}", "{0.body}", {0.scope}, {0.task_id});'.format(self))
 
-print(Task("Hello", now(), STATUS_UNSET, SCOPE_DAY, 0))
+def daterange(start_date, end_date):
+    for n in range(int ((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
+def gen_tasks(name, days=60, scope = SCOPE_DAY):
+    end = datetime.now()
+    "Generate months worth of example tasks"
+    for date in daterange(end - timedelta(days), end):
+        task = Task(name, date, STATUS_UNSET, scope, 0)
+        yield task
+
+# TODO: Generate tasks for months, years
+print('BEGIN TRANSACTION;')
+[print(task) for task in gen_tasks("Exercise")]
+[print(task) for task in gen_tasks("Diet")]
+print('END TRANSACTION;')

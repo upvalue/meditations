@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class=row>
-
   <div class=col-md-3>
     <a name="scope-day-anchor"></a>
     <scope-days/>
@@ -21,4 +20,13 @@
     <a name="scope-bucket-anchor"></a>
     <scope id="scope-bucket"/>
   </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/assets/vendor/riot/riot+compiler.min.js"></script>
+<script src="/assets/vendor/RiotControl/riotcontrol.js"></script>
+<script src="/assets/site/habits.js">
+<script src="/assets/site/habits.tag" type=riot/tag></script>
+<script type="text/javascript">$(document).ready(window.Habits.main);</script>
 {% endblock %}

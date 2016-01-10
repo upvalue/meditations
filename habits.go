@@ -18,8 +18,6 @@ const (
 	ScopeMonth = iota
 	// Scope for yearly tasks and comments
 	ScopeYear = iota
-	// Scope for comments that belong to a specific task
-	ScopeUnset = iota
 	// Scope for "bucket list" tasks and comments
 	ScopeBucket = iota
 )
@@ -50,9 +48,7 @@ type TaskComment struct {
 	ID        int       `sql:"AUTO_INCREMENT" json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	Body      string    `json:"body"`
-	// Comments can be either under a scope (e.g. a given day or month) or under a specific task
-	Scope  int `json:"scope"`
-	TaskID int `json:"task_id"`
+	TaskID    int       `json:"task_id"`
 }
 
 // Given a task's date and scope, return a range of dates that will get all tasks within the scope
@@ -139,7 +135,7 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 
 func tasksInBucket(c *macaron.Context) {
 	var tasks []Task
-	DB.Where("scope = 3").Order("`order` asc").Preload("Comment").Find(&tasks)
+	DB.Where("scope = ?", ScopeBucket).Order("`order` asc").Preload("Comment").Find(&tasks)
 	c.JSON(http.StatusOK, tasks)
 }
 
