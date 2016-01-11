@@ -2,10 +2,12 @@
 package main
 
 import (
+	"log"
 	"math"
 	"net/http"
 	"time"
 
+	"github.com/go-macaron/binding"
 	"github.com/jinzhu/now"
 
 	"gopkg.in/macaron.v1"
@@ -153,10 +155,20 @@ func tasksInYear(c *macaron.Context) {
 	tasksInScopeR(c, ScopeYear)
 }
 
+// Update a task's fields by JSON
+func taskUpdate(c *macaron.Context, task Task) {
+	log.Printf("TASK UPDATE %+v\n", task)
+	DB.Where("id = ?", c.Params("id")).First(&task)
+	DB.Save(&task)
+	// TODO: Sync
+}
+
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "habits")
 	})
 
-	m.Get("/task/in-year", tasksInYear)
+	m.Get("/tasks/in-year", tasksInYear)
+	m.Get("/tasks/in-month", tasksInMonth)
+	m.Post("/tasks/update", binding.Bind(Task{}), taskUpdate)
 }

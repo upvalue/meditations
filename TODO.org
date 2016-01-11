@@ -6,3 +6,4 @@
 ** TODO Tagging
 * Misc
 ** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served)
+** TODO Are Macaron errors displayed in production?

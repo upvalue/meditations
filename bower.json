@@ -25,6 +25,7 @@
     "moment": "~2.11.0",
     "octicons": "~3.3.0",
     "roboto-fontface": "~0.4.3",
-    "RiotControl": "riotcontrol#*"
+    "RiotControl": "riotcontrol#*",
+    "jquery": "~2.2.0"
   }
 }

@@ -113,16 +113,15 @@
 
 <task>
   <section class="entry">
-    <button class="btn btn-sm btn-default {task-complete: status == Status.complete} {task-incomplete: status == Status.incomplete}" onclick={change_status}>
+    <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
       {name}
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
-    <br />
     <span class="pull-right">
-      <button class="btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
-      <button class="btn btn-xs btn-default octicon octicon-chevron-up" onclick={up}></button>
-      <button class="btn btn-xs btn-default octicon octicon-chevron-down" onclick={down}></button>
-      <button class="btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-chevron-up" onclick={up}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-chevron-down" onclick={down}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
     </span>
     <span class="comment" id="comment-{id}" onblur={comment_unfocus} onfocus={comment_focus} contenteditable="{false: !comment.body}">{comment.body}</comment>

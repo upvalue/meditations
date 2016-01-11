@@ -29,7 +29,7 @@ class TaskStore
       when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
       when Scope.bucket then ["bucket", fetch_date, "#scope-bucket"]
 
-    $.get "/habits/task/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
+    $.get "/habits/tasks/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
       tasks = tasks or []
       title = switch
         when scope == Scope.day then date.format('Do')
@@ -48,18 +48,26 @@ class TaskStore
         self.trigger 'comment-updated', task, saved_comment
 
     self.on 'task-new', (scope, task_name, created_at) ->
-      $.post 'habits/task/new', { name: task_name, scope: scope.scope, created_at: created_at.format('YYYY-MM-DD') }, () ->
+      $.post 'habits/tasks/new', { name: task_name, scope: scope.scope, created_at: created_at.format('YYYY-MM-DD') }, () ->
         self.mount_scope scope.scope, scope.date
         
+    # Run a command that changes a task, then remount in order to display changes
     remount = (path) ->
       (task) ->
-        $.post path, task, () ->
-          self.mount_scope task.scope, task.created_at
+        delete task.comment;
+        req = 
+          type: "POST"
+          url: path
+          data: JSON.stringify(task)
+          contentType: "application/json; charset=UTF-8"
+          dataType: "application/json"
+          success: () -> self.mount_scope task.scope, task.date 
+        $.ajax(req)
 
-    self.on 'task-delete', remount('/habits/task/delete')
-    self.on 'task-order-down', remount('/habits/task/order-down')
-    self.on 'task-order-up', remount('/habits/task/order-up')
-    self.on 'task-update', remount('/habits/task/update')
+    self.on 'task-delete', remount('/habits/tasks/delete')
+    self.on 'task-order-down', remount('/habits/tasks/order-down')
+    self.on 'task-order-up', remount('/habits/tasks/order-up')
+    self.on 'task-update', remount('/habits/tasks/update')
 
 # Navigation
 initialize = () ->
@@ -77,7 +85,7 @@ browse_from = (from) ->
   document.title = "#{from.format('MMM YYYY')} / habits"
   current_date = from.clone()
 
-  #task_store.mount_scope Scope.month, from
+  task_store.mount_scope Scope.month, from
   task_store.mount_scope Scope.year, from
   #task_store.mount_scope Scope.bucket, from
 
@@ -95,11 +103,6 @@ browse_from = (from) ->
         #task_store.mount_scope Scope.day, next
         date += 1
   })###
-RiotControl.on "change-date", (forward, scope) ->
-  riot.route.exec (action, date) ->
-    date = scope.date.clone().date(1)
-    date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-    riot.route "from/#{date.format('YYYY-MM')}"
 
 main = () ->
   console.log 'Habits: installing router'
@@ -107,14 +110,21 @@ main = () ->
   initialize()
   current_date = false
 
-  # Handle routes
+  # Install Router
+  RiotControl.on "change-date", (forward, scope) ->
+    riot.route.exec (action, date) ->
+      date = scope.date.clone().date(1)
+      date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
+      riot.route "from/#{date.format('YYYY-MM')}"
+
+  riot.route.start(true)
+  
   riot.route((action, rest) ->
     switch action
       when 'from' then browse_from(rest)
       else console.log "Unknown action", action)
 
-  riot.route "from/#{moment().format('YYYY-MM')}"
-  
+  riot.route("from/2016-01")
   ### Setup websocket
   task_near = (task, date2) ->
     date1 = moment.utc(task.created_at)

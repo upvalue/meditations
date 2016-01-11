@@ -39,7 +39,7 @@
             return ["bucket", fetch_date, "#scope-bucket"];
         }
       })(), fetch = ref[0], fetch_date = ref[1], mount = ref[2];
-      return $.get("/habits/task/in-" + fetch + "?date=" + (fetch_date.format('YYYY-MM-DD')), function(tasks) {
+      return $.get("/habits/tasks/in-" + fetch + "?date=" + (fetch_date.format('YYYY-MM-DD')), function(tasks) {
         var result, title;
         tasks = tasks || [];
         title = (function() {
@@ -73,7 +73,7 @@
         });
       });
       self.on('task-new', function(scope, task_name, created_at) {
-        return $.post('habits/task/new', {
+        return $.post('habits/tasks/new', {
           name: task_name,
           scope: scope.scope,
           created_at: created_at.format('YYYY-MM-DD')
@@ -83,15 +83,25 @@
       });
       remount = function(path) {
         return function(task) {
-          return $.post(path, task, function() {
-            return self.mount_scope(task.scope, task.created_at);
-          });
+          var req;
+          delete task.comment;
+          req = {
+            type: "POST",
+            url: path,
+            data: JSON.stringify(task),
+            contentType: "application/json; charset=UTF-8",
+            dataType: "application/json",
+            success: function() {
+              return self.mount_scope(task.scope, task.date);
+            }
+          };
+          return $.ajax(req);
         };
       };
-      self.on('task-delete', remount('/habits/task/delete'));
-      self.on('task-order-down', remount('/habits/task/order-down'));
-      self.on('task-order-up', remount('/habits/task/order-up'));
-      self.on('task-update', remount('/habits/task/update'));
+      self.on('task-delete', remount('/habits/tasks/delete'));
+      self.on('task-order-down', remount('/habits/tasks/order-down'));
+      self.on('task-order-up', remount('/habits/tasks/order-up'));
+      self.on('task-update', remount('/habits/tasks/update'));
     }
 
     return TaskStore;
@@ -115,6 +125,7 @@
     from = moment(from, 'YYYY-MM');
     document.title = (from.format('MMM YYYY')) + " / habits";
     current_date = from.clone();
+    task_store.mount_scope(Scope.month, from);
     return task_store.mount_scope(Scope.year, from);
 
     /*riot.mount("scope-days", {
@@ -132,19 +143,19 @@
      */
   };
 
-  RiotControl.on("change-date", function(forward, scope) {
-    return riot.route.exec(function(action, date) {
-      date = scope.date.clone().date(1);
-      date[forward ? 'add' : 'subtract'](1, scope.scope === Scope.month ? 'months' : 'years');
-      return riot.route("from/" + (date.format('YYYY-MM')));
-    });
-  });
-
   main = function() {
     var current_date;
     console.log('Habits: installing router');
     initialize();
     current_date = false;
+    RiotControl.on("change-date", function(forward, scope) {
+      return riot.route.exec(function(action, date) {
+        date = scope.date.clone().date(1);
+        date[forward ? 'add' : 'subtract'](1, scope.scope === Scope.month ? 'months' : 'years');
+        return riot.route("from/" + (date.format('YYYY-MM')));
+      });
+    });
+    riot.route.start(true);
     riot.route(function(action, rest) {
       switch (action) {
         case 'from':
@@ -153,7 +164,7 @@
           return console.log("Unknown action", action);
       }
     });
-    return riot.route("from/" + (moment().format('YYYY-MM')));
+    return riot.route("from/2016-01");
 
     /* Setup websocket
     task_near = (task, date2) ->
