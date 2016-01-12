@@ -36,7 +36,7 @@ class Task(object):
         self.order = order
 
     def __repr__(self):
-        return('INSERT INTO "tasks" VALUES({0.id}, "{0.created_at}", "{0.name}", "{0.date}", {0.status}, {0.scope}, {0.order});'.format(self))
+        return('INSERT INTO "tasks" VALUES({0.id}, "{0.created_at}", "{0.created_at}", NULL, "{0.name}", "{0.date}", {0.status}, {0.scope}, {0.order});'.format(self))
 
 class Comment(object):
     COUNT = 1
@@ -50,7 +50,7 @@ class Comment(object):
         self.task_id = task_id
 
     def __repr__(self):
-        return('INSERT INTO "comments" VALUES({0.id}, "{0.created_at}", "{0.body}", {0.task_id});'.format(self))
+        return('INSERT INTO "comments" VALUES({0.id}, "{0.created_at}", "{0.created_at}", NULL, "{0.body}", {0.task_id});'.format(self))
 
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):

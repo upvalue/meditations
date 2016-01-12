@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-macaron/binding"
+	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/now"
 
 	"gopkg.in/macaron.v1"
@@ -37,9 +38,8 @@ const (
 )
 
 type Task struct {
-	ID        int       `sql:"AUTO_INCREMENT" json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	Name      string    `json:"name" form:"name"`
+	gorm.Model
+	Name string `json:"name" form:"name"`
 	// The actual date of the task, regardless of when it was created
 	Date           time.Time `json:"date"`
 	Status         int       `json:"status" form:"status"`
@@ -52,10 +52,9 @@ type Task struct {
 }
 
 type Comment struct {
-	ID        int       `sql:"AUTO_INCREMENT" json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	Body      string    `json:"body"`
-	TaskID    int       `json:"task_id"`
+	gorm.Model
+	Body   string `json:"body"`
+	TaskID int    `json:"task_id"`
 }
 
 func syncTask(t Task) {
@@ -254,9 +253,9 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 		var swap Task
 		var from, to time.Time
 
-		between(task.CreatedAt, task.Scope, &from, &to)
+		between(task.Date, task.Scope, &from, &to)
 
-		DB.Where("created_at between ? and ? and scope = ? and `order` = ?", from, to,
+		DB.Where("date between ? and ? and scope = ? and `order` = ?", from, to,
 			task.Scope, task.Order+change).First(&swap)
 
 		// If there is something to swap it with
