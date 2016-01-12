@@ -1,11 +1,18 @@
 * Habits
-** TODO Display & navigation
-** TODO Calculate completion streaks
+** DONE Display & navigation
+** DONE Calculate completion streaks
+** TODO Bug with ordering down first element of daily scope
+** TODO Comments
+** TODO Port old database
 * Journal
 ** TODO Tagging
+** TODO Display habits
+** TODO Port old journal
 * Wiki
 ** TODO Tagging
 * Misc
-** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served)
+** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served) (and only if not running under entr?)
 ** TODO Are Macaron errors displayed in production?
 ** TODO Sequential AJAX requests
+** TODO Fixed navigation (for mobile)
+

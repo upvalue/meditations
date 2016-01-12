@@ -26,6 +26,7 @@
     "octicons": "~3.3.0",
     "roboto-fontface": "~0.4.3",
     "RiotControl": "riotcontrol#*",
-    "jquery": "~2.2.0"
+    "jquery": "~2.2.0",
+    "medium-editor": "~5.12.0"
   }
 }

@@ -53,8 +53,14 @@ class TaskStore
     self = this
 
     self.on 'comment-update', (task, comment) ->
-      $.post 'habits/comment/update', comment, (saved_comment) ->
-        self.trigger 'comment-updated', task, saved_comment
+      task["comment"] = comment
+      if not comment.id
+        comment.id = 0
+      $.ajax jsonRequest
+        url: "/habits/tasks/comment-update"
+        success: () ->
+          self.mount_scope task.scope, task.date
+        data: task
 
     self.on 'task-new', (scope, task_name, date) ->
       $.ajax jsonRequest
@@ -83,8 +89,7 @@ class TaskStore
     self.on 'task-order-up', remount('/habits/tasks/order-up')
     self.on 'task-update', remount('/habits/tasks/update')
 
-# Navigation
-
+# Initialize machinery necessary for task interaction
 initialize = () ->
   console.log 'Habits: initializing'
   if html5?
@@ -94,6 +99,7 @@ initialize = () ->
   window.Habits.task_store = task_store
   RiotControl.addStore(task_store)
 
+# Navigation function
 browse_from = (from) ->
   console.log('Browsing from', from)
   today = moment()
@@ -114,12 +120,14 @@ browse_from = (from) ->
         next = from.clone().date(date)
         if next > today
           check = next.clone()
+          # Display the next day 4 hours in advance so tasks can easily be added to it
           unless check.subtract(4, 'hours') < today 
             break
         task_store.mount_scope Scope.day, next
         date += 1
   })
 
+# Main page routing and synchronization for /habits page
 main = () ->
   console.log 'Habits: installing router'
 
@@ -128,10 +136,10 @@ main = () ->
 
   # Install Router
   RiotControl.on "change-date", (forward, scope) ->
-    riot.route.exec (action, date) ->
-      date = scope.date.clone().date(1)
-      date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-      riot.route "from/#{date.format('YYYY-MM')}"
+    date = scope.date.clone().date(1)
+    date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
+    console.log "NEW DATE #{date}"
+    riot.route "from/#{date.format('YYYY-MM')}"
 
   riot.route.start(true)
   
@@ -174,10 +182,18 @@ main = () ->
     #  , 10000)
   socket = make_socket()
 
+  make_editor()
+
+make_editor = (selector, args = {}) ->
+  editor = window.Habits.editor = new MediumEditor selector,
+    $.extend({autoLink: true}, args)
+  editor
+
 # Export variables
 window.Habits =
   Scope: Scope,
   Status: Status,
   initialize: initialize,
   task_store: task_store
+  make_editor: make_editor
   main: main

@@ -47,33 +47,6 @@
       RiotControl.trigger('task-new', opts, title, opts.date);
     }
   }
-
-  comment(e) {
-    console.log('Editing comment');
-  }
-
-  comment_focus(e) {
-    console.log($(e.target).html());
-  }
-
-  comment_blur(e) {
-    console.log('1: Before any changes', JSON.stringify($(target).html()));
-    $(target).children('br').each((function() {
-      $(this).replaceWith("\n");
-    }));
-
-    console.log('2: After BR replace', JSON.stringify($(target).html()));
-    $(target).children('div').each((function() {
-      $(this).children('br').each((function() {
-        $(this).replaceWith("\n");
-      }));
-      $(this).replaceWith($(this).html());
-    }));
-
-    console.log('3: After DIV replace', JSON.stringify($(target).html()));
-    var content = markdown.toHTML($(target).html());
-    console.log('4: Markdown rendering', JSON.stringify(content));
-  }
 </scope>
 
 <scope-days>
@@ -121,7 +94,7 @@
     <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
       {name}
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
-      <span if={ scope == window.Habits.Scope.year }>Streak: {streak}; Best: {best_streak} </span>
+      <span if={ scope == window.Habits.Scope.year }>Streak: {streak} days / {best_streak} (best) </span>
     </button>
     <span class="pull-right">
       <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
@@ -130,17 +103,13 @@
       <button class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
     </span>
-    <span class="comment" id="comment-{id}" onblur={comment_unfocus} onfocus={comment_focus} contenteditable="{false: !comment.body}">{comment.body}</comment>
+    <div class="comment" id="comment-{id}"></comment>
   </section>
 
   var self = this
+  
 
   var comment_div = function() { return "#comment-"+self.id }
-
-  var fix_comment = function() {
-    // Make comment links clickable 
-    $(comment_div()).find("a").attr("contenteditable", false);
-  }
 
   RiotControl.on('task-updated', function(task) {
     if(task.id == self._item.id) {
@@ -149,12 +118,18 @@
   });
 
   var render_comment = function(task) {
-    $("#comment-"+task.id).html(markdown.toHTML(task.comment.body));
-    fix_comment();
+    //$("#comment-"+task.id).html(markdown.toHTML(task.comment.body));
+    //fix_comment();
   }
 
   self.one('mount', function() {
-    render_comment(this);
+    //$("#comment-"+task.id).html(this.comment.body);
+    $("#comment-"+this.id).html(this.comment.body);
+    self.editor = window.Habits.make_editor("#comment-"+this.id, {});
+    self.editor.subscribe("blur", function() {
+      self.comment.body = $(comment_div()).html();
+      RiotControl.trigger('comment-update', self._item, self.comment);
+    });
   });
 
   change_status(e) {
@@ -181,7 +156,6 @@
     self._item.comment.task_id = self.id;
     console.log(self);
     self.comment = {'task_id': self.id}
-    $("#comment-"+self.id).attr("contenteditable", true).focus();
   }
 
   copy(_) {
@@ -197,25 +171,4 @@
     RiotControl.trigger('task-new', {date: date, scope: scope}, self._item.name, date)
   }
 
-  comment_focus(e) {
-    $(e.target).text(self.comment.body);
-  }
-
-  comment_unfocus(e) {
-    // Collapse divs that are inserted as newlines by contenteditable
-    $(e.target).children("div").each(function() {
-      $(this).replaceWith("\n" + $(this).html());
-    });
-    console.log($(e.target).text());
-    self.comment.body = $(e.target).text();
-    RiotControl.trigger('comment-update', self._item, self.comment);
-    var content = markdown.toHTML(self.comment.body);
-    if(content.length == 0) {
-      $(comment_div()).attr("contenteditable", false);
-    } else {
-      $(comment_div()).html(markdown.toHTML(self.comment.body));
-    }
-
-    fix_comment();
-  }
 </task>

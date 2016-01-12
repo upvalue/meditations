@@ -1,8 +1,22 @@
 @import url("/assets/vendor/roboto-fontface/css/roboto-fontface.css");
 @import url("/assets/vendor/octicons/octicons/octicons.css");
+@import url("/assets/vendor/medium-editor/dist/css/medium-editor.min.css");
+@import url("/assets/vendor/medium-editor/dist/css/themes/bootstrap.min.css");
 
 body {
   font-family: Roboto, sans-serif;
+}
+
+a, a:visited {
+  color: #09d;
+}
+
+ul.nav a {
+  color: #09d !important;
+}
+
+ul.nav a:hover {
+  background-color: #eee !important;
 }
 
 /**** HABITS */
@@ -16,7 +30,7 @@ section.scope {
 }
 
 section.scope task:first-of-type .entry {
-  padding-top:1em;
+  padding-top:.5em;
 }
 
 section.scope task .entry {
@@ -25,3 +39,8 @@ section.scope task .entry {
 
 input.form-control[type=text] { height:1.5em; }
 
+.comment p {
+  margin-bottom: 0;
+}
+
+.comment p:first-of-type { padding-top:.25em; }

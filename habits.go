@@ -91,7 +91,7 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 		between(start, scope, &from, &to)
 
 		DB.Where("date BETWEEN ? and ? and scope = ?", from.Format("2006-01-02"), to.Format("2006-01-02"), scope).Order("`order` asc").
-			Find(tasks)
+			Preload("Comment").Find(tasks)
 	}
 }
 
@@ -281,6 +281,31 @@ func taskOrderDown(c *macaron.Context, t Task) {
 	taskSwapOrder(c, 1, t)
 }
 
+// Update or create a comment
+func commentUpdate(c *macaron.Context, task Task) {
+	comment := task.Comment
+	cid := comment.ID
+	log.Printf("%+v", task)
+
+	if cid != 0 {
+		DB.Save(&comment)
+		return
+	} else if cid == 0 && len(comment.Body) == 0 {
+		serverError(c, "empty comment")
+		return
+	}
+
+	// Empty comment = deletion
+	if len(comment.Body) == 0 {
+		DB.Where("task_id = ?", task.ID).Find(&comment).Delete(&comment)
+	} else {
+		DB.Save(&comment)
+	}
+
+	syncTask(task)
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "habits")
@@ -295,6 +320,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/tasks/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/tasks/order-up", binding.Bind(Task{}), taskOrderUp)
 	m.Post("/tasks/order-down", binding.Bind(Task{}), taskOrderDown)
+	m.Post("/tasks/comment-update", binding.Bind(Task{}), commentUpdate)
 
 	habitSync = MakeSyncPage("habits")
 	m.Get("/sync", habitSync.Handler())
