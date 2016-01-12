@@ -57,22 +57,22 @@ def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
-def gen_tasks(name, days=90, day_order=0):
-    end = datetime.now()
+def gen_tasks(name, days=90, order=0):
+    end = datetime.now() + timedelta(days = 1)
     "Generate months worth of example tasks"
     month = None
     for date in daterange(end - timedelta(days), end):
-        task = Task(name, date, STATUS_UNSET, SCOPE_DAY, day_order)
+        task = Task(name, date, STATUS_UNSET, SCOPE_DAY, order)
         if not month:
             month = date
-            yield Task(name, date, STATUS_UNSET, SCOPE_MONTH, 0)
+            yield Task(name, date, STATUS_UNSET, SCOPE_MONTH, order)
         elif month.month != date.month or month.year != date.year:
             month = None
-            yield Task(name, date, STATUS_UNSET, SCOPE_YEAR, 0)
+            yield Task(name, date, STATUS_UNSET, SCOPE_YEAR, order)
         yield task
 
 # TODO: Generate tasks for months, years
 print('BEGIN TRANSACTION;')
 [print(task) for task in gen_tasks("Exercise")]
-[print(task) for task in gen_tasks("Diet", day_order = 1)]
+[print(task) for task in gen_tasks("Diet", order = 1)]
 print('END TRANSACTION;')

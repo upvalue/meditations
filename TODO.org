@@ -1,5 +1,6 @@
 * Habits
 ** TODO Display & navigation
+** TODO Calculate completion streaks
 * Journal
 ** TODO Tagging
 * Wiki
@@ -7,3 +8,4 @@
 * Misc
 ** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served)
 ** TODO Are Macaron errors displayed in production?
+** TODO Sequential AJAX requests

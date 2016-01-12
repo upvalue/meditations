@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"math"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 
 	"gopkg.in/macaron.v1"
 )
+
+var habitSync *SyncPage
 
 const (
 	// Scope for daily tasks and comments
@@ -118,7 +121,12 @@ func completionRate(task Task) float64 {
 	}
 }
 
-// Given a
+func syncTask(t Task) {
+	json, err := json.Marshal(t)
+	checkErr(err)
+	habitSync.Sync(json)
+}
+
 func tasksInScopeR(c *macaron.Context, scope int) {
 	var tasks []Task
 	date, err := time.Parse("2006-01-02", c.Query("date"))
@@ -160,7 +168,81 @@ func taskUpdate(c *macaron.Context, task Task) {
 	log.Printf("TASK UPDATE %+v\n", task)
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
-	// TODO: Sync
+	syncTask(task)
+}
+
+func taskNew(c *macaron.Context, task Task) {
+	var tasks []Task
+
+	tasksInScope(&tasks, task.Scope, task.Date)
+	task.Order = len(tasks)
+	DB.Save(&task)
+	syncTask(task)
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
+func taskDelete(c *macaron.Context, task Task) {
+	var comment Comment
+	var tasks []Task
+
+	DB.Where("id = ?", c.Params("id")).First(&task)
+
+	tasksNear(task, &tasks)
+
+	log.Printf("%+v", task)
+
+	DB.Delete(&task)
+	if task.Comment.ID > 0 {
+		DB.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
+	}
+
+	syncTask(task)
+
+	// Reorder tasks after this one
+	for _, t := range tasks {
+		if t.Order > task.Order {
+			t.Order = t.Order - 1
+		}
+		DB.Save(&t)
+	}
+
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
+// Change task ordering within scope
+func taskSwapOrder(c *macaron.Context, change int, task Task) {
+	DB.Where("id = ?", task.ID).First(&task)
+	log.Printf("%d %+v", change, task)
+
+	if (change == -1 && task.Order > 0) || change == 1 {
+		var swap Task
+		var from, to time.Time
+
+		between(task.CreatedAt, task.Scope, &from, &to)
+
+		DB.Where("created_at between ? and ? and scope = ? and `order` = ?", from, to,
+			task.Scope, task.Order+change).First(&swap)
+
+		// If there is something to swap it with
+		if swap.ID > 0 {
+			b := swap.Order
+			swap.Order = task.Order
+			task.Order = b
+			DB.Save(&swap).Save(&task)
+		}
+	}
+
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
+// Move task up in order within scope
+func taskOrderUp(c *macaron.Context, t Task) {
+	taskSwapOrder(c, -1, t)
+}
+
+// Move task down in order within scope
+func taskOrderDown(c *macaron.Context, t Task) {
+	taskSwapOrder(c, 1, t)
 }
 
 func habitsInit(m *macaron.Macaron) {
@@ -170,5 +252,14 @@ func habitsInit(m *macaron.Macaron) {
 
 	m.Get("/tasks/in-year", tasksInYear)
 	m.Get("/tasks/in-month", tasksInMonth)
+	m.Get("/tasks/in-day", tasksInDay)
+
 	m.Post("/tasks/update", binding.Bind(Task{}), taskUpdate)
+	m.Post("/tasks/new", binding.Bind(Task{}), taskNew)
+	m.Post("/tasks/delete", binding.Bind(Task{}), taskDelete)
+	m.Post("/tasks/order-up", binding.Bind(Task{}), taskOrderUp)
+	m.Post("/tasks/order-down", binding.Bind(Task{}), taskOrderDown)
+
+	habitSync = MakeSyncPage("habits")
+	m.Get("/sync", habitSync.Handler())
 }

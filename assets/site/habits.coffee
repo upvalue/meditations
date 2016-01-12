@@ -11,6 +11,13 @@ Status =
   incomplete: 2
   wrap: 3
 
+jsonRequest = (data) ->
+  ret = $.extend({type: "POST", contentType: "application/json; charset=UTF-8"}, data)
+  if ret.data.comment.id == 0
+    delete ret.data.comment
+  ret.data = JSON.stringify(ret.data)
+  return ret
+
 class TaskStore
   mount_scope: (scope, date, mount) ->
     self = this
@@ -47,21 +54,26 @@ class TaskStore
       $.post 'habits/comment/update', comment, (saved_comment) ->
         self.trigger 'comment-updated', task, saved_comment
 
-    self.on 'task-new', (scope, task_name, created_at) ->
-      $.post 'habits/tasks/new', { name: task_name, scope: scope.scope, created_at: created_at.format('YYYY-MM-DD') }, () ->
-        self.mount_scope scope.scope, scope.date
+    self.on 'task-new', (scope, task_name, date) ->
+      $.ajax jsonRequest
+        url: "habits/tasks/new"
+        success: () ->
+          self.mount_scope scope.scope, date
+        data:
+          name: task_name
+          scope: scope.scope
+          date: date.format "YYYY-MM-DDTHH:mm:ssZ"
         
     # Run a command that changes a task, then remount in order to display changes
     remount = (path) ->
       (task) ->
-        delete task.comment;
         req = 
           type: "POST"
           url: path
           data: JSON.stringify(task)
           contentType: "application/json; charset=UTF-8"
-          dataType: "application/json"
-          success: () -> self.mount_scope task.scope, task.date 
+          success: () ->
+            self.mount_scope task.scope, task.date
         $.ajax(req)
 
     self.on 'task-delete', remount('/habits/tasks/delete')
@@ -91,7 +103,7 @@ browse_from = (from) ->
 
   # Allow days up to the current date
   # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
-  ###riot.mount("scope-days", {
+  riot.mount("scope-days", {
     thunk: () ->
       date = 1
       while date <= from.daysInMonth()
@@ -100,9 +112,9 @@ browse_from = (from) ->
           check = next.clone()
           unless check.subtract(4, 'hours') < today 
             break
-        #task_store.mount_scope Scope.day, next
+        task_store.mount_scope Scope.day, next
         date += 1
-  })###
+  })
 
 main = () ->
   console.log 'Habits: installing router'
@@ -125,10 +137,11 @@ main = () ->
       else console.log "Unknown action", action)
 
   riot.route("from/2016-01")
-  ### Setup websocket
+
+  # Setup websocket
   task_near = (task, date2) ->
-    date1 = moment.utc(task.created_at)
-    # only compare down to months because that's what we browse
+    date1 = moment.utc(task.date)
+    # only compare down to months because we don't browse by the day
     # Sorry.
     return ((task.scope == Scope.month or task.scope == Scope.day) and date1.month() == date2.month() and 
       date1.year() == date2.year()) or
@@ -137,13 +150,15 @@ main = () ->
 
   socket = false
   make_socket = () ->
-    socket = new WebSocket("ws://#{window.location.hostname}:#{window.location.port}/update-subscribe")
+    url = "ws://#{window.location.hostname}:#{window.location.port}/habits/sync"
+    socket = new WebSocket url
     socket.onopen = (m) ->
-      console.log 'Connected to /update-subscribe websocket'
+      console.log "Connected to #{url} websocket"
     socket.onmessage = (m) ->
+      console.log "Socket message #{m}"
       task = $.parseJSON(m.data)
       # No need to refresh if task is not in the current scope
-      date = moment.utc(task.created_at)
+      date = moment.utc(task.date)
       console.log task_near(task, current_date), task, current_date
       if task_near(task, current_date)
         task_store.mount_scope task.scope, date
@@ -153,8 +168,7 @@ main = () ->
     #    socket = make_socket()
     #    console.log 'Lost websocket connection, retrying in 10 seconds'
     #  , 10000)
-  #socket = make_socket()
-  ###
+  socket = make_socket()
 
 # Export variables
 window.Habits =

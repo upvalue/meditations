@@ -1,6 +1,6 @@
 <scope>
   <section class="scope">
-    <h3 class=scope-title>{opts.date}</h3>
+    <h4 class=scope-title>{opts.date}</h4>
     <span class="pull-right">
       <form class=form-inline>
         <input type="text" size="15" class="form-control " />
@@ -13,7 +13,6 @@
       </form>
     </span>
     <task each={opts.tasks} />
-    <br/>
   </section>
 
   var self = this
@@ -21,7 +20,7 @@
   this.on('mount', function() {
     // These will be mounted at the beginning with no data, so hide the ones without data passed
     if(opts.date) {
-      $(this.root).show().children('section').children('h3').text(opts.title);
+      $(this.root).show().children('section').children('h4').text(opts.title);
     } else {
       $(this.root).hide();
     }
@@ -180,7 +179,7 @@
 
   copy(_) {
     var scope = self._item.scope - 1
-    var date = moment(self._item.created_at).utc()
+    var date = moment(self._item.date).utc()
     // Create task on current day from monthly task
     if(scope == window.Habits.Scope.day) {
       date.date(moment().date())
