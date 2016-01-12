@@ -16,6 +16,10 @@ func main() {
 			Name:  "db-log",
 			Usage: "verbosely log SQL",
 		},
+		cli.BoolTFlag{
+			Name:  "development",
+			Usage: "whether development is true",
+		},
 	}
 
 	app.Commands = []cli.Command{

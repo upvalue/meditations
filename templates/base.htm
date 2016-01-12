@@ -47,6 +47,9 @@
     <script src="/assets/vendor/moment/min/moment.min.js"></script>
     <script src="/assets/vendor/RiotControl/riotcontrol.js"></script>
     <script src="/assets/vendor/riot/riot+compiler.min.js"></script>
+    <script type="text/javascript">$(document).ready(function() {
+      window.development = {% if Development %}true{% else %}false{% endif %};
+    });</script>
     {% block script %}{% endblock %}
   </body>
 </html>

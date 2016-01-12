@@ -12,21 +12,23 @@ import (
 )
 
 type Configuration struct {
-	Port      int
-	DBPath    string
-	DBLog     bool
-	Host      string
-	SiteTitle string
-	Encrypted bool
+	Port        int
+	DBPath      string
+	DBLog       bool
+	Host        string
+	SiteTitle   string
+	Encrypted   bool
+	Development bool
 }
 
 var Config = Configuration{
-	Host:      "",
-	Port:      8080,
-	DBPath:    "development.sqlite3",
-	DBLog:     false,
-	SiteTitle: "meditations",
-	Encrypted: false,
+	Host:        "",
+	Port:        8080,
+	DBPath:      "development.sqlite3",
+	DBLog:       false,
+	SiteTitle:   "meditations",
+	Encrypted:   false,
+	Development: true,
 }
 
 func loadConfig(c *cli.Context) {
@@ -40,6 +42,10 @@ func loadConfig(c *cli.Context) {
 	if c.IsSet("db-log") == true {
 		Config.DBLog = c.Bool("db-log")
 	}
+
+	if c.IsSet("development") == true {
+		Config.Development = c.BoolT("development")
+	}
 }
 
 func App() *macaron.Macaron {
@@ -47,6 +53,11 @@ func App() *macaron.Macaron {
 
 	DBOpen()
 
+	if Config.Development == true {
+		macaron.Env = "development"
+	} else {
+		macaron.Env = "production"
+	}
 	m.Use(session.Sessioner())
 	m.Use(csrf.Csrfer())
 	m.Use(pongo2.Pongoer(pongo2.Options{
@@ -59,6 +70,7 @@ func App() *macaron.Macaron {
 
 	m.Use(func(c *macaron.Context) {
 		c.Data["SiteTitle"] = Config.SiteTitle
+		c.Data["Development"] = Config.Development
 		c.Next()
 	})
 

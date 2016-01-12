@@ -47,6 +47,8 @@ type Task struct {
 	Order          int       `json:"order" form:"order"`
 	Comment        Comment   `json:"comment"`
 	CompletionRate float64   `json:"completion_rate" sql:"-"`
+	BestStreak     int       `json:"best_streak" sql:"-"`
+	Streak         int       `json:"streak" sql:"-"`
 }
 
 type Comment struct {
@@ -54,6 +56,12 @@ type Comment struct {
 	CreatedAt time.Time `json:"created_at"`
 	Body      string    `json:"body"`
 	TaskID    int       `json:"task_id"`
+}
+
+func syncTask(t Task) {
+	json, err := json.Marshal(t)
+	checkErr(err)
+	habitSync.Sync(json)
 }
 
 // Given a task's date and scope, return a range of dates that will get all tasks within the scope
@@ -93,11 +101,9 @@ func tasksNear(task Task, tasks *[]Task) {
 }
 
 // Given a yearly or monthly task, calculate the completion rate of all tasks in daily scopes with the same name
-func completionRate(task Task) float64 {
+func calculateCompletionRate(task Task) float64 {
 	var from, to time.Time
 	var tasks []Task
-
-	return 0
 
 	between(task.Date, task.Scope, &from, &to)
 
@@ -121,10 +127,35 @@ func completionRate(task Task) float64 {
 	}
 }
 
-func syncTask(t Task) {
-	json, err := json.Marshal(t)
-	checkErr(err)
-	habitSync.Sync(json)
+// Given a yearly task, calculate a streak of days
+func calculateStreak(task Task) (int, int) {
+	var tasks []Task
+	best_streak, streak := 0, 0
+
+	var from, to time.Time
+
+	between(task.Date, task.Scope, &from, &to)
+
+	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"),
+		to.Format("2006-01-02"), ScopeDay, task.Name).Order("date", true).Find(&tasks)
+
+	for _, t := range tasks {
+		if t.Status == TaskComplete {
+			streak += 1
+		} else if t.Status == TaskIncomplete {
+			if streak > best_streak {
+				best_streak = streak
+			}
+			streak = 0
+		}
+		// Skip unset tasks so that today's uncompleted tasks do not change the streak
+	}
+
+	if streak > best_streak {
+		best_streak = streak
+	}
+
+	return streak, best_streak
 }
 
 func tasksInScopeR(c *macaron.Context, scope int) {
@@ -135,7 +166,12 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 		tasksInScope(&tasks, scope, date)
 		if scope == ScopeMonth || scope == ScopeYear {
 			for i, t := range tasks {
-				tasks[i].CompletionRate = completionRate(t)
+				tasks[i].CompletionRate = calculateCompletionRate(t)
+			}
+		}
+		if scope == ScopeYear {
+			for i, t := range tasks {
+				tasks[i].Streak, tasks[i].BestStreak = calculateStreak(t)
 			}
 		}
 

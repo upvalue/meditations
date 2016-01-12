@@ -1,4 +1,6 @@
 # habits.coffee - habits code
+
+task_store = false
 Scope =
   day: 0
   month: 1
@@ -82,12 +84,14 @@ class TaskStore
     self.on 'task-update', remount('/habits/tasks/update')
 
 # Navigation
+
 initialize = () ->
   console.log 'Habits: initializing'
   if html5?
     html5.addElements('scope task scope-days')
 
-  task_store = window.task_store = new TaskStore()
+  task_store = new TaskStore()
+  window.Habits.task_store = task_store
   RiotControl.addStore(task_store)
 
 browse_from = (from) ->
@@ -174,6 +178,6 @@ main = () ->
 window.Habits =
   Scope: Scope,
   Status: Status,
-  TaskStore: TaskStore,
   initialize: initialize,
+  task_store: task_store
   main: main

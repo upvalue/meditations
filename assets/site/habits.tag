@@ -10,6 +10,7 @@
         <button class="btn btn-xs btn-default octicon octicon-chevron-right" onclick={nav_right}></button>
       </span>
       <button class="btn btn-xs btn-default octicon octicon-comment" onclick={comment}></button>
+      <button if={ window.development } class="btn btn-xs btn-default octicon octicon-sync" onclick={remount}></button>
       </form>
     </span>
     <task each={opts.tasks} />
@@ -25,6 +26,11 @@
       $(this.root).hide();
     }
   });
+
+  remount(e) {
+    //console.log(opts)
+    window.Habits.task_store.mount_scope(opts.scope, opts.date);
+  }
 
   nav_left(e) {
     RiotControl.trigger('change-date', false, opts);
@@ -115,6 +121,7 @@
     <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
       {name}
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
+      <span if={ scope == window.Habits.Scope.year }>Streak: {streak}; Best: {best_streak} </span>
     </button>
     <span class="pull-right">
       <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
