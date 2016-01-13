@@ -27,6 +27,6 @@
     "roboto-fontface": "~0.4.3",
     "RiotControl": "riotcontrol#*",
     "jquery": "~2.2.0",
-    "medium-editor": "~5.12.0"
+    "medium-editor": "~5.12.0",
   }
 }

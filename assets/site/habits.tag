@@ -2,14 +2,14 @@
   <section class="scope">
     <h4 class=scope-title>{opts.date}</h4>
     <span class="pull-right">
-      <form class="form-inline scope-controls">
-        <input type="text" size="15" class="form-control " />
-        <button type="submit" class="btn btn-xs btn-default octicon octicon-plus" onclick={new_task}></button>
-      </form>
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
-        <button class="btn btn-xs btn-default octicon octicon-chevron-left" onclick={nav_left}></button>
-        <button class="btn btn-xs btn-default octicon octicon-chevron-right" onclick={nav_right}></button>
+        <button class="btn btn-xs btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
+        <button class="btn btn-xs btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button>
       </span>
+      <span if={opts.scope > window.Habits.Scope.year}>
+        <button class="btn btn-xs btn-default octicon octicon-briefcase" title="Change bucket" onclick={change_bucket}></button>
+      </span>
+      <button type=submit class="btn btn-xs btn-default octicon octicon-plus" title="Add task" onclick={new_task}></button>
       <!--<button if={ window.development } class="btn btn-xs btn-default octicon octicon-sync" onclick={remount}></button>-->
     </span>
     <task each={opts.tasks} />
@@ -19,8 +19,18 @@
 
   this.on('mount', function() {
     // These will be mounted at the beginning with no data, so hide the ones without data passed
+    var title;
+    if(opts.title) {
+      title = opts.title;
+    } else {
+      switch(opts.scope) {
+        case window.Habits.Scope.day: title = opts.date.format("Do"); break;
+        case window.Habits.Scope.month: title = opts.date.format("MMMM"); break; 
+        case window.Habits.Scope.year: title = opts.date.format("YYYY"); break;
+      }
+    }
     if(opts.date) {
-      $(this.root).show().children('section').children('h4').text(opts.title);
+      $(this.root).show().children('section').children('h4').text(title);
     } else {
       $(this.root).hide();
     }
@@ -40,11 +50,17 @@
   }
 
   new_task(e) {
-    var title = $(e.target).parent().children('input').val();
-    if(title.length > 0) {
+    var title = window.prompt("Task name");
+    if(title != null&&title!="") {
       console.log('Adding a new task', opts.date);
       RiotControl.trigger('task-new', opts, title, opts.date);
     }
+  }
+
+  change_bucket(e) {
+    $.get("/habits/buckets", function(result) {
+      console.log(result);
+    });
   }
 </scope>
 
@@ -95,11 +111,11 @@
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
     <span class="pull-right">
-      <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
-      <button class="task-control btn btn-xs btn-default octicon octicon-chevron-up" onclick={up}></button>
-      <button class="task-control btn btn-xs btn-default octicon octicon-chevron-down" onclick={down}></button>
-      <button if={ (comment.ID == 0) } class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
-      <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
+      <button if={ (comment.ID == 0) } class="task-control btn btn-xs btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
+      <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} title="Copy to present day" class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
     </span>
     <div if={ (scope == window.Habits.Scope.year && best_streak > 0) } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>
     <div class="comment" id="comment-{ID}"></div>

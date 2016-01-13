@@ -40,7 +40,7 @@
       self = this;
       self.on('comment-update', function(task, comment) {
         return $.ajax(jsonRequest({
-          url: "/habits/tasks/comment-update",
+          url: "/habits/comment-update",
           success: function() {
             return false;
           },
@@ -103,7 +103,7 @@
       var fetch, fetch_date, ref, self;
       self = this;
       fetch = null;
-      if (scope === Scope.bucket) {
+      if ((scope === Scope.bucket) || (scope > Scope.year)) {
         return $.get("/habits/tasks/in-bucket/" + scope, function(result) {
           var tasks;
           console.log(result);
@@ -134,23 +134,12 @@
           }
         })(), fetch = ref[0], fetch_date = ref[1], mount = ref[2];
         return $.get("/habits/tasks/in-" + fetch + "?date=" + (fetch_date.format('YYYY-MM-DD')), function(tasks) {
-          var result, title;
+          var result;
           tasks = tasks || [];
-          title = (function() {
-            switch (false) {
-              case scope !== Scope.day:
-                return date.format('Do');
-              case scope !== Scope.month:
-                return date.format('MMMM');
-              case scope !== Scope.year:
-                return date.format('YYYY');
-            }
-          })();
           return result = riot.mount(mount, {
             date: date,
             scope: scope,
-            tasks: tasks,
-            title: title
+            tasks: tasks
           });
         });
       }

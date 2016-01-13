@@ -30,7 +30,7 @@ class TaskStore
 
     self.on 'comment-update', (task, comment) ->
       $.ajax jsonRequest
-        url: "/habits/tasks/comment-update"
+        url: "/habits/comment-update"
         success: () -> false
         data: comment
 
@@ -80,7 +80,7 @@ class TaskStore
     self = this
     fetch = null
 
-    if (scope == Scope.bucket)# or (scope > Scope.year)
+    if (scope == Scope.bucket) or (scope > Scope.year)
       $.get "/habits/tasks/in-bucket/#{scope}", (result) ->
         console.log(result)
         scope = result["scope"]
@@ -99,16 +99,10 @@ class TaskStore
         when Scope.day then ["day", fetch_date, "#scope-day-#{date.format('DD')}"]
         when Scope.month then ["month", fetch_date.date(1), "#scope-month"]
         when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
-        #when Scope.bucket then ["bucket", fetch_date, "#scope-bucket"]
 
       $.get "/habits/tasks/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
         tasks = tasks or []
-        title = switch
-          when scope == Scope.day then date.format('Do')
-          when scope == Scope.month then date.format('MMMM')
-          when scope == Scope.year then date.format('YYYY')
-          #when scope == Scope.bucket then "Bucket"
-        result = riot.mount mount, { date: date, scope: scope, tasks: tasks, title: title }
+        result = riot.mount mount, { date: date, scope: scope, tasks: tasks, }
 
 # Initialize machinery necessary for task interaction
 initialize = () ->

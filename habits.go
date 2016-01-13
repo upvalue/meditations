@@ -330,6 +330,13 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 	c.PlainText(200, []byte("OK"))
 }
 
+// Return list of all buckets by most recent
+func buckets(c *macaron.Context) {
+	var scopes []Scope
+	DB.Where("id > ?", ScopeYear).Find(&scopes)
+	c.JSON(200, scopes)
+}
+
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "habits")
@@ -339,13 +346,14 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/tasks/in-month", tasksInMonth)
 	m.Get("/tasks/in-day", tasksInDay)
 	m.Get("/tasks/in-bucket/:id([0-9]+)", tasksInBucket)
+	m.Get("/buckets", buckets)
 
 	m.Post("/tasks/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/tasks/new", binding.Bind(Task{}), taskNew)
 	m.Post("/tasks/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/tasks/order-up", binding.Bind(Task{}), taskOrderUp)
 	m.Post("/tasks/order-down", binding.Bind(Task{}), taskOrderDown)
-	m.Post("/tasks/comment-update", binding.Bind(Comment{}), commentUpdate)
+	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)
 
 	habitSync = MakeSyncPage("habits")
 	m.Get("/sync", habitSync.Handler())
