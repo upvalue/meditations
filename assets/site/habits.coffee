@@ -1,6 +1,8 @@
 # habits.coffee - habits code
 
+current_date = false
 task_store = false
+
 Scope =
   day: 0
   month: 1
@@ -71,7 +73,6 @@ class TaskStore
     self.on 'task-order-down', command('/habits/tasks/order-down', remount)
 
   mount_task: (task) ->
-    console.log "REMOUNTING TASK", task
     riot.mount("#task-#{task.ID}", task)
 
   mount_scope: (scope, date, mount) ->
@@ -142,7 +143,6 @@ main = () ->
   console.log 'Habits: installing router'
 
   initialize()
-  current_date = false
 
   # Install Router
   RiotControl.on "change-date", (forward, scope) ->
@@ -180,7 +180,6 @@ main = () ->
       task = $.parseJSON(m.data)
       # No need to refresh if task is not in the current scope
       date = moment.utc(task.date)
-      console.log task_near(task, current_date), task, current_date
       if task_near(task, current_date)
         task_store.mount_scope task.scope, date
     # Reconnect to socket on failure for development re-loading

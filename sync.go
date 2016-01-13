@@ -72,7 +72,7 @@ func (page *SyncPage) Server() {
 			for c := range page.connections {
 				select {
 				case c.send <- m:
-					log.Printf("Sync[%s]: sent data", page.name, m)
+					log.Printf("Sync[%s]: sent data\n", page.name)
 				default:
 					delete(page.connections, c)
 					close(c.send)
@@ -87,6 +87,7 @@ func MakeSyncPage(name string) *SyncPage {
 		connections: make(map[*connection]bool),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
+		broadcast:   make(chan []byte),
 		upgrader:    &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024},
 		name:        name,
 	}
@@ -97,6 +98,7 @@ func MakeSyncPage(name string) *SyncPage {
 }
 
 func (page *SyncPage) Sync(data []byte) {
+	log.Printf("Sync[%s]: sending data", page.name)
 	select {
 	case page.broadcast <- data:
 	default:

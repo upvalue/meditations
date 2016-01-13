@@ -5,7 +5,8 @@
 ** DONE Comments
 ** DONE Port old database
 ** TODO Remount only tasks when necessary rather than whole scope
-** TODO Synchronization
+** TODO Fix synchronization
+** TODO Mobile navigation
 * Journal
 ** TODO Tagging
 ** TODO Display habits

@@ -157,7 +157,7 @@
     var date = moment(self._item.date).utc()
     // Create task on current day from monthly task
     if(scope == window.Habits.Scope.day) {
-      date.date(moment().date())
+      date.date(moment().clone().add(4, 'hour').date());
     } else if(scope == window.Habits.Scope.month) {
       date.month(moment().month());
       date.date(moment().date());

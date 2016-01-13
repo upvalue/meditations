@@ -268,6 +268,7 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 		}
 	}
 
+	syncTask(task)
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
