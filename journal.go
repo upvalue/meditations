@@ -19,4 +19,8 @@ func journalInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "journal")
 	})
+
+	// journalView/<date>
+	// journalEntryUpdate/<date>
+	//
 }

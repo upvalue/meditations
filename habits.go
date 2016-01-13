@@ -18,14 +18,14 @@ import (
 var habitSync *SyncPage
 
 const (
-	// Scope for daily tasks and comments
-	ScopeDay = iota
-	// Scope for monthly tasks and comments
-	ScopeMonth = iota
-	// Scope for yearly tasks and comments
-	ScopeYear = iota
 	// Scope for "bucket list" tasks and comments
 	ScopeBucket = iota
+	// Scope for daily tasks and journal entries
+	ScopeDay = iota
+	// Scope for monthly tasks
+	ScopeMonth = iota
+	// Scope for yearly tasks
+	ScopeYear = iota
 )
 
 const (
@@ -49,6 +49,11 @@ type Task struct {
 	CompletionRate float64   `json:"completion_rate" sql:"-"`
 	BestStreak     int       `json:"best_streak" sql:"-"`
 	Streak         int       `json:"streak" sql:"-"`
+}
+
+type Scope struct {
+	gorm.Model
+	Name string
 }
 
 type Comment struct {
@@ -116,8 +121,7 @@ func calculateCompletionRate(task Task) float64 {
 
 	from, to := between(task.Date, task.Scope)
 
-	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"),
-		to.Format("2006-01-02"), ScopeDay, task.Name).Find(&tasks)
+	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"), to.Format("2006-01-02"), ScopeDay, task.Name).Find(&tasks)
 
 	count := float64(len(tasks))
 
@@ -143,8 +147,7 @@ func calculateStreak(task Task) (int, int) {
 
 	from, to := between(task.Date, task.Scope)
 
-	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"),
-		to.Format("2006-01-02"), ScopeDay, task.Name).Order("date", true).Find(&tasks)
+	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from, to, ScopeDay, task.Name).Order("date", true).Find(&tasks)
 
 	for _, t := range tasks {
 		if t.Status == TaskComplete {
@@ -189,9 +192,25 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 }
 
 func tasksInBucket(c *macaron.Context) {
+	var scope Scope
+	scope.ID = uint(c.ParamsInt(":id"))
+	if scope.ID == 0 {
+		DB.Order("updated_at desc").First(&scope)
+	} else {
+		DB.First(&scope)
+	}
+
+	if scope.ID == 0 {
+		serverError(c, "could not find scope %s", scope.Name)
+		return
+	}
+
 	var tasks []Task
-	DB.Where("scope = ?", ScopeBucket).Order("`order` asc").Preload("Comment").Find(&tasks)
-	c.JSON(http.StatusOK, tasks)
+	DB.Where("scope = ?", scope.ID).Order("`order` asc").Preload("Comment").Find(&tasks)
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"scope": scope,
+		"tasks": tasks,
+	})
 }
 
 func tasksInDay(c *macaron.Context) {
@@ -295,27 +314,20 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 	cid := comment.ID
 	log.Printf("%+v", comment)
 
-	if cid != 0 {
-		DB.Where("ID = ?", comment.TaskID).Find(&task)
-		syncTask(task)
-		c.JSON(200, task)
-		DB.Save(&comment)
-		return
-	} else if cid == 0 && len(comment.Body) == 0 {
-		serverError(c, "empty comment")
-		return
-	}
-
-	// Empty comment = deletion
-	if len(comment.Body) == 0 {
-		DB.Where("task_id = ?", comment.TaskID).Find(&comment).Delete(&comment)
-	} else {
-		DB.Save(&comment)
-	}
-
+	empty := (len(comment.Body) == 0 || comment.Body == "<p><br></p>")
 	DB.Where("ID = ?", comment.TaskID).Find(&task)
+
+	if cid == 0 && empty == true {
+		// Empty, do not create comment
+	} else if cid > 0 {
+		// Delete comment
+		DB.Delete(&comment)
+	} else {
+		// Create or update comment
+		DB.Save(&comment)
+	}
 	syncTask(task)
-	c.JSON(200, task)
+	c.PlainText(200, []byte("OK"))
 }
 
 func habitsInit(m *macaron.Macaron) {
@@ -326,6 +338,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/tasks/in-year", tasksInYear)
 	m.Get("/tasks/in-month", tasksInMonth)
 	m.Get("/tasks/in-day", tasksInDay)
+	m.Get("/tasks/in-bucket/:id([0-9]+)", tasksInBucket)
 
 	m.Post("/tasks/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/tasks/new", binding.Bind(Task{}), taskNew)

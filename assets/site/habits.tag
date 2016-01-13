@@ -10,7 +10,7 @@
         <button class="btn btn-xs btn-default octicon octicon-chevron-left" onclick={nav_left}></button>
         <button class="btn btn-xs btn-default octicon octicon-chevron-right" onclick={nav_right}></button>
       </span>
-      <button if={ window.development } class="btn btn-xs btn-default octicon octicon-sync" onclick={remount}></button>
+      <!--<button if={ window.development } class="btn btn-xs btn-default octicon octicon-sync" onclick={remount}></button>-->
     </span>
     <task each={opts.tasks} />
   </section>
@@ -101,7 +101,7 @@
       <button if={ (comment.ID == 0) } class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
     </span>
-    <div if={ scope == window.Habits.Scope.year } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>
+    <div if={ (scope == window.Habits.Scope.year && best_streak > 0) } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>
     <div class="comment" id="comment-{ID}"></div>
   </section>
 
@@ -164,5 +164,4 @@
     }
     RiotControl.trigger('task-new', {date: date, scope: scope}, self._item.name, date)
   }
-
 </task>

@@ -4,13 +4,19 @@
 ** DONE Bug with ordering down first element of daily scope
 ** DONE Comments
 ** DONE Port old database
-** TODO Remount only tasks when necessary rather than whole scope
+** DONE Remount only tasks when necessary rather than whole scope
 ** DONE Sync completion rate
-** TODO Fix synchronization
+** DONE Fix synchronization
+** TODO Synchronization: Reload tasks rather than whole scopes when necessary.
 ** TODO Mobile navigation
 ** TODO Deleting empty comments not currently possibly as medium-editor inserts <p><br><p>... add button?
-** TODO Very odd: monthly comments do not render on first request serverd
+** DONE Very odd: monthly comments do not render on first request serverd
 ** TODO Clicking on journal from habits needs to be done twice. Riot router bug?
+** TODO bucket lists
+** TODO Scope control formatting on small screens
+** TODO Allow refresh without going to present day
+** TODO Session-based error reporting?
+** TODO Adding a comment should look better (try inserting <p> to begin with)
 * Journal
 ** TODO Tagging
 ** TODO Display habits
@@ -21,5 +27,3 @@
 ** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served) (and only if not running under entr?)
 ** TODO Are Macaron errors displayed in production?
 ** TODO Sequential AJAX requests
-** TODO Fixed navigation (for mobile)
-

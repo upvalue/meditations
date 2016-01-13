@@ -1,13 +1,15 @@
 # habits.coffee - habits code
 
 current_date = false
+current_bucket = false
 task_store = false
 
 Scope =
-  day: 0
-  month: 1
-  year: 2
-  bucket: 3
+  bucket: 0
+  day: 1
+  month: 2
+  year: 3
+  wrap: 4
 
 Status =
   unset: 0
@@ -29,8 +31,7 @@ class TaskStore
     self.on 'comment-update', (task, comment) ->
       $.ajax jsonRequest
         url: "/habits/tasks/comment-update"
-        success: (task) ->
-          self.mount_task { opts: task }
+        success: () -> false
         data: comment
 
     self.on 'task-new', (scope, task_name, date) ->
@@ -79,27 +80,35 @@ class TaskStore
     self = this
     fetch = null
 
-    if typeof date == 'string'
-      date = moment.utc(date)
+    if (scope == Scope.bucket)# or (scope > Scope.year)
+      $.get "/habits/tasks/in-bucket/#{scope}", (result) ->
+        console.log(result)
+        scope = result["scope"]
+        tasks = result["tasks"]
+
+        result = riot.mount "#scope-bucket", { date: date, scope: scope["ID"], tasks: tasks, title: scope["Name"] }
     else
-      date = date.clone()
+      if typeof date == 'string'
+        date = moment.utc(date)
+      else
+        date = date.clone()
 
-    fetch_date = date.clone()
+      fetch_date = date.clone()
 
-    [fetch, fetch_date, mount] = switch scope
-      when Scope.day then ["day", fetch_date, "#scope-day-#{date.format('DD')}"]
-      when Scope.month then ["month", fetch_date.date(1), "#scope-month"]
-      when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
-      when Scope.bucket then ["bucket", fetch_date, "#scope-bucket"]
+      [fetch, fetch_date, mount] = switch scope
+        when Scope.day then ["day", fetch_date, "#scope-day-#{date.format('DD')}"]
+        when Scope.month then ["month", fetch_date.date(1), "#scope-month"]
+        when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
+        #when Scope.bucket then ["bucket", fetch_date, "#scope-bucket"]
 
-    $.get "/habits/tasks/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
-      tasks = tasks or []
-      title = switch
-        when scope == Scope.day then date.format('Do')
-        when scope == Scope.month then date.format('MMMM')
-        when scope == Scope.year then date.format('YYYY')
-        when scope == Scope.bucket then "Bucket"
-      result = riot.mount mount, { date: date, scope: scope, tasks: tasks, title: title }
+      $.get "/habits/tasks/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
+        tasks = tasks or []
+        title = switch
+          when scope == Scope.day then date.format('Do')
+          when scope == Scope.month then date.format('MMMM')
+          when scope == Scope.year then date.format('YYYY')
+          #when scope == Scope.bucket then "Bucket"
+        result = riot.mount mount, { date: date, scope: scope, tasks: tasks, title: title }
 
 # Initialize machinery necessary for task interaction
 initialize = () ->
@@ -114,16 +123,18 @@ initialize = () ->
   return true
 
 # Navigation function
-browse_from = (from) ->
+browse = (from, bucket) ->
   console.log('Browsing from', from)
   today = moment()
   from = moment(from, 'YYYY-MM')
   document.title = "#{from.format('MMM YYYY')} / habits"
   current_date = from.clone()
+  current_bucket = parseInt(bucket)
 
   task_store.mount_scope Scope.month, from
   task_store.mount_scope Scope.year, from
   #task_store.mount_scope Scope.bucket, from
+  task_store.mount_scope current_bucket, from
 
   # Allow days up to the current date
   # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
@@ -150,16 +161,15 @@ main = () ->
   RiotControl.on "change-date", (forward, scope) ->
     date = scope.date.clone().date(1)
     date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-    riot.route "from/#{date.format('YYYY-MM')}"
+    riot.route "from/#{date.format('YYYY-MM')}/#{current_bucket or 0}"
+
+  riot.route((action, date, bucket) ->
+    switch action
+      when 'from' then browse(date, bucket)
+      else console.log "Unknown action", action, date, bucket)
 
   riot.route.start(true)
-  
-  riot.route((action, rest) ->
-    switch action
-      when 'from' then browse_from(rest)
-      else console.log "Unknown action", action)
-
-  riot.route("from/2016-01")
+  riot.route("from/2016-01/0")
 
   # Setup websocket
   task_near = (task, date2) ->
@@ -196,7 +206,13 @@ main = () ->
 
 make_editor = (selector, args = {}) ->
   editor = window.Habits.editor = new MediumEditor selector,
-    $.extend({autoLink: true, placeholder: false}, args)
+    $.extend({
+      autoLink: true
+      placeholder: false
+      toolbar: {
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote', 'orderedlist', 'unorderedlist']
+      }
+    }, args)
   editor
 
 # Export variables

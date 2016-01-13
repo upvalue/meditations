@@ -7,6 +7,17 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+func dbcmd(c *cli.Context, create bool) {
+	loadConfig(c)
+	Config.DBLog = true
+	DBOpen()
+	DBMigrate()
+	if create == true {
+		DBCreate()
+	}
+	DBClose()
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "meditations"
@@ -25,15 +36,17 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "migrate",
-			Usage: "database migrations",
+			Usage: "migrate database",
 			Flags: flags,
 			Action: func(c *cli.Context) {
-				loadConfig(c)
-				Config.DBLog = true
-				DBOpen()
-				DBMigrate()
-				DBClose()
+				dbcmd(c, false)
 			},
+		},
+		{
+			Name:   "create",
+			Usage:  "create database",
+			Flags:  flags,
+			Action: func(c *cli.Context) { dbcmd(c, true) },
 		},
 		{
 			Name:  "serve",

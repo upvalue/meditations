@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 # gentestdb.py - Generate test database data for debugging and automated tests
-import random
+import random, sys
 from datetime import datetime, timedelta
 
 import bcrypt
+
+print("NEEDS TO BE UPDATED")
+sys.exit(1)
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def now():
     return datetime.now().strftime(TIME_FORMAT)
 
-SCOPE_DAY = 0
-SCOPE_MONTH = 1
-SCOPE_YEAR = 2
-SCOPE_BUCKET = 3
+SCOPE_BUCKET = 0
+SCOPE_DAY = 1
+SCOPE_MONTH = 2
+SCOPE_YEAR = 3
 
 STATUS_UNSET = 0
 STATUS_COMPLETE = 1
@@ -79,7 +82,7 @@ def gen_comments():
 random.seed("Not really random")
 
 print('BEGIN TRANSACTION;')
-[print(task) for task in gen_tasks("Exercise")]
+[print(task) for task in gen_tasks("Exercise", status = STATUS_COMPLETE)]
 [print(task) for task in gen_tasks("Diet", order = 1)]
 [print(comment) for comment in gen_comments()]
 print('END TRANSACTION;')
