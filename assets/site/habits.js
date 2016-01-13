@@ -155,7 +155,11 @@
     }
     task_store = new TaskStore();
     window.Habits.task_store = task_store;
-    return RiotControl.addStore(task_store);
+    RiotControl.addStore(task_store);
+    initialize = function() {
+      return false;
+    };
+    return true;
   };
 
   browse_from = function(from) {

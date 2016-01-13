@@ -98,7 +98,7 @@
       <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
       <button class="task-control btn btn-xs btn-default octicon octicon-chevron-up" onclick={up}></button>
       <button class="task-control btn btn-xs btn-default octicon octicon-chevron-down" onclick={down}></button>
-      <button class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
+      <button if={ (comment.ID == 0) } class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
     </span>
     <div if={ scope == window.Habits.Scope.year } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>

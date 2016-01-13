@@ -110,6 +110,8 @@ initialize = () ->
   task_store = new TaskStore()
   window.Habits.task_store = task_store
   RiotControl.addStore(task_store)
+  initialize = () -> false
+  return true
 
 # Navigation function
 browse_from = (from) ->

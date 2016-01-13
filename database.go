@@ -16,7 +16,10 @@ func DBOpen() {
 }
 
 func DBMigrate() {
+	// habits.go
 	DB.AutoMigrate(&Task{}, &Comment{})
+	// journal.go
+	DB.AutoMigrate(&Entry{}, &Tag{})
 }
 
 func DBClose() {

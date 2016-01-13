@@ -83,5 +83,9 @@ func App() *macaron.Macaron {
 		habitsInit(m)
 	})
 
+	m.Group("/journal", func() {
+		journalInit(m)
+	})
+
 	return m
 }

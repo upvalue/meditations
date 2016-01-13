@@ -57,37 +57,48 @@ type Comment struct {
 	TaskID int    `json:"task_id"`
 }
 
+// If a stat is monthly or yearly, recalculate streak and completion rate as well
+func syncStats(t Task, scope int) {
+	from, to := between(t.Date, scope)
+	var task Task
+	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).First(&task)
+	task.CompletionRate = calculateCompletionRate(task)
+	task.Streak, task.BestStreak = calculateStreak(task)
+	syncTask(task)
+}
+
 func syncTask(t Task) {
 	json, err := json.Marshal(t)
 	checkErr(err)
 	habitSync.Sync(json)
-}
-
-// Given a task's date and scope, return a range of dates that will get all tasks within the scope
-func between(start time.Time, scope int, from *time.Time, to *time.Time) {
-	switch scope {
-	case ScopeDay:
-		*from = now.New(start).BeginningOfDay()
-		*to = (*from).AddDate(0, 0, 1)
-	case ScopeMonth:
-		*from = now.New(start).BeginningOfMonth()
-		*to = (*from).AddDate(0, 1, 0)
-	case ScopeYear:
-		*from = now.New(start).BeginningOfYear()
-		*to = (*from).AddDate(1, 0, 0)
-	case ScopeBucket:
-		*from = time.Date(2000, 0, 0, 0, 0, 0, 0, time.Now().Location())
-		*to = time.Now()
+	if t.Scope == ScopeDay {
+		syncStats(t, ScopeMonth)
+		syncStats(t, ScopeYear)
 	}
 }
 
-func tasksInScope(tasks *[]Task, scope int, start time.Time) {
-	var from, to time.Time
+// Given a task's date and scope, return a range of dates that will get all tasks within the scope
+func between(start time.Time, scope int) (time.Time, time.Time) {
+	switch scope {
+	case ScopeDay:
+		from := now.New(start).BeginningOfDay()
+		return from, from.AddDate(0, 0, 1)
+	case ScopeMonth:
+		from := now.New(start).BeginningOfMonth()
+		return from, from.AddDate(0, 1, 0)
+	case ScopeYear:
+		from := now.New(start).BeginningOfYear()
+		return from, from.AddDate(1, 0, 0)
+	case ScopeBucket:
+	}
+	return time.Now(), time.Now()
+}
 
+func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 	if scope == ScopeBucket {
 		DB.Where("scope = ?", ScopeBucket).Preload("Comment").Find(tasks)
 	} else {
-		between(start, scope, &from, &to)
+		from, to := between(start, scope)
 
 		DB.Where("date BETWEEN ? and ? and scope = ?", from.Format("2006-01-02"), to.Format("2006-01-02"), scope).Order("`order` asc").
 			Preload("Comment").Find(tasks)
@@ -101,10 +112,9 @@ func tasksNear(task Task, tasks *[]Task) {
 
 // Given a yearly or monthly task, calculate the completion rate of all tasks in daily scopes with the same name
 func calculateCompletionRate(task Task) float64 {
-	var from, to time.Time
 	var tasks []Task
 
-	between(task.Date, task.Scope, &from, &to)
+	from, to := between(task.Date, task.Scope)
 
 	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"),
 		to.Format("2006-01-02"), ScopeDay, task.Name).Find(&tasks)
@@ -131,9 +141,7 @@ func calculateStreak(task Task) (int, int) {
 	var tasks []Task
 	best_streak, streak := 0, 0
 
-	var from, to time.Time
-
-	between(task.Date, task.Scope, &from, &to)
+	from, to := between(task.Date, task.Scope)
 
 	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"),
 		to.Format("2006-01-02"), ScopeDay, task.Name).Order("date", true).Find(&tasks)
@@ -252,12 +260,10 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 
 	if (change == -1 && task.Order > 0) || change == 1 {
 		var swap Task
-		var from, to time.Time
 
-		between(task.Date, task.Scope, &from, &to)
+		from, to := between(task.Date, task.Scope)
 
-		DB.Where("date between ? and ? and scope = ? and `order` = ?", from, to,
-			task.Scope, task.Order+change).First(&swap)
+		DB.Where("date between ? and ? and scope = ? and `order` = ?", from, to, task.Scope, task.Order+change).First(&swap)
 
 		// If there is something to swap it with
 		if swap.ID > 0 {
