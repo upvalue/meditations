@@ -24,14 +24,79 @@
       type: "POST",
       contentType: "application/json; charset=UTF-8"
     }, data);
-    if (ret.data.comment.id === 0) {
-      delete ret.data.comment;
-    }
     ret.data = JSON.stringify(ret.data);
     return ret;
   };
 
   TaskStore = (function() {
+    function TaskStore() {
+      var command, remount, self;
+      riot.observable(this);
+      self = this;
+      self.on('comment-update', function(task, comment) {
+        return $.ajax(jsonRequest({
+          url: "/habits/tasks/comment-update",
+          success: function(task) {
+            return self.mount_task({
+              opts: task
+            });
+          },
+          data: comment
+        }));
+      });
+      self.on('task-new', function(scope, task_name, date) {
+        return $.ajax(jsonRequest({
+          url: "/habits/tasks/new",
+          success: function() {
+            return self.mount_scope(scope.scope, date);
+          },
+          data: {
+            name: task_name,
+            scope: scope.scope,
+            date: date.format("YYYY-MM-DDTHH:mm:ssZ")
+          }
+        }));
+      });
+      command = function(path, thunk) {
+        return function(task) {
+          var req;
+          req = {
+            type: "POST",
+            url: path,
+            data: JSON.stringify(task),
+            contentType: "application/json; charset=UTF-8",
+            success: thunk(task)
+          };
+          return $.ajax(req);
+        };
+      };
+      self.on('task-delete', command('/habits/tasks/delete', function(task) {
+        return function() {
+          $("#task-" + task.ID).remove();
+          return riot.update();
+        };
+      }));
+      self.on('task-update', command('/habits/tasks/update', function() {
+        return function(task) {
+          return self.mount_task({
+            opts: task
+          });
+        };
+      }));
+      remount = function(task) {
+        return function() {
+          return self.mount_scope(task.scope, task.date);
+        };
+      };
+      self.on('task-order-up', command('/habits/tasks/order-up', remount));
+      self.on('task-order-down', command('/habits/tasks/order-down', remount));
+    }
+
+    TaskStore.prototype.mount_task = function(task) {
+      console.log("REMOUNTING TASK", task);
+      return riot.mount("#task-" + task.ID, task);
+    };
+
     TaskStore.prototype.mount_scope = function(scope, date, mount) {
       var fetch, fetch_date, ref, self;
       self = this;
@@ -77,57 +142,6 @@
         });
       });
     };
-
-    function TaskStore() {
-      var remount, self;
-      riot.observable(this);
-      self = this;
-      self.on('comment-update', function(task, comment) {
-        task["comment"] = comment;
-        if (!comment.id) {
-          comment.id = 0;
-        }
-        return $.ajax(jsonRequest({
-          url: "/habits/tasks/comment-update",
-          success: function() {
-            return self.mount_scope(task.scope, task.date);
-          },
-          data: task
-        }));
-      });
-      self.on('task-new', function(scope, task_name, date) {
-        return $.ajax(jsonRequest({
-          url: "habits/tasks/new",
-          success: function() {
-            return self.mount_scope(scope.scope, date);
-          },
-          data: {
-            name: task_name,
-            scope: scope.scope,
-            date: date.format("YYYY-MM-DDTHH:mm:ssZ")
-          }
-        }));
-      });
-      remount = function(path) {
-        return function(task) {
-          var req;
-          req = {
-            type: "POST",
-            url: path,
-            data: JSON.stringify(task),
-            contentType: "application/json; charset=UTF-8",
-            success: function() {
-              return self.mount_scope(task.scope, task.date);
-            }
-          };
-          return $.ajax(req);
-        };
-      };
-      self.on('task-delete', remount('/habits/tasks/delete'));
-      self.on('task-order-down', remount('/habits/tasks/order-down'));
-      self.on('task-order-up', remount('/habits/tasks/order-up'));
-      self.on('task-update', remount('/habits/tasks/update'));
-    }
 
     return TaskStore;
 
@@ -182,7 +196,6 @@
       var date;
       date = scope.date.clone().date(1);
       date[forward ? 'add' : 'subtract'](1, scope.scope === Scope.month ? 'months' : 'years');
-      console.log("NEW DATE " + date);
       return riot.route("from/" + (date.format('YYYY-MM')));
     });
     riot.route.start(true);
@@ -229,7 +242,8 @@
       args = {};
     }
     editor = window.Habits.editor = new MediumEditor(selector, $.extend({
-      autoLink: true
+      autoLink: true,
+      placeholder: false
     }, args));
     return editor;
   };

@@ -1,9 +1,11 @@
 * Habits
 ** DONE Display & navigation
 ** DONE Calculate completion streaks
-** TODO Bug with ordering down first element of daily scope
-** TODO Comments
-** TODO Port old database
+** DONE Bug with ordering down first element of daily scope
+** DONE Comments
+** DONE Port old database
+** TODO Remount only tasks when necessary rather than whole scope
+** TODO Synchronization
 * Journal
 ** TODO Tagging
 ** TODO Display habits

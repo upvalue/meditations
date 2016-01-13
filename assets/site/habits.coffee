@@ -15,12 +15,65 @@ Status =
 
 jsonRequest = (data) ->
   ret = $.extend({type: "POST", contentType: "application/json; charset=UTF-8"}, data)
-  if ret.data.comment.id == 0
-    delete ret.data.comment
   ret.data = JSON.stringify(ret.data)
   return ret
 
 class TaskStore
+  constructor: ->
+    riot.observable(this)
+
+    self = this
+
+    self.on 'comment-update', (task, comment) ->
+      $.ajax jsonRequest
+        url: "/habits/tasks/comment-update"
+        success: (task) ->
+          self.mount_task { opts: task }
+        data: comment
+
+    self.on 'task-new', (scope, task_name, date) ->
+      $.ajax jsonRequest
+        url: "/habits/tasks/new"
+        success: () ->
+          self.mount_scope scope.scope, date
+        data:
+          name: task_name
+          scope: scope.scope
+          date: date.format "YYYY-MM-DDTHH:mm:ssZ"
+        
+    # Run a command that changes a task and displays changes
+    command = (path, thunk) ->
+      (task) ->
+        req =
+          type: "POST"
+          url: path
+          data: JSON.stringify(task)
+          contentType: "application/json; charset=UTF-8"
+          success: thunk(task)
+        $.ajax(req)
+
+    self.on 'task-delete', command('/habits/tasks/delete', (task) ->
+      () ->
+        $("#task-#{task.ID}").remove()
+        riot.update()
+    )
+
+    self.on 'task-update', command('/habits/tasks/update', () ->
+      (task) ->
+        self.mount_task opts: task
+    )
+
+    remount = (task) ->
+      () ->
+        self.mount_scope task.scope, task.date
+
+    self.on 'task-order-up', command('/habits/tasks/order-up', remount)
+    self.on 'task-order-down', command('/habits/tasks/order-down', remount)
+
+  mount_task: (task) ->
+    console.log "REMOUNTING TASK", task
+    riot.mount("#task-#{task.ID}", task)
+
   mount_scope: (scope, date, mount) ->
     self = this
     fetch = null
@@ -46,48 +99,6 @@ class TaskStore
         when scope == Scope.year then date.format('YYYY')
         when scope == Scope.bucket then "Bucket"
       result = riot.mount mount, { date: date, scope: scope, tasks: tasks, title: title }
-
-  constructor: ->
-    riot.observable(this)
-
-    self = this
-
-    self.on 'comment-update', (task, comment) ->
-      task["comment"] = comment
-      if not comment.id
-        comment.id = 0
-      $.ajax jsonRequest
-        url: "/habits/tasks/comment-update"
-        success: () ->
-          self.mount_scope task.scope, task.date
-        data: task
-
-    self.on 'task-new', (scope, task_name, date) ->
-      $.ajax jsonRequest
-        url: "habits/tasks/new"
-        success: () ->
-          self.mount_scope scope.scope, date
-        data:
-          name: task_name
-          scope: scope.scope
-          date: date.format "YYYY-MM-DDTHH:mm:ssZ"
-        
-    # Run a command that changes a task, then remount in order to display changes
-    remount = (path) ->
-      (task) ->
-        req = 
-          type: "POST"
-          url: path
-          data: JSON.stringify(task)
-          contentType: "application/json; charset=UTF-8"
-          success: () ->
-            self.mount_scope task.scope, task.date
-        $.ajax(req)
-
-    self.on 'task-delete', remount('/habits/tasks/delete')
-    self.on 'task-order-down', remount('/habits/tasks/order-down')
-    self.on 'task-order-up', remount('/habits/tasks/order-up')
-    self.on 'task-update', remount('/habits/tasks/update')
 
 # Initialize machinery necessary for task interaction
 initialize = () ->
@@ -127,7 +138,6 @@ browse_from = (from) ->
         date += 1
   })
 
-# Main page routing and synchronization for /habits page
 main = () ->
   console.log 'Habits: installing router'
 
@@ -138,7 +148,6 @@ main = () ->
   RiotControl.on "change-date", (forward, scope) ->
     date = scope.date.clone().date(1)
     date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-    console.log "NEW DATE #{date}"
     riot.route "from/#{date.format('YYYY-MM')}"
 
   riot.route.start(true)
@@ -186,7 +195,7 @@ main = () ->
 
 make_editor = (selector, args = {}) ->
   editor = window.Habits.editor = new MediumEditor selector,
-    $.extend({autoLink: true}, args)
+    $.extend({autoLink: true, placeholder: false}, args)
   editor
 
 # Export variables

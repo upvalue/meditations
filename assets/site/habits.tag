@@ -2,16 +2,15 @@
   <section class="scope">
     <h4 class=scope-title>{opts.date}</h4>
     <span class="pull-right">
-      <form class=form-inline>
+      <form class="form-inline scope-controls">
         <input type="text" size="15" class="form-control " />
         <button type="submit" class="btn btn-xs btn-default octicon octicon-plus" onclick={new_task}></button>
+      </form>
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
         <button class="btn btn-xs btn-default octicon octicon-chevron-left" onclick={nav_left}></button>
         <button class="btn btn-xs btn-default octicon octicon-chevron-right" onclick={nav_right}></button>
       </span>
-      <button class="btn btn-xs btn-default octicon octicon-comment" onclick={comment}></button>
       <button if={ window.development } class="btn btn-xs btn-default octicon octicon-sync" onclick={remount}></button>
-      </form>
     </span>
     <task each={opts.tasks} />
   </section>
@@ -89,12 +88,11 @@
   });
 </scope-days>
 
-<task>
+<task id="task-{ID}">
   <section class="entry">
     <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
       {name}
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
-      <span if={ scope == window.Habits.Scope.year }>Streak: {streak} days / {best_streak} (best) </span>
     </button>
     <span class="pull-right">
       <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" onclick={delete}></button>
@@ -103,32 +101,29 @@
       <button class="task-control btn btn-xs btn-default octicon octicon-comment" onclick={edit_comment}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
     </span>
-    <div class="comment" id="comment-{id}"></comment>
+    <div if={ scope == window.Habits.Scope.year } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>
+    <div class="comment" id="comment-{ID}"></div>
   </section>
 
   var self = this
-  
 
-  var comment_div = function() { return "#comment-"+self.id }
+  var comment_div = function() { return $("#comment-"+self.ID); }
 
   RiotControl.on('task-updated', function(task) {
-    if(task.id == self._item.id) {
+    if(task.ID == self._item.ID) {
       self.update(task);
     }
   });
 
-  var render_comment = function(task) {
-    //$("#comment-"+task.id).html(markdown.toHTML(task.comment.body));
-    //fix_comment();
-  }
-
   self.one('mount', function() {
-    //$("#comment-"+task.id).html(this.comment.body);
-    $("#comment-"+this.id).html(this.comment.body);
-    self.editor = window.Habits.make_editor("#comment-"+this.id, {});
+    comment_div().html(self.comment.body);
+    self.editor = window.Habits.make_editor("#comment-"+self.ID, {});
     self.editor.subscribe("blur", function() {
-      self.comment.body = $(comment_div()).html();
-      RiotControl.trigger('comment-update', self._item, self.comment);
+      RiotControl.trigger('comment-update', self._item, {
+        ID: self.comment.ID || 0,
+        body: comment_div().html(),
+        task_id: self._item.ID
+      });
     });
   });
 
@@ -153,9 +148,8 @@
   }
 
   edit_comment(_) {
-    self._item.comment.task_id = self.id;
-    console.log(self);
-    self.comment = {'task_id': self.id}
+    comment_div().focus();
+    self.comment = {'task_id': self.ID}
   }
 
   copy(_) {

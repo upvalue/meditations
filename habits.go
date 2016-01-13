@@ -204,6 +204,7 @@ func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
 	syncTask(task)
+	c.JSON(200, task)
 }
 
 func taskNew(c *macaron.Context, task Task) {
@@ -281,12 +282,16 @@ func taskOrderDown(c *macaron.Context, t Task) {
 }
 
 // Update or create a comment
-func commentUpdate(c *macaron.Context, task Task) {
-	comment := task.Comment
+func commentUpdate(c *macaron.Context, comment Comment) {
+	var task Task
+
 	cid := comment.ID
-	log.Printf("%+v", task)
+	log.Printf("%+v", comment)
 
 	if cid != 0 {
+		DB.Where("ID = ?", comment.TaskID).Find(&task)
+		syncTask(task)
+		c.JSON(200, task)
 		DB.Save(&comment)
 		return
 	} else if cid == 0 && len(comment.Body) == 0 {
@@ -296,13 +301,14 @@ func commentUpdate(c *macaron.Context, task Task) {
 
 	// Empty comment = deletion
 	if len(comment.Body) == 0 {
-		DB.Where("task_id = ?", task.ID).Find(&comment).Delete(&comment)
+		DB.Where("task_id = ?", comment.TaskID).Find(&comment).Delete(&comment)
 	} else {
 		DB.Save(&comment)
 	}
 
+	DB.Where("ID = ?", comment.TaskID).Find(&task)
 	syncTask(task)
-	c.PlainText(http.StatusOK, []byte("OK"))
+	c.JSON(200, task)
 }
 
 func habitsInit(m *macaron.Macaron) {
@@ -319,7 +325,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/tasks/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/tasks/order-up", binding.Bind(Task{}), taskOrderUp)
 	m.Post("/tasks/order-down", binding.Bind(Task{}), taskOrderDown)
-	m.Post("/tasks/comment-update", binding.Bind(Task{}), commentUpdate)
+	m.Post("/tasks/comment-update", binding.Bind(Comment{}), commentUpdate)
 
 	habitSync = MakeSyncPage("habits")
 	m.Get("/sync", habitSync.Handler())

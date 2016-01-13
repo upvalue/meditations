@@ -19,21 +19,25 @@ ul.nav a:hover {
   background-color: #eee !important;
 }
 
+.medium-editor-toolbar li button {height: auto; min-width: 0; }
+
 /**** HABITS */
 
 .scope-title {
   display: inline;
 }
 
-section.scope {
+.scope-controls { display: inline; }
+
+.scope {
   padding: 0 .25em .50em .25em;
 }
 
-section.scope task:first-of-type .entry {
-  padding-top:.5em;
+.scope task:first-of-type .entry {
+  padding-top:1.5em;
 }
 
-section.scope task .entry {
+.scope .entry {
   padding-bottom: .15em;
 }
 
@@ -44,3 +48,5 @@ input.form-control[type=text] { height:1.5em; }
 }
 
 .comment p:first-of-type { padding-top:.25em; }
+
+.comment:empty { display: inline;}
