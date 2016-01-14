@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 	"gopkg.in/macaron.v1"
 )
@@ -13,6 +15,20 @@ type Entry struct {
 
 type Tag struct {
 	gorm.Model
+	Name string
+}
+
+var journalSync *SyncPage
+
+func journalEntries(c *macaron.Context) {
+	date, err := time.Parse("2006-01", c.Query("date"))
+	if err != nil {
+		serverError(c, "error parsing date %s", c.Query("date"))
+	}
+	var entry Entry
+	from, to := between(date, ScopeMonth)
+	DB.Where("created_at between ? and ?", from, to).Find(&entry)
+	c.JSON(200, entry)
 }
 
 func journalInit(m *macaron.Macaron) {
@@ -20,7 +36,8 @@ func journalInit(m *macaron.Macaron) {
 		c.HTML(200, "journal")
 	})
 
-	// journalView/<date>
-	// journalEntryUpdate/<date>
-	//
+	m.Get("/entries", journalEntries)
+
+	//journalSync = MakeSyncPage("journal")
+	//m.Get("/sync", journalSync.Handler())
 }

@@ -19,7 +19,7 @@ func DBMigrate() {
 	// habits.go
 	DB.AutoMigrate(&Task{}, &Comment{}, &Scope{})
 	// journal.go
-	// DB.AutoMigrate(&Entry{}, &Tag{})
+	DB.AutoMigrate(&Entry{}, &Tag{})
 }
 
 func DBCreate() {

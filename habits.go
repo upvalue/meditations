@@ -53,7 +53,7 @@ type Task struct {
 
 type Scope struct {
 	gorm.Model
-	Name string
+	Name string `sql:"not null;unique"`
 }
 
 type Comment struct {
@@ -171,24 +171,23 @@ func calculateStreak(task Task) (int, int) {
 func tasksInScopeR(c *macaron.Context, scope int) {
 	var tasks []Task
 	date, err := time.Parse("2006-01-02", c.Query("date"))
-	if err == nil {
-		// Calculate completion rates
-		tasksInScope(&tasks, scope, date)
-		if scope == ScopeMonth || scope == ScopeYear {
-			for i, t := range tasks {
-				tasks[i].CompletionRate = calculateCompletionRate(t)
-			}
-		}
-		if scope == ScopeYear {
-			for i, t := range tasks {
-				tasks[i].Streak, tasks[i].BestStreak = calculateStreak(t)
-			}
-		}
-
-		c.JSON(http.StatusOK, tasks)
-	} else {
+	if err != nil {
 		serverError(c, "error parsing date %s", c.Query("date"))
 	}
+	// Calculate completion rates
+	tasksInScope(&tasks, scope, date)
+	if scope == ScopeMonth || scope == ScopeYear {
+		for i, t := range tasks {
+			tasks[i].CompletionRate = calculateCompletionRate(t)
+		}
+	}
+	if scope == ScopeYear {
+		for i, t := range tasks {
+			tasks[i].Streak, tasks[i].BestStreak = calculateStreak(t)
+		}
+	}
+
+	c.JSON(http.StatusOK, tasks)
 }
 
 func tasksInBucket(c *macaron.Context) {
@@ -319,7 +318,7 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 
 	if cid == 0 && empty == true {
 		// Empty, do not create comment
-	} else if cid > 0 {
+	} else if cid > 0 && empty == true {
 		// Delete comment
 		DB.Delete(&comment)
 	} else {
@@ -337,23 +336,31 @@ func buckets(c *macaron.Context) {
 	c.JSON(200, scopes)
 }
 
+func bucketNew(c *macaron.Context) {
+	var scope Scope
+	scope.Name = c.Params("name")
+	DB.Save(&scope)
+	c.JSON(200, scope)
+}
+
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "habits")
 	})
 
-	m.Get("/tasks/in-year", tasksInYear)
-	m.Get("/tasks/in-month", tasksInMonth)
-	m.Get("/tasks/in-day", tasksInDay)
-	m.Get("/tasks/in-bucket/:id([0-9]+)", tasksInBucket)
+	m.Get("/in-year", tasksInYear)
+	m.Get("/in-month", tasksInMonth)
+	m.Get("/in-day", tasksInDay)
+	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
 	m.Get("/buckets", buckets)
 
-	m.Post("/tasks/update", binding.Bind(Task{}), taskUpdate)
-	m.Post("/tasks/new", binding.Bind(Task{}), taskNew)
-	m.Post("/tasks/delete", binding.Bind(Task{}), taskDelete)
-	m.Post("/tasks/order-up", binding.Bind(Task{}), taskOrderUp)
-	m.Post("/tasks/order-down", binding.Bind(Task{}), taskOrderDown)
+	m.Post("/update", binding.Bind(Task{}), taskUpdate)
+	m.Post("/new", binding.Bind(Task{}), taskNew)
+	m.Post("/delete", binding.Bind(Task{}), taskDelete)
+	m.Post("/order-up", binding.Bind(Task{}), taskOrderUp)
+	m.Post("/order-down", binding.Bind(Task{}), taskOrderDown)
 	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)
+	m.Post("/bucket-new/:name", bucketNew)
 
 	habitSync = MakeSyncPage("habits")
 	m.Get("/sync", habitSync.Handler())

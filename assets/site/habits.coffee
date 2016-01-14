@@ -17,10 +17,7 @@ Status =
   incomplete: 2
   wrap: 3
 
-jsonRequest = (data) ->
-  ret = $.extend({type: "POST", contentType: "application/json; charset=UTF-8"}, data)
-  ret.data = JSON.stringify(ret.data)
-  return ret
+json_request = window.Common.json_request
 
 class TaskStore
   constructor: ->
@@ -29,14 +26,14 @@ class TaskStore
     self = this
 
     self.on 'comment-update', (task, comment) ->
-      $.ajax jsonRequest
+      $.ajax json_request
         url: "/habits/comment-update"
         success: () -> false
         data: comment
 
     self.on 'task-new', (scope, task_name, date) ->
-      $.ajax jsonRequest
-        url: "/habits/tasks/new"
+      $.ajax json_request
+        url: "/habits/new"
         success: () ->
           self.mount_scope scope.scope, date
         data:
@@ -55,13 +52,13 @@ class TaskStore
           success: thunk(task)
         $.ajax(req)
 
-    self.on 'task-delete', command('/habits/tasks/delete', (task) ->
+    self.on 'task-delete', command('/habits/delete', (task) ->
       () ->
         $("#task-#{task.ID}").remove()
         riot.update()
     )
 
-    self.on 'task-update', command('/habits/tasks/update', () ->
+    self.on 'task-update', command('/habits/update', () ->
       (task) ->
         self.mount_task opts: task
     )
@@ -70,8 +67,8 @@ class TaskStore
       () ->
         self.mount_scope task.scope, task.date
 
-    self.on 'task-order-up', command('/habits/tasks/order-up', remount)
-    self.on 'task-order-down', command('/habits/tasks/order-down', remount)
+    self.on 'task-order-up', command('/habits/order-up', remount)
+    self.on 'task-order-down', command('/habits/order-down', remount)
 
   mount_task: (task) ->
     riot.mount("#task-#{task.ID}", task)
@@ -81,7 +78,7 @@ class TaskStore
     fetch = null
 
     if (scope == Scope.bucket) or (scope > Scope.year)
-      $.get "/habits/tasks/in-bucket/#{scope}", (result) ->
+      $.get "/habits/in-bucket/#{scope}", (result) ->
         console.log(result)
         scope = result["scope"]
         tasks = result["tasks"]
@@ -100,7 +97,7 @@ class TaskStore
         when Scope.month then ["month", fetch_date.date(1), "#scope-month"]
         when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
 
-      $.get "/habits/tasks/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
+      $.get "/habits/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
         tasks = tasks or []
         result = riot.mount mount, { date: date, scope: scope, tasks: tasks, }
 
@@ -127,7 +124,6 @@ browse = (from, bucket) ->
 
   task_store.mount_scope Scope.month, from
   task_store.mount_scope Scope.year, from
-  #task_store.mount_scope Scope.bucket, from
   task_store.mount_scope current_bucket, from
 
   # Allow days up to the current date
@@ -157,13 +153,17 @@ main = () ->
     date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
     riot.route "from/#{date.format('YYYY-MM')}/#{current_bucket or 0}"
 
+  RiotControl.on "change-bucket", (bucket) ->
+    riot.route "from/#{current_date.format('YYYY-MM')}/#{bucket}"
+
   riot.route((action, date, bucket) ->
     switch action
       when 'from' then browse(date, bucket)
+      when '' then riot.route("from/#{moment().format('YYYY-MM')}/0")
       else console.log "Unknown action", action, date, bucket)
 
   riot.route.start(true)
-  riot.route("from/2016-01/0")
+  #riot.route("from/2016-01/0")
 
   # Setup websocket
   task_near = (task, date2) ->
@@ -196,24 +196,10 @@ main = () ->
     #  , 10000)
   socket = make_socket()
 
-  make_editor()
-
-make_editor = (selector, args = {}) ->
-  editor = window.Habits.editor = new MediumEditor selector,
-    $.extend({
-      autoLink: true
-      placeholder: false
-      toolbar: {
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote', 'orderedlist', 'unorderedlist']
-      }
-    }, args)
-  editor
-
 # Export variables
 window.Habits =
   Scope: Scope,
   Status: Status,
   initialize: initialize,
   task_store: task_store
-  make_editor: make_editor
   main: main

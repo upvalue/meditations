@@ -59,7 +59,26 @@
 
   change_bucket(e) {
     $.get("/habits/buckets", function(result) {
+      $("#bucket-select").empty();
       console.log(result);
+      for(var i = 0; i != result.length; i++) {
+        $("<option selected value="+result[i].ID+">"+result[i].Name+"</option>").appendTo($("#bucket-select"));
+      }
+      $("#bucket-select-button").click(function() {
+        var selected = parseInt($("#bucket-select option:selected").val());
+        RiotControl.trigger("change-bucket", selected);
+      });
+      $("#bucket-add").click(function() {
+        $.post("/habits/bucket-new/"+$("#bucket-add-name").val(), function(scope) {
+          RiotControl.trigger("change-bucket", scope.ID);
+        });
+      });
+      /*
+      $("#bucket-delete").click(function() {
+
+      });
+      */
+      $("#bucket-modal").modal();
     });
   }
 </scope>
@@ -133,8 +152,9 @@
 
   self.one('mount', function() {
     comment_div().html(self.comment.body);
-    self.editor = window.Habits.make_editor("#comment-"+self.ID, {});
+    self.editor = window.Common.make_editor(comment_div());
     self.editor.subscribe("blur", function() {
+      console.log("Comment update", comment_div().html());
       RiotControl.trigger('comment-update', self._item, {
         ID: self.comment.ID || 0,
         body: comment_div().html(),

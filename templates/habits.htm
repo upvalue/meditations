@@ -21,12 +21,39 @@
     <scope id="scope-bucket"/>
   </div>
 </div>
+
+<div id=bucket-modal class="modal fade" tabindex=-1 role=dialog>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Bucket lists</h4>
+      </div>
+      <div class="modal-body">
+        <select id="bucket-select" class=form-control>
+        </select>
+        <br/>
+        <button id=bucket-select-button type=button class="btn btn-default" data-dismiss=modal>Select</button>
+        <!--<button id=bucket-delete type=button class="btn btn-default">Delete</button>-->
+        <br />
+        <br/>
+        <form class=form-inline>
+          <div class=form-group>
+            <input id=bucket-add-name class=form-control placeholder=Name>
+          </div>
+          <button id=bucket-add type=submit class="btn btn-default" data-dismiss=modal>Add list</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block script %}
 <script src="/assets/site/habits.js"></script>
 <script src="/assets/site/habits.tag" type="riot/tag"></script>
-<script type="text/javascript">$(document).ready(function() {
-  window.Habits.main()
-});</script>
+
+<script type="text/javascript">$(document).ready(function() { window.Habits.main() });</script>
 {% endblock %}

@@ -2,16 +2,23 @@
 
 {% block title %}Journal{% endblock %}
 
+{% block navigation %}
+  <form class="navbar-form navbar-right">
+    <div class=form-group>
+      <input id=journal-new-entry-date type=text placeholder="New entry" class=form-control />
+    </div>
+  </form>
+{% endblock %}
+
 {% block content %}
+<entries></entries>
 {% endblock %}
 
 {% block script %}
-<!--
-<script src="/assets/site/habits.js"></script>
-<script src="/assets/site/habits.tag" type="riot/tag"></script>
-<script type="text/javascript">$(document).ready(function() {
-  window.Habits.main()
-});</script>
--->
+<script src="/assets/vendor/jquery-ui/jquery-ui.min.js"></script>
+
 <script src="/assets/site/journal.js"></script>
+<script src="/assets/site/journal.tag" type=riot/tag></script>
+
+<script type="text/javascript">$(document).ready(function() { /*window.Habits.initialize();*/ window.Journal.main(); });</script>
 {% endblock %}
