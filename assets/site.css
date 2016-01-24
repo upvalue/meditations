@@ -52,3 +52,7 @@ input.form-control[type=text] { height:1.5em; }
 .comment p:first-of-type { padding-top:.25em; }
 
 .comment:empty { display: inline;}
+
+/**** JOURNAL */
+
+.container-fluid h3:first-of-type { margin:0; }

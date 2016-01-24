@@ -10,6 +10,7 @@ Scope =
   month: 2
   year: 3
   wrap: 4
+  bucketp: (scope) -> scope == Scope.bucket or Scope > Scope.year
 
 Status =
   unset: 0
@@ -77,7 +78,7 @@ class TaskStore
     self = this
     fetch = null
 
-    if (scope == Scope.bucket) or (scope > Scope.year)
+    if Scope.bucketp(scope)
       $.get "/habits/in-bucket/#{scope}", (result) ->
         console.log(result)
         scope = result["scope"]
@@ -199,6 +200,7 @@ main = () ->
 # Export variables
 window.Habits =
   Scope: Scope,
+  ScopeBucketp: (scope) -> scope == Scope.bucket or scope > Scope.year
   Status: Status,
   initialize: initialize,
   task_store: task_store

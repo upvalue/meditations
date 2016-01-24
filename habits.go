@@ -173,6 +173,7 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 	date, err := time.Parse("2006-01-02", c.Query("date"))
 	if err != nil {
 		serverError(c, "error parsing date %s", c.Query("date"))
+		return
 	}
 	// Calculate completion rates
 	tasksInScope(&tasks, scope, date)
@@ -198,11 +199,12 @@ func tasksInBucket(c *macaron.Context) {
 	} else {
 		DB.First(&scope)
 	}
-
-	if scope.ID == 0 {
-		serverError(c, "could not find scope %s", scope.Name)
-		return
-	}
+	/*
+		if scope.ID == 0 {
+			serverError(c, "could not find scope %s", scope.Name)
+			return
+		}
+	*/
 
 	var tasks []Task
 	DB.Where("scope = ?", scope.ID).Order("`order` asc").Preload("Comment").Find(&tasks)

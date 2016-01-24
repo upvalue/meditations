@@ -5,9 +5,6 @@ from datetime import datetime, timedelta
 
 import bcrypt
 
-print("NEEDS TO BE UPDATED")
-sys.exit(1)
-
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def now():
@@ -79,10 +76,31 @@ def gen_comments():
     for task_id in range(1, Task.COUNT):
         yield Comment("<p>Task %s</p>" % task_id, 0, task_id)
 
+class Entry(object):
+    COUNT = 1
+
+    def __init__(self, date):
+        self.id = Entry.COUNT
+        Entry.COUNT += 1
+
+        self.created_at = now()
+        self.date = date
+        self.body = date.strftime("Journal entry for %Y/%m/%d")
+
+    def __repr__(self):
+        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", "{0.body}");'.format(self))
+
 random.seed("Not really random")
+
+def gen_entries(days=30):
+    end = datetime.now() + timedelta(days = 1)
+    for date in daterange(end - timedelta(days), end):
+        yield Entry(date)
+
 
 print('BEGIN TRANSACTION;')
 [print(task) for task in gen_tasks("Exercise", status = STATUS_COMPLETE)]
 [print(task) for task in gen_tasks("Diet", order = 1)]
 [print(comment) for comment in gen_comments()]
+[print(e) for e in gen_entries()]
 print('END TRANSACTION;')

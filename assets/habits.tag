@@ -1,6 +1,6 @@
 <scope>
   <section class="scope">
-    <h4 class=scope-title>{opts.date}</h4>
+    <h4 class=scope-title></h4>
     <span class="pull-right">
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
         <button class="btn btn-xs btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
@@ -30,7 +30,7 @@
       }
     }
     if(opts.date) {
-      $(this.root).show().children('section').children('h4').text(title);
+      $(this.root).show().children('section').children('h4.scope-title').text(title);
     } else {
       $(this.root).hide();
     }

@@ -11,7 +11,7 @@
       <script src="/assets/vendor/respond/dest/respond.min.js"></script>
     <![endif]-->
     
-    <link href="/assets/site/site.css" rel=stylesheet>
+    <link href="/assets/site.css" rel=stylesheet>
     {% block style %}{% endblock %}
   </head>
   <body>
@@ -52,7 +52,7 @@
     <script type="text/javascript">$(document).ready(function() {
       window.development = {% if Development %}true{% else %}false{% endif %};
     });</script>
-    <script src="/assets/site/common.js"></script>
+    <script src="/assets/common.js"></script>
     {% block script %}{% endblock %}
   </body>
 </html>
