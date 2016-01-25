@@ -10,7 +10,7 @@ Scope =
   month: 2
   year: 3
   wrap: 4
-  bucketp: (scope) -> scope == Scope.bucket or Scope > Scope.year
+  bucketp: (scope) -> scope > Scope.year
 
 Status =
   unset: 0
@@ -84,7 +84,7 @@ class TaskStore
         scope = result["scope"]
         tasks = result["tasks"]
 
-        result = riot.mount "#scope-bucket", { date: date, scope: scope["ID"], tasks: tasks, title: scope["Name"] }
+        result = riot.mount "#scope-bucket", { date: date, scope: scope.ID, tasks: tasks, title: scope["Name"] }
     else
       if typeof date == 'string'
         date = moment.utc(date)
@@ -160,9 +160,10 @@ main = () ->
   riot.route((action, date, bucket) ->
     switch action
       when 'from' then browse(date, bucket)
-      when '' then riot.route("from/#{moment().format('YYYY-MM')}/0")
-      else console.log "Unknown action", action, date, bucket)
+      when '' then riot.route("from/#{moment().format('YYYY-MM')}/4")
+      else console.log "Unknown action", riot.route.query(), action, date, bucket)
 
+  riot.route.base('/habits#')
   riot.route.start(true)
   #riot.route("from/2016-01/0")
 
@@ -174,7 +175,8 @@ main = () ->
     return ((task.scope == Scope.month or task.scope == Scope.day) and date1.month() == date2.month() and 
       date1.year() == date2.year()) or
       (task.scope == Scope.year and date1.year() == date2.year()) or
-      task.scope == Scope.bucket
+      Scope.bucketp(task.scope)
+      #task.scope == Scope.bucket
 
   socket = false
   make_socket = () ->
@@ -200,7 +202,6 @@ main = () ->
 # Export variables
 window.Habits =
   Scope: Scope,
-  ScopeBucketp: (scope) -> scope == Scope.bucket or scope > Scope.year
   Status: Status,
   initialize: initialize,
   task_store: task_store

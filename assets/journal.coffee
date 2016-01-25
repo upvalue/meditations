@@ -11,11 +11,13 @@ initialize = () ->
   initialize = () -> false
   true
 
-view = (date) ->
-  $.get "/journal/entries?date=#{date}", (entries) ->
+view = (datestr) ->
+  date = moment(datestr, 'YYYY-MM')
+  document.title = "#{date.format('MMM YYYY')} / journal"
+  $.get "/journal/entries?date=#{datestr}", (entries) ->
     console.log "View date", entries
     riot.mount('entries',
-      date: moment(date, 'YYYY-MM'),
+      date: date
       entries: entries
     )
 
