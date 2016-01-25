@@ -3,6 +3,7 @@
 current_date = false
 current_bucket = false
 task_store = false
+json_request = window.Common.json_request
 
 Scope =
   bucket: 0
@@ -17,8 +18,6 @@ Status =
   complete: 1
   incomplete: 2
   wrap: 3
-
-json_request = window.Common.json_request
 
 class TaskStore
   constructor: ->
@@ -165,7 +164,7 @@ main = () ->
 
   riot.route.base('/habits#')
   riot.route.start(true)
-  #riot.route("from/2016-01/0")
+  riot.route("from/#{moment().format('YYYY-MM')}/4")
 
   # Setup websocket
   task_near = (task, date2) ->

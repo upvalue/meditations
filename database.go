@@ -24,22 +24,8 @@ func DBMigrate() {
 
 func DBCreate() {
 	DBMigrate()
-	//daily, monthly, yearly, bucket := Scope{"Daily"}, Scope{"Monthly"}, Scope{"Yearly"}, Scope{"Bucket"}
-	var day Scope
-	day.Name = "Day"
-	DB.Create(&day)
-
-	var month Scope
-	month.Name = "Month"
-	DB.Create(&month)
-
-	var year Scope
-	year.Name = "Year"
-	DB.Create(&year)
-
-	var bucket Scope
-	bucket.Name = "Bucket"
-	DB.Create(&bucket)
+	day, month, year, bucket := Scope{Name: "Day"}, Scope{Name: "Month"}, Scope{Name: "Year"}, Scope{Name: "Bucket"}
+	DB.Create(&day).Create(&month).Create(&year).Create(&bucket)
 }
 
 func DBClose() {

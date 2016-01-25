@@ -60,6 +60,7 @@ main = () ->
       when 'create' then create(date)
       else true)
 
+  riot.route.base("/journal#")
   riot.route.start(true)
   riot.route("view/#{moment().format('YYYY-MM')}")
 

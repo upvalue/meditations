@@ -92,11 +92,10 @@ class Entry(object):
 
 random.seed("Not really random")
 
-def gen_entries(days=30):
+def gen_entries(days=90):
     end = datetime.now() + timedelta(days = 1)
     for date in daterange(end - timedelta(days), end):
         yield Entry(date)
-
 
 print('BEGIN TRANSACTION;')
 [print(task) for task in gen_tasks("Exercise", status = STATUS_COMPLETE)]
