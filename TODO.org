@@ -12,18 +12,21 @@
 ** DONE Very odd: monthly comments do not render on first request serverd
 ** DONE bucket lists
 ** TODO Synchronization: Reload tasks rather than whole scopes when necessary.
-** TODO Clicking on journal from habits needs to be done twice. Riot router bug?
+** DONE Clicking on journal from habits needs to be done twice. Riot router bug?
 ** TODO Scope control formatting on small screens
 ** TODO Allow refresh without going to present day
 ** TODO Session-based error reporting?
-** TODO Adding a comment should look better (try inserting <p> to begin with)
+** DONE Adding a comment should look better (try inserting <p> to begin with)
 ** TODO Combine requests for efficiency?
 ** TODO Select most recently viewed bucket list
+** TODO Copy habits text, copy journal entries, and export entire ranges
+** TODO Fair bit of code repitition in the javascript, can possibly be simplified (common Store ancestor that automatically translates events to on_ methods0
 * Journal
 ** TODO Tagging
 ** TODO Display habits
 ** TODO Port old journal
 * Wiki
+** TODO Wiki
 ** TODO Tagging
 * Misc
 ** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served) (and only if not running under entr?)

@@ -56,3 +56,5 @@ input.form-control[type=text] { height:1.5em; }
 /**** JOURNAL */
 
 .container-fluid h3:first-of-type { margin:0; }
+
+#entries-title { display: inline; }

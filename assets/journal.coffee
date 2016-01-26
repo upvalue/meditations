@@ -14,10 +14,19 @@ initialize = () ->
 view = (datestr) ->
   date = moment(datestr, 'YYYY-MM')
   document.title = "#{date.format('MMM YYYY')} / journal"
-  $.get "/journal/entries?date=#{datestr}", (entries) ->
+  $.get "/journal/entries/date?date=#{datestr}", (entries) ->
     console.log "View date", entries
     riot.mount('entries',
+      title: date.format('MMM YYYY')
       date: date
+      entries: entries
+    )
+
+tag = (name) ->
+  $.get "/journal/entries/tag/#{name}", (entries) ->
+    console.log "View tag #{name}"
+    riot.mount('entries',
+      title: name
       entries: entries
     )
 
@@ -30,6 +39,9 @@ class EntryStore
     riot.observable(this)
 
     this.on 'journal-update', this.journal_update
+    this.on 'add-tag', this.add_tag
+    this.on 'remove-tag', this.on_remove_tag
+    this.on 'browse-tag', this.on_browse_tag
 
   journal_update: (entry) ->
     $.ajax json_request
@@ -39,6 +51,21 @@ class EntryStore
         RiotControl.trigger("journal-updated", data)
 
       data: entry
+
+  add_tag: (entry_id, tag) ->
+    $.post
+      url: "/journal/add-tag/#{entry_id}/#{tag}"
+      success: (data) ->
+        RiotControl.trigger("journal-updated", data)
+
+  on_remove_tag: (entry_id, tag) ->
+    $.post
+      url: "/journal/remove-tag/#{entry_id}/#{tag}"
+      success: (data) ->
+        RiotControl.trigger "journal-updated", data
+
+  on_browse_tag: (name) ->
+    riot.route("tag/#{name}")
 
 main = () ->
   initialize()
@@ -58,6 +85,7 @@ main = () ->
     switch action
       when 'view' then view(date)
       when 'create' then create(date)
+      when 'tag' then tag(date)
       else true)
 
   riot.route.base("/journal#")

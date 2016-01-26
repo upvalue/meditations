@@ -13,6 +13,7 @@ func DBOpen() {
 	checkErr(err)
 	DB = &db
 	DB.LogMode(Config.DBLog)
+
 }
 
 func DBMigrate() {

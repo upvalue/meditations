@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	"github.com/go-macaron/binding"
@@ -30,11 +31,32 @@ func journalEntries(c *macaron.Context) {
 	}
 	var entries []Entry
 	from, to := between(date, ScopeMonth)
-	DB.Where("date between ? and ?", from, to).Order("`date` desc").Find(&entries)
+	DB.Where("date between ? and ?", from, to).Order("`date` desc").Preload("Tags").Find(&entries)
 	c.JSON(200, entries)
 }
 
-func journalEntryNew(c *macaron.Context) {
+func journalEntriesByTag(c *macaron.Context) {
+	var tag Tag
+	var entries []Entry
+
+	DB.Where("name = ?", c.Params("name")).Find(&tag)
+	log.Printf("%v\n", tag)
+	rows, _ := DB.Table("entry_tags").Where("tag_id = ?", tag.ID).Select("entry_id").Rows()
+
+	defer rows.Close()
+	for rows.Next() {
+		var entry_id int
+		var entry Entry
+		rows.Scan(&entry_id)
+		DB.Where("id = ?", entry_id).Preload("Tags").Find(&entry)
+		entries = append(entries, entry)
+	}
+
+	// TODO: How to get Entries easier?
+	c.JSON(200, entries)
+}
+
+func journalNew(c *macaron.Context) {
 	date, err := time.Parse("2006-01-02", c.Query("date"))
 	if err != nil {
 		serverError(c, "error parsing date %s", c.Query("date"))
@@ -54,12 +76,38 @@ func journalEntryNew(c *macaron.Context) {
 	c.JSON(200, entry)
 }
 
-func journalEntryUpdate(c *macaron.Context, entry_update Entry) {
+func journalUpdate(c *macaron.Context, entry_update Entry) {
 	var entry Entry
 	DB.Where("id = ?", entry_update.ID).Find(&entry)
 	entry.Body = entry_update.Body
 	DB.Save(&entry)
+}
 
+func getTag(c *macaron.Context) (Entry, Tag) {
+	var entry Entry
+	var tag Tag
+
+	log.Printf("%s\n", c.Params("tag"))
+	DB.Where("id = ?", c.ParamsInt("id")).Find(&entry)
+	DB.Where(Tag{Name: c.Params("tag")}).FirstOrCreate(&tag)
+
+	return entry, tag
+}
+
+func journalAddTag(c *macaron.Context) {
+	entry, tag := getTag(c)
+	DB.Model(&entry).Association("Tags")
+	DB.Model(&entry).Association("Tags").Append(tag)
+
+	c.JSON(200, entry)
+}
+
+func journalRemoveTag(c *macaron.Context) {
+	entry, tag := getTag(c)
+	DB.Model(&entry).Association("Tags")
+	DB.Model(&entry).Association("Tags").Delete(tag)
+
+	c.JSON(200, entry)
 }
 
 func journalInit(m *macaron.Macaron) {
@@ -67,9 +115,12 @@ func journalInit(m *macaron.Macaron) {
 		c.HTML(200, "journal")
 	})
 
-	m.Get("/entries", journalEntries)
-	m.Post("/new", journalEntryNew)
-	m.Post("/update", binding.Bind(Entry{}), journalEntryUpdate)
+	m.Get("/entries/date", journalEntries)
+	m.Get("/entries/tag/:name", journalEntriesByTag)
+	m.Post("/new", journalNew)
+	m.Post("/update", binding.Bind(Entry{}), journalUpdate)
+	m.Post("/add-tag/:id/:tag", journalAddTag)
+	m.Post("/remove-tag/:id/:tag", journalRemoveTag)
 
 	journalSync = MakeSyncPage("journal")
 	m.Get("/sync", journalSync.Handler())
