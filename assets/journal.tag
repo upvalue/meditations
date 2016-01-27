@@ -91,9 +91,9 @@
   }
 
   remove_tag(e) {
-    window.confirm("Are you sure you want to remove this tag?", function() {
+    if(window.confirm("Are you sure you want to remove this tag?")) {
       RiotControl.trigger('remove-tag', self.ID, $(e.target).attr("data-name"))
-    });
+    }
   }
 
   browse_tag(e) {

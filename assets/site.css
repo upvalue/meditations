@@ -1,12 +1,12 @@
 @import url("/assets/vendor/bootstrap/dist/css/bootstrap.min.css");
-@import url("/assets/vendor/roboto-fontface/css/roboto-fontface.css");
+@import url("/assets/vendor/open-sans-fontface/open-sans.css");
 @import url("/assets/vendor/octicons/octicons/octicons.css");
 @import url("/assets/vendor/medium-editor/dist/css/medium-editor.min.css");
 @import url("/assets/vendor/medium-editor/dist/css/themes/bootstrap.min.css");
 @import url("/assets/vendor/jquery-ui/themes/smoothness/jquery-ui.css");
 
 body {
-  font-family: Roboto, sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 a, a:visited {
@@ -60,3 +60,4 @@ ul.nav a:hover {
 #entries-title { display: inline; }
 
 .entry-tag-form {display:inline; }
+
