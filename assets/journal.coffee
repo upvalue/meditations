@@ -48,7 +48,6 @@ class EntryStore
     $.ajax json_request
       url: "/journal/update"
       success: (data) ->
-        #riot.mount("#entry-#{entry.ID}", data)
         RiotControl.trigger("journal-updated", data)
 
       data: entry
@@ -56,14 +55,10 @@ class EntryStore
   add_tag: (entry_id, tag) ->
     $.post
       url: "/journal/add-tag/#{entry_id}/#{tag}"
-      #success: (data) ->
-      #  RiotControl.trigger("journal-updated", data)
 
   on_remove_tag: (entry_id, tag) ->
     $.post
       url: "/journal/remove-tag/#{entry_id}/#{tag}"
-      #success: (data) ->
-      #  RiotControl.trigger "journal-updated", data
 
   on_browse_tag: (name) ->
     riot.route("tag/#{name}")
@@ -98,7 +93,6 @@ main = () ->
     entry = $.parseJSON(m.data)
     if $("#entry-#{entry.ID}").length
       riot.mount("#entry-#{entry.ID}", entry)
-    #RiotControl.trigger "journal-updated", entry
 
 window.Journal = 
   initialize: initialize
