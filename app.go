@@ -46,6 +46,14 @@ func loadConfig(c *cli.Context) {
 	if c.IsSet("development") == true {
 		Config.Development = c.BoolT("development")
 	}
+
+	if c.IsSet("database") == true {
+		Config.DBPath = c.String("database")
+	}
+
+	if c.IsSet("port") == true {
+		Config.Port = c.Int("port")
+	}
 }
 
 func App() *macaron.Macaron {

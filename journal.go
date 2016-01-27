@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
@@ -22,6 +23,14 @@ type Tag struct {
 }
 
 var journalSync *SyncPage
+
+func syncEntry(e Entry) {
+	DB.Where("id = ?", e.ID).Preload("Tags").First(&e)
+	log.Printf("%+v", e)
+	json, err := json.Marshal(e)
+	checkErr(err)
+	journalSync.Sync(json)
+}
 
 func journalEntries(c *macaron.Context) {
 	date, err := time.Parse("2006-01", c.Query("date"))
@@ -81,6 +90,7 @@ func journalUpdate(c *macaron.Context, entry_update Entry) {
 	DB.Where("id = ?", entry_update.ID).Find(&entry)
 	entry.Body = entry_update.Body
 	DB.Save(&entry)
+	syncEntry(entry)
 }
 
 func getTag(c *macaron.Context) (Entry, Tag) {

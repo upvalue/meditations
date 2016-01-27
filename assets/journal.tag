@@ -50,6 +50,30 @@
 
   var self = this
 
+  self.one('mount', function() {
+    // What a hack. Seems riot won't allow remounting of tags created with each= (or rather, there is no way to load
+    // the variables back into the "context"
+    if(this.opts.__proto__.ID) {
+      self.update(this.opts.__proto__);
+    }
+    $(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("ddd Do"));
+    $(this.root).children(".entry-body").html(this.Body);
+    self.editor = window.Common.make_editor("#entry-body-" + this.ID);
+    self.editor.subscribe("blur", function() {
+      console.log("Journal update");
+      RiotControl.trigger('journal-update', {
+        ID: self.ID,
+        Body: $("#entry-body-"+self.ID).html()
+      });
+    });
+  });
+
+  RiotControl.on('journal-updated', function(data) {
+    if(data.ID == self._item.ID) {
+      self.update(data);
+    }
+  });
+
   new_tag() {
     RiotControl.trigger('add-tag', self._item.ID, $(this.root).find(".tag-name").val());
   }
@@ -61,23 +85,4 @@
   browse_tag(e) {
     RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
   }
-
-  RiotControl.on('journal-updated', function(data) {
-    if(data.ID == self._item.ID) {
-      self.update(data);
-    }
-  });
-
-  this.on('mount', function() {
-    $(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("Do"));
-    $(this.root).children(".entry-body").html(this.Body);
-    self.editor = window.Common.make_editor("#entry-body-" + this.ID);
-    self.editor.subscribe("blur", function() {
-      console.log("Journal update");
-      RiotControl.trigger('journal-update', {
-        ID: self.ID,
-        Body: $("#entry-body-"+self.ID).html()
-      });
-    });
-  });
 </entry>

@@ -27,9 +27,18 @@ func main() {
 			Name:  "db-log",
 			Usage: "verbosely log SQL",
 		},
+		cli.StringFlag{
+			Name:  "database",
+			Usage: "database",
+		},
 		cli.BoolTFlag{
 			Name:  "development",
 			Usage: "whether development is true",
+		},
+		cli.IntFlag{
+			Name:  "port",
+			Usage: "HTTP port",
+			Value: 8080,
 		},
 	}
 

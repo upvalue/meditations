@@ -92,6 +92,11 @@ main = () ->
   riot.route.start(true)
   riot.route("view/#{moment().format('YYYY-MM')}")
 
+  socket = window.Common.make_socket "journal/sync", (m) ->
+    entry = $.parseJSON(m.data)
+    riot.mount($("#entry-#{entry.ID}")[0], entry)
+    #RiotControl.trigger "journal-updated", entry
+
 window.Journal = 
   initialize: initialize
   main: main

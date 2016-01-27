@@ -59,8 +59,7 @@ class TaskStore
     )
 
     self.on 'task-update', command('/habits/update', () ->
-      (task) ->
-        self.mount_task opts: task
+      () -> true
     )
 
     remount = (task) ->
@@ -69,9 +68,6 @@ class TaskStore
 
     self.on 'task-order-up', command('/habits/order-up', remount)
     self.on 'task-order-down', command('/habits/order-down', remount)
-
-  mount_task: (task) ->
-    riot.mount("#task-#{task.ID}", task)
 
   mount_scope: (scope, date, mount) ->
     self = this
@@ -178,25 +174,12 @@ main = () ->
       #task.scope == Scope.bucket
 
   socket = false
-  make_socket = () ->
-    url = "ws://#{window.location.hostname}:#{window.location.port}/habits/sync"
-    socket = new WebSocket url
-    socket.onopen = (m) ->
-      console.log "Connected to #{url} websocket"
-    socket.onmessage = (m) ->
-      console.log "Socket message #{m}"
-      task = $.parseJSON(m.data)
-      # No need to refresh if task is not in the current scope
-      date = moment.utc(task.date)
-      if task_near(task, current_date)
-        task_store.mount_scope task.scope, date
-    # Reconnect to socket on failure for development re-loading
-    #socket.onclose = () ->
-    #  setTimeout(() ->
-    #    socket = make_socket()
-    #    console.log 'Lost websocket connection, retrying in 10 seconds'
-    #  , 10000)
-  socket = make_socket()
+  socket = window.Common.make_socket "habits/sync", (m) ->
+    task = $.parseJSON(m.data)
+    # No need to refresh if task is not in the current scope
+    date = moment.utc(task.date)
+    if task_near(task, current_date)
+      task_store.mount_scope task.scope, date
 
 # Export variables
 window.Habits =

@@ -24,7 +24,7 @@
       title = opts.title;
     } else {
       switch(opts.scope) {
-        case window.Habits.Scope.day: title = opts.date.format("Do"); break;
+        case window.Habits.Scope.day: title = opts.date.format("ddd Do"); break;
         case window.Habits.Scope.month: title = opts.date.format("MMMM"); break; 
         case window.Habits.Scope.year: title = opts.date.format("YYYY"); break;
       }
@@ -130,7 +130,7 @@
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
     <span class="pull-right">
-      <button if={ (comment.ID == 0) } class="task-control btn btn-xs btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
+      <button class="task-control btn btn-xs btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
       <button class="task-control btn btn-xs btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} title="Copy to present day" class="btn btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
       <button class="task-control btn btn-xs btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
