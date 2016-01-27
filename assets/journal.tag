@@ -91,12 +91,12 @@
   }
 
   remove_tag(e) {
-    RiotControl.trigger('remove-tag', self.ID, $(e.target).attr("data-name"))
+    window.confirm("Are you sure you want to remove this tag?", function() {
+      RiotControl.trigger('remove-tag', self.ID, $(e.target).attr("data-name"))
+    });
   }
 
   browse_tag(e) {
-    window.confirm("Are you sure you want to remove this tag?", function() {
-      RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
-    });
+    RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
   }
 </entry>

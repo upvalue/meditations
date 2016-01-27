@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/go-macaron/binding"
@@ -42,6 +43,20 @@ func journalEntries(c *macaron.Context) {
 	c.JSON(200, entries)
 }
 
+type ByDate []Entry
+
+func (e ByDate) Len() int {
+	return len(e)
+}
+
+func (s ByDate) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s ByDate) Less(i, j int) bool {
+	return s[i].Date.After(s[j].Date)
+}
+
 func journalEntriesByTag(c *macaron.Context) {
 	var tag Tag
 	var entries []Entry
@@ -50,6 +65,7 @@ func journalEntriesByTag(c *macaron.Context) {
 	log.Printf("%v\n", tag)
 	rows, _ := DB.Table("entry_tags").Where("tag_id = ?", tag.ID).Select("entry_id").Rows()
 
+	// TODO: How to pull Entries belonging to Tags?
 	defer rows.Close()
 	for rows.Next() {
 		var entry_id int
@@ -58,6 +74,8 @@ func journalEntriesByTag(c *macaron.Context) {
 		DB.Where("id = ?", entry_id).Preload("Tags").Find(&entry)
 		entries = append(entries, entry)
 	}
+
+	sort.Sort(ByDate(entries))
 
 	// TODO: How to get Entries easier?
 	c.JSON(200, entries)
