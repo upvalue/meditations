@@ -14,6 +14,7 @@ initialize = () ->
 view = (datestr) ->
   date = moment(datestr, 'YYYY-MM')
   document.title = "#{date.format('MMM YYYY')} / journal"
+  $("#habits-link").attr "href", "/habits#from/#{date.format('YYYY-MM')}/0"
   $.get "/journal/entries/date?date=#{datestr}", (entries) ->
     console.log "View date", entries
     riot.mount('entries',
@@ -90,7 +91,8 @@ main = () ->
 
   riot.route.base("/journal#")
   riot.route.start(true)
-  riot.route("view/#{moment().format('YYYY-MM')}")
+  unless window.location.hash.length > 1
+    riot.route("view/#{moment().format('YYYY-MM')}")
 
   socket = window.Common.make_socket "journal/sync", (m) ->
     entry = $.parseJSON(m.data)

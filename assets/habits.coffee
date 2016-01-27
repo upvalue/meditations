@@ -11,7 +11,7 @@ Scope =
   month: 2
   year: 3
   wrap: 4
-  bucketp: (scope) -> scope > Scope.year
+  bucketp: (scope) -> scope == Scope.bucket or scope > Scope.year
 
 Status =
   unset: 0
@@ -114,6 +114,7 @@ browse = (from, bucket) ->
   console.log('Browsing from', from)
   today = moment()
   from = moment(from, 'YYYY-MM')
+  $("#journal-link").attr "href", "/journal#view/#{from.format('YYYY-MM')}"
   document.title = "#{from.format('MMM YYYY')} / habits"
   current_date = from.clone()
   current_bucket = parseInt(bucket)
@@ -160,7 +161,8 @@ main = () ->
 
   riot.route.base('/habits#')
   riot.route.start(true)
-  riot.route("from/#{moment().format('YYYY-MM')}/4")
+  unless window.location.hash.length > 1
+    riot.route("from/#{moment().format('YYYY-MM')}/4")
 
   # Setup websocket
   task_near = (task, date2) ->

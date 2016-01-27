@@ -199,12 +199,6 @@ func tasksInBucket(c *macaron.Context) {
 	} else {
 		DB.First(&scope)
 	}
-	/*
-		if scope.ID == 0 {
-			serverError(c, "could not find scope %s", scope.Name)
-			return
-		}
-	*/
 
 	var tasks []Task
 	DB.Where("scope = ?", scope.ID).Order("`order` asc").Preload("Comment").Find(&tasks)
