@@ -43,7 +43,7 @@ ul.nav a:hover {
   padding-bottom: .15em;
 }
 
-input.form-control[type=text] { height:1.5em; }
+#content input.form-control[type=text] { height:1.5em; }
 
 .comment p {
   margin-bottom: 0;
@@ -58,3 +58,5 @@ input.form-control[type=text] { height:1.5em; }
 .container-fluid h3:first-of-type { margin:0; }
 
 #entries-title { display: inline; }
+
+.entry-tag-form {display:inline; }
