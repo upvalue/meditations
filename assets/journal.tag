@@ -54,7 +54,9 @@
     // What a hack. Seems riot won't allow remounting of tags created with each= (or rather, there is no way to load
     // the variables back into the "context"
     if(this.opts.__proto__.ID) {
+      console.log(this.opts.__proto__);
       self.update(this.opts.__proto__);
+    } else {
     }
     $(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("ddd Do"));
     $(this.root).children(".entry-body").html(this.Body);
@@ -69,17 +71,18 @@
   });
 
   RiotControl.on('journal-updated', function(data) {
-    if(data.ID == self._item.ID) {
+    if(data.ID == self.ID) {
       self.update(data);
+      self = this;
     }
   });
 
   new_tag() {
-    RiotControl.trigger('add-tag', self._item.ID, $(this.root).find(".tag-name").val());
+    RiotControl.trigger('add-tag', self.ID, $(this.root).find(".tag-name").val());
   }
 
   remove_tag(e) {
-    RiotControl.trigger('remove-tag', self._item.ID, $(e.target).attr("data-name"))
+    RiotControl.trigger('remove-tag', self.ID, $(e.target).attr("data-name"))
   }
 
   browse_tag(e) {

@@ -55,14 +55,14 @@ class EntryStore
   add_tag: (entry_id, tag) ->
     $.post
       url: "/journal/add-tag/#{entry_id}/#{tag}"
-      success: (data) ->
-        RiotControl.trigger("journal-updated", data)
+      #success: (data) ->
+      #  RiotControl.trigger("journal-updated", data)
 
   on_remove_tag: (entry_id, tag) ->
     $.post
       url: "/journal/remove-tag/#{entry_id}/#{tag}"
-      success: (data) ->
-        RiotControl.trigger "journal-updated", data
+      #success: (data) ->
+      #  RiotControl.trigger "journal-updated", data
 
   on_browse_tag: (name) ->
     riot.route("tag/#{name}")
@@ -94,7 +94,8 @@ main = () ->
 
   socket = window.Common.make_socket "journal/sync", (m) ->
     entry = $.parseJSON(m.data)
-    riot.mount($("#entry-#{entry.ID}")[0], entry)
+    if $("#entry-#{entry.ID}").length
+      riot.mount("#entry-#{entry.ID}", entry)
     #RiotControl.trigger "journal-updated", entry
 
 window.Journal = 

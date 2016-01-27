@@ -25,6 +25,7 @@ type Tag struct {
 var journalSync *SyncPage
 
 func syncEntry(e Entry) {
+	e.Tags = e.Tags[:0]
 	DB.Where("id = ?", e.ID).Preload("Tags").First(&e)
 	log.Printf("%+v", e)
 	json, err := json.Marshal(e)
@@ -110,6 +111,7 @@ func journalAddTag(c *macaron.Context) {
 	DB.Model(&entry).Association("Tags").Append(tag)
 
 	c.JSON(200, entry)
+	syncEntry(entry)
 }
 
 func journalRemoveTag(c *macaron.Context) {
@@ -118,6 +120,7 @@ func journalRemoveTag(c *macaron.Context) {
 	DB.Model(&entry).Association("Tags").Delete(tag)
 
 	c.JSON(200, entry)
+	syncEntry(entry)
 }
 
 func journalInit(m *macaron.Macaron) {

@@ -4,7 +4,7 @@ make_editor = (selector, args = {}) ->
       autoLink: true
       placeholder: false
       toolbar: {
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote', 'orderedlist', 'unorderedlist']
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
       }
     }, args)
   editor
