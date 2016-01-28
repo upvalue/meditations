@@ -129,6 +129,9 @@ func calculateCompletionRate(task Task) float64 {
 	for _, t := range tasks {
 		if t.Status == TaskComplete {
 			rate += 1.0
+		} else if t.Status == TaskUnset {
+			// Do not include unset tasks in the total
+			count -= 1.0
 		}
 	}
 

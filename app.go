@@ -83,7 +83,6 @@ func App() *macaron.Macaron {
 	})
 
 	m.Get("/", func(c *macaron.Context) {
-		//c.HTML(200, "index")
 		c.Redirect("/habits")
 	})
 
