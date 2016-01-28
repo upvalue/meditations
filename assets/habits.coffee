@@ -156,13 +156,13 @@ main = () ->
   riot.route((action, date, bucket) ->
     switch action
       when 'from' then browse(date, bucket)
-      when '' then riot.route("from/#{moment().format('YYYY-MM')}/4")
+      when '' then riot.route("from/#{moment().format('YYYY-MM')}/0")
       else console.log "Unknown action", riot.route.query(), action, date, bucket)
 
   riot.route.base('/habits#')
   riot.route.start(true)
   unless window.location.hash.length > 1
-    riot.route("from/#{moment().format('YYYY-MM')}/4")
+    riot.route("from/#{moment().format('YYYY-MM')}/0")
 
   # Setup websocket
   task_near = (task, date2) ->

@@ -30,7 +30,8 @@
       today.add(4, 'hours');
       if (today.isSame(check, 'month')) {
         if (!check.isSame(today, 'day')) {
-          $("<button class=\"btn btn-xs\">Add entry for " + (today.format('YYYY-MM-DD')) + "</button>").insertBefore("entries").click(function() {
+          $("<button id=entry-add-for-btn class=\"btn btn-xs\">Add entry for " + (today.format('YYYY-MM-DD')) + "</button>").insertBefore("entries").click(function() {
+            $("#entry-add-for-btn").remove();
             return riot.route("create/" + (today.format('YYYY-MM-DD')));
           });
           console.log('new journal entry', today);

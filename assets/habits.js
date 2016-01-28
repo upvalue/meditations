@@ -203,7 +203,7 @@
         case 'from':
           return browse(date, bucket);
         case '':
-          return riot.route("from/" + (moment().format('YYYY-MM')) + "/4");
+          return riot.route("from/" + (moment().format('YYYY-MM')) + "/0");
         default:
           return console.log("Unknown action", riot.route.query(), action, date, bucket);
       }
@@ -211,7 +211,7 @@
     riot.route.base('/habits#');
     riot.route.start(true);
     if (!(window.location.hash.length > 1)) {
-      riot.route("from/" + (moment().format('YYYY-MM')) + "/4");
+      riot.route("from/" + (moment().format('YYYY-MM')) + "/0");
     }
     task_near = function(task, date2) {
       var date1;

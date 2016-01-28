@@ -41,7 +41,7 @@
 
 <entry id={"entry-"+ID}>
   <h4>{title}</h4>
-  <div id={"entry-body-"+ID} class=entry-body></div>
+  <div id={"entry-body-"+ID} class=entry-body onfocus={focus} onblur={blur}></div>
   <span class=entry-tags>
     <div class=form-inline>
       <span each={Tags}>
@@ -59,6 +59,13 @@
 
   var self = this
 
+  var save = function() {
+    RiotControl.trigger('journal-update', {
+      ID: self.ID,
+      Body: $("#entry-body-"+self.ID).html()
+    });
+  }
+
   self.one('mount', function() {
     // What a hack. Seems riot won't allow remounting of tags created with each= (or rather, there is no way to load
     // the variables back into the "context"
@@ -72,10 +79,7 @@
     self.editor = window.Common.make_editor("#entry-body-" + this.ID);
     self.editor.subscribe("blur", function() {
       console.log("Journal update");
-      RiotControl.trigger('journal-update', {
-        ID: self.ID,
-        Body: $("#entry-body-"+self.ID).html()
-      });
+      save();
     });
   });
 
@@ -98,5 +102,17 @@
 
   browse_tag(e) {
     RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
+  }
+
+  // Focus/blur managers to ensure the data is saved if the window is closed
+  focus(e) {
+    console.log("Focused on thing");
+    $(window).on("beforeunload", function() {
+      save();
+    });
+  }
+
+  blur(e) {
+    $(window).off("unload");
   }
 </entry>

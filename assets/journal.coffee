@@ -23,8 +23,9 @@ view = (datestr) ->
     today.add(4, 'hours')
     if today.isSame(check, 'month')
       unless check.isSame(today, 'day')
-        $("<button class=\"btn btn-xs\">Add entry for #{today.format('YYYY-MM-DD')}</button>")
+        $("<button id=entry-add-for-btn class=\"btn btn-xs\">Add entry for #{today.format('YYYY-MM-DD')}</button>")
           .insertBefore("entries").click () ->
+            $("#entry-add-for-btn").remove()
             riot.route("create/#{today.format('YYYY-MM-DD')}")
         console.log('new journal entry', today)
 
