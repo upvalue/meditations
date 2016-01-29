@@ -96,12 +96,15 @@ func between(start time.Time, scope int) (time.Time, time.Time) {
 		return from, from.AddDate(1, 0, 0)
 	case ScopeBucket:
 	}
+	if scope > ScopeYear {
+		return time.Date(1960, 1, 1, 0, 0, 0, 0, time.Local), time.Now()
+	}
 	return time.Now(), time.Now()
 }
 
 func tasksInScope(tasks *[]Task, scope int, start time.Time) {
-	if scope == ScopeBucket {
-		DB.Where("scope = ?", ScopeBucket).Preload("Comment").Find(tasks)
+	if scope > ScopeYear {
+		DB.Where("scope = ?", scope).Preload("Comment").Find(tasks)
 	} else {
 		from, to := between(start, scope)
 
