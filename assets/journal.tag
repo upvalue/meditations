@@ -12,7 +12,6 @@
   </span>
   <entry each={opts.entries}></entry>
   this.on('mount', function() {
-    //console.log(opts.entries);
     if(opts.thunk) { 
       opts.thunk();
     }
@@ -41,7 +40,7 @@
 
 <entry id={"entry-"+ID}>
   <h4>{title}</h4>
-  <div id={"entry-body-"+ID} class="entry-body"  onfocus={focus} onblur={blur}></div>
+  <div id={"entry-body-"+ID} class="entry-body" onfocus={focus} onblur={blur}></div>
   <span class=entry-tags>
     <div class=form-inline>
       <span each={Tags}>
@@ -51,10 +50,11 @@
         </button>
       </span>
       <form class="entry-tag-form" onsubmit={new_tag}>
-        <input type=text class="form-control tag-name" size=10 placeholder="New Tag" />
+        <input type=text class="form-control tag-name" size=10 placeholder="New tag" />
         <button class="btn btn-xs btn-link octicon octicon-plus" title="Add tag" onclick={new_tag}></button>
       </form>
     </div>
+
   </span>
 
   var self = this
@@ -67,26 +67,25 @@
   }
 
   self.one('mount', function() {
-    // What a hack. Seems riot won't allow remounting of tags created with each= (or rather, there is no way to load
-    // the variables back into the "context"
-    if(this.opts.__proto__.ID) {
-      console.log(this.opts.__proto__);
-      self.update(this.opts.__proto__);
-    } else {
-    }
     $(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("dddd, MMM Do"));
     $(this.root).children(".entry-body").html(this.Body);
     self.editor = window.Common.make_editor("#entry-body-" + this.ID);
+
+    self.editor.subscribe("focus", function() {
+      $(window).on("beforeunload", function() {
+        save();
+      });
+    });
+
     self.editor.subscribe("blur", function() {
-      console.log("Journal update");
       save();
+      $(window).off("unload");
     });
   });
 
   RiotControl.on('journal-updated', function(data) {
-    if(data.ID == self.ID) {
+    if(data.ID == self._item.ID) {
       self.update(data);
-      self = this;
     }
   });
 
@@ -102,17 +101,5 @@
 
   browse_tag(e) {
     RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
-  }
-
-  // Focus/blur managers to ensure the data is saved if the window is closed
-  focus(e) {
-    console.log("Focused on thing");
-    $(window).on("beforeunload", function() {
-      save();
-    });
-  }
-
-  blur(e) {
-    $(window).off("unload");
   }
 </entry>

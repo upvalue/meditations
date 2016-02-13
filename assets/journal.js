@@ -23,20 +23,7 @@
     document.title = (date.format('MMM YYYY')) + " / journal";
     $("#habits-link").attr("href", "/habits#from/" + (date.format('YYYY-MM')) + "/0");
     return $.get("/journal/entries/date?date=" + datestr, function(entries) {
-      var check, today;
       console.log("View date", entries);
-      check = moment(entries[0].Date, 'YYYY-MM-DD');
-      today = moment();
-      today.add(4, 'hours');
-      if (today.isSame(check, 'month')) {
-        if (!check.isSame(today, 'day')) {
-          $("<button id=entry-add-for-btn class=\"btn btn-xs\">Add entry for " + (today.format('YYYY-MM-DD')) + "</button>").insertBefore("entries").click(function() {
-            $("#entry-add-for-btn").remove();
-            return riot.route("create/" + (today.format('YYYY-MM-DD')));
-          });
-          console.log('new journal entry', today);
-        }
-      }
       return riot.mount('entries', {
         title: date.format('MMM YYYY'),
         date: date,
@@ -74,7 +61,7 @@
       return $.ajax(json_request({
         url: "/journal/update",
         success: function(data) {
-          return RiotControl.trigger("journal-updated", data);
+          return true;
         },
         data: entry
       }));
@@ -109,15 +96,13 @@
       onSelect: function(datestr) {
         var date;
         date = moment(datestr, "MM/DD/YYYY");
-        return riot.route("create/" + (date.format('YYYY-MM-DD')));
+        return create(date.format('YYYY-MM-DD'));
       }
     });
     riot.route(function(action, date) {
       switch (action) {
         case 'view':
           return view(date);
-        case 'create':
-          return create(date);
         case 'tag':
           return tag(date);
         case '':
@@ -135,7 +120,7 @@
       var entry;
       entry = $.parseJSON(m.data);
       if ($("#entry-" + entry.ID).length) {
-        return riot.mount("#entry-" + entry.ID, entry);
+        return RiotControl.trigger("journal-updated", entry);
       }
     });
   };

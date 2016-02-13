@@ -35,7 +35,7 @@
       return console.log("Connected to " + url + " websocket");
     };
     return socket.onmessage = function(m) {
-      console.log(location + ": Socket message " + m);
+      console.log(location + ": Socket message", m);
       return onmessage(m);
     };
   };

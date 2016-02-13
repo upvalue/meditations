@@ -17,18 +17,6 @@ view = (datestr) ->
   $("#habits-link").attr "href", "/habits#from/#{date.format('YYYY-MM')}/0"
   $.get "/journal/entries/date?date=#{datestr}", (entries) ->
     console.log "View date", entries
-    # if there's not an entry for today (or tomorrow if within 4 hours of that), add a little "click to edit" mount
-    check = moment(entries[0].Date, 'YYYY-MM-DD')
-    today = moment()
-    today.add(4, 'hours')
-    if today.isSame(check, 'month')
-      unless check.isSame(today, 'day')
-        $("<button id=entry-add-for-btn class=\"btn btn-xs\">Add entry for #{today.format('YYYY-MM-DD')}</button>")
-          .insertBefore("entries").click () ->
-            $("#entry-add-for-btn").remove()
-            riot.route("create/#{today.format('YYYY-MM-DD')}")
-        console.log('new journal entry', today)
-
 
     riot.mount('entries',
       title: date.format('MMM YYYY')
@@ -61,7 +49,7 @@ class EntryStore
     $.ajax json_request
       url: "/journal/update"
       success: (data) ->
-        RiotControl.trigger("journal-updated", data)
+        true#RiotControl.trigger("journal-updated", data)
 
       data: entry
 
@@ -87,13 +75,12 @@ main = () ->
   $("#journal-new-entry-date").datepicker
     onSelect: (datestr) ->
       date = moment(datestr, "MM/DD/YYYY")
-      riot.route("create/#{date.format('YYYY-MM-DD')}")
+      create(date.format('YYYY-MM-DD'))
 
   # Install router
   riot.route((action, date) ->
     switch action
       when 'view' then view(date)
-      when 'create' then create(date)
       when 'tag' then tag(date)
       when '' then riot.route("view/#{moment().format('YYYY-MM')}")
       else true)
@@ -106,7 +93,7 @@ main = () ->
   socket = window.Common.make_socket "journal/sync", (m) ->
     entry = $.parseJSON(m.data)
     if $("#entry-#{entry.ID}").length
-      riot.mount("#entry-#{entry.ID}", entry)
+      RiotControl.trigger("journal-updated", entry)
 
 window.Journal = 
   initialize: initialize

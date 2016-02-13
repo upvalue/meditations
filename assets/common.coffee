@@ -20,7 +20,7 @@ make_socket = (location, onmessage) ->
   socket.onopen = (m) ->
     console.log "Connected to #{url} websocket"
   socket.onmessage = (m) ->
-    console.log "#{location}: Socket message #{m}"
+    console.log "#{location}: Socket message", m
     onmessage(m)
   # Reconnect to socket on failure for development re-loading
   #socket.onclose = () ->
