@@ -10,10 +10,14 @@
     <button if={opts.date} class="btn btn-link btn-xs octicon octicon-chevron-right" title="Next month" onclick={next_month}></button>
     <button if={opts.date} class="btn btn-link btn-xs octicon octicon-triangle-right" title="Next year" onclick={next_year}></button>
   </span>
+  <!--<date-entries if={opts.date} entries={opts.entries}></entry-days>
+  <tag-entries if={opts.date} entries={opts.entries}></tag-entries>-->
   <entry each={opts.entries}></entry>
+  <!--<entry each={opts.entries}></entry>-->
   this.on('mount', function() {
+    console.log(opts);
     if(opts.thunk) { 
-      opts.thunk();
+      opts.thunk(this.root);
     }
   });
 
@@ -37,6 +41,14 @@
     history.back();
   }
 </entries>
+
+<date-entries>
+  <entry each={opts.entries}></entry>
+</date-entries>
+
+<tag-entries>
+  <entry each={opts.entries}></entry>
+</tag-entries>
 
 <entry id={"entry-"+ID}>
   <h4>{title}</h4>

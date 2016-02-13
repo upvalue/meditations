@@ -39,7 +39,7 @@ func journalEntries(c *macaron.Context) {
 	}
 	var entries []Entry
 	from, to := between(date, ScopeMonth)
-	DB.Where("date between ? and ?", from, to).Order("`date` desc").Preload("Tags").Find(&entries)
+	DB.Where("date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
 	c.JSON(200, entries)
 }
 
@@ -89,11 +89,6 @@ func journalNew(c *macaron.Context) {
 	}
 
 	var entry Entry
-	DB.Where("date = ?", date).Find(&entry)
-
-	if entry.ID > 0 {
-		c.JSON(200, entry)
-	}
 
 	entry.Date = date
 	entry.Body = "Click to edit"

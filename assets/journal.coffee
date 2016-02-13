@@ -11,6 +11,9 @@ initialize = () ->
   initialize = () -> false
   true
 
+mount_entries = (root) ->
+  console.log "Appending entries to", root
+
 view = (datestr) ->
   date = moment(datestr, 'YYYY-MM')
   document.title = "#{date.format('MMM YYYY')} / journal"
@@ -22,6 +25,8 @@ view = (datestr) ->
       title: date.format('MMM YYYY')
       date: date
       entries: entries
+      mount_entries: (root) ->
+        console.log $(this.root).find('entry-days')
     )
 
 tag = (name) ->
@@ -30,6 +35,7 @@ tag = (name) ->
     riot.mount('entries',
       title: name
       entries: entries
+      thunk: mount_entries
     )
 
 create = (date) ->
