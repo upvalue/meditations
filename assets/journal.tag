@@ -40,7 +40,7 @@
 
 <entry id={"entry-"+ID}>
   <h4>{title}</h4>
-  <div id={"entry-body-"+ID} class="entry-body" onfocus={focus} onblur={blur}></div>
+  <div id={"entry-body-"+ID} class="entry-body"></div>
   <span class=entry-tags>
     <div class=form-inline>
       <span each={Tags}>
