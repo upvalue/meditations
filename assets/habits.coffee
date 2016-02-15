@@ -1,9 +1,10 @@
 # habits.coffee - habits code
 
+common = window.Common
 current_date = false
 current_bucket = false
 task_store = false
-json_request = window.Common.json_request
+json_request = common.json_request
 
 Scope =
   bucket: 0
@@ -19,73 +20,18 @@ Status =
   incomplete: 2
   wrap: 3
 
-class TaskStore
-  constructor: ->
-    riot.observable(this)
-
-    self = this
-
-    self.on 'comment-update', (task, comment) ->
-      $.ajax json_request
-        url: "/habits/comment-update"
-        success: () -> false
-        data: comment
-
-    self.on 'task-new', (scope, task_name, date) ->
-      $.ajax json_request
-        url: "/habits/new"
-        success: () ->
-          self.mount_scope scope.scope, date
-        data:
-          name: task_name
-          scope: scope.scope
-          date: date.format "YYYY-MM-DDTHH:mm:ssZ"
-        
-    # Run a command that changes a task and displays changes
-    command = (path, thunk) ->
-      (task) ->
-        req =
-          type: "POST"
-          url: path
-          data: JSON.stringify(task)
-          contentType: "application/json; charset=UTF-8"
-          success: thunk(task)
-        $.ajax(req)
-
-    self.on 'task-delete', command('/habits/delete', (task) ->
-      () ->
-        $("#task-#{task.ID}").remove()
-        riot.update()
-    )
-
-    self.on 'task-update', command('/habits/update', () ->
-      () -> true
-    )
-
-    remount = (task) ->
-      () ->
-        self.mount_scope task.scope, task.date
-
-    self.on 'task-order-up', command('/habits/order-up', remount)
-    self.on 'task-order-down', command('/habits/order-down', remount)
-
+class TaskStore extends common.Store
   mount_scope: (scope, date, mount) ->
-    self = this
     fetch = null
 
     if Scope.bucketp(scope)
       $.get "/habits/in-bucket/#{scope}", (result) ->
         console.log(result)
-        scope = result["scope"]
-        tasks = result["tasks"]
+        [scope, tasks] = [result.scope, result.tasks]
 
         result = riot.mount "#scope-bucket", { date: date, scope: scope.ID, tasks: tasks, title: scope["Name"] }
     else
-      if typeof date == 'string'
-        date = moment.utc(date)
-      else
-        date = date.clone()
-
+      date = if typeof date == 'string' then moment.utc(date) else date.clone()
       fetch_date = date.clone()
 
       [fetch, fetch_date, mount] = switch scope
@@ -97,11 +43,44 @@ class TaskStore
         tasks = tasks or []
         result = riot.mount mount, { date: date, scope: scope, tasks: tasks, }
 
+  command: (path, task, thunk) ->
+    common.request
+      url: path
+      data: task
+      success: () =>
+        thunk(task) if thunk
+
+  on_task_new: (scope, task_name, date) ->
+    common.request
+      url: "/habits/new"
+      success: () =>
+        @mount_scope scope.scope, date
+      data:
+        name: task_name
+        scope: scope.scope
+        date: date.format "YYYY-MM-DDTHH:mm:ssZ"
+
+  on_comment_update: (task, comment) ->
+    common.request
+      url: "/habits/comment-update"
+      success: () -> false
+      data: comment
+
+  on_task_order_up: (task) -> @command '/habits/order-up', task
+  on_task_order_down: (task) -> @command '/habits/order-down', task
+
+  on_task_update: (task) -> @command '/habits/update', task
+
+  on_task_delete: (task) ->
+    @command '/habits/delete', task, () ->
+      $("#task-#{task.ID}").remove()
+      riot.update()
+      task
+
 # Initialize machinery necessary for task interaction
 initialize = () ->
   console.log 'Habits: initializing'
-  if html5?
-    html5.addElements('scope task scope-days')
+  html5.addElements('scope task scope-days') if html5?
 
   task_store = new TaskStore()
   window.Habits.task_store = task_store
@@ -110,7 +89,7 @@ initialize = () ->
   return true
 
 # Navigation function
-browse = (from, bucket) ->
+view = (from, bucket) ->
   console.log('Browsing from', from)
   today = moment()
   from = moment(from, 'YYYY-MM')
@@ -148,40 +127,36 @@ main = () ->
   RiotControl.on "change-date", (forward, scope) ->
     date = scope.date.clone().date(1)
     date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-    riot.route "from/#{date.format('YYYY-MM')}/#{current_bucket or 0}"
+    riot.route "view/#{date.format('YYYY-MM')}/#{current_bucket or 0}"
 
   RiotControl.on "change-bucket", (bucket) ->
-    riot.route "from/#{current_date.format('YYYY-MM')}/#{bucket}"
+    riot.route "view/#{current_date.format('YYYY-MM')}/#{bucket}"
 
-  riot.route((action, date, bucket) ->
-    switch action
-      when 'from' then browse(date, bucket)
-      when '' then riot.route("from/#{moment().format('YYYY-MM')}/0")
-      else console.log "Unknown action", riot.route.query(), action, date, bucket)
-
-  riot.route.base('/habits#')
-  riot.route.start(true)
-  unless window.location.hash.length > 1
-    riot.route("from/#{moment().format('YYYY-MM')}/0")
+  common.route "/habits#", "view/#{moment().format('YYYY-MM')}/0", 
+    view: view
+    no_action: () -> riot.route("view/#{moment().format('YYYY-MM')}/0")
 
   # Setup websocket
   task_near = (task, date2) ->
     date1 = moment.utc(task.date)
     # only compare down to months because we don't browse by the day
-    # Sorry.
     return ((task.scope == Scope.month or task.scope == Scope.day) and date1.month() == date2.month() and 
       date1.year() == date2.year()) or
       (task.scope == Scope.year and date1.year() == date2.year()) or
       Scope.bucketp(task.scope)
-      #task.scope == Scope.bucket
 
   socket = false
-  socket = window.Common.make_socket "habits/sync", (m) ->
-    task = $.parseJSON(m.data)
+  socket = window.Common.make_socket "habits/sync", (msg) ->
+    whole_scope = msg.wholescope
+    task = msg.task
     # No need to refresh if task is not in the current scope
     date = moment.utc(task.date)
     if task_near(task, current_date)
-      task_store.mount_scope task.scope, date
+      if whole_scope
+        console.log 'Mounting whole scope!'
+        task_store.mount_scope task.scope, date
+      else
+        RiotControl.trigger 'task-updated', task
 
 # Export variables
 window.Habits =

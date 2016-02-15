@@ -94,5 +94,9 @@ func App() *macaron.Macaron {
 		journalInit(m)
 	})
 
+	m.Group("/wiki", func() {
+		wikiInit(m)
+	})
+
 	return m
 }

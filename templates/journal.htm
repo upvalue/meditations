@@ -3,15 +3,19 @@
 {% block title %}Journal{% endblock %}
 
 {% block navigation %}
-  <form class="navbar-form navbar-right">
-    <div class="form-group">
-      <input class="form-control" id="journal-new-entry-date" type=text placeholder="New entry" >
-    </div>
-  </form>
+  <div class=navbar-right>
+    <a class="navbar-btn btn btn-sm" href="/journal#tags">Tags</a>
+    <form class="navbar-form navbar-right">
+      <div class="form-group">
+        <input class="form-control" id="journal-new-entry-date" type=text placeholder="New entry" >
+      </div>
+    </form>
+  </div>
 {% endblock %}
 
 {% block content %}
 <entries></entries>
+<tag-cloud></tag-cloud>
 {% endblock %}
 
 {% block script %}

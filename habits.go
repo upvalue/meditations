@@ -62,6 +62,14 @@ type Comment struct {
 	TaskID int    `json:"task_id"`
 }
 
+///// Synchronization
+
+type syncMessage struct {
+	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
+	Wholescope bool `json:"wholescope"`
+	Task       Task `json:"task"`
+}
+
 // If a stat is monthly or yearly, recalculate streak and completion rate as well
 func syncStats(t Task, scope int) {
 	from, to := between(t.Date, scope)
@@ -69,11 +77,15 @@ func syncStats(t Task, scope int) {
 	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).First(&task)
 	task.CompletionRate = calculateCompletionRate(task)
 	task.Streak, task.BestStreak = calculateStreak(task)
-	syncTask(task)
+	syncTask(task, false)
 }
 
-func syncTask(t Task) {
-	json, err := json.Marshal(t)
+func syncTask(t Task, scope bool) {
+	message := syncMessage{
+		Wholescope: scope,
+		Task:       t,
+	}
+	json, err := json.Marshal(message)
 	checkErr(err)
 	habitSync.Sync(json)
 	if t.Scope == ScopeDay {
@@ -231,7 +243,7 @@ func taskUpdate(c *macaron.Context, task Task) {
 	log.Printf("TASK UPDATE %+v\n", task)
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
-	syncTask(task)
+	syncTask(task, false)
 	c.JSON(200, task)
 }
 
@@ -241,7 +253,7 @@ func taskNew(c *macaron.Context, task Task) {
 	tasksInScope(&tasks, task.Scope, task.Date)
 	task.Order = len(tasks)
 	DB.Save(&task)
-	syncTask(task)
+	syncTask(task, true)
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
@@ -260,7 +272,7 @@ func taskDelete(c *macaron.Context, task Task) {
 		DB.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
 	}
 
-	syncTask(task)
+	syncTask(task, true)
 
 	// Reorder tasks after this one
 	for _, t := range tasks {
@@ -294,7 +306,7 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 		}
 	}
 
-	syncTask(task)
+	syncTask(task, true)
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
@@ -327,7 +339,7 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 		// Create or update comment
 		DB.Save(&comment)
 	}
-	syncTask(task)
+	syncTask(task, false)
 	c.PlainText(200, []byte("OK"))
 }
 

@@ -17,21 +17,19 @@
 ** DONE Allow refresh without going to present day
 ** DONE Session-based error reporting?
 ** DONE Adding a comment should look better (try inserting <p> to begin with)
-** TODO Combine requests for efficiency?
-** TODO Select most recently viewed bucket list
+** DONE Select most recently viewed bucket list
 ** TODO Copy habits text, copy journal entries, and export entire ranges
-** TODO Fair bit of code repitition in the javascript, can possibly be simplified (common Store ancestor that automatically translates events to on_ methods
+** DONE Fair bit of code repitition in the javascript, can possibly be simplified (common Store ancestor that automatically translates events to on_ methods
 ** TODO Archive tasks (a-la trello) with an optional checkmark to display archived items.
 * Journal
 ** DONE Tagging
 ** TODO Display habits
-** TODO Adding tags to old entries causes a duplicate entry to be mounted on the page.
-
+** DONE Adding tags to old entries causes a duplicate entry to be mounted on the page.
 * Wiki
 ** TODO Wiki
 ** TODO Tagging
 * Misc
-** TODO Graceful requires two ctrl-cs to shutdown? (but only if a request has been served) (and only if not running under entr?)
+** DONE Graceful requires two ctrl-cs to shutdown? (but only if a request has been served) (and only if not running under entr?)
 ** TODO Are Macaron errors displayed in production?
 ** TODO Sequential AJAX requests
 ** TODO Search

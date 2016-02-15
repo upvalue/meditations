@@ -133,6 +133,29 @@ func journalRemoveTag(c *macaron.Context) {
 	syncEntry(entry)
 }
 
+func journalTags(c *macaron.Context) {
+	type TagCount struct {
+		Tag   Tag
+		Count int
+	}
+
+	var tags []Tag
+	var results []TagCount
+
+	DB.Find(&tags)
+
+	for _, tag := range tags {
+		count := TagCount{
+			Tag: tag,
+		}
+		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
+		row.Scan(&count.Count)
+		results = append(results, count)
+	}
+
+	c.JSON(200, results)
+}
+
 func journalInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "journal")
@@ -140,6 +163,8 @@ func journalInit(m *macaron.Macaron) {
 
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
+	m.Get("/tags", journalTags)
+
 	m.Post("/new", journalNew)
 	m.Post("/update", binding.Bind(Entry{}), journalUpdate)
 	m.Post("/add-tag/:id/:tag", journalAddTag)

@@ -21,6 +21,8 @@ func DBMigrate() {
 	DB.AutoMigrate(&Task{}, &Comment{}, &Scope{})
 	// journal.go
 	DB.AutoMigrate(&Entry{}, &Tag{})
+	// wiki.go
+	DB.AutoMigrate(&Page{}, &Revision{})
 }
 
 func DBCreate() {
