@@ -70,18 +70,7 @@
   self.one('mount', function() {
     $(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("dddd, MMM Do"));
     $(this.root).children(".entry-body").html(this.Body);
-    self.editor = window.Common.make_editor("#entry-body-" + this.ID);
-
-    self.editor.subscribe("focus", function() {
-      $(window).on("beforeunload", function() {
-        save();
-      });
-    });
-
-    self.editor.subscribe("blur", function() {
-      save();
-      $(window).off("unload");
-    });
+    self.editor = window.Common.make_editor("#entry-body-" + this.ID, save, save);
   });
 
   RiotControl.on('journal-updated', function(data) {

@@ -25,7 +25,7 @@ view = (datestr) ->
       date: date
       entries: entries
 
-actions = 
+actions =
   view: view
 
   tag: (name) ->

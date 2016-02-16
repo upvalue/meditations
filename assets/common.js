@@ -23,7 +23,7 @@
       ret.data = JSON.stringify(ret.data);
       return $.ajax(ret);
     },
-    make_editor: function(selector, args) {
+    make_editor: function(selector, focus, blur, args) {
       var editor;
       if (args == null) {
         args = {};
@@ -35,6 +35,14 @@
           buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         }
       }, args));
+      editor.subscribe("focus", function() {
+        return $(window).on("beforeunload", focus);
+      });
+      editor.subscribe("blur", function() {
+        console.log("I blur");
+        blur();
+        return $(window).off("unload");
+      });
       return editor;
     },
     make_socket: function(location, onmessage) {

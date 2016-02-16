@@ -11,7 +11,7 @@ window.Common =
     ret.data = JSON.stringify(ret.data)
     return $.ajax(ret)
 
-  make_editor: (selector, args = {}) ->
+  make_editor: (selector, focus, blur, args = {}) ->
     editor = window.Common.editor = new MediumEditor selector,
       $.extend({
         autoLink: true
@@ -20,6 +20,15 @@ window.Common =
           buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         }
       }, args)
+
+    editor.subscribe "focus", () ->
+      $(window).on("beforeunload", focus)
+
+    editor.subscribe "blur", () ->
+      console.log "I blur"
+      blur()
+      $(window).off("unload")
+
     editor
 
   make_socket: (location, onmessage) ->

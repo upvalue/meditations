@@ -104,7 +104,7 @@ view = (from, bucket) ->
 
   # Allow days up to the current date
   # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
-  riot.mount("scope-days", {
+  riot.mount "scope-days",
     thunk: () ->
       date = 1
       while date <= from.daysInMonth()
@@ -116,7 +116,6 @@ view = (from, bucket) ->
             break
         task_store.mount_scope Scope.day, next
         date += 1
-  })
 
 main = () ->
   console.log 'Habits: installing router'

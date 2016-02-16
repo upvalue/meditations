@@ -14,7 +14,21 @@
     }
 
     WikiStore.prototype.on_add_page = function(title) {
-      return console.log(title);
+      common.request({
+        url: "/wiki/new/" + title
+      });
+      return riot.route("view/" + title);
+    };
+
+    WikiStore.prototype.on_edit_page = function(title, msg) {
+      console.log('edit-page', title, msg);
+      return common.request({
+        url: "/wiki/edit",
+        data: msg,
+        success: function() {
+          return riot.route("view/" + title);
+        }
+      });
     };
 
     return WikiStore;
@@ -27,9 +41,19 @@
         type: "GET",
         url: "/wiki/index",
         success: function(pages) {
-          return riot.mount('wiki-index', {
+          return riot.mount('index', {
             pages: pages
           });
+        }
+      });
+    },
+    view: function(title) {
+      $("index").remove();
+      return common.request({
+        type: "GET",
+        url: "/wiki/page/" + title,
+        success: function(page) {
+          return riot.mount('page', page);
         }
       });
     }
@@ -40,7 +64,7 @@
       var initialize;
       console.log('Wiki: initializing');
       if (typeof html5 !== "undefined" && html5 !== null) {
-        html5.addElements(' controlsindex page');
+        html5.addElements(' wiki-controls index page');
       }
       return initialize = function() {
         return false;
@@ -48,7 +72,7 @@
     },
     main: function() {
       this.initialize();
-      riot.mount('controls');
+      riot.mount('wiki-controls');
       RiotControl.addStore(new WikiStore);
       return common.route('/wiki#', 'index', actions);
     }

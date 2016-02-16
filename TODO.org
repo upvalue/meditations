@@ -21,6 +21,7 @@
 ** TODO Copy habits text, copy journal entries, and export entire ranges
 ** DONE Fair bit of code repitition in the javascript, can possibly be simplified (common Store ancestor that automatically translates events to on_ methods
 ** TODO Archive tasks (a-la trello) with an optional checkmark to display archived items.
+** TODO Medium blur does not trigger if one clicks outside of HTML (e.g. the bottom of a wiki entry...)
 * Journal
 ** DONE Tagging
 ** TODO Display habits
