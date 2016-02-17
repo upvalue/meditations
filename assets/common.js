@@ -39,7 +39,6 @@
         return $(window).on("beforeunload", focus);
       });
       editor.subscribe("blur", function() {
-        console.log("I blur");
         blur();
         return $(window).off("unload");
       });
@@ -66,7 +65,11 @@
         } else if (action === '' && routes['no_action']) {
           return routes['no_action'].apply(this, arguments);
         } else {
-          return console.log('Unknown action', action);
+          if (routes['unknown']) {
+            return routes.unknown.apply(this, arguments);
+          } else {
+            return console.log('Unknown action', action);
+          }
         }
       });
       riot.route.base(base);

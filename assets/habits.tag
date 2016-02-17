@@ -150,17 +150,18 @@
     }
   });
 
+  var save = function() {
+    console.log("Comment update", comment_div().html());
+    RiotControl.trigger('comment-update', self._item, {
+      ID: self.comment.ID || 0,
+      body: comment_div().html(),
+      task_id: self._item.ID
+    });
+  }
+
   self.one('mount', function() {
     comment_div().html(self.comment.body);
-    self.editor = window.Common.make_editor(comment_div());
-    self.editor.subscribe("blur", function() {
-      console.log("Comment update", comment_div().html());
-      RiotControl.trigger('comment-update', self._item, {
-        ID: self.comment.ID || 0,
-        body: comment_div().html(),
-        task_id: self._item.ID
-      });
-    });
+    self.editor = window.Common.make_editor(comment_div(), save, save);
   });
 
   change_status(e) {

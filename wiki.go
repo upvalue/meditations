@@ -8,15 +8,11 @@ import (
 
 type Page struct {
 	gorm.Model
-	Name      string `json:"name"`
-	Revisions []Revision
-}
-
-type Revision struct {
-	gorm.Model
-	PageID uint
-	Number uint
-	Body   string
+	Name string `json:"name"`
+	// NOTE: For some reason, Text Text does not work to create a one-to-many relationship in GORM
+	// TODO: Index
+	TextID   uint
+	FartHell Text
 }
 
 type editMessage struct {
@@ -43,10 +39,12 @@ func wikiInit(m *macaron.Macaron) {
 
 	m.Get("/page/*", func(c *macaron.Context) {
 		var page Page
+		var text Text
 		page.Name = c.Params("*")
 		if DB.First(&page).RecordNotFound() == false {
+			DB.Where("id = ?", page.TextID).First(&text)
 			var rev Revision
-			rev.PageID = page.ID
+			rev.TextID = text.ID
 			DB.Order("number desc").First(&rev)
 			c.JSON(200, pageMessage{
 				Page:     page,
@@ -59,10 +57,12 @@ func wikiInit(m *macaron.Macaron) {
 
 	m.Post("/edit", binding.Bind(editMessage{}), func(c *macaron.Context, e editMessage) {
 		var page Page
+		var text Text
 		page.ID = e.ID
 		if DB.First(&page).RecordNotFound() == false {
+			DB.Where("id = ?", page.TextID).First(&text)
 			var rev Revision
-			rev.PageID = page.ID
+			rev.TextID = text.ID
 			rev.Number = e.LastRevision + 1
 			rev.Body = e.Body
 			err := DB.Create(&rev).Error
@@ -81,9 +81,14 @@ func wikiInit(m *macaron.Macaron) {
 
 	m.Post("/new/*", func(c *macaron.Context) {
 		var page Page
+		var text Text
 		page.Name = c.Params("*")
+		DB.Create(&text)
+		page.TextID = text.ID
+		//page.Text = text
 		DB.Create(&page)
 		var rev Revision
+		rev.TextID = text.ID
 		rev.Number = 1
 		rev.Body = "Click to edit"
 		DB.Create(&rev)

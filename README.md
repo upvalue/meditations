@@ -7,3 +7,7 @@ you, but it is a great way to get a much more objective, overarching view of how
 
     $ go build
     $ ./meditations --port [PORT] --database [PATH]
+
+# Attribution
+
+The favicon.ico was used under public domain from [Tango](http://tango.freedesktop.org)

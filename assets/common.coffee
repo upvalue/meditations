@@ -25,7 +25,6 @@ window.Common =
       $(window).on("beforeunload", focus)
 
     editor.subscribe "blur", () ->
-      console.log "I blur"
       blur()
       $(window).off("unload")
 
@@ -47,14 +46,17 @@ window.Common =
     #  , 10000)
 
   route: (base, first, routes) ->
-    riot.route(() ->
+    riot.route () ->
       action = [].shift.apply(arguments)
       if routes[action]
         routes[action].apply(this, arguments)
       else if action == '' and routes['no_action']
         routes['no_action'].apply(this, arguments)
       else
-        console.log 'Unknown action', action)
+        if routes['unknown']
+          routes.unknown.apply(this, arguments)
+        else
+          console.log 'Unknown action', action
 
     riot.route.base(base)
     riot.route.start(true)

@@ -1,4 +1,4 @@
-// models.go - Database code
+// database.go - Database open, close and migration
 package main
 
 import (
@@ -13,16 +13,20 @@ func DBOpen() {
 	checkErr(err)
 	DB = &db
 	DB.LogMode(Config.DBLog)
-
 }
 
 func DBMigrate() {
 	// habits.go
-	DB.AutoMigrate(&Task{}, &Comment{}, &Scope{})
-	// journal.go
-	DB.AutoMigrate(&Entry{}, &Tag{})
-	// wiki.go
-	DB.AutoMigrate(&Page{}, &Revision{})
+	DB.AutoMigrate(
+		// habits.go
+		&Task{}, &Comment{}, &Scope{},
+		// journal.go
+		&Entry{},
+		// wiki.go
+		&Page{},
+		// text.go
+		&Revision{}, &Text{}, &Tag{},
+	)
 }
 
 func DBCreate() {
