@@ -82,6 +82,11 @@ func App() *macaron.Macaron {
 		c.Next()
 	})
 
+	// Routes
+	m.Get("/favicon.ico", func(c *macaron.Context) {
+		c.ServeFileContent("favicon.ico")
+	})
+
 	m.Get("/", func(c *macaron.Context) {
 		c.Redirect("/habits")
 	})
