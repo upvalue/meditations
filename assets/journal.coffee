@@ -41,6 +41,7 @@ actions =
     $.get "/journal/tags", (results) ->
       for value in results
         console.log value
+      RiotControl.trigger 'entries-unmount'
       riot.mount 'tag-cloud',
         tags: results
 

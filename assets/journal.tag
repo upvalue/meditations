@@ -68,9 +68,20 @@
   }
 
   self.one('mount', function() {
-    $(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("dddd, MMM Do"));
+    var date = moment(this.Date, "YYYY-MM-DD");
+    $(this.root).children("h4").append(
+      date.format('dddd, '),
+      $('<a/>', {href: "journal#view/"+date.format('YYYY-MM'), text: date.format('MMM')}),
+      date.format(' Do')
+    )
+
+    //$(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("dddd, MMM Do"));
     $(this.root).children(".entry-body").html(this.Body);
     self.editor = window.Common.make_editor("#entry-body-" + this.ID, save, save);
+  });
+
+  RiotControl.on('entries-unmount', function() {
+    self.unmount();
   });
 
   RiotControl.on('journal-updated', function(data) {

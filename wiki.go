@@ -11,8 +11,7 @@ type Page struct {
 	Name string `json:"name"`
 	// NOTE: For some reason, Text Text does not work to create a one-to-many relationship in GORM
 	// TODO: Index
-	TextID   uint
-	FartHell Text
+	TextID uint
 }
 
 type editMessage struct {

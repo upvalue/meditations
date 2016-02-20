@@ -57,6 +57,7 @@
           value = results[i];
           console.log(value);
         }
+        RiotControl.trigger('entries-unmount');
         return riot.mount('tag-cloud', {
           tags: results
         });
