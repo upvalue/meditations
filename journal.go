@@ -99,9 +99,13 @@ func journalNew(c *macaron.Context) {
 func journalUpdate(c *macaron.Context, entry_update Entry) {
 	var entry Entry
 	DB.Where("id = ?", entry_update.ID).Preload("Tags").Find(&entry)
-	entry.Body = entry_update.Body
-	DB.Save(&entry)
-	syncEntry(entry)
+	if entry_update.Body == "" {
+
+	} else {
+		entry.Body = entry_update.Body
+		DB.Save(&entry)
+		syncEntry(entry)
+	}
 }
 
 func getTag(c *macaron.Context) (Entry, Tag) {

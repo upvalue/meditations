@@ -17,6 +17,7 @@ func DBOpen() {
 
 func DBMigrate() {
 	// habits.go
+	DB.Exec("pragma foreign_keys = on;")
 	DB.AutoMigrate(
 		// habits.go
 		&Task{}, &Comment{}, &Scope{},
