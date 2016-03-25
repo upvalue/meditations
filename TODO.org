@@ -1,36 +1,16 @@
 * Habits
-** DONE Display & navigation
-** DONE Calculate completion streaks
-** DONE Bug with ordering down first element of daily scope
-** DONE Comments
-** DONE Port old database
-** DONE Remount only tasks when necessary rather than whole scope
-** DONE Sync completion rate
-** DONE Fix synchronization
-** DONE Mobile navigation
-** DONE Deleting empty comments not currently possibly as medium-editor inserts <p><br><p>... add button?
-** DONE Very odd: monthly comments do not render on first request serverd
-** DONE bucket lists
-** TODO Synchronization: Reload tasks rather than whole scopes when necessary.
-** DONE Clicking on journal from habits needs to be done twice. Riot router bug?
-** TODO Scope control formatting on mobile
-** DONE Allow refresh without going to present day
-** DONE Session-based error reporting?
-** DONE Adding a comment should look better (try inserting <p> to begin with)
-** DONE Select most recently viewed bucket list
-** TODO Copy habits text, copy journal entries, and export entire ranges
-** DONE Fair bit of code repitition in the javascript, can possibly be simplified (common Store ancestor that automatically translates events to on_ methods
-** TODO Archive tasks (a-la trello) with an optional checkmark to display archived items.
+** TODO Archive tasks with an optional checkmark to display archived items.
 ** TODO Medium blur does not trigger if one clicks outside of HTML (e.g. the bottom of a wiki entry...)
+** TODO Comment update does not sync
 * Journal
-** DONE Tagging
-** TODO Display habits
-** DONE Adding tags to old entries causes a duplicate entry to be mounted on the page.
+** TODO Don't update unless it is necessary
+** TODO Delta storage
+** TODO Display habits?
 * Wiki
-** TODO Wiki
+** DONE Wiki
 ** TODO Tagging
-* Misc
-** DONE Graceful requires two ctrl-cs to shutdown? (but only if a request has been served) (and only if not running under entr?)
-** TODO Are Macaron errors displayed in production?
+* All
 ** TODO Sequential AJAX requests
 ** TODO Search
+** TODO Export useful data. For instance export all habits in a textual log format
+** TODO Consolidate Wiki and Journal into single Text type, differing in navigation but allowing shared code for editing tags, revising text (and deleting revisions?)

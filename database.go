@@ -23,10 +23,6 @@ func DBMigrate() {
 		&Task{}, &Comment{}, &Scope{},
 		// journal.go
 		&Entry{},
-		// wiki.go
-		&Page{},
-		// text.go
-		&Revision{}, &Text{}, &Tag{},
 	)
 }
 

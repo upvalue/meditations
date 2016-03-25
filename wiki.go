@@ -8,10 +8,20 @@ import (
 
 type Page struct {
 	gorm.Model
-	Name string `json:"name"`
-	// NOTE: For some reason, Text Text does not work to create a one-to-many relationship in GORM
-	// TODO: Index
+	Name   string `json:"name"`
 	TextID uint
+}
+
+type Revision struct {
+	gorm.Model
+	TextID uint
+	Number uint
+	Body   string
+}
+
+type Text struct {
+	gorm.Model
+	Tags []Tag `gorm:"many2many:text_tags"`
 }
 
 type editMessage struct {
@@ -23,6 +33,19 @@ type editMessage struct {
 type pageMessage struct {
 	Page     Page
 	Revision Revision
+	Text     Text
+}
+
+type textEditMsg struct {
+	ID           uint
+	LastRevision uint
+	Body         string
+}
+
+func textInit(m *macaron.Macaron) {
+	/*m.Get("/edit", func(c *macaron.Context) {
+
+			})*/
 }
 
 func wikiInit(m *macaron.Macaron) {
@@ -39,14 +62,13 @@ func wikiInit(m *macaron.Macaron) {
 	m.Get("/page/*", func(c *macaron.Context) {
 		var page Page
 		var text Text
-		page.Name = c.Params("*")
-		if DB.First(&page).RecordNotFound() == false {
+		if DB.Where("name = ?", c.Params("*")).First(&page).RecordNotFound() == false {
 			DB.Where("id = ?", page.TextID).First(&text)
 			var rev Revision
-			rev.TextID = text.ID
-			DB.Order("number desc").First(&rev)
+			DB.Order("number desc").Where("text_id = ?", text.ID).First(&rev)
 			c.JSON(200, pageMessage{
 				Page:     page,
+				Text:     text,
 				Revision: rev,
 			})
 		} else {

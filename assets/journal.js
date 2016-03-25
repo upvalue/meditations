@@ -29,6 +29,7 @@
     document.title = (date.format('MMM YYYY')) + " / journal";
     $("#habits-link").attr("href", "/habits#view/" + (date.format('YYYY-MM')) + "/0");
     return $.get("/journal/entries/date?date=" + datestr, function(entries) {
+      $("#content").html("<entries/>");
       console.log("View date", entries);
       return riot.mount('entries', {
         title: date.format('MMM YYYY'),
@@ -40,8 +41,25 @@
 
   actions = {
     view: view,
+    wiki_index: function() {
+      return $.get("/journal/entries/wiki-index", function(entries) {
+        $("#content").html("<wiki-entries/>");
+        return riot.mount('wiki-entries', {
+          entries: entries
+        });
+      });
+    },
+    wiki: function(name) {
+      return $.get("/journal/entries/name/" + name, function(entry) {
+        $("#content").html("<entry-single/>");
+        return riot.mount('entry-single', {
+          entry_array: [entry]
+        });
+      });
+    },
     tag: function(name) {
       return $.get("/journal/entries/tag/" + name, function(entries) {
+        $("#content").html("<entries/>");
         console.log("View tag " + name);
         return riot.mount('entries', {
           title: name,
@@ -52,12 +70,31 @@
     },
     tags: function() {
       return $.get("/journal/tags", function(results) {
-        var i, len, value;
+        var font_max, font_min, i, len, max, min, r;
+        window.results = results;
+        max = results.reduce(function(x, y) {
+          if (x.Count) {
+            return x.Count;
+          }
+          return Math.max(x, y.Count);
+        });
+        min = results.reduce(function(x, y) {
+          if (x.Count) {
+            return x.Count;
+          }
+          return Math.min(x, y.Count);
+        });
+        font_min = 12;
+        font_max = 24;
         for (i = 0, len = results.length; i < len; i++) {
-          value = results[i];
-          console.log(value);
+          r = results[i];
+          if (r.Count === min) {
+            r.Size = font_min;
+          } else {
+            r.Size = Math.round((r.Count / max) * (font_max - font_min) + font_min);
+          }
         }
-        RiotControl.trigger('entries-unmount');
+        $("#content").html("<tag-cloud/>");
         return riot.mount('tag-cloud', {
           tags: results
         });
@@ -94,6 +131,26 @@
     EntryStore.prototype.on_remove_tag = function(entry_id, tag) {
       return $.post({
         url: "/journal/remove-tag/" + entry_id + "/" + tag
+      });
+    };
+
+    EntryStore.prototype.on_delete_entry = function(id) {
+      return $.post({
+        url: "/journal/delete-entry/" + id,
+        success: function() {
+          console.log("Success", id);
+          return $("#entry-" + id).remove();
+        }
+      });
+    };
+
+    EntryStore.prototype.on_promote_entry = function(id, name) {
+      console.log(id, name);
+      return $.post({
+        url: "/journal/promote-entry/" + id + "/" + name,
+        success: function() {
+          return $("#entry-" + id).remove();
+        }
       });
     };
 

@@ -39,8 +39,28 @@
   }
 </entries>
 
+<entry-link>
+  <h4><a href="/journal#wiki/{Name}">{Name}</a></h4>
+</entry-link>
+
+<wiki-entries>
+  <h3>Wiki</h3>
+  <entry-link each={opts.entries}></entry-link>
+
+  this.on('mount', function() {
+    console.log(opts);
+  });
+</wiki-entries>
+
+<entry-single>
+  <entry each={opts.entry_array}></entry>
+</entry-single>
+
 <entry id={"entry-"+ID}>
-  <h4>{title}</h4>
+  <h4>{title}
+    <button class="btn btn-xs octicon octicon-x" onclick={delete_entry}></button>
+    <button if={!Name} class="btn btn-xs octicon octicon-cloud-upload" onclick={promote_entry}></button>  
+  </h4>
   <div id={"entry-body-"+ID} class="entry-body"></div>
   <span class=entry-tags>
     <div class=form-inline>
@@ -70,6 +90,8 @@
   self.one('mount', function() {
     var date = moment(this.Date, "YYYY-MM-DD");
     $(this.root).children("h4").append(
+      this.Name ? '<strong>'+this.Name+'</strong>' : '',
+      '&nbsp;',
       date.format('dddd, '),
       $('<a/>', {href: "journal#view/"+date.format('YYYY-MM'), text: date.format('MMM')}),
       date.format(' Do')
@@ -78,10 +100,6 @@
     //$(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("dddd, MMM Do"));
     $(this.root).children(".entry-body").html(this.Body);
     self.editor = window.Common.make_editor("#entry-body-" + this.ID, save, save);
-  });
-
-  RiotControl.on('entries-unmount', function() {
-    self.unmount();
   });
 
   RiotControl.on('journal-updated', function(data) {
@@ -100,6 +118,19 @@
     }
   }
 
+  promote_entry(e) {
+    var name = window.prompt("What would you like to name this entry?");
+    if(name) {
+      RiotControl.trigger('promote-entry', self.ID, name);
+    }
+  }
+
+  delete_entry(e) {
+    if(window.confirm("Are you sure you want to remove this entry?")) {
+      RiotControl.trigger('delete-entry', self.ID);
+    }
+  }
+
   browse_tag(e) {
     RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
   }
@@ -108,7 +139,7 @@
 <tag-cloud>
   <h1>Tags</h1>
   <span each={opts.tags}>
-    <button class="btn btn-xs" onclick={browse_tag} data-name="{Tag.Name}" style="font-size:{size}">
+    <button class="btn btn-xs" onclick={browse_tag} data-name="{Tag.Name}" style="font-size:{Size}px;">
       {Tag.Name}
     </button>
   </span>

@@ -9,6 +9,8 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+.navbar { margin-bottom:5px; }
+
 a, a:visited {
   color: #09d;
 }

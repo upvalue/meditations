@@ -13,9 +13,11 @@ import (
 
 type Entry struct {
 	gorm.Model
-	Date time.Time
-	Body string
-	Tags []Tag `gorm:"many2many:entry_tags"`
+	Date     time.Time
+	Name     string
+	Body     string
+	LastBody string
+	Tags     []Tag `gorm:"many2many:entry_tags"`
 }
 
 type Tag struct {
@@ -39,7 +41,19 @@ func journalEntries(c *macaron.Context) {
 	}
 	var entries []Entry
 	from, to := between(date, ScopeMonth)
-	DB.Where("date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
+	DB.Where("name is null and date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
+	c.JSON(200, entries)
+}
+
+func journalNamedEntry(c *macaron.Context) {
+	var entry Entry
+	DB.Where("name = ?", c.Params("name")).Preload("tags").First(&entry)
+	c.JSON(200, entry)
+}
+
+func journalWikiIndex(c *macaron.Context) {
+	var entries []Entry
+	DB.Where("name is not null").Order("name desc").Preload("tags").Find(&entries)
 	c.JSON(200, entries)
 }
 
@@ -99,9 +113,10 @@ func journalNew(c *macaron.Context) {
 func journalUpdate(c *macaron.Context, entry_update Entry) {
 	var entry Entry
 	DB.Where("id = ?", entry_update.ID).Preload("Tags").Find(&entry)
-	if entry_update.Body == "" {
+	if entry_update.Body == "" || entry_update.Body == entry.Body {
 
 	} else {
+		entry.LastBody = entry.Body
 		entry.Body = entry_update.Body
 		DB.Save(&entry)
 		syncEntry(entry)
@@ -160,6 +175,24 @@ func journalTags(c *macaron.Context) {
 	c.JSON(200, results)
 }
 
+func journalDeleteEntry(c *macaron.Context) {
+	var entry Entry
+
+	DB.Where("id = ?", c.ParamsInt("id")).First(&entry).Delete(&entry)
+
+	c.PlainText(200, []byte("OK"))
+}
+
+func journalPromoteEntry(c *macaron.Context) {
+	var entry Entry
+	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
+
+	entry.Name = c.Params("name")
+	DB.Save(&entry)
+
+	c.PlainText(200, []byte("ok"))
+}
+
 func journalInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "journal")
@@ -167,12 +200,16 @@ func journalInit(m *macaron.Macaron) {
 
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
+	m.Get("/entries/name/:name", journalNamedEntry)
+	m.Get("/entries/wiki-index", journalWikiIndex)
 	m.Get("/tags", journalTags)
 
 	m.Post("/new", journalNew)
 	m.Post("/update", binding.Bind(Entry{}), journalUpdate)
 	m.Post("/add-tag/:id/:tag", journalAddTag)
 	m.Post("/remove-tag/:id/:tag", journalRemoveTag)
+	m.Post("/delete-entry/:id", journalDeleteEntry)
+	m.Post("/promote-entry/:id/:name", journalPromoteEntry)
 
 	journalSync = MakeSyncPage("journal")
 	m.Get("/sync", journalSync.Handler())

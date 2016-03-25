@@ -36,9 +36,14 @@
         }
       }, args));
       editor.subscribe("focus", function() {
+        $("#saved-button").removeClass("octicon-check");
+        $("#saved-button").addClass("octicon-circle-slash");
         return $(window).on("beforeunload", focus);
       });
       editor.subscribe("blur", function() {
+        console.log("Das blur");
+        $("#saved-button").addClass("octicon-check");
+        $("#saved-button").removeClass("octicon-circle-slash");
         blur();
         return $(window).off("unload");
       });

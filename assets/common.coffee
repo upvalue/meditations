@@ -22,9 +22,16 @@ window.Common =
       }, args)
 
     editor.subscribe "focus", () ->
+      $("#saved-button").removeClass "octicon-check"
+      $("#saved-button").addClass "octicon-circle-slash"
+
       $(window).on("beforeunload", focus)
 
     editor.subscribe "blur", () ->
+      console.log("Das blur")
+      $("#saved-button").addClass "octicon-check"
+      $("#saved-button").removeClass "octicon-circle-slash"
+
       blur()
       $(window).off("unload")
 
@@ -68,3 +75,4 @@ window.Common =
     for key, value of store
       if key.slice(0, 3) == "on_"
         store.on key.slice(3).replace(/_/g, "-"), value
+
