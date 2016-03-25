@@ -100,7 +100,7 @@ func App() *macaron.Macaron {
 		journalInit(m)
 	})
 	m.Get("/wiki/:name", func(c *macaron.Context) {
-		c.Redirect(fmt.Sprintf("/journal#name/%s", c.Params("name")), 302)
+		c.Redirect(fmt.Sprintf("/journal#wiki/%s", c.Params("name")), 302)
 	})
 
 	return m
