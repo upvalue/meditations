@@ -107,6 +107,7 @@ func journalNew(c *macaron.Context) {
 	entry.Date = date
 	entry.Body = "Click to edit"
 	DB.Save(&entry)
+	DB.Exec("update entries set name = null where id = ?", entry.ID)
 	c.JSON(200, entry)
 }
 
