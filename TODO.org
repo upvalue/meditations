@@ -3,14 +3,8 @@
 ** TODO Medium blur does not trigger if one clicks outside of HTML (e.g. the bottom of a wiki entry...)
 ** TODO Comment update does not sync
 * Journal
-** TODO Don't update unless it is necessary
-** TODO Delta storage
 ** TODO Display habits?
-* Wiki
-** DONE Wiki
-** TODO Tagging
 * All
 ** TODO Sequential AJAX requests
 ** TODO Search
 ** TODO Export useful data. For instance export all habits in a textual log format
-** TODO Consolidate Wiki and Journal into single Text type, differing in navigation but allowing shared code for editing tags, revising text (and deleting revisions?)

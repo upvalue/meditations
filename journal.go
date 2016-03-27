@@ -120,6 +120,9 @@ func journalUpdate(c *macaron.Context, entry_update Entry) {
 		entry.LastBody = entry.Body
 		entry.Body = entry_update.Body
 		DB.Save(&entry)
+		if entry.Name == "" {
+			DB.Exec("update entries set name = null where id = ?", entry.ID)
+		}
 		syncEntry(entry)
 	}
 }
