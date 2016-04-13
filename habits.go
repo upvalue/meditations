@@ -286,6 +286,12 @@ func taskNew(c *macaron.Context, task Task) {
 	tasksInScope(&tasks, task.Scope, task.Date)
 	task.Order = len(tasks)
 	DB.Save(&task)
+	if task.Scope > ScopeYear {
+		var scope Scope
+		DB.Where("id = ?", task.Scope).First(&scope)
+		scope.UpdatedAt = time.Now()
+		DB.Save(&scope)
+	}
 	syncTask(task, true)
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
