@@ -18,7 +18,7 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.3.6",
+    "bootstrap": "v4.0.0-alpha.2",
     "html5shiv": "~3.7.3",
     "respond": "~1.4.2",
     "riot": "~2.3.12",

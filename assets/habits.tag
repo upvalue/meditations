@@ -131,7 +131,7 @@
       </span>
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
-    <span class="pull-right" style="display:block;">
+    <span class="pull-xs-right">
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
       <button if={scope == window.Habits.Scope.day} title="Log time"
