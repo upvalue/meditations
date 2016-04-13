@@ -28,7 +28,6 @@ window.Common =
       $(window).on("beforeunload", focus)
 
     editor.subscribe "blur", () ->
-      console.log("Das blur")
       $("#saved-button").addClass "octicon-check"
       $("#saved-button").removeClass "octicon-circle-slash"
 

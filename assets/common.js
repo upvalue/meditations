@@ -41,7 +41,6 @@
         return $(window).on("beforeunload", focus);
       });
       editor.subscribe("blur", function() {
-        console.log("Das blur");
         $("#saved-button").addClass("octicon-check");
         $("#saved-button").removeClass("octicon-circle-slash");
         blur();

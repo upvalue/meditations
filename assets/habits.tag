@@ -3,14 +3,13 @@
     <h4 class=scope-title></h4>
     <span class="pull-right">
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
-        <button class="btn btn-link btn-xs btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
-        <button class="btn btn-link btn-xs btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button>
+        <button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
+        <button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button>
       </span>
       <span if={opts.scope > window.Habits.Scope.year}>
-        <button class="btn btn-link btn-xs btn-default octicon octicon-briefcase" title="Change bucket" onclick={change_bucket}></button>
+        <button class="btn btn-link btn-sm btn-default octicon octicon-briefcase" title="Change bucket" onclick={change_bucket}></button>
       </span>
-      <button type=submit class="btn btn-link btn-xs btn-default octicon octicon-plus" title="Add task" onclick={new_task}></button>
-      <!--<button if={ window.development } class="btn btn-xs btn-default octicon octicon-sync" onclick={remount}></button>-->
+      <button type=submit class="btn btn-link btn-sm btn-default octicon octicon-plus" title="Add task" onclick={new_task}></button>
     </span>
     <task each={opts.tasks} />
   </section>
@@ -130,11 +129,11 @@
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
     <span class="pull-right">
-      <button class="task-control btn-link btn btn-xs btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
-      <button class="task-control btn-link btn btn-xs btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
-      <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} title="Copy to present day" class="btn btn-link btn-xs btn-default octicon octicon-clippy" onclick={copy}></button>
-      <button class="task-control btn-link btn btn-xs btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
-      <button class="task-control btn-link btn btn-xs btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
+      <button class="task-control btn-link btn btn-sm btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
+      <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
+      <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} title="Copy to present day" class="task-control btn btn-link btn-sm btn-default octicon octicon-clippy" onclick={copy}></button>
+      <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
+      <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
     </span>
     <div if={ (scope == window.Habits.Scope.year && best_streak > 0) } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>
     <div class="comment" id="comment-{ID}"></div>

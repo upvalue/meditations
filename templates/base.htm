@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
     <title>{% block title %}{% endblock %} | {{ SiteTitle }}</title>
 
     <!--[if lt IE 9]>
@@ -15,28 +15,46 @@
     {% block style %}{% endblock %}
   </head>
   <body>
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">{{SiteTitle}}</a>
+    
+    <div class="container-fluid">
+      <nav class="navbar navbar-light bg-faded">
+        <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header">
+          &#9776;
+        </button>
+        <div class="collapse navbar-toggleable-xs" id="navbar-header">
+          <a class="navbar-brand" href="/">meditations</a>
+          <ul class="nav navbar-nav">
+            <li class="nav-item">
+              <a id=habits-link class="nav-link" href="/habits">Habits</a>
+            </li>
+            <li class="nav-item">
+              <a id=journal-link class="nav-link" href="/journal#">Journal</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/journal#wiki_index">Wiki</a>
+            </li>
+          </ul>
+          {% block navigation %}{% endblock %}
         </div>
-
-        <div class="collapse navbar-collapse" id=navbar-collapse-1>
+      </nav>
+    </div>
+      <!--
+    <nav class="navbar navbar-static-top">
+      <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header">
+        &#9776;
+      </button>
+      <div class="container">
+        <div class="collapse navbar-collapse" id=navbar-header>
+          <a class="navbar-brand" href="#">{{SiteTitle}}</a>
           <ul class="nav navbar-nav">
             <li><a id=habits-link href="/habits">Habits</a></li>
             <li><a id=journal-link href="/journal#">Journal</a></li>
             <li><a id=named-link href="/journal#wiki_index">Wiki</a></li>
           </ul>
-          {% block navigation %} {% endblock %}
         </div>
       </div>
     </nav>
+      -->
     <div id=content class="container-fluid">
       {% block content %}{% endblock %}
     </div>

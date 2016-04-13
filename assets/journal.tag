@@ -1,14 +1,14 @@
 <entries>
   <span> 
-    <button if={opts.date} class="btn btn-link btn-xs octicon octicon-triangle-left" title="Last year" onclick={last_year}></button>
-    <button if={opts.date} class="btn btn-link btn-xs octicon octicon-chevron-left" title="Last month" onclick={last_month}></button>
+    <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-left" title="Last year" onclick={last_year}></button>
+    <button if={opts.date} class="btn btn-link btn-sm octicon octicon-chevron-left" title="Last month" onclick={last_month}></button>
   </span>
   <h3 if={opts.date} id=entries-title>{opts.title}</h3>
   <h3 if={!opts.date} id=entries-title>Tag: {opts.title}</h3>
   <span>
-    <button if={!opts.date} class="btn btn-link btn-xs octicon octicon-x" title="Back to journal" onclick={remove_tag}></button>
-    <button if={opts.date} class="btn btn-link btn-xs octicon octicon-chevron-right" title="Next month" onclick={next_month}></button>
-    <button if={opts.date} class="btn btn-link btn-xs octicon octicon-triangle-right" title="Next year" onclick={next_year}></button>
+    <button if={!opts.date} class="btn btn-link btn-sm octicon octicon-x" title="Back to journal" onclick={remove_tag}></button>
+    <button if={opts.date} class="btn btn-link btn-sm octicon octicon-chevron-right" title="Next month" onclick={next_month}></button>
+    <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year" onclick={next_year}></button>
   </span>
   <entry each={opts.entries}></entry>
   this.on('mount', function() {
@@ -58,21 +58,21 @@
 
 <entry id={"entry-"+ID}>
   <h4>{title}
-    <button class="btn btn-xs octicon octicon-x" onclick={delete_entry}></button>
-    <button if={!Name} class="btn btn-xs octicon octicon-cloud-upload" onclick={promote_entry}></button>  
+    <button class="btn btn-sm octicon octicon-x" onclick={delete_entry}></button>
+    <button if={!Name} class="btn btn-sm octicon octicon-cloud-upload" onclick={promote_entry}></button>  
   </h4>
   <div id={"entry-body-"+ID} class="entry-body"></div>
   <span class=entry-tags>
     <div class=form-inline>
       <span each={Tags}>
-        <button class="btn btn-xs" onclick={browse_tag} data-name="{Name}">
+        <button class="btn btn-sm" onclick={browse_tag} data-name="{Name}">
           {Name}
-          <button class="btn btn-xs btn-link octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
+          <button class="btn btn-sm btn-link octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
         </button>
       </span>
       <form class="entry-tag-form" onsubmit={new_tag}>
         <input type=text class="form-control tag-name" size=10 placeholder="New tag" />
-        <button class="btn btn-xs btn-link octicon octicon-plus" title="Add tag" onclick={new_tag}></button>
+        <button class="btn btn-sm btn-link octicon octicon-plus" title="Add tag" onclick={new_tag}></button>
       </form>
     </div>
 
@@ -139,7 +139,7 @@
 <tag-cloud>
   <h1>Tags</h1>
   <span each={opts.tags}>
-    <button class="btn btn-xs" onclick={browse_tag} data-name="{Tag.Name}" style="font-size:{Size}px;">
+    <button class="btn btn-sm" onclick={browse_tag} data-name="{Tag.Name}" style="font-size:{Size}px;">
       {Tag.Name}
     </button>
   </span>

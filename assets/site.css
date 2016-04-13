@@ -9,7 +9,7 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
-.navbar { margin-bottom:5px; }
+
 
 a, a:visited {
   color: #09d;
@@ -54,6 +54,13 @@ ul.nav a:hover {
 .comment p:first-of-type { padding-top:.25em; }
 
 .comment:empty { display: inline;}
+
+.btn-xs {
+  font-size: .75rem;
+  padding: .05rem .30rem;
+}
+
+.task-control { padding:2px;}
 
 /**** JOURNAL */
 
