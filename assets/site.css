@@ -45,6 +45,11 @@ ul.nav a:hover {
   padding-bottom: .15em;
 }
 
+/* Text align doesn't work properly if we don't do this to pad them from the task controls */
+.entry div:first-of-type { padding-top:2px;}
+
+.entry { font-size: 0.8em; }
+
 #content input.form-control[type=text] { height:1.5em; }
 
 .comment p {

@@ -69,6 +69,19 @@ class TaskStore extends common.Store
   on_task_order_up: (task) -> @command '/habits/order-up', task
   on_task_order_down: (task) -> @command '/habits/order-down', task
 
+  on_task_log_time: (task, time) ->
+    time = time.split(":")
+    if time.length == 1
+      task["hours"] = 0
+      task["minutes"] = parseInt(time[0])
+    else if time.length == 2
+      task["hours"] = parseInt(time[0])
+      task["minutes"] = parseInt(time[1])
+    else
+      console.log("Bad time", time)
+      return
+
+    @command '/habits/update', task
   on_task_update: (task) -> @command '/habits/update', task
 
   on_task_delete: (task) ->

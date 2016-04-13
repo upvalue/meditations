@@ -41,14 +41,19 @@ type Task struct {
 	gorm.Model
 	Name string `json:"name" form:"name"`
 	// The actual date of the task, regardless of when it was created
-	Date           time.Time `json:"date"`
-	Status         int       `json:"status" form:"status"`
-	Scope          int       `json:"scope" form:"scope"`
-	Order          int       `json:"order" form:"order"`
-	Comment        Comment   `json:"comment"`
-	CompletionRate float64   `json:"completion_rate" sql:"-"`
-	BestStreak     int       `json:"best_streak" sql:"-"`
-	Streak         int       `json:"streak" sql:"-"`
+	Date    time.Time `json:"date"`
+	Status  int       `json:"status" form:"status"`
+	Scope   int       `json:"scope" form:"scope"`
+	Order   int       `json:"order" form:"order"`
+	Comment Comment   `json:"comment"`
+	// Statistics
+	CompletionRate float64 `json:"completion_rate" sql:"-"`
+	CompletedTasks int     `json:"completed_tasks" sql:"-"`
+	TotalTasks     int     `json:"total_tasks" sql:"-"`
+	BestStreak     int     `json:"best_streak" sql:"-"`
+	Streak         int     `json:"streak" sql:"-"`
+	Hours          int     `json:"hours"`
+	Minutes        int     `json:"minutes"`
 }
 
 type Scope struct {
@@ -77,6 +82,7 @@ func syncStats(t Task, scope int) {
 	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).First(&task)
 	task.CompletionRate = calculateCompletionRate(task)
 	task.Streak, task.BestStreak = calculateStreak(task)
+	task.CompletedTasks, task.TotalTasks, task.Hours, task.Minutes = calculateTime(task)
 	syncTask(task, false)
 }
 
@@ -186,6 +192,32 @@ func calculateStreak(task Task) (int, int) {
 	return streak, best_streak
 }
 
+func calculateTime(task Task) (int, int, int, int) {
+	var tasks []Task
+
+	from, to := between(task.Date, task.Scope)
+
+	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from.Format("2006-01-02"), to.Format("2006-01-02"), ScopeDay, task.Name).Find(&tasks)
+
+	completed, total, hours, minutes := 0, 0, 0, 0
+
+	for _, t := range tasks {
+		hours += t.Hours
+		minutes += t.Minutes
+		if t.Status == TaskComplete {
+			completed += 1
+		}
+		total += 1
+	}
+
+	for minutes > 60 {
+		minutes -= 60
+		hours += 1
+	}
+
+	return completed, total, hours, minutes
+}
+
 func tasksInScopeR(c *macaron.Context, scope int) {
 	var tasks []Task
 	date, err := time.Parse("2006-01-02", c.Query("date"))
@@ -198,6 +230,7 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 	if scope == ScopeMonth || scope == ScopeYear {
 		for i, t := range tasks {
 			tasks[i].CompletionRate = calculateCompletionRate(t)
+			tasks[i].CompletedTasks, tasks[i].TotalTasks, tasks[i].Hours, tasks[i].Minutes = calculateTime(t)
 		}
 	}
 	if scope == ScopeYear {

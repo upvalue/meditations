@@ -2,6 +2,7 @@
 ** TODO Archive tasks with an optional checkmark to display archived items.
 ** TODO Medium blur does not trigger if one clicks outside of HTML (e.g. the bottom of a wiki entry...)
 ** TODO Comment update does not sync
+** TODO Completion rate can be calculated browser side now
 * Journal
 ** TODO Display habits?
 * All

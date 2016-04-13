@@ -127,6 +127,21 @@
       return this.command('/habits/order-down', task);
     };
 
+    TaskStore.prototype.on_task_log_time = function(task, time) {
+      time = time.split(":");
+      if (time.length === 1) {
+        task["hours"] = 0;
+        task["minutes"] = parseInt(time[0]);
+      } else if (time.length === 2) {
+        task["hours"] = parseInt(time[0]);
+        task["minutes"] = parseInt(time[1]);
+      } else {
+        console.log("Bad time", time);
+        return;
+      }
+      return this.command('/habits/update', task);
+    };
+
     TaskStore.prototype.on_task_update = function(task) {
       return this.command('/habits/update', task);
     };

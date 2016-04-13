@@ -1,6 +1,6 @@
 <scope>
   <section class="scope">
-    <h4 class=scope-title></h4>
+    <h5 class=scope-title></h5>
     <span class="pull-right">
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
         <button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
@@ -29,7 +29,7 @@
       }
     }
     if(opts.date) {
-      $(this.root).show().children('section').children('h4.scope-title').text(title);
+      $(this.root).show().children('section').children('.scope-title').text(title);
     } else {
       $(this.root).hide();
     }
@@ -126,16 +126,33 @@
   <section class="entry">
     <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
       {name}
+      <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)}>
+        {completed_tasks}/{total_tasks}
+      </span>
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
-    <span class="pull-right">
+    <span class="pull-right" style="display:block;">
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
+      <button if={scope == window.Habits.Scope.day} title="Log time"
+        class="task-control btn-link btn btn-sm btn-default octicon octicon-clock" onclick={log_time}></button>
       <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} title="Copy to present day" class="task-control btn btn-link btn-sm btn-default octicon octicon-clippy" onclick={copy}></button>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
     </span>
-    <div if={ (scope == window.Habits.Scope.year && best_streak > 0) } style="text-align:center;">Streak: {streak} days / {best_streak} (best)</div>
+    <div if={(minutes > 0 || hours > 0) || (scope == window.Habits.Scope.year && best_streak > 0)}
+      style="text-align:center; "> 
+      <span if={ ((minutes > 0 || hours > 0)) }>
+        <i class="octicon octicon-clock"></i>
+        <span if={hours > 0}>{hours} hour{hours > 1 ? "s" : ""}</span>
+        <span if={minutes > 0}>{minutes} minutes</span>
+      </span>
+      <span if={ (scope == window.Habits.Scope.year && best_streak > 0) }>
+        <i class="octicon octicon-dashboard"></i>
+        Streak: {streak} days / {best_streak} (best)
+      </span>
+
+    </div>
     <div class="comment" id="comment-{ID}"></div>
   </section>
 
@@ -173,6 +190,11 @@
     if(window.confirm('Really delete?')) {
       RiotControl.trigger('task-delete', self._item)
     }
+  }
+
+  log_time(e) {
+    var time = window.prompt("Log time (HH:MM or minutes, 0 to clear)");
+    RiotControl.trigger('task-log-time', self._item, time);
   }
 
   up(_) {
