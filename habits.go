@@ -75,18 +75,25 @@ type syncMessage struct {
 	Task       Task `json:"task"`
 }
 
+func calcStats(task *Task) {
+	task.CompletionRate = calculateCompletionRate(*task)
+	task.Streak, task.BestStreak = calculateStreak(*task)
+	task.CompletedTasks, task.TotalTasks, task.Hours, task.Minutes = calculateTime(*task)
+}
+
 // If a stat is monthly or yearly, recalculate streak and completion rate as well
 func syncStats(t Task, scope int) {
 	from, to := between(t.Date, scope)
 	var task Task
 	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).First(&task)
-	task.CompletionRate = calculateCompletionRate(task)
-	task.Streak, task.BestStreak = calculateStreak(task)
-	task.CompletedTasks, task.TotalTasks, task.Hours, task.Minutes = calculateTime(task)
+	calcStats(&task)
 	syncTask(task, false)
 }
 
 func syncTask(t Task, scope bool) {
+	if t.Scope == ScopeMonth || t.Scope == ScopeYear {
+		calcStats(&t)
+	}
 	message := syncMessage{
 		Wholescope: scope,
 		Task:       t,

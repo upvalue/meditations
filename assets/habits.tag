@@ -126,7 +126,7 @@
   <section class="entry">
     <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
       {name}
-      <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)}>
+      <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year )&& (total_tasks > 0)}>
         {completed_tasks}/{total_tasks}
       </span>
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
