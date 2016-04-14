@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 	"time"
@@ -173,7 +174,10 @@ func journalTags(c *macaron.Context) {
 		}
 		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
 		row.Scan(&count.Count)
-		results = append(results, count)
+		fmt.Printf("I got me a tag %v\n", count)
+		if count.Count > 0 {
+			results = append(results, count)
+		}
 	}
 
 	c.JSON(200, results)

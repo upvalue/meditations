@@ -6,7 +6,7 @@
   <h3 if={opts.date} id=entries-title>{opts.title}</h3>
   <h3 if={!opts.date} id=entries-title>Tag: {opts.title}</h3>
   <span>
-    <button if={!opts.date} class="btn btn-link btn-sm octicon octicon-x" title="Back to journal" onclick={remove_tag}></button>
+    <button if={!opts.date} class="btn btn-link btn-sm octicon octicon-arrow-left" title="Back to journal" onclick={remove_tag}></button>
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-chevron-right" title="Next month" onclick={next_month}></button>
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year" onclick={next_year}></button>
   </span>
