@@ -54,7 +54,7 @@ func journalNamedEntry(c *macaron.Context) {
 
 func journalWikiIndex(c *macaron.Context) {
 	var entries []Entry
-	DB.Where("name is not null").Order("name desc").Preload("tags").Find(&entries)
+	DB.Where("name is not null").Order("name asc").Preload("tags").Find(&entries)
 	c.JSON(200, entries)
 }
 
