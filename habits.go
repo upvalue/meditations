@@ -2,7 +2,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"math"
 	"net/http"
@@ -403,6 +405,32 @@ func bucketNew(c *macaron.Context) {
 	c.JSON(200, scope)
 }
 
+func export(c *macaron.Context) {
+	var buffer bytes.Buffer
+	var scopes []string
+
+	name := c.Req.PostFormValue("name")
+	if c.Req.PostFormValue("day") == "day" {
+		scopes = append(scopes, fmt.Sprintf("%d", ScopeDay))
+	}
+	if c.Req.PostFormValue("month") == "month" {
+		scopes = append(scopes, fmt.Sprintf("%d", ScopeMonth))
+	}
+	if c.Req.PostFormValue("year") == "year" {
+		scopes = append(scopes, fmt.Sprintf("%d", ScopeYear))
+	}
+
+	// Construct query
+	var tasks []Task
+	DB.Where("name = ? and scope in (?)", name, scopes).Order("date desc").Preload("Comment").Find(&tasks)
+
+	for _, t := range tasks {
+		buffer.WriteString(fmt.Sprintf("%s: %s\n", t.Date.Format("2006-01-02"), t.Comment.Body))
+	}
+
+	c.PlainText(200, buffer.Bytes())
+}
+
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", func(c *macaron.Context) {
 		c.HTML(200, "habits")
@@ -421,6 +449,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/order-down", binding.Bind(Task{}), taskOrderDown)
 	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)
 	m.Post("/bucket-new/:name", bucketNew)
+	m.Post("/export", export)
 
 	habitSync = MakeSyncPage("habits")
 	m.Get("/sync", habitSync.Handler())
