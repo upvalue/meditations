@@ -1,12 +1,13 @@
 @import url("/assets/vendor/bootstrap/dist/css/bootstrap.min.css");
 @import url("/assets/vendor/open-sans-fontface/open-sans.css");
+@import url("/assets/vendor/Inconsolata/css/inconsolata.css");
 @import url("/assets/vendor/octicons/octicons/octicons.css");
 @import url("/assets/vendor/medium-editor/dist/css/medium-editor.min.css");
 @import url("/assets/vendor/medium-editor/dist/css/themes/bootstrap.min.css");
 @import url("/assets/vendor/jquery-ui/themes/smoothness/jquery-ui.css");
 
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", monospace;
 }
 
 a, a:visited {
@@ -49,6 +50,10 @@ ul.nav a:hover {
 .entry { font-size: 0.8em; }
 
 #content input.form-control[type=text] { height:1.5em; }
+
+.comment {
+  font-family: "Inconsolata", monospace;
+}
 
 .comment p {
   margin-bottom: 0;
