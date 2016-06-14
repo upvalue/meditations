@@ -102,10 +102,17 @@ class EntryStore extends common.Store
         console.log("Success", id)
         $("#entry-#{id}").remove()
 
+  on_name_entry: (id, name) ->
+    console.log id, name
+    $.post
+      url: "/journal/name-entry/#{id}/#{name}"
+      success: () ->
+        true
+
   on_promote_entry: (id, name) ->
     console.log id, name
     $.post
-      url: "/journal/promote-entry/#{id}/#{name}"
+      url: "/journal/promote-entry/#{id}"
       success: () ->
         $("#entry-#{id}").remove()
 

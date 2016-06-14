@@ -59,7 +59,9 @@
 <entry id={"entry-"+ID}>
   <h4>{title}
     <button class="btn btn-sm octicon octicon-x" onclick={delete_entry}></button>
-    <button if={!Name} class="btn btn-sm octicon octicon-cloud-upload" onclick={promote_entry}></button>  
+
+    <button class="btn btn-sm octicon octicon-text-size" onclick={name_entry}></button>  
+    <button if={!Wiki} class="btn btn-sm octicon octicon-cloud-upload" onclick={promote_entry}></button>  
   </h4>
   <div id={"entry-body-"+ID} class="entry-body"></div>
   <span class=entry-tags>
@@ -118,11 +120,15 @@
     }
   }
 
-  promote_entry(e) {
+  name_entry(e) {
     var name = window.prompt("What would you like to name this entry?");
     if(name) {
-      RiotControl.trigger('promote-entry', self.ID, name);
+      RiotControl.trigger('name-entry', self.ID, name);
     }
+  }
+
+  promote_entry(e) {
+    RiotControl.trigger('promote-entry', self.ID);
   }
 
   delete_entry(e) {

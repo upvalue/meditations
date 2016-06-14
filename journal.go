@@ -16,6 +16,7 @@ type Entry struct {
 	gorm.Model
 	Date     time.Time
 	Name     string
+	Wiki     bool
 	Body     string
 	LastBody string
 	Tags     []Tag `gorm:"many2many:entry_tags"`
@@ -42,7 +43,8 @@ func journalEntries(c *macaron.Context) {
 	}
 	var entries []Entry
 	from, to := between(date, ScopeMonth)
-	DB.Where("name is null and date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
+	//DB.Where("(wiki = 0 or wiki is null) and date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
+	DB.Where("date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
 	c.JSON(200, entries)
 }
 
@@ -54,7 +56,7 @@ func journalNamedEntry(c *macaron.Context) {
 
 func journalWikiIndex(c *macaron.Context) {
 	var entries []Entry
-	DB.Where("name is not null").Order("name asc").Preload("tags").Find(&entries)
+	DB.Where("wiki = 1").Order("name asc").Preload("tags").Find(&entries)
 	c.JSON(200, entries)
 }
 
@@ -191,11 +193,21 @@ func journalDeleteEntry(c *macaron.Context) {
 	c.PlainText(200, []byte("OK"))
 }
 
-func journalPromoteEntry(c *macaron.Context) {
+func journalNameEntry(c *macaron.Context) {
 	var entry Entry
 	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
 
 	entry.Name = c.Params("name")
+	DB.Save(&entry)
+
+	c.PlainText(200, []byte("ok"))
+}
+
+func journalPromoteEntry(c *macaron.Context) {
+	var entry Entry
+	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
+
+	entry.Wiki = true
 	DB.Save(&entry)
 
 	c.PlainText(200, []byte("ok"))
@@ -217,7 +229,8 @@ func journalInit(m *macaron.Macaron) {
 	m.Post("/add-tag/:id/:tag", journalAddTag)
 	m.Post("/remove-tag/:id/:tag", journalRemoveTag)
 	m.Post("/delete-entry/:id", journalDeleteEntry)
-	m.Post("/promote-entry/:id/:name", journalPromoteEntry)
+	m.Post("/name-entry/:id/:name", journalNameEntry)
+	m.Post("/promote-entry/:id", journalPromoteEntry)
 
 	journalSync = MakeSyncPage("journal")
 	m.Get("/sync", journalSync.Handler())

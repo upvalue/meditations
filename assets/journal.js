@@ -144,10 +144,20 @@
       });
     };
 
+    EntryStore.prototype.on_name_entry = function(id, name) {
+      console.log(id, name);
+      return $.post({
+        url: "/journal/name-entry/" + id + "/" + name,
+        success: function() {
+          return true;
+        }
+      });
+    };
+
     EntryStore.prototype.on_promote_entry = function(id, name) {
       console.log(id, name);
       return $.post({
-        url: "/journal/promote-entry/" + id + "/" + name,
+        url: "/journal/promote-entry/" + id,
         success: function() {
           return $("#entry-" + id).remove();
         }
