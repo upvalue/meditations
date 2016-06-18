@@ -45,11 +45,11 @@ window.Common =
       console.log "#{location}: Socket message", m
       onmessage $.parseJSON(m.data)
     # Reconnect to socket on failure for development re-loading
-    #socket.onclose = () ->
-    #  setTimeout(() ->
-    #    socket = make_socket()
-    #    console.log 'Lost websocket connection, retrying in 10 seconds'
-    #  , 10000)
+    socket.onclose = () ->
+      setTimeout(() ->
+        socket = make_socket()
+        console.log 'Lost websocket connection, retrying in 10 seconds'
+      , 10000)
 
   route: (base, first, routes) ->
     riot.route () ->
