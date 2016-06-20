@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
@@ -98,9 +97,6 @@ func App() *macaron.Macaron {
 
 	m.Group("/journal", func() {
 		journalInit(m)
-	})
-	m.Get("/wiki/:name", func(c *macaron.Context) {
-		c.Redirect(fmt.Sprintf("/journal#wiki/%s", c.Params("name")), 302)
 	})
 
 	return m

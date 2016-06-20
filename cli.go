@@ -58,6 +58,12 @@ func main() {
 			Action: func(c *cli.Context) { dbcmd(c, true) },
 		},
 		{
+			Name:   "repair",
+			Usage:  "repair out-of-order tasks in database",
+			Flags:  flags,
+			Action: func(c *cli.Context) { DBRepair() },
+		},
+		{
 			Name:  "serve",
 			Usage: "start server",
 			Flags: flags,

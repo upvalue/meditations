@@ -35,3 +35,7 @@ func DBCreate() {
 func DBClose() {
 	DB.Close()
 }
+
+func DBRepair() {
+
+}

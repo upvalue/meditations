@@ -55,9 +55,15 @@
       socket.onopen = function(m) {
         return console.log("Connected to " + url + " websocket");
       };
-      return socket.onmessage = function(m) {
+      socket.onmessage = function(m) {
         console.log(location + ": Socket message", m);
         return onmessage($.parseJSON(m.data));
+      };
+      return socket.onclose = function() {
+        return setTimeout(function() {
+          socket = make_socket();
+          return console.log('Lost websocket connection, retrying in 10 seconds');
+        }, 10000);
       };
     },
     route: function(base, first, routes) {
