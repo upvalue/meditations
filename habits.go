@@ -87,7 +87,7 @@ func calcStats(task *Task) {
 func syncStats(t Task, scope int) {
 	from, to := between(t.Date, scope)
 	var task Task
-	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).First(&task)
+	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).Preload("Comment").First(&task)
 	calcStats(&task)
 	syncTask(task, false)
 }
