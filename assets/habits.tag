@@ -163,6 +163,7 @@
   RiotControl.on('task-updated', function(task) {
     if(task.ID == self._item.ID) {
       self.update(task);
+      comment_div().html(task.comment.body);
     }
   });
 

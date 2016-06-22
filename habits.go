@@ -386,6 +386,7 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 	} else {
 		// Create or update comment
 		DB.Save(&comment)
+		task.Comment = comment
 	}
 	syncTask(task, false)
 	c.PlainText(200, []byte("OK"))
