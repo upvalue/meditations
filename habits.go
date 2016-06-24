@@ -93,6 +93,10 @@ func syncStats(t Task, scope int) {
 }
 
 func syncTask(t Task, scope bool) {
+	if t.ID == 0 {
+		return
+	}
+
 	if t.Scope == ScopeMonth || t.Scope == ScopeYear {
 		calcStats(&t)
 	}

@@ -4,10 +4,9 @@
 ** TODO Completion rate can be calculated browser side now
 ** TODO Improve WebSockets
 ** TODO WebSockets should probably reconnect
-** TODO BUG When clicking on a comment directly from another comment, this triggers a comment update which causes the new comment to lose focus because of scope being 
-mounted
-** TODO Allow removal of names
+** TODO Updating a comment then changing status loses the comment update. Instead of updating the whole task at once, task-update should only update what is changed.
 * Journal
+** TODO Allow removal of names
 ** TODO Add title without wiki promotion
 ** TODO Display habits?
 * All
