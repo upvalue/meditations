@@ -5,11 +5,11 @@
 ** TODO Improve WebSockets
 ** TODO WebSockets should probably reconnect
 ** TODO Updating a comment then changing status loses the comment update. Instead of updating the whole task at once, task-update should only update what is changed.
+** TODO Add a quick nav with months and years, only those that actually have entries. For example J F M A '14 '15 '16
 * Journal
 ** TODO Allow removal of names
 ** TODO Add title without wiki promotion
 ** TODO Display habits?
-** TODO Renaming an article causes it to disappear because the URL is no longer valid; redirection is required.
 * All
 ** TODO Sequential AJAX requests
 ** TODO Search

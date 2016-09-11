@@ -18,10 +18,11 @@ func Server() *graceful.Server {
 		},
 	}
 
-	server.BeforeShutdown = func() {
+	server.BeforeShutdown = func() bool {
 		log.Printf("closing database")
 		DBClose()
 		log.Printf("shutting down server")
+		return true
 	}
 
 	return server
