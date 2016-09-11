@@ -88,8 +88,7 @@ func syncStats(t Task, scope int) {
 	from, to := between(t.Date, scope)
 	var task Task
 	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).Preload("Comment").First(&task)
-	task.CalculateTimeAndCompletion()
-	task.CalculateStreak()
+	task.CalculateStats()
 	syncTask(task, false)
 }
 
@@ -160,7 +159,7 @@ func tasksNear(task Task, tasks *[]Task) {
 }
 
 // Given a yearly task, calculate a streak of days
-func (task Task) CalculateStreak() {
+func (task *Task) CalculateStreak() {
 	var tasks []Task
 	best_streak, streak := 0, 0
 
@@ -488,7 +487,7 @@ func habitsIndex(c *macaron.Context) {
 	}
 
 	c.Data["HabitYearLinks"] = year_links
-	c.Data["MonthLinks"] = month_links
+	c.Data["HabitMonthLinks"] = month_links
 
 	c.HTML(200, "habits")
 }

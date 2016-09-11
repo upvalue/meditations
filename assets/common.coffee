@@ -1,11 +1,5 @@
-class Store
-  constructor: () ->
-    riot.observable(@)
-    window.Common.register_events(@)
 
 window.Common = 
-  Store: Store
-
   request: (data) ->
     ret = $.extend({type: "POST", contentType: "application/json; charset=UTF-8"}, data)
     ret.data = JSON.stringify(ret.data)
@@ -75,3 +69,7 @@ window.Common =
       if key.slice(0, 3) == "on_"
         store.on key.slice(3).replace(/_/g, "-"), value
 
+class window.Common.Store
+  constructor: () ->
+    riot.observable(@)
+    window.Common.register_events(@)

@@ -1,6 +1,10 @@
+<habits-navbar-links>
+
+</habits-navbar-links>
+
 <scope>
   <section class="scope">
-    <h5 class=scope-title></h5>
+    <h6 class=scope-title></h6>
     <span class="pull-right">
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
         <button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
@@ -132,6 +136,15 @@
       <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
     </button>
     <span class="pull-xs-right">
+      <span if={minutes > 0 || hours > 0}>
+        <i class="octicon octicon-clock"></i>
+        <span if={hours > 0}>{hours}h</span>
+        <span if={minutes > 0}>{minutes}m </span>
+      </span>
+      <span if={scope == window.Habits.Scope.year && best_streak > 0}>
+        <i title="Current/Best streak" class="octicon octicon-dashboard"></i>
+        <span>{streak}/{best_streak}</span>
+      </span>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
       <button if={scope == window.Habits.Scope.day} title="Log time"
@@ -140,19 +153,6 @@
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
       <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
     </span>
-    <div if={(minutes > 0 || hours > 0) || (scope == window.Habits.Scope.year && best_streak > 0)}
-      style="text-align:center; "> 
-      <span if={ ((minutes > 0 || hours > 0)) }>
-        <i class="octicon octicon-clock"></i>
-        <span if={hours > 0}>{hours} hour{hours > 1 ? "s" : ""}</span>
-        <span if={minutes > 0}>{minutes} minutes</span>
-      </span>
-      <span if={ (scope == window.Habits.Scope.year && best_streak > 0) }>
-        <i class="octicon octicon-dashboard"></i>
-        Streak: {streak} days / {best_streak} (best)
-      </span>
-
-    </div>
     <div class="comment" id="comment-{ID}"></div>
   </section>
 

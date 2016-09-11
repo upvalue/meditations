@@ -24,6 +24,15 @@ ul.nav a.navbar-link-disabled {
   color: #000 !important;
 }
 
+.navbar-brand { font-size: medium; }
+.navbar{
+  font-size: small;
+}
+
+.controls {
+  font-size: small !important;  
+}
+
 /**** HABITS */
 
 .scope-title {

@@ -1,11 +1,13 @@
 * Habits
 ** TODO Archive tasks with an optional checkmark to display archived items.
 ** TODO Medium blur does not trigger if one clicks outside of HTML (e.g. the bottom of a wiki entry...)
+** TODO Prompt to save journal entry on leaving
 ** TODO Completion rate can be calculated browser side now
 ** TODO Improve WebSockets
 ** TODO WebSockets should probably reconnect
 ** TODO Updating a comment then changing status loses the comment update. Instead of updating the whole task at once, task-update should only update what is changed.
 ** TODO Add a quick nav with months and years, only those that actually have entries. For example J F M A '14 '15 '16
+** TODO Some comments seem to be overwritten by empty comments
 * Journal
 ** TODO Allow removal of names
 ** TODO Add title without wiki promotion
