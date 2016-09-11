@@ -42,47 +42,33 @@
     }
 
     TaskStore.prototype.mount_days = function(date) {
-      var limit, today;
+      var limit, next, today;
       date = typeof date === 'string' ? moment.utc(date) : date.clone();
       today = moment();
       limit = date.daysInMonth() + 1;
       if (today.month() === date.month() && today.year() === date.year()) {
-        limit = today.date();
-
-        /*
-            today = moment()
-            next = date.clone().date(1)
-            if next > today
-        check = next.clone()
-        unless 
-        date = 1
-        while date <= from.daysInMonth()
-        today = moment()
-          next = from.clone().date(date)
-          if next > today
-            check = next.clone()
-             * Display the next day 4 hours in advance so tasks can easily be added to it
-            unless check.subtract(4, 'hours') < today 
-              break
-          task_store.mount_scope Scope.day, next
-          date += 1
-         */
+        limit = today.date() + 1;
+        next = today.clone();
+        next.add(4, 'hours');
+        if (next.date() !== today.date()) {
+          limit += 1;
+        }
       }
       console.log("Getting daily tasks");
       return $.get("/habits/in-days?date=" + (date.format('YYYY-MM-DD')) + "&limit=" + limit, function(results) {
-        var i, len, result;
+        var i, len, result, results1;
         results = results || [];
+        results1 = [];
         for (i = 0, len = results.length; i < len; i++) {
           result = results[i];
           date = moment(result.Date, "YYYY-MM-DD");
-          console.log("#scope-day-" + (date.format('DD')));
-          riot.mount("#scope-day-" + (date.format('DD')), {
+          results1.push(riot.mount("#scope-day-" + (date.format('DD')), {
             date: date,
             scope: Scope.day,
             tasks: result.Tasks
-          });
+          }));
         }
-        return console.log(results);
+        return results1;
       });
     };
 
