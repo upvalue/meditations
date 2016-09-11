@@ -11,7 +11,7 @@ var DB *gorm.DB
 func DBOpen() {
 	db, err := gorm.Open("sqlite3", Config.DBPath)
 	checkErr(err)
-	DB = &db
+	DB = db
 	DB.LogMode(Config.DBLog)
 }
 
