@@ -21,6 +21,45 @@ Status =
   wrap: 3
 
 class TaskStore extends common.Store
+  # This function mounts all days; it is only called when the month navigation is changed/on startup
+  mount_days: (date) =>
+    date = if typeof(date) == 'string' then moment.utc(date) else date.clone()
+    today = moment()
+
+    limit = date.daysInMonth() + 1
+
+    # If we are mounting the current month, we will not mount dates too far in advance so as not to clutter the screen
+    if today.month() == date.month() and today.year() == date.year()
+      limit = today.date()
+      
+      ###
+    today = moment()
+    next = date.clone().date(1)
+    if next > today
+      check = next.clone()
+      unless 
+      date = 1
+      while date <= from.daysInMonth()
+      today = moment()
+        next = from.clone().date(date)
+        if next > today
+          check = next.clone()
+          # Display the next day 4 hours in advance so tasks can easily be added to it
+          unless check.subtract(4, 'hours') < today 
+            break
+        task_store.mount_scope Scope.day, next
+        date += 1
+        ###
+
+    console.log "Getting daily tasks"
+    $.get "/habits/in-days?date=#{date.format('YYYY-MM-DD')}&limit=#{limit}", (results) ->
+      results = results or []
+      for result in results
+        date = moment(result.Date, "YYYY-MM-DD")
+        console.log("#scope-day-#{date.format('DD')}")
+        riot.mount "#scope-day-#{date.format('DD')}", { date: date, scope: Scope.day, tasks: result.Tasks}
+      console.log(results)
+
   mount_scope: (scope, date, mount) ->
     fetch = null
 
@@ -104,7 +143,6 @@ initialize = () ->
 # Navigation function
 view = (from, bucket) ->
   console.log('Browsing from', from)
-  today = moment()
   from = moment(from, 'YYYY-MM')
   $("#journal-link").attr "href", "/journal#view/#{from.format('YYYY-MM')}"
   document.title = "#{from.format('MMM YYYY')} / habits"
@@ -119,8 +157,12 @@ view = (from, bucket) ->
   # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
   riot.mount "scope-days",
     thunk: () ->
+      task_store.mount_days from
+      ###
+      task_store.mount_scope "days", from
       date = 1
       while date <= from.daysInMonth()
+      today = moment()
         next = from.clone().date(date)
         if next > today
           check = next.clone()
@@ -129,6 +171,7 @@ view = (from, bucket) ->
             break
         task_store.mount_scope Scope.day, next
         date += 1
+        ###
 
 main = () ->
   console.log 'Habits: installing router'

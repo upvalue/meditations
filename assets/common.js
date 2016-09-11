@@ -48,24 +48,26 @@
       });
       return editor;
     },
-    make_socket: function(location, onmessage) {
-      var socket, url;
-      url = "ws://" + window.location.hostname + ":" + window.location.port + "/" + location;
-      socket = new WebSocket(url);
-      socket.onopen = function(m) {
-        return console.log("Connected to " + url + " websocket");
+    make_socket: (function(_this) {
+      return function(location, onmessage) {
+        var url;
+        url = "ws://" + window.location.hostname + ":" + window.location.port + "/" + location;
+        _this.socket = new WebSocket(url);
+        _this.socket.onopen = function(m) {
+          return console.log("Connected to " + url + " websocket");
+        };
+        _this.socket.onmessage = function(m) {
+          console.log(location + ": Socket message", m);
+          return onmessage($.parseJSON(m.data));
+        };
+        return _this.socket.onclose = function() {
+          return setTimeout(function() {
+            this.socket = this.make_socket();
+            return console.log('Lost websocket connection, retrying in 10 seconds');
+          }, 10000);
+        };
       };
-      socket.onmessage = function(m) {
-        console.log(location + ": Socket message", m);
-        return onmessage($.parseJSON(m.data));
-      };
-      return socket.onclose = function() {
-        return setTimeout(function() {
-          socket = make_socket();
-          return console.log('Lost websocket connection, retrying in 10 seconds');
-        }, 10000);
-      };
-    },
+    })(this),
     route: function(base, first, routes) {
       riot.route(function() {
         var action;

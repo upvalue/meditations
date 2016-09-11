@@ -27,6 +27,13 @@
             <li class="nav-item">
               <a id=habits-link class="nav-link" href="/habits">Habits</a>
             </li>
+            {% if HabitYearLinks %}
+              {% for link in HabitYearLinks %}
+              <li class="nav-item">
+                <a id=habits-link class="nav-link" href="/habits#view/{{link.Href}}/0">{{link.Text}}</a>
+              </li>
+              {% endfor %}
+            {% endif %}
             <li class="nav-item">
               <a id=journal-link class="nav-link" href="/journal#">Journal</a>
             </li>

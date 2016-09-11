@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-macaron/binding"
@@ -197,8 +198,8 @@ func (task *Task) CalculateTimeAndCompletion() {
 	from, to := between(task.Date, task.Scope)
 
 	// Complex queries: we sum the hours and minutes of all tasks, count all tasks, and finally count all completed tasks
-	rows, err := DB.Table("tasks").Select("sum(hours), sum(minutes), count(*)").Where("date between ? and ? and scope = ? and name = ?", from, to, ScopeDay, task.Name).Rows()
-	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ?", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
+	rows, err := DB.Table("tasks").Select("sum(hours), sum(minutes), count(*)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
+	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ? and deleted_at is null", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
 
 	if err == nil {
 		defer rows.Close()
@@ -207,9 +208,6 @@ func (task *Task) CalculateTimeAndCompletion() {
 		}
 	}
 
-	if task.Name == "Meditate" {
-		fmt.Printf("%v %v\n", minutes, hours)
-	}
 	// Calculate time by converting minutes to hours and accouting for overflow
 	hours += (minutes / 60)
 	minutes = minutes % 60
@@ -221,10 +219,6 @@ func (task *Task) CalculateTimeAndCompletion() {
 		rate = math.Floor((completed * 100.0) / total)
 	}
 
-	if task.Name == "Meditate" {
-		fmt.Printf("%v %v %v %v %v\n", rate, completed, total, hours, minutes)
-	}
-
 	task.Hours, task.Minutes, task.CompletedTasks, task.TotalTasks, task.CompletionRate = hours, minutes,
 		int(completed), int(total), rate
 }
@@ -234,6 +228,24 @@ func (task *Task) CalculateStats() {
 	task.CalculateStreak()
 }
 
+func tasksInBucket(c *macaron.Context) {
+	var scope Scope
+	scope.ID = uint(c.ParamsInt(":id"))
+	if scope.ID == 0 {
+		DB.Order("updated_at desc").First(&scope)
+	} else {
+		DB.First(&scope)
+	}
+
+	var tasks []Task
+	DB.Where("scope = ?", scope.ID).Order("`order` asc").Preload("Comment").Find(&tasks)
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"scope": scope,
+		"tasks": tasks,
+	})
+}
+
+// Fetch tasks in a given scope and date range, return JSON
 func tasksInScopeR(c *macaron.Context, scope int) {
 	var tasks []Task
 	date, err := time.Parse(DateFormat, c.Query("date"))
@@ -257,21 +269,34 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 	c.JSON(http.StatusOK, tasks)
 }
 
-func tasksInBucket(c *macaron.Context) {
-	var scope Scope
-	scope.ID = uint(c.ParamsInt(":id"))
-	if scope.ID == 0 {
-		DB.Order("updated_at desc").First(&scope)
-	} else {
-		DB.First(&scope)
+func tasksInDays(c *macaron.Context) {
+	type Result struct {
+		Date  string
+		Tasks []Task
+	}
+	var results []Result
+	date, err := time.Parse(DateFormat, c.Query("date"))
+	finish := now.New(date).EndOfMonth().AddDate(0, 0, 1)
+	if err != nil {
+		serverError(c, "error parsing date %s", c.Query("date"))
+		return
+	}
+	limit, err := strconv.ParseInt(c.Query("limit"), 10, 32)
+	if err != nil {
+		serverError(c, "error parsing limit int %s", c.Query("limit"))
+	}
+	date = now.New(date).BeginningOfMonth()
+	for date.Month() != finish.Month() {
+		var tasks []Task
+		tasksInScope(&tasks, ScopeDay, date)
+		results = append(results, Result{date.Format("2006-01-02"), tasks})
+		date = date.AddDate(0, 0, 1)
+		if date.Day() == int(limit) {
+			break
+		}
 	}
 
-	var tasks []Task
-	DB.Where("scope = ?", scope.ID).Order("`order` asc").Preload("Comment").Find(&tasks)
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"scope": scope,
-		"tasks": tasks,
-	})
+	c.JSON(200, results)
 }
 
 func tasksInDay(c *macaron.Context) {
@@ -440,9 +465,30 @@ func export(c *macaron.Context) {
 }
 
 func habitsIndex(c *macaron.Context) {
-	//var first, last Task
-	//DB.Model(struct Task).Where("scope = ?", ScopeDay).Order("date", true).Limit(1).First(&first)
-	//DB.Model(Task).Where("scope = ?", ScopeDay).Order("date", false).Limit(1).First(&last)
+	var first, first_this_year, last Task
+
+	DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first)
+	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
+
+	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
+
+	type Link struct {
+		Href string
+		Text string
+	}
+
+	var month_links, year_links []Link
+
+	for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
+		year_links = append(year_links, Link{Href: d.Format("2006-01"), Text: d.Format("'06")})
+	}
+
+	for d := first_this_year.CreatedAt; d.Month() != last.CreatedAt.Month(); d = d.AddDate(0, 1, 0) {
+		month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: d.Format("Jan")})
+	}
+
+	c.Data["HabitYearLinks"] = year_links
+	c.Data["MonthLinks"] = month_links
 
 	c.HTML(200, "habits")
 }
@@ -453,6 +499,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-year", tasksInYear)
 	m.Get("/in-month", tasksInMonth)
 	m.Get("/in-day", tasksInDay)
+	m.Get("/in-days", tasksInDays)
 	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
 	m.Get("/buckets", buckets)
 

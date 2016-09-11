@@ -15,14 +15,14 @@ a, a:visited {
 }
 
 ul.nav a {
-  color: #09d !important;
-}
-
-ul.nav a:hover {
-  background-color: #eee !important;
+  color: #09d!important;
 }
 
 .medium-editor-toolbar li button {height: auto; min-width: 0; }
+
+ul.nav a.navbar-link-disabled {
+  color: #000 !important;
+}
 
 /**** HABITS */
 
