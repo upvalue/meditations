@@ -197,15 +197,15 @@ func (task *Task) CalculateTimeAndCompletion() {
 	from, to := between(task.Date, task.Scope)
 
 	// Complex queries: we sum the hours and minutes of all tasks, count all tasks, and finally count all completed tasks
-	rows, err := DB.Table("tasks").Select("sum(hours), sum(minutes)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
+	rows, err := DB.Table("tasks").Select("count(*), sum(hours), sum(minutes)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
 
 	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ?and deleted_at is null", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
-	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Find(&tasks).Count(&total)
+	//DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Find(&tasks).Count(&total)
 
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
-			rows.Scan(&hours, &minutes)
+			rows.Scan(&total, &hours, &minutes)
 		}
 	}
 	// Calculate time by converting minutes to hours and accouting for overflow
