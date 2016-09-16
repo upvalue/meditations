@@ -197,16 +197,17 @@ func (task *Task) CalculateTimeAndCompletion() {
 	from, to := between(task.Date, task.Scope)
 
 	// Complex queries: we sum the hours and minutes of all tasks, count all tasks, and finally count all completed tasks
-	rows, err := DB.Table("tasks").Select("sum(hours), sum(minutes), count(*)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
-	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ? and deleted_at is null", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
+	rows, err := DB.Table("tasks").Select("sum(hours), sum(minutes)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
+
+	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ?and deleted_at is null", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
+	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Find(&tasks).Count(&total)
 
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
-			rows.Scan(&hours, &minutes, &total)
+			rows.Scan(&hours, &minutes)
 		}
 	}
-
 	// Calculate time by converting minutes to hours and accouting for overflow
 	hours += (minutes / 60)
 	minutes = minutes % 60
@@ -214,12 +215,15 @@ func (task *Task) CalculateTimeAndCompletion() {
 	// Calculate completion rate
 	if total == 0.0 {
 		rate = -1.0
+	} else if completed == total {
+		rate = 100.0
 	} else {
 		rate = math.Floor((completed * 100.0) / total)
 	}
 
 	task.Hours, task.Minutes, task.CompletedTasks, task.TotalTasks, task.CompletionRate = hours, minutes,
 		int(completed), int(total), rate
+	fmt.Printf("Completion Rate %v, %v,  %v=%v, %v, %v\n", from, to, task.CompletedTasks, completed, total, task.CompletionRate)
 }
 
 func (task *Task) CalculateStats() {
@@ -463,31 +467,43 @@ func export(c *macaron.Context) {
 	c.PlainText(200, buffer.Bytes())
 }
 
+func navbarLinks(c *macaron.Context) {
+	_ = uint(c.ParamsInt(":year"))
+	/*
+		var first, first_this_year, last Task
+
+		DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first)
+		DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
+
+		DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
+
+		type Link struct {
+			Href string
+			Text string
+		}
+
+		var month_links, year_links []Link
+
+		for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
+			year_links = append(year_links, Link{Href: d.Format("2006-01"), Text: d.Format("06")})
+		}
+
+		for d := first_this_year.CreatedAt; d.Month() != last.CreatedAt.Month(); d = d.AddDate(0, 1, 0) {
+			month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: d.Format("Jan")})
+		}
+
+		c.JSON(http.StatusOK, map[string]interface{
+			"years": year_links,
+			"months": month_links
+		})
+
+		c.Data["HabitYearLinks"] = year_links
+		c.Data["HabitMonthLinks"] = month_links
+	*/
+
+}
+
 func habitsIndex(c *macaron.Context) {
-	var first, first_this_year, last Task
-
-	DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first)
-	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
-
-	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
-
-	type Link struct {
-		Href string
-		Text string
-	}
-
-	var month_links, year_links []Link
-
-	for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
-		year_links = append(year_links, Link{Href: d.Format("2006-01"), Text: d.Format("'06")})
-	}
-
-	for d := first_this_year.CreatedAt; d.Month() != last.CreatedAt.Month(); d = d.AddDate(0, 1, 0) {
-		month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: d.Format("Jan")})
-	}
-
-	c.Data["HabitYearLinks"] = year_links
-	c.Data["HabitMonthLinks"] = month_links
 
 	c.HTML(200, "habits")
 }
@@ -500,6 +516,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-day", tasksInDay)
 	m.Get("/in-days", tasksInDays)
 	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
+	m.Get("/navbar-links/:year([0-9]+)", navbarLinks)
 	m.Get("/buckets", buckets)
 
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)
