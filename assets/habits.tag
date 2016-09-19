@@ -209,7 +209,6 @@
 
   edit_comment(_) {
     comment_div().focus();
-    self.comment = {'task_id': self.ID}
   }
 
   copy(_) {

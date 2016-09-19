@@ -91,13 +91,11 @@ func App() *macaron.Macaron {
 		c.Redirect("/habits")
 	})
 
-	m.Group("/habits", func() {
-		habitsInit(m)
-	})
+	init := func(x string, r func(m *macaron.Macaron)) { m.Group(x, func() { r(m) }) }
 
-	m.Group("/journal", func() {
-		journalInit(m)
-	})
+	init("/habits", habitsInit)
+	init("/journal", journalInit)
+	init("/log", logInit)
 
 	return m
 }

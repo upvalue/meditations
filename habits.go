@@ -316,7 +316,6 @@ func tasksInYear(c *macaron.Context) {
 
 // Update a task's fields by JSON
 func taskUpdate(c *macaron.Context, task Task) {
-	log.Printf("TASK UPDATE %+v\n", task)
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
 	syncTask(task, false)
@@ -413,11 +412,19 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 	DB.Where("ID = ?", comment.TaskID).Find(&task)
 
 	if cid == 0 && empty == true {
-		// Empty, do not create comment
+		// Empty, do not create or update comment
 	} else if cid > 0 && empty == true {
-		// Delete comment
+		// Delete existing comment
 		DB.Delete(&comment)
 	} else {
+		if cid == 0 {
+			// Update existing comment
+			var test Comment
+			DB.Where("task_id = ?", comment.TaskID).First(&test)
+			if test.ID > 0 {
+				comment.ID = test.ID
+			}
+		}
 		// Create or update comment
 		DB.Save(&comment)
 		task.Comment = comment
