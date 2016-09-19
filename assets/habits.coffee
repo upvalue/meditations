@@ -70,14 +70,12 @@ class TaskStore extends common.Store
     common.request
       url: path
       data: task
-      success: () =>
-        thunk(task) if thunk
+      success: () => thunk(task) if thunk
 
   on_task_new: (scope, task_name, date) ->
     common.request
       url: "/habits/new"
-      success: () =>
-        @mount_scope scope.scope, date
+      success: () => @mount_scope scope.scope, date
       data:
         name: task_name
         scope: scope.scope
@@ -105,6 +103,7 @@ class TaskStore extends common.Store
       return
 
     @command '/habits/update', task
+
   on_task_update: (task) -> @command '/habits/update', task
 
   on_task_delete: (task) ->
@@ -142,20 +141,6 @@ view = (from, bucket) ->
   riot.mount "scope-days",
     thunk: () ->
       task_store.mount_days from
-      ###
-      task_store.mount_scope "days", from
-      date = 1
-      while date <= from.daysInMonth()
-      today = moment()
-        next = from.clone().date(date)
-        if next > today
-          check = next.clone()
-          # Display the next day 4 hours in advance so tasks can easily be added to it
-          unless check.subtract(4, 'hours') < today 
-            break
-        task_store.mount_scope Scope.day, next
-        date += 1
-        ###
 
 main = () ->
   console.log 'Habits: installing router'
@@ -186,12 +171,11 @@ main = () ->
 
   socket = false
   socket = window.Common.make_socket "habits/sync", (msg) ->
-    whole_scope = msg.wholescope
     task = msg.task
     # No need to refresh if task is not in the current scope
     date = moment.utc(task.date)
     if task_near(task, current_date)
-      if whole_scope
+      if msg.wholescope
         console.log 'Mounting whole scope!'
         task_store.mount_scope task.scope, date
       else

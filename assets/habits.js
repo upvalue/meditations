@@ -218,21 +218,6 @@
     return riot.mount("scope-days", {
       thunk: function() {
         return task_store.mount_days(from);
-
-        /*
-        task_store.mount_scope "days", from
-        date = 1
-        while date <= from.daysInMonth()
-        today = moment()
-          next = from.clone().date(date)
-          if next > today
-            check = next.clone()
-             * Display the next day 4 hours in advance so tasks can easily be added to it
-            unless check.subtract(4, 'hours') < today 
-              break
-          task_store.mount_scope Scope.day, next
-          date += 1
-         */
       }
     });
   };
@@ -263,12 +248,11 @@
     };
     socket = false;
     return socket = window.Common.make_socket("habits/sync", function(msg) {
-      var date, task, whole_scope;
-      whole_scope = msg.wholescope;
+      var date, task;
       task = msg.task;
       date = moment.utc(task.date);
       if (task_near(task, current_date)) {
-        if (whole_scope) {
+        if (msg.wholescope) {
           console.log('Mounting whole scope!');
           return task_store.mount_scope(task.scope, date);
         } else {
