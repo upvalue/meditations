@@ -32,16 +32,16 @@ window.Common =
 
   make_socket: (location, onmessage) =>
     url = "ws://#{window.location.hostname}:#{window.location.port}/#{location}"
-    @socket = new WebSocket url
-    @socket.onopen = (m) ->
+    socket = new WebSocket url
+    socket.onopen = (m) ->
       console.log "Connected to #{url} websocket"
-    @socket.onmessage = (m) ->
+    socket.onmessage = (m) ->
       console.log "#{location}: Socket message", m
       onmessage $.parseJSON(m.data)
     # Reconnect to socket on failure for development re-loading
-    @socket.onclose = () =>
-      setTimeout(() ->
-        @socket = @make_socket()
+    socket.onclose = () =>
+      setTimeout(() =>
+        socket = window.Common.make_socket()
         console.log 'Lost websocket connection, retrying in 10 seconds'
       , 10000)
 

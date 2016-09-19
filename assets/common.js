@@ -38,6 +38,7 @@
     make_socket: (function(_this) {
       return function(location, onmessage) {
         var url;
+        _this = window.Common;
         url = "ws://" + window.location.hostname + ":" + window.location.port + "/" + location;
         _this.socket = new WebSocket(url);
         _this.socket.onopen = function(m) {
@@ -49,7 +50,7 @@
         };
         return _this.socket.onclose = function() {
           return setTimeout(function() {
-            this.socket = this.make_socket();
+            _this.socket = _this.make_socket();
             return console.log('Lost websocket connection, retrying in 10 seconds');
           }, 10000);
         };
