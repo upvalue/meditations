@@ -96,7 +96,10 @@
 
 {% block script %}
 <script src="/assets/habits.js"></script>
-<script src="/assets/habits.tag" type="riot/tag"></script>
+<script type=riot/tag src=assets/habits-tag.tag></script>
 
-<script type="text/javascript">$(document).ready(function() { window.Habits.main() });</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  window.Habits.main()
+});</script>
 {% endblock %}

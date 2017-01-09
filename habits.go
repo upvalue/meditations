@@ -97,6 +97,8 @@ func syncTask(t Task, scope bool) {
 		return
 	}
 
+	DB.Where("task_id = ?", t.ID).First(&t.Comment)
+
 	if t.Scope == ScopeMonth || t.Scope == ScopeYear {
 		t.CalculateTimeAndCompletion()
 		if t.Scope == ScopeYear {
@@ -223,7 +225,6 @@ func (task *Task) CalculateTimeAndCompletion() {
 
 	task.Hours, task.Minutes, task.CompletedTasks, task.TotalTasks, task.CompletionRate = hours, minutes,
 		int(completed), int(total), rate
-	fmt.Printf("Completion Rate %v, %v,  %v=%v, %v, %v\n", from, to, task.CompletedTasks, completed, total, task.CompletionRate)
 }
 
 func (task *Task) CalculateStats() {
@@ -318,6 +319,7 @@ func tasksInYear(c *macaron.Context) {
 func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
+	//DB.Where("task_id = ?", task.ID).First(&task.Comment)
 	syncTask(task, false)
 	c.JSON(200, task)
 }

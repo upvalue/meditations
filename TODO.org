@@ -18,3 +18,5 @@
 ** TODO Export useful data. For instance export all habits in a textual log format
 ** TODO SQLCipher
 ** TODO Browse all named entries
+
+** TODO !!! Allow re-opening database

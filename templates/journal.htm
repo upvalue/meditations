@@ -21,7 +21,10 @@
 <script src="/assets/vendor/jquery-ui/jquery-ui.min.js"></script>
 
 <script src="/assets/journal.js"></script>
-<script src="/assets/journal.tag" type=riot/tag></script>
+<script type=riot/tag src="/assets/journal-tag.tag"></script>
 
-<script type="text/javascript">$(document).ready(function() { /*window.Habits.initialize();*/ window.Journal.main(); });</script>
+<script type="text/javascript">$(document).ready(function() { 
+  window.Journal.main();
+});
+</script>
 {% endblock %}

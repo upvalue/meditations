@@ -102,6 +102,7 @@ class TaskStore extends common.Store
       console.log("Bad time", time)
       return
 
+    delete task.comment
     @command '/habits/update', task
 
   on_task_update: (task) -> @command '/habits/update', task
