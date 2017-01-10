@@ -95,7 +95,6 @@ func App() *macaron.Macaron {
 
 	init("/habits", habitsInit)
 	init("/journal", journalInit)
-	init("/log", logInit)
 
 	return m
 }
