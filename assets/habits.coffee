@@ -106,7 +106,10 @@ class TaskStore extends common.Store
     delete task.comment
     @command '/habits/update', task
 
-  on_task_update: (task) -> @command '/habits/update', task
+  on_task_update: (task) ->
+    # Do not update comment
+    delete task.comment
+    @command '/habits/update', task
 
   on_task_delete: (task) ->
     @command '/habits/delete', task, () ->

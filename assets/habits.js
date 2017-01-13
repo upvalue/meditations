@@ -177,6 +177,7 @@
     };
 
     TaskStore.prototype.on_task_update = function(task) {
+      delete task.comment;
       return this.command('/habits/update', task);
     };
 
