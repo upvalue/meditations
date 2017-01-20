@@ -91,6 +91,7 @@ class TaskStore extends common.Store
   on_task_order_down: (task) -> @command '/habits/order-down', task
 
   on_task_log_time: (task, time) ->
+    # Break down hours and minutes
     time = time.split(":")
     if time.length == 1
       task["hours"] = 0
@@ -156,14 +157,14 @@ main = () ->
   RiotControl.on "change-date", (forward, scope) ->
     date = scope.date.clone().date(1)
     date[if forward then 'add' else 'subtract'](1, if scope.scope == Scope.month then 'months' else 'years')
-    riot.route "view/#{date.format('YYYY-MM')}/#{current_bucket or 0}"
+    route "view/#{date.format('YYYY-MM')}/#{current_bucket or 0}"
 
   RiotControl.on "change-bucket", (bucket) ->
-    riot.route "view/#{current_date.format('YYYY-MM')}/#{bucket}"
+    route "view/#{current_date.format('YYYY-MM')}/#{bucket}"
 
   common.route "/habits#", "view/#{moment().format('YYYY-MM')}/0", 
     view: view
-    no_action: () -> riot.route("view/#{moment().format('YYYY-MM')}/0")
+    no_action: () -> route("view/#{moment().format('YYYY-MM')}/0")
 
   # Setup websocket
   task_near = (task, date2) ->

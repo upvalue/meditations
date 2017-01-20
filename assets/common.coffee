@@ -46,7 +46,7 @@ window.Common =
       , 10000)
 
   route: (base, first, routes) ->
-    riot.route () ->
+    route () ->
       action = [].shift.apply(arguments)
       if routes[action]
         routes[action].apply(this, arguments)
@@ -58,10 +58,10 @@ window.Common =
         else
           console.log 'Unknown action', action
 
-    riot.route.base(base)
-    riot.route.start(true)
+    route.base(base)
+    route.start(true)
     unless window.location.hash.length > 2
-      riot.route(first) if first
+      route(first) if first
 
   # Automatically register store methods to listen to events with the same name
   register_events: (store) ->

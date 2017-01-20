@@ -52,8 +52,11 @@ actions =
   tags: () ->
     $.get "/journal/tags", (results) ->
       window.results = results
-      #for value in results
-      #  console.log value
+
+      unless results
+        console.log("No tags, not doing anything")
+        return
+
       max = results.reduce (x,y) ->
         if x.Count
           return x.Count
@@ -76,7 +79,7 @@ actions =
       riot.mount 'tag-cloud',
         tags: results
 
-  no_action: () -> riot.route("view/#{moment().format('YYYY-MM')}")
+  no_action: () -> route("view/#{moment().format('YYYY-MM')}")
 
 class EntryStore extends common.Store
   on_journal_update: (entry) ->
@@ -117,7 +120,7 @@ class EntryStore extends common.Store
         $("#entry-#{id}").remove()
 
   on_browse_tag: (name) ->
-    riot.route("tag/#{name}")
+    route("tag/#{name}")
 
 main = () ->
   initialize()

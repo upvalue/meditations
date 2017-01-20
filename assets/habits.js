@@ -232,15 +232,15 @@
       var date;
       date = scope.date.clone().date(1);
       date[forward ? 'add' : 'subtract'](1, scope.scope === Scope.month ? 'months' : 'years');
-      return riot.route("view/" + (date.format('YYYY-MM')) + "/" + (current_bucket || 0));
+      return route("view/" + (date.format('YYYY-MM')) + "/" + (current_bucket || 0));
     });
     RiotControl.on("change-bucket", function(bucket) {
-      return riot.route("view/" + (current_date.format('YYYY-MM')) + "/" + bucket);
+      return route("view/" + (current_date.format('YYYY-MM')) + "/" + bucket);
     });
     common.route("/habits#", "view/" + (moment().format('YYYY-MM')) + "/0", {
       view: view,
       no_action: function() {
-        return riot.route("view/" + (moment().format('YYYY-MM')) + "/0");
+        return route("view/" + (moment().format('YYYY-MM')) + "/0");
       }
     });
     task_near = function(task, date2) {

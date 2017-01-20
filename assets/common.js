@@ -56,7 +56,7 @@
       };
     })(this),
     route: function(base, first, routes) {
-      riot.route(function() {
+      route(function() {
         var action;
         action = [].shift.apply(arguments);
         if (routes[action]) {
@@ -71,11 +71,11 @@
           }
         }
       });
-      riot.route.base(base);
-      riot.route.start(true);
+      route.base(base);
+      route.start(true);
       if (!(window.location.hash.length > 2)) {
         if (first) {
-          return riot.route(first);
+          return route(first);
         }
       }
     },

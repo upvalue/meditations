@@ -50,6 +50,7 @@ ul.nav a.navbar-link-disabled {
 }
 
 .scope .entry {
+  clear:both;
   padding-bottom: .15em;
 }
 

@@ -110,7 +110,8 @@
     }
   });
 
-  new_tag() {
+  new_tag(e) {
+    e.preventDefault();
     RiotControl.trigger('add-tag', self.ID, $(this.root).find(".tag-name").val());
   }
 

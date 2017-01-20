@@ -21,7 +21,6 @@
     "bootstrap": "v4.0.0-alpha.4",
     "html5shiv": "~3.7.3",
     "respond": "~1.4.2",
-    "riot": "~2.3.12",
     "moment": "~2.11.0",
     "octicons": "~3.3.0",
     "RiotControl": "riotcontrol#*",
@@ -30,6 +29,8 @@
     "jquery-ui": "~1.11.4",
     "open-sans-fontface": "^1.4.2",
     "Inconsolata": "inconsolata#^0.0.1",
-    "intro.js": "^2.4.0"
+    "intro.js": "^2.4.0",
+    "riot": "^3.0.7",
+    "riot-route": "^3.0.2"
   }
 }

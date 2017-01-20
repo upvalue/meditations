@@ -72,6 +72,10 @@
       return $.get("/journal/tags", function(results) {
         var font_max, font_min, i, len, max, min, r;
         window.results = results;
+        if (!results) {
+          console.log("No tags, not doing anything");
+          return;
+        }
         max = results.reduce(function(x, y) {
           if (x.Count) {
             return x.Count;
@@ -101,7 +105,7 @@
       });
     },
     no_action: function() {
-      return riot.route("view/" + (moment().format('YYYY-MM')));
+      return route("view/" + (moment().format('YYYY-MM')));
     }
   };
 
@@ -165,7 +169,7 @@
     };
 
     EntryStore.prototype.on_browse_tag = function(name) {
-      return riot.route("tag/" + name);
+      return route("tag/" + name);
     };
 
     return EntryStore;
