@@ -156,7 +156,7 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 }
 
 // Find TASKS in the same scope as TASK
-func tasksNear(task Task, tasks *[]Task) {
+func (task *Task) Near(tasks *[]Task) {
 	tasksInScope(tasks, task.Scope, task.Date)
 }
 
@@ -346,7 +346,7 @@ func taskDelete(c *macaron.Context, task Task) {
 
 	DB.Where("id = ?", c.Params("id")).First(&task)
 
-	tasksNear(task, &tasks)
+	task.Near(&tasks)
 
 	log.Printf("%+v", task)
 

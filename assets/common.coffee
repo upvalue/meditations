@@ -1,5 +1,5 @@
 
-window.Common = 
+window.Common =
   request: (data) ->
     ret = $.extend({type: "POST", contentType: "application/json; charset=UTF-8"}, data)
     ret.data = JSON.stringify(ret.data)
