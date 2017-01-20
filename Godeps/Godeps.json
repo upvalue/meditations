@@ -1,0 +1,89 @@
+{
+	"ImportPath": "meditations",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v77",
+	"Deps": [
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.2.0-21-g9906417",
+			"Rev": "99064174e013895bbd9b025c31100bd1d9b590ca"
+		},
+		{
+			"ImportPath": "github.com/Unknwon/com",
+			"Comment": "v1",
+			"Rev": "28b053d5a2923b87ce8c5a08f3af779894a72758"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "v1.19.1-2-g8f6a367",
+			"Rev": "8f6a3675e11d69c50a82670c4a570e06d41094b7"
+		},
+		{
+			"ImportPath": "github.com/flosch/pongo2",
+			"Comment": "v1.0-rc1-211-g22499f9",
+			"Rev": "22499f94d3d56c7238591344a6902715d0b8fbbf"
+		},
+		{
+			"ImportPath": "github.com/go-macaron/binding",
+			"Rev": "48920167fa152d02f228cfbece7e0f1e452d200a"
+		},
+		{
+			"ImportPath": "github.com/go-macaron/csrf",
+			"Rev": "6a9a7df172cc1fcd81e4585f44b09200b6087cc0"
+		},
+		{
+			"ImportPath": "github.com/go-macaron/inject",
+			"Rev": "d8a0b8677191f4380287cfebd08e462217bac7ad"
+		},
+		{
+			"ImportPath": "github.com/go-macaron/pongo2",
+			"Rev": "28e8bf81cad72bee3aa5fef3d2fd7210b9b97b3f"
+		},
+		{
+			"ImportPath": "github.com/go-macaron/session",
+			"Rev": "b8a2b5ef7fb4c91c1c8ca23e2a52e29a4bcbb22f"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.1.0-6-gadf16b3",
+			"Rev": "adf16b31781325cbd41085c5be901d95b4d1f33d"
+		},
+		{
+			"ImportPath": "github.com/jinzhu/gorm",
+			"Comment": "v1.0-108-g1aa2d4c",
+			"Rev": "1aa2d4ca89885c0e519ca82420f3a245b78835c2"
+		},
+		{
+			"ImportPath": "github.com/jinzhu/inflection",
+			"Rev": "1c35d901db3da928c72a72d8458480cc9ade058f"
+		},
+		{
+			"ImportPath": "github.com/jinzhu/now",
+			"Rev": "95f61531f9021a162633b50777cc1263d3064641"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-sqlite3",
+			"Comment": "v1.2.0-13-gefea85c",
+			"Rev": "efea85cb9a06f1d4f661649f6beb5fd04597a366"
+		},
+		{
+			"ImportPath": "github.com/tylerb/graceful",
+			"Comment": "v1.2.13-4-gd37e108",
+			"Rev": "d37e108c89765a8e307f15b8fb2ecd10575da6bb"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "b03f0d9a164ac99fff690e1e0bb0af36f760322b"
+		},
+		{
+			"ImportPath": "gopkg.in/ini.v1",
+			"Comment": "v1.23.0",
+			"Rev": "6f66b0e091edb3c7b380f7c4f0f884274d550b67"
+		},
+		{
+			"ImportPath": "gopkg.in/macaron.v1",
+			"Comment": "v1.1.11",
+			"Rev": "ddb19a9f3e8cedd44696b9dd5854dc8a43f3dd6c"
+		}
+	]
+}

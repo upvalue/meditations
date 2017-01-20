@@ -513,7 +513,6 @@ func navbarLinks(c *macaron.Context) {
 }
 
 func habitsIndex(c *macaron.Context) {
-
 	c.HTML(200, "habits")
 }
 

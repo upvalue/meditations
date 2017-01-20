@@ -35,6 +35,10 @@ func main() {
 			Name:  "development",
 			Usage: "whether development is true",
 		},
+		cli.BoolFlag{
+			Name:  "tutorial",
+			Usage: "enable tutorial",
+		},
 		cli.IntFlag{
 			Name:  "port",
 			Usage: "HTTP port",

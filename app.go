@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
@@ -19,6 +20,7 @@ type Configuration struct {
 	SiteTitle   string
 	Encrypted   bool
 	Development bool
+	Tutorial    bool
 }
 
 var Config = Configuration{
@@ -29,6 +31,7 @@ var Config = Configuration{
 	SiteTitle:   "meditations",
 	Encrypted:   false,
 	Development: true,
+	Tutorial:    false,
 }
 
 func loadConfig(c *cli.Context) {
@@ -54,6 +57,10 @@ func loadConfig(c *cli.Context) {
 	if c.IsSet("port") == true {
 		Config.Port = c.Int("port")
 	}
+
+	if c.IsSet("tutorial") == true {
+		Config.Tutorial = c.Bool("tutorial")
+	}
 }
 
 func App() *macaron.Macaron {
@@ -76,8 +83,14 @@ func App() *macaron.Macaron {
 	// Serve static files from /assets
 	m.Use(macaron.Static("assets", macaron.StaticOptions{Prefix: "assets"}))
 
+	// Expose some configuration variables to templates
 	m.Use(func(c *macaron.Context) {
-		c.Data["SiteTitle"] = Config.SiteTitle
+		if Config.Tutorial {
+			c.Data["SiteTitle"] = Config.SiteTitle
+		} else {
+			c.Data["SiteTitle"] = fmt.Sprintf("%s (tutorial enabled)", Config.SiteTitle)
+		}
+		c.Data["Tutorial"] = Config.Tutorial
 		c.Data["Development"] = Config.Development
 		c.Next()
 	})
