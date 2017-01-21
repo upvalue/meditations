@@ -67,6 +67,7 @@ func App() *macaron.Macaron {
 	m := macaron.Classic()
 
 	DBOpen()
+	DBMigrate()
 
 	if Config.Development == true {
 		macaron.Env = "development"
