@@ -49,11 +49,15 @@ type Task struct {
 	gorm.Model
 	Name string `json:"name" form:"name"`
 	// The actual date of the task, regardless of when it was created
-	Date    time.Time `json:"date"`
-	Status  int       `json:"status" form:"status"`
-	Scope   int       `json:"scope" form:"scope"`
-	Order   int       `json:"order" form:"order"`
-	Comment Comment   `json:"comment"`
+	Date time.Time `json:"date"`
+	// The status of the task: complete, incomplete, or unset
+	Status int `json:"status" form:"status"`
+	// The scope of the task (monthly, yearly, daily)
+	Scope int `json:"scope" form:"scope"`
+	// The task's position within that scope
+	Order int `json:"order" form:"order"`
+	// Comment
+	Comment Comment `json:"comment"`
 	// Statistics
 	CompletionRate float64 `json:"completion_rate" sql:"-"`
 	CompletedTasks int     `json:"completed_tasks" sql:"-"`
@@ -64,6 +68,7 @@ type Task struct {
 	Minutes        int     `json:"minutes"`
 }
 
+// Time-based scopes are built-in, but the user can add non-timed scopes to use as lists
 type Scope struct {
 	gorm.Model
 	Name string `sql:"not null;unique"`
@@ -77,6 +82,7 @@ type Comment struct {
 
 ///// Synchronization
 
+// A message that will be sent to connected clients
 type syncMessage struct {
 	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
 	Wholescope bool `json:"wholescope"`
@@ -112,6 +118,7 @@ func syncTask(t Task, scope bool) {
 	json, err := json.Marshal(message)
 	checkErr(err)
 	habitSync.Sync(json)
+	// Recalculate stats for higher scopes
 	if t.Scope == ScopeDay {
 		syncStats(t, ScopeMonth)
 		syncStats(t, ScopeYear)
@@ -476,43 +483,36 @@ func export(c *macaron.Context) {
 	c.PlainText(200, buffer.Bytes())
 }
 
-func navbarLinks(c *macaron.Context) {
-	_ = uint(c.ParamsInt(":year"))
+func habitsIndex(c *macaron.Context) {
+	var first, first_this_year, last Task
+
+	type Link struct {
+		Href string
+		Text string
+	}
+
+	DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first)
+	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
+	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
+
+	var year_links []Link
+
+	for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
+		year_links = append(year_links, Link{Href: d.Format("2006"), Text: d.Format("06")})
+		fmt.Printf("%s\n", d.Format("06"))
+	}
+
+	c.Data["HabitYearLinks"] = year_links
+
 	/*
-		var first, first_this_year, last Task
-
-		DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first)
-		DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
-
-		DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
-
-		type Link struct {
-			Href string
-			Text string
-		}
-
-		var month_links, year_links []Link
-
-		for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
-			year_links = append(year_links, Link{Href: d.Format("2006-01"), Text: d.Format("06")})
-		}
-
 		for d := first_this_year.CreatedAt; d.Month() != last.CreatedAt.Month(); d = d.AddDate(0, 1, 0) {
-			month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: d.Format("Jan")})
+			month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: string(d.Format("Jan")[0])})
+			fmt.Printf("%s\n", d.Format("Jan"))
 		}
 
-		c.JSON(http.StatusOK, map[string]interface{
-			"years": year_links,
-			"months": month_links
-		})
-
-		c.Data["HabitYearLinks"] = year_links
 		c.Data["HabitMonthLinks"] = month_links
 	*/
 
-}
-
-func habitsIndex(c *macaron.Context) {
 	c.HTML(200, "habits")
 }
 
@@ -524,7 +524,6 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-day", tasksInDay)
 	m.Get("/in-days", tasksInDays)
 	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
-	m.Get("/navbar-links/:year([0-9]+)", navbarLinks)
 	m.Get("/buckets", buckets)
 
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)

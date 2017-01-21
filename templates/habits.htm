@@ -5,6 +5,17 @@
 {% block navigation %}
   <div class="controls pull-xs-right navbar-right">
     <div class=navbar-btn>
+      {% for link in HabitYearLinks %}
+      <button type=button class="btn btn-link btn-sm">
+        <a href="/habits#view/{{link.Href}}-01/0">'{{link.Text}}</a>
+      </button>
+      {% endfor %}
+
+      {% for link in HabitMonthLinks %}
+      <button type=button class="btn btn-link btn-sm">
+        <a href="/habits#view/{{link.Href}}-01/0">{{link.Text}}</a>
+      </button>
+      {% endfor %}
       <button type=button class="btn btn-primary btn-sm" data-toggle=modal data-target="#export-modal">
         Export data
       </button>

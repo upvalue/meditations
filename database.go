@@ -36,6 +36,9 @@ func DBClose() {
 	DB.Close()
 }
 
+func DBLoadTutorial() {
+}
+
 func DBRepair() {
 
 }

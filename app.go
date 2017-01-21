@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/codegangsta/cli"
@@ -21,6 +22,7 @@ type Configuration struct {
 	Encrypted   bool
 	Development bool
 	Tutorial    bool
+	Migrate     bool
 }
 
 var Config = Configuration{
@@ -32,6 +34,7 @@ var Config = Configuration{
 	Encrypted:   false,
 	Development: true,
 	Tutorial:    false,
+	Migrate:     false,
 }
 
 func loadConfig(c *cli.Context) {
@@ -61,13 +64,23 @@ func loadConfig(c *cli.Context) {
 	if c.IsSet("tutorial") == true {
 		Config.Tutorial = c.Bool("tutorial")
 	}
+
+	if c.IsSet("migrate") == true {
+		Config.Migrate = c.Bool("migrate")
+	}
 }
 
 func App() *macaron.Macaron {
 	m := macaron.Classic()
 
 	DBOpen()
-	DBMigrate()
+	if Config.Migrate == true {
+		DBMigrate()
+	}
+
+	if Config.Tutorial == true {
+		DBLoadTutorial()
+	}
 
 	if Config.Development == true {
 		macaron.Env = "development"
@@ -111,4 +124,61 @@ func App() *macaron.Macaron {
 	init("/journal", journalInit)
 
 	return m
+}
+
+func main() {
+	app := cli.NewApp()
+	app.Name = "meditations"
+
+	flags := []cli.Flag{
+		cli.BoolFlag{
+			Name:  "db-log",
+			Usage: "verbosely log SQL",
+		},
+		cli.StringFlag{
+			Name:  "database",
+			Usage: "database",
+		},
+		cli.BoolTFlag{
+			Name:  "development",
+			Usage: "whether development is true",
+		},
+		cli.BoolFlag{
+			Name:  "tutorial",
+			Usage: "enable tutorial",
+		},
+		cli.IntFlag{
+			Name:  "port",
+			Usage: "HTTP port",
+			Value: 8080,
+		},
+		cli.BoolFlag{
+			Name:  "migrate",
+			Usage: "run database migration",
+		},
+	}
+
+	app.Commands = []cli.Command{
+		{
+			Name:   "repair",
+			Usage:  "repair out-of-order tasks in database",
+			Flags:  flags,
+			Action: func(c *cli.Context) { DBRepair() },
+		},
+		{
+			Name:  "serve",
+			Usage: "start server",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				loadConfig(c)
+				log.Printf("running with configuration %+v\n", Config)
+				log.Printf("starting server")
+				server := Server()
+				err := server.ListenAndServe()
+				log.Printf("%v", err)
+			},
+		},
+	}
+
+	app.Run(os.Args)
 }
