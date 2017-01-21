@@ -1,0 +1,24 @@
+{
+  "name": "meditations",
+  "version": "1.0.0",
+  "description": "meditations is an application for tracking life progress that builds on habit formation and long term thinking.",
+  "main": "index.js",
+  "dependencies": {
+    "bower": "1.8.0"  
+  },
+  "devDependencies": {},
+  "scripts": {
+    "postinstall": "bower install --config.directory=assets/vendor"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ioddly/meditations.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "AGPL",
+  "bugs": {
+    "url": "https://github.com/ioddly/meditations/issues"
+  },
+  "homepage": "https://github.com/ioddly/meditations#readme"
+}

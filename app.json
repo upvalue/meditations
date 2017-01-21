@@ -1,0 +1,10 @@
+{
+  "name": "meditations",
+  "description": "meditations",
+
+  "scripts": {
+    "dokku": {
+      "postdeploy": "bin/meditations migrate"
+    }
+  }
+}

@@ -23,7 +23,6 @@
     "respond": "~1.4.2",
     "moment": "~2.11.0",
     "octicons": "~3.3.0",
-    "RiotControl": "riotcontrol#*",
     "jquery": "3.1.1",
     "medium-editor": "5.22.2",
     "jquery-ui": "~1.11.4",
@@ -31,6 +30,7 @@
     "Inconsolata": "inconsolata#^0.0.1",
     "intro.js": "^2.4.0",
     "riot": "^3.0.7",
-    "riot-route": "^3.0.2"
+    "riot-route": "^3.0.2",
+    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154"
   }
 }
