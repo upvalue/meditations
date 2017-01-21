@@ -4,11 +4,6 @@
 	"GodepVersion": "v77",
 	"Deps": [
 		{
-			"ImportPath": "github.com/BurntSushi/toml",
-			"Comment": "v0.2.0-21-g9906417",
-			"Rev": "99064174e013895bbd9b025c31100bd1d9b590ca"
-		},
-		{
 			"ImportPath": "github.com/Unknwon/com",
 			"Comment": "v1",
 			"Rev": "28b053d5a2923b87ce8c5a08f3af779894a72758"

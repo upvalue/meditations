@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/BurntSushi/toml"
 	"github.com/codegangsta/cli"
 	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/pongo2"
@@ -23,6 +22,7 @@ type Configuration struct {
 	Development bool
 	Tutorial    bool
 	Migrate     bool
+	Message     string
 }
 
 var Config = Configuration{
@@ -35,16 +35,10 @@ var Config = Configuration{
 	Development: true,
 	Tutorial:    false,
 	Migrate:     false,
+	Message:     "",
 }
 
 func loadConfig(c *cli.Context) {
-	if len(c.Args()) > 0 {
-		config_path := c.Args()[0]
-		_, err := toml.DecodeFile(config_path, &Config)
-		checkErr(err)
-		log.Printf("loaded configuration from %s %+v\n", config_path, Config)
-	}
-
 	if c.IsSet("db-log") == true {
 		Config.DBLog = c.Bool("db-log")
 	}
@@ -67,6 +61,10 @@ func loadConfig(c *cli.Context) {
 
 	if c.IsSet("migrate") == true {
 		Config.Migrate = c.Bool("migrate")
+	}
+
+	if c.IsSet("message") == true {
+		Config.Message = c.String("message")
 	}
 }
 
@@ -106,6 +104,7 @@ func App() *macaron.Macaron {
 		}
 		c.Data["Tutorial"] = Config.Tutorial
 		c.Data["Development"] = Config.Development
+		c.Data["Message"] = Config.Message
 		c.Next()
 	})
 
@@ -138,6 +137,10 @@ func main() {
 		cli.StringFlag{
 			Name:  "database",
 			Usage: "database",
+		},
+		cli.StringFlag{
+			Name:  "message",
+			Usage: "A message that will be displayed at the top, used for demo deployment",
 		},
 		cli.BoolTFlag{
 			Name:  "development",
