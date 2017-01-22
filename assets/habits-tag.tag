@@ -32,17 +32,13 @@
         case window.Habits.Scope.year: title = opts.date.format("YYYY"); break;
       }
     }
+
     if(opts.date) {
       $(this.root).show().children('section').children('.scope-title').text(title);
     } else {
       $(this.root).hide();
     }
   });
-
-  remount(e) {
-    //console.log(opts)
-    window.Habits.task_store.mount_scope(opts.scope, opts.date);
-  }
 
   nav_left(e) {
     RiotControl.trigger('change-date', false, opts);
@@ -121,6 +117,7 @@
 
   this.on('mount', function() {
     if(opts.thunk) { 
+      console.log("scope-days mounted");
       opts.thunk();
     }
   });

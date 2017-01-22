@@ -23,6 +23,7 @@ Status =
 class TaskStore extends common.Store
   # This function mounts all days; it is only called when the month navigation is changed/on startup
   mount_days: (date) =>
+    console.log "Mounting all days"
     date = if typeof(date) == 'string' then moment.utc(date) else date.clone()
     today = moment()
 
@@ -42,7 +43,9 @@ class TaskStore extends common.Store
       results = results or []
       for result in results
         date = moment(result.Date, "YYYY-MM-DD")
-        riot.mount "#scope-day-#{date.format('DD')}", { date: date, scope: Scope.day, tasks: result.Tasks}
+        opts = date: date, scope: Scope.day, tasks: result.Tasks
+        #console.log "Mounting day #scope-day-#{date.format('DD')}", opts
+        riot.mount "#scope-day-#{date.format('DD')}", opts
 
   mount_scope: (scope, date, mount) ->
     fetch = null
@@ -64,7 +67,9 @@ class TaskStore extends common.Store
 
       $.get "/habits/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
         tasks = tasks or []
-        result = riot.mount mount, { date: date, scope: scope, tasks: tasks, }
+        opts = date: date, scope: scope, tasks: tasks
+        #console.log "Mounting day", opts
+        result = riot.mount mount, opts
 
   command: (path, task, thunk) ->
     common.request
@@ -115,7 +120,7 @@ class TaskStore extends common.Store
   on_task_delete: (task) ->
     @command '/habits/delete', task, () ->
       $("#task-#{task.ID}").remove()
-      riot.update()
+      #riot.update()
       task
 
 # Initialize machinery necessary for task interaction
@@ -144,6 +149,7 @@ view = (from, bucket) ->
 
   # Allow days up to the current date
   # Note: Day <scope> tags must be mounted only after the <scope-days> tag is, thus we pass it a function for doing what we want
+  console.log "Mounting <scope-days>"
   riot.mount "scope-days",
     thunk: () ->
       task_store.mount_days from

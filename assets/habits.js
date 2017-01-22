@@ -43,6 +43,7 @@
 
     TaskStore.prototype.mount_days = function(date) {
       var limit, next, today;
+      console.log("Mounting all days");
       date = typeof date === 'string' ? moment.utc(date) : date.clone();
       today = moment();
       limit = date.daysInMonth() + 1;
@@ -56,17 +57,18 @@
       }
       console.log("Getting daily tasks");
       return $.get("/habits/in-days?date=" + (date.format('YYYY-MM-DD')) + "&limit=" + limit, function(results) {
-        var i, len, result, results1;
+        var i, len, opts, result, results1;
         results = results || [];
         results1 = [];
         for (i = 0, len = results.length; i < len; i++) {
           result = results[i];
           date = moment(result.Date, "YYYY-MM-DD");
-          results1.push(riot.mount("#scope-day-" + (date.format('DD')), {
+          opts = {
             date: date,
             scope: Scope.day,
             tasks: result.Tasks
-          }));
+          };
+          results1.push(riot.mount("#scope-day-" + (date.format('DD')), opts));
         }
         return results1;
       });
@@ -101,13 +103,14 @@
           }
         })(), fetch = ref[0], fetch_date = ref[1], mount = ref[2];
         return $.get("/habits/in-" + fetch + "?date=" + (fetch_date.format('YYYY-MM-DD')), function(tasks) {
-          var result;
+          var opts, result;
           tasks = tasks || [];
-          return result = riot.mount(mount, {
+          opts = {
             date: date,
             scope: scope,
             tasks: tasks
-          });
+          };
+          return result = riot.mount(mount, opts);
         });
       }
     };
@@ -184,7 +187,6 @@
     TaskStore.prototype.on_task_delete = function(task) {
       return this.command('/habits/delete', task, function() {
         $("#task-" + task.ID).remove();
-        riot.update();
         return task;
       });
     };
@@ -217,6 +219,7 @@
     task_store.mount_scope(Scope.month, from);
     task_store.mount_scope(Scope.year, from);
     task_store.mount_scope(current_bucket, from);
+    console.log("Mounting <scope-days>");
     return riot.mount("scope-days", {
       thunk: function() {
         return task_store.mount_days(from);
