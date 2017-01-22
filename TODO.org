@@ -7,10 +7,14 @@
 ** TODO Add a quick nav with months and years, only those that actually have entries. For example J F M A '14 '15 '16
 ** TODO Some comments seem to be overwritten by empty comments
 ** TODO Add all-time streak/time counter scope
+** TODO Re-ordering and adding time causes an error
 * Journal
 ** TODO Allow removal of names
 ** TODO Add title without wiki promotion
 ** TODO Display habits?
+** TODO Should streaks carry over through years?
+** TODO Multiple meditations in a day: how should this effect streaks?
+
 * All
 ** TODO Sequential AJAX requests
 ** TODO Search

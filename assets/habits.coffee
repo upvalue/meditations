@@ -187,6 +187,7 @@ main = () ->
     # No need to refresh if task is not in the current scope
     date = moment.utc(task.date)
     if task_near(task, current_date)
+      msg.wholescope = true # TODO this is a bandaid fix for time change cloneNode issue
       if msg.wholescope
         console.log 'Mounting whole scope!'
         task_store.mount_scope task.scope, date

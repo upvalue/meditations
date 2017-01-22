@@ -257,6 +257,7 @@
       task = msg.task;
       date = moment.utc(task.date);
       if (task_near(task, current_date)) {
+        msg.wholescope = true;
         if (msg.wholescope) {
           console.log('Mounting whole scope!');
           return task_store.mount_scope(task.scope, date);

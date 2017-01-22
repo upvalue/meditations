@@ -15,7 +15,7 @@
       </span>
       <button type=submit class="btn btn-link btn-sm btn-default octicon octicon-plus" title="Add task" onclick={new_task}></button>
     </span>
-    <task each={opts.tasks} />
+    <task each={opts.tasks}></task>
   </section>
 
   var self = this
@@ -159,7 +159,8 @@
 
   RiotControl.on('task-updated', function(task) {
     if(task.ID == self._item.ID) {
-      //self._item = task;
+      self._item = task;
+      console.log("Updating task",task);
       self.update(task);
       comment_div().html(task.comment.body);
     }
