@@ -19,19 +19,19 @@
   });
 
   last_year() {
-    riot.route("view/"+opts.date.clone().subtract(1, 'year').format('YYYY-MM'));
+    route("view/"+opts.date.clone().subtract(1, 'year').format('YYYY-MM'));
   }
 
   last_month() {
-    riot.route("view/"+opts.date.clone().subtract(1, 'month').format('YYYY-MM'));
+    route("view/"+opts.date.clone().subtract(1, 'month').format('YYYY-MM'));
   }
 
   next_month() {
-    riot.route("view/"+opts.date.clone().add(1, 'month').format('YYYY-MM'));
+    route("view/"+opts.date.clone().add(1, 'month').format('YYYY-MM'));
   }
 
   next_year() {
-    riot.route("view/"+opts.date.clone().add(1, 'year').format('YYYY-MM'));
+    route("view/"+opts.date.clone().add(1, 'year').format('YYYY-MM'));
   }
 
   remove_tag() {
