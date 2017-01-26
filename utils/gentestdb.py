@@ -22,7 +22,7 @@ STATUS_INCOMPLETE = 2
 class Task(object):
     COUNT = 1
 
-    def __init__(self, name, date, status, scope, order):
+    def __init__(self, name, date, status, scope, order, minutes):
         self.id = Task.COUNT
         Task.COUNT += 1
 
@@ -34,9 +34,10 @@ class Task(object):
         self.status = status
         self.scope = scope
         self.order = order
+        self.minutes = minutes
 
     def __repr__(self):
-        return('INSERT INTO "tasks" VALUES({0.id}, "{0.created_at}", "{0.created_at}", NULL, "{0.name}", "{0.date}", {0.status}, {0.scope}, {0.order});'.format(self))
+        return('INSERT INTO "tasks" VALUES({0.id}, "{0.created_at}", "{0.created_at}", NULL, "{0.name}", "{0.date}", {0.status}, {0.scope}, {0.order}, 0, {0.minutes});'.format(self))
 
 class Comment(object):
     COUNT = 1
@@ -56,7 +57,7 @@ def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
-def gen_tasks(name, days=90, order=0, status = None):
+def gen_tasks(name, days=90, order=0, status = None, minutes = "NULL"):
     end = datetime.now() + timedelta(days = 1)
     "Generate months worth of example tasks"
     month = None
@@ -66,11 +67,11 @@ def gen_tasks(name, days=90, order=0, status = None):
             status_n = random.randint(1, 2)
         if not month:
             month = date
-            yield Task(name, date, status_n, SCOPE_MONTH, order)
+            yield Task(name, date, status_n, SCOPE_MONTH, order, minutes)
         elif month.month != date.month or month.year != date.year:
             month = None
-            yield Task(name, date, status_n, SCOPE_YEAR, order)
-        yield Task(name, date, status_n, SCOPE_DAY, order)
+            yield Task(name, date, status_n, SCOPE_YEAR, order, minutes)
+        yield Task(name, date, status_n, SCOPE_DAY, order, minutes)
 
 def gen_comments():
     for task_id in range(1, Task.COUNT):
@@ -88,7 +89,7 @@ class Entry(object):
         self.body = date.strftime("Journal entry for %Y/%m/%d")
 
     def __repr__(self):
-        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", "{0.body}");'.format(self))
+        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", NULL, 0, "{0.body}", NULL);'.format(self))
 
 random.seed("Not really random")
 
@@ -98,7 +99,7 @@ def gen_entries(days=90):
         yield Entry(date)
 
 print('BEGIN TRANSACTION;')
-[print(task) for task in gen_tasks("Exercise", status = STATUS_COMPLETE)]
+[print(task) for task in gen_tasks("Exercise", status = STATUS_COMPLETE, minutes = 30)]
 [print(task) for task in gen_tasks("Diet", order = 1)]
 [print(comment) for comment in gen_comments()]
 [print(e) for e in gen_entries()]
