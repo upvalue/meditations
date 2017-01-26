@@ -1,9 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # gentestdb.py - Generate test database data for debugging and automated tests
 import random, sys
 from datetime import datetime, timedelta
-
-import bcrypt
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
