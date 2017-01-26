@@ -491,19 +491,21 @@ func habitsIndex(c *macaron.Context) {
 		Text string
 	}
 
-	DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first)
+	var year_links []Link
+
+	err := DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first).Error
 	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
 	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
 
-	var year_links []Link
+	if err == nil {
+		for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
+			year_links = append(year_links, Link{Href: d.Format("2006"), Text: d.Format("06")})
+			fmt.Printf("%s\n", d.Format("06"))
+		}
 
-	for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
-		year_links = append(year_links, Link{Href: d.Format("2006"), Text: d.Format("06")})
-		fmt.Printf("%s\n", d.Format("06"))
 	}
 
 	c.Data["HabitYearLinks"] = year_links
-
 	/*
 		for d := first_this_year.CreatedAt; d.Month() != last.CreatedAt.Month(); d = d.AddDate(0, 1, 0) {
 			month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: string(d.Format("Jan")[0])})
