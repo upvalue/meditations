@@ -1,1 +1,1 @@
-web: meditations serve --migrate --port $PORT --message \"This is a demo meditations deployment, wiped every hour on the hour.\"
+web: ./dokku_run_meditations.sh
