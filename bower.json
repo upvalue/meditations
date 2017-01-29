@@ -19,8 +19,6 @@
   ],
   "dependencies": {
     "bootstrap": "v4.0.0-alpha.4",
-    "html5shiv": "~3.7.3",
-    "respond": "~1.4.2",
     "moment": "~2.11.0",
     "octicons": "~3.3.0",
     "jquery": "3.1.1",
@@ -31,6 +29,7 @@
     "intro.js": "^2.4.0",
     "riot": "^3.0.7",
     "riot-route": "^3.0.2",
-    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154"
+    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154",
+    "tether-shepherd": "shepherd.js#^1.8.1"
   }
 }

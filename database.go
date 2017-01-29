@@ -24,12 +24,17 @@ func DBMigrate() {
 		// journal.go
 		&Entry{},
 	)
+	DBCreate()
 }
 
 func DBCreate() {
-	DBMigrate()
 	day, month, year, bucket := Scope{Name: "Day"}, Scope{Name: "Month"}, Scope{Name: "Year"}, Scope{Name: "Bucket"}
-	DB.Create(&day).Create(&month).Create(&year).Create(&bucket)
+
+	// lazily create scopes
+	DB.Create(&day)
+	DB.Create(&month)
+	DB.Create(&year)
+	DB.Create(&bucket)
 }
 
 func DBClose() {

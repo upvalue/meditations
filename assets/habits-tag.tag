@@ -138,7 +138,7 @@
         <span if={hours > 0}>{hours}h</span>
         <span if={minutes > 0}>{minutes}m </span>
       </span>
-      <span if={scope == window.Habits.Scope.year && best_streak > 0}>
+      <span class="streak" if={scope == window.Habits.Scope.year && best_streak > 0}>
         <i title="Current/Best streak" class="octicon octicon-dashboard"></i>
         <span>{streak}/{best_streak}</span>
       </span>

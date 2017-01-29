@@ -18,7 +18,7 @@ view = (datestr) ->
   document.title = "#{date.format('MMM YYYY')} / journal"
   $("#habits-link").attr "href", "/habits#view/#{date.format('YYYY-MM')}/0"
   $.get "/journal/entries/date?date=#{datestr}", (entries) ->
-    $("#content").html("<entries/>")
+    $("#journal-ui").html("<entries/>")
     console.log "View date", entries
 
     riot.mount 'entries',
@@ -31,17 +31,17 @@ actions =
 
   wiki_index: () ->
     $.get "/journal/entries/wiki-index", (entries) ->
-      $("#content").html("<wiki-entries/>")
+      $("#journal-ui").html("<wiki-entries/>")
       riot.mount 'wiki-entries', entries: entries
 
   wiki: (name) ->
     $.get "/journal/entries/name/#{name}", (entry) ->
-      $("#content").html("<entry-single/>")
+      $("#journal-ui").html("<entry-single/>")
       riot.mount 'entry-single', entry_array: [entry]
 
   tag: (name) ->
     $.get "/journal/entries/tag/#{name}", (entries) ->
-      $("#content").html("<entries/>")
+      $("#journal-ui").html("<entries/>")
       console.log "View tag #{name}"
       riot.mount('entries',
         title: name
@@ -75,7 +75,7 @@ actions =
         else 
           r.Size = Math.round((r.Count / max) * (font_max - font_min) + font_min)
 
-      $("#content").html("<tag-cloud/>")
+      $("#journal-ui").html("<tag-cloud/>")
       riot.mount 'tag-cloud',
         tags: results
 
