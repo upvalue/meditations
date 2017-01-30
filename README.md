@@ -5,10 +5,12 @@ you, but it is a great way to get a much more objective, overarching view of how
 
 ![image](http://ioddly.com/images/meditations.png)
 
+## [Live Demo & Tutorial](http://meditations.ioddly.com)
+
 # Usage
 
     $ go build
-    $ ./meditations --port [PORT] --database [PATH] --tutorial
+    $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial
 
 # Attribution
 
