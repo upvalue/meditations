@@ -1,6 +1,9 @@
+* TODO Journal
+** TODO 
+
 * TODO Journal navigation
 * TODO Tutorial
 * TODO Add all-time streak/time counter scope
 * TODO Sequential AJAX requests
 * TODO Search
-* TODO C&Ping comments doesn't seem to work.
+* TODO C&Ping comments doesn't seem to work. Probably because it messes with focus in some way.

@@ -7,8 +7,8 @@
     <h6 class=scope-title></h6>
     <span class="pull-right">
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
-        <button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button>
-        <button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button>
+        <a href="#view/{opts.date.clone().subtract(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/{opts.current_bucket}"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button></a>
+        <a href="#view/{opts.date.clone().add(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button></a>
       </span>
       <span if={opts.scope > window.Habits.Scope.year}>
         <button class="btn btn-link btn-sm btn-default octicon octicon-briefcase" title="Change bucket" onclick={change_bucket}></button>
@@ -41,10 +41,12 @@
   });
 
   nav_left(e) {
+    e.preventDefault();
     RiotControl.trigger('change-date', false, opts);
   }
 
   nav_right(e) {
+    e.preventDefault();
     RiotControl.trigger('change-date', true, opts)
   }
 
@@ -158,8 +160,8 @@
   var comment_div = function() { return $("#comment-"+self.ID); }
 
   RiotControl.on('task-updated', function(task) {
-    if(task.ID == self._item.ID) {
-      self._item = task;
+    if(task.ID == self.__.item.ID) {
+      self.__.item = task;
       console.log("Updating task",task);
       self.update(task);
       comment_div().html(task.comment.body);
@@ -168,10 +170,10 @@
 
   var save = function() {
     console.log("Comment update", comment_div().html());
-    RiotControl.trigger('comment-update', self._item, {
+    RiotControl.trigger('comment-update', self.__.item, {
       ID: self.comment.ID || 0,
       body: comment_div().html(),
-      task_id: self._item.ID
+      task_id: self.__.item.ID
     });
   }
 
@@ -181,28 +183,28 @@
   });
 
   change_status(e) {
-    var task = self._item;
+    var task = self.__.item;
     task.status = (task.status + 1) % window.Habits.Status.wrap;
     RiotControl.trigger('task-update', task);
   }
 
   delete(e) {
     if(window.confirm('Really delete?')) {
-      RiotControl.trigger('task-delete', self._item)
+      RiotControl.trigger('task-delete', self.__.item)
     }
   }
 
   log_time(e) {
     var time = window.prompt("Log time (HH:MM or minutes, 0 to clear)");
-    RiotControl.trigger('task-log-time', self._item, time);
+    RiotControl.trigger('task-log-time', self.__.item, time);
   }
 
   up(_) {
-    RiotControl.trigger('task-order-up', self._item);
+    RiotControl.trigger('task-order-up', self.__.item);
   }
 
   down(_) {
-    RiotControl.trigger('task-order-down', self._item);
+    RiotControl.trigger('task-order-down', self.__.item);
   }
 
   edit_comment(_) {
@@ -210,8 +212,8 @@
   }
 
   copy(_) {
-    var scope = self._item.scope - 1
-    var date = moment(self._item.date).utc()
+    var scope = self.__.item.scope - 1
+    var date = moment(self.__.item.date).utc()
     // Create task on current day from monthly task
     if(scope == window.Habits.Scope.day) {
       date.date(moment().clone().add(4, 'hour').date());
@@ -219,6 +221,6 @@
       date.month(moment().month());
       date.date(moment().date());
     }
-    RiotControl.trigger('task-new', {date: date, scope: scope}, self._item.name, date)
+    RiotControl.trigger('task-new', {date: date, scope: scope}, self.__.item.name, date)
   }
 </task>

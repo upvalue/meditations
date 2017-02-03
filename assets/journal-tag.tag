@@ -57,13 +57,18 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h4>{title}
+  <h5 class=entry-title if={Seen == 1}>{title}
     <button class="btn btn-sm octicon octicon-x" onclick={delete_entry}></button>
 
     <button class="btn btn-sm octicon octicon-text-size" onclick={name_entry}></button>  
     <button if={!Wiki} class="btn btn-sm octicon octicon-cloud-upload" onclick={promote_entry}></button>  
-  </h4>
-  <div id={"entry-body-"+ID} class="entry-body"></div>
+  </h5>
+  <span class=pull-xs-right>
+    controls
+  </span>
+  <div id={"entry-body-"+ID} class="entry-body">
+  
+  </div>
   <span class=entry-tags>
     <div class=form-inline>
       <span each={Tags}>
@@ -73,7 +78,7 @@
         </button>
       </span>
       <form class="entry-tag-form" onsubmit={new_tag}>
-        <input type=text class="form-control tag-name" size=10 placeholder="New tag" />
+        <input type=text class="form-control tag-name" size=10 placeholder="Add tag" />
         <button class="btn btn-sm btn-link octicon octicon-plus" title="Add tag" onclick={new_tag}></button>
       </form>
     </div>
@@ -91,7 +96,7 @@
 
   self.one('mount', function() {
     var date = moment(this.Date, "YYYY-MM-DD");
-    $(this.root).children("h4").append(
+    $(this.root).find('.entry-title').append(
       this.Name ? '<strong>'+this.Name+'</strong>' : '',
       '&nbsp;',
       date.format('dddd, '),
@@ -105,7 +110,7 @@
   });
 
   RiotControl.on('journal-updated', function(data) {
-    if(data.ID == self._item.ID) {
+    if(data.ID == self.__.item.ID) {
       self.update(data);
     }
   });
@@ -113,6 +118,7 @@
   new_tag(e) {
     e.preventDefault();
     RiotControl.trigger('add-tag', self.ID, $(this.root).find(".tag-name").val());
+    //$(this.root).find('.tag-name').val("");
   }
 
   remove_tag(e) {

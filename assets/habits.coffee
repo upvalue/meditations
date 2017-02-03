@@ -2,7 +2,7 @@
 
 common = window.Common
 current_date = false
-current_bucket = false
+current_bucket = 0
 task_store = false
 json_request = common.json_request
 
@@ -67,7 +67,7 @@ class TaskStore extends common.Store
 
       $.get "/habits/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
         tasks = tasks or []
-        opts = date: date, scope: scope, tasks: tasks
+        opts = date: date, scope: scope, tasks: tasks, current_bucket: current_bucket
         #console.log "Mounting day", opts
         result = riot.mount mount, opts
 

@@ -88,5 +88,8 @@ ul.nav a.navbar-link-disabled {
 
 .entry-tag-form {display:inline; }
 
+/* Remove spurious spacing between entries */
+.entry-body p:last-of-type { margin-bottom:0; }
+
 /***** WIKI */
 div#content h1:first-of-type { margin-top:0; }

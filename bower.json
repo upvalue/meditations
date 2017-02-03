@@ -29,7 +29,6 @@
     "intro.js": "^2.4.0",
     "riot": "^3.0.7",
     "riot-route": "^3.0.2",
-    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154",
-    "tether-shepherd": "shepherd.js#^1.8.1"
+    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154"
   }
 }

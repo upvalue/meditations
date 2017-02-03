@@ -21,6 +21,18 @@ view = (datestr) ->
     $("#journal-ui").html("<entries/>")
     console.log "View date", entries
 
+
+    seen = {}
+    # Sort by most recent
+    entries = entries.sort (a, b) -> b.ID - a.ID
+    for entry in entries
+      # This is so we can only display a date header once
+      entry_date = entry.Date.split("T")[0]
+      if not seen[entry_date]
+        seen[entry_date] = 0
+      seen[entry_date] += 1
+      entry.Seen = seen[entry_date]
+
     riot.mount 'entries',
       title: date.format('MMM YYYY')
       date: date
@@ -83,6 +95,7 @@ actions =
 
 class EntryStore extends common.Store
   on_journal_update: (entry) ->
+    console.log entry
     common.request
       url: "/journal/update"
       success: (data) ->

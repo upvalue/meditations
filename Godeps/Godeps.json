@@ -1,7 +1,7 @@
 {
 	"ImportPath": "meditations",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v77",
+	"GodepVersion": "v78",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Unknwon/com",
