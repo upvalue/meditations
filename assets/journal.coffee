@@ -41,12 +41,7 @@ view = (datestr) ->
 actions =
   view: view
 
-  wiki_index: () ->
-    $.get "/journal/entries/wiki-index", (entries) ->
-      $("#journal-ui").html("<wiki-entries/>")
-      riot.mount 'wiki-entries', entries: entries
-
-  wiki: (name) ->
+  name: (name) ->
     $.get "/journal/entries/name/#{name}", (entry) ->
       $("#journal-ui").html("<entry-single/>")
       riot.mount 'entry-single', entry_array: [entry]

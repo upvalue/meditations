@@ -263,7 +263,22 @@ func journalIndex(c *macaron.Context) {
 		}
 	}
 
+	// Display alphabetical navigation information
+	type NameLink struct {
+		Name string
+	}
+
+	var name_links []NameLink
+	var name_entries []Entry
+	DB.Where("name is not null").Order("name").Find(&name_entries)
+
+	for _, entry := range name_entries {
+		name_links = append(name_links, NameLink{Name: entry.Name})
+	}
+
 	c.Data["Years"] = years
+	c.Data["NameLinks"] = name_links
+
 	c.HTML(200, "journal")
 }
 

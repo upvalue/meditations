@@ -39,19 +39,6 @@
   }
 </entries>
 
-<entry-link>
-  <h4><a href="/journal#wiki/{Name}">{Name}</a></h4>
-</entry-link>
-
-<wiki-entries>
-  <h3>Wiki</h3>
-  <entry-link each={opts.entries}></entry-link>
-
-  this.on('mount', function() {
-    console.log(opts);
-  });
-</wiki-entries>
-
 <entry-single>
   <entry each={opts.entry_array}></entry>
 </entry-single>

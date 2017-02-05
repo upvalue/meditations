@@ -16,22 +16,41 @@
 
 {% block content %}
 <div class=row>
-  <div class=col-sm-1>
-    <a href="#">Chronological</a>|<a href="#">Alphabetical</a>
-    <ul class="list-group navigation-list">
-    {% for year in Years %}
-    <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="#chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a></li>
-    <ul class=collapse id="chrono-nav-{{year.Date}}" class="list-group navigation-list">
-      {% for month in year.Sub %}
-      <li><a href="#view/{{month.Link}}">{{month.Date}} ({{month.Count}})</a></li>
-      {% endfor %}
+  <div class=col-sm-2 id=journal-nav>
+    <ul class="nav nav-tabs" role=tablist>
+      <li class=nav-item>
+        <a class=active data-toggle=tab href="#chronological" role=tab><span class="octicon octicon-clock"></span>Time</a>
+      </li>
+      <li class=nav-item>
+        <a data-toggle=tab href="#alphabetical" role=tab><span class="octicon octicon-text-size"></span>Title</a>
+      </li>
     </ul>
-    {% endfor %}
-    </ul>
-  <p>NOTE: A new entry should be created simply by typing rather than using the calendar.</p>
+    <div class=tab-content>
+      <div class="tab-pane active" id=chronological role=tabpanel>
+        <ul class="list-group navigation-list">
+          {% for year in Years %}
+          <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="#chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a></li>
+          <ul class=collapse id="chrono-nav-{{year.Date}}" class="list-group navigation-list">
+            {% for month in year.Sub %}
+            <li><a href="#view/{{month.Link}}">{{month.Date}} ({{month.Count}})</a></li>
+            {% endfor %}
+          </ul>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="tab-pane" id=alphabetical role=tabpanel>
+        <ul class="list-group navigation-list">
+          {% for link in NameLinks %}
+          <li><a href="#name/{{link.Name}}">{{link.Name}}</a></li>
+
+          {% endfor %}
+        </ul>
+      </div>
+      <!--<p>NOTE: A new entry should be created simply by typing rather than using the calendar.</p>-->
+    </div>
   </div>
 
-  <div class=col-sm-11 id=journal-ui>
+  <div class=col-sm-10 id=journal-ui>
   </div>
 </div>
 {% endblock %}
@@ -43,7 +62,9 @@
 <script type=riot/tag src="/assets/journal-tag.tag"></script>
 
 <script type="text/javascript">
-$(document).ready(window.Journal.main);
+$(document).ready(function() {
+  window.Journal.main();
+});
 
 </script>
 {% endblock %}

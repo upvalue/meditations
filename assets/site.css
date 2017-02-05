@@ -95,6 +95,10 @@ ul.nav a.navbar-link-disabled {
 
 .navigation-list ul { font-size:0.8em; list-style: none; padding-left: 1em; }
 
+#journal-nav ul.nav { display:inline; clear:none; list-style-type:none; margin:0;padding:0; }
+
+div#alphabetical li { font-size:0.8em; }
+
 /* Remove spurious spacing between entries */
 .entry-body p:last-of-type { margin-bottom:0; }
 
