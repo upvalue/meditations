@@ -1,6 +1,3 @@
-<chrono-nav>
-  <ul
-</chrono-nav>
 <entries>
   <span> 
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-left" title="Last year" onclick={last_year}></button>
