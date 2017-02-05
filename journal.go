@@ -238,19 +238,19 @@ func journalIndex(c *macaron.Context) {
 
 		year := Link{Date: d.Format("2006"), Count: 0}
 		for ; d.Year() < e.Year() || d.Month() <= e.Month(); d = d.AddDate(0, 1, 0) {
-			rows, err := DB.Table("entries").Select("count(*)").Where("date between ? and ? and deleted_at is null", d.Format(DateFormat), d.AddDate(0, 1, -1).Format(DateFormat)).Rows()
+			rows, err := DB.Table("entries").Select("count(*)").Where("date between ? and ? and deleted_at is null", d.Format(DateFormat), d.AddDate(0, 1, 0).Format(DateFormat)).Rows()
 			if err == nil {
 				var count int
 				rows.Next()
 				rows.Scan(&count)
 				rows.Close()
-				year.Sub = append([]Link{Link{Date: d.Format("January"), Count: count, Link: d.Format("2006-02")}}, year.Sub...)
+				year.Sub = append([]Link{Link{Date: d.Format("January"), Count: count, Link: d.Format("2006-01")}}, year.Sub...)
 				// At end of year
 				if (d.Year() != d.AddDate(0, 1, 0).Year()) || (d.Year() == e.Year() && d.AddDate(0, 1, 0).Month() > e.Month()) {
-					// Get count of yearly stuff
+					// Get count of entries in year
 
 					rows, _ := DB.Table("Entries").Select("count(*)").Where("date between ? and ? and deleted_at is null",
-						now.New(d).BeginningOfYear().Format("2006-02-01"), now.New(d).EndOfYear().Format("2006-02-01")).Rows()
+						now.New(d).BeginningOfYear().Format(DateFormat), now.New(d).EndOfYear().Format(DateFormat)).Rows()
 					rows.Next()
 					rows.Scan(&year.Count)
 					rows.Close()

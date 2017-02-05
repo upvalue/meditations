@@ -17,6 +17,7 @@
 {% block content %}
 <div class=row>
   <div class=col-sm-1>
+    <a href="#">Chronological</a>|<a href="#">Alphabetical</a>
     <ul class="list-group navigation-list">
     {% for year in Years %}
     <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="#chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a></li>
@@ -27,6 +28,7 @@
     </ul>
     {% endfor %}
     </ul>
+  <p>NOTE: A new entry should be created simply by typing rather than using the calendar.</p>
   </div>
 
   <div class=col-sm-11 id=journal-ui>

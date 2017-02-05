@@ -62,6 +62,9 @@ $(document).ready () ->
   help "#scope-bucket .octicon-briefcase",
     "Use the bucket modal to create and change which bucket scope is visible."
 
+  help "section.entry:visible:first .octicon-comment",
+    "For comment editing functionality, see: <a href=\"https://yabwe.github.io/medium-editor/\">Medium Editor documentation</a>"
+
   window.intro = intro
 
   $("#tutorial-btn").click () -> intro.start()
