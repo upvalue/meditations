@@ -10,9 +10,10 @@ window.Common =
       $.extend({
         autoLink: true
         placeholder: false
-        toolbar: {
-          buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-        }
+        extensions: 
+          table: new MediumEditorTable
+        toolbar:
+          buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table']
       }, args)
 
     editor.subscribe "focus", () ->

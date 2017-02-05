@@ -29,6 +29,7 @@
     "intro.js": "^2.4.0",
     "riot": "3.1.1",
     "riot-route": "^3.0.2",
-    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154"
+    "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154",
+    "medium-editor-tables": "^0.6.1"
   }
 }
