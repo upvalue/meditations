@@ -18,7 +18,7 @@ import (
 	"gopkg.in/macaron.v1"
 )
 
-var habitSync *SyncPage
+var habitSync *SyncPage = MakeSyncPage("habits")
 
 const (
 	// Date format used in database
@@ -58,14 +58,15 @@ type Task struct {
 	Order int `json:"order" form:"order"`
 	// Comment
 	Comment Comment `json:"comment"`
-	// Statistics
+	// Time stats (these may be set directly by the user or derived from lower scopes)
+	Hours   int `json:"hours"`
+	Minutes int `json:"minutes"`
+	// Derived statistics
 	CompletionRate float64 `json:"completion_rate" sql:"-"`
 	CompletedTasks int     `json:"completed_tasks" sql:"-"`
 	TotalTasks     int     `json:"total_tasks" sql:"-"`
 	BestStreak     int     `json:"best_streak" sql:"-"`
 	Streak         int     `json:"streak" sql:"-"`
-	Hours          int     `json:"hours"`
-	Minutes        int     `json:"minutes"`
 }
 
 // Time-based scopes are built-in, but the user can add non-timed scopes to use as lists
@@ -493,7 +494,7 @@ func habitsIndex(c *macaron.Context) {
 
 	var year_links []Link
 
-	err := DB.Where("scope = ?", ScopeDay).Order("date").Limit(1).First(&first).Error
+	err := DB.Where("scope = ?", ScopeDay).Order("date asc").Limit(1).First(&first).Error
 	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
 	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
 
@@ -537,6 +538,5 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/bucket-new/:name", bucketNew)
 	m.Post("/export", export)
 
-	habitSync = MakeSyncPage("habits")
 	m.Get("/sync", habitSync.Handler())
 }

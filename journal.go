@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-macaron/binding"
 	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/now"
 	"gopkg.in/macaron.v1"
 )
 
@@ -27,7 +28,7 @@ type Tag struct {
 	Name string
 }
 
-var journalSync *SyncPage
+var journalSync *SyncPage = MakeSyncPage("journal")
 
 func syncEntry(e Entry) {
 	json, err := json.Marshal(e)
@@ -213,11 +214,61 @@ func journalPromoteEntry(c *macaron.Context) {
 	c.PlainText(200, []byte("ok"))
 }
 
-func journalInit(m *macaron.Macaron) {
-	m.Get("/", func(c *macaron.Context) {
-		c.HTML(200, "journal")
-	})
+func journalIndex(c *macaron.Context) {
+	// Display chronological navigation information
+	var first, last Entry
 
+	err := DB.Order("date").Limit(1).First(&first).Error
+	DB.Order("date desc").Limit(1).First(&last)
+
+	// Struct for rendering info about links
+	type Link struct {
+		Date  string
+		Count int
+		Sub   []Link
+		Link  string
+	}
+
+	var years []Link
+
+	if err == nil {
+		d := now.New(first.Date).BeginningOfMonth()
+		e := now.New(last.Date).EndOfMonth()
+		fmt.Printf("%v %v\n", d, e)
+
+		year := Link{Date: d.Format("2006"), Count: 0}
+		for ; d.Year() < e.Year() || d.Month() <= e.Month(); d = d.AddDate(0, 1, 0) {
+			rows, err := DB.Table("entries").Select("count(*)").Where("date between ? and ? and deleted_at is null", d.Format(DateFormat), d.AddDate(0, 1, -1).Format(DateFormat)).Rows()
+			if err == nil {
+				var count int
+				rows.Next()
+				rows.Scan(&count)
+				rows.Close()
+				year.Sub = append([]Link{Link{Date: d.Format("January"), Count: count, Link: d.Format("2006-02")}}, year.Sub...)
+				// At end of year
+				if (d.Year() != d.AddDate(0, 1, 0).Year()) || (d.Year() == e.Year() && d.AddDate(0, 1, 0).Month() > e.Month()) {
+					// Get count of yearly stuff
+
+					rows, _ := DB.Table("Entries").Select("count(*)").Where("date between ? and ? and deleted_at is null",
+						now.New(d).BeginningOfYear().Format("2006-02-01"), now.New(d).EndOfYear().Format("2006-02-01")).Rows()
+					rows.Next()
+					rows.Scan(&year.Count)
+					rows.Close()
+
+					// prepend year
+					years = append([]Link{year}, years...)
+					year = Link{Date: d.AddDate(0, 1, 0).Format("2006"), Count: 0}
+				}
+			}
+		}
+	}
+
+	c.Data["Years"] = years
+	c.HTML(200, "journal")
+}
+
+func journalInit(m *macaron.Macaron) {
+	m.Get("/", journalIndex)
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
 	m.Get("/entries/name/:name", journalNamedEntry)
@@ -232,6 +283,5 @@ func journalInit(m *macaron.Macaron) {
 	m.Post("/name-entry/:id/:name", journalNameEntry)
 	m.Post("/promote-entry/:id", journalPromoteEntry)
 
-	journalSync = MakeSyncPage("journal")
 	m.Get("/sync", journalSync.Handler())
 }

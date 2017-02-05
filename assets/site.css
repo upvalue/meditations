@@ -88,6 +88,13 @@ ul.nav a.navbar-link-disabled {
 
 .entry-tag-form {display:inline; }
 
+.navigation-list { 
+  list-style: none;
+  margin-left: 2px;
+}
+
+.navigation-list ul { font-size:0.8em; list-style: none; padding-left: 1em; }
+
 /* Remove spurious spacing between entries */
 .entry-body p:last-of-type { margin-bottom:0; }
 

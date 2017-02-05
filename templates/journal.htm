@@ -17,11 +17,16 @@
 {% block content %}
 <div class=row>
   <div class=col-sm-1>
-    <a href="#">2017</a>
-    <ul>
-      <li><a href="#">January</a></li>
+    <ul class="list-group navigation-list">
+    {% for year in Years %}
+    <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="#chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a></li>
+    <ul class=collapse id="chrono-nav-{{year.Date}}" class="list-group navigation-list">
+      {% for month in year.Sub %}
+      <li><a href="#view/{{month.Link}}">{{month.Date}} ({{month.Count}})</a></li>
+      {% endfor %}
     </ul>
-    <p>horsey</p>
+    {% endfor %}
+    </ul>
   </div>
 
   <div class=col-sm-11 id=journal-ui>
@@ -35,8 +40,8 @@
 <script src="/assets/journal.js"></script>
 <script type=riot/tag src="/assets/journal-tag.tag"></script>
 
-<script type="text/javascript">$(document).ready(function() { 
-  window.Journal.main();
-});
+<script type="text/javascript">
+$(document).ready(window.Journal.main);
+
 </script>
 {% endblock %}
