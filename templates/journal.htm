@@ -5,7 +5,6 @@
 {% block navigation %}
   <div class=pull-right>
     <form class="form-inline pull-xs-right">
-      <a class="navbar-btn btn btn-sm" href="/journal#tags">Tags</a>
       <div class="form-group">
         <input class="form-control" id="journal-new-entry-date" type=text placeholder="New entry" >
       </div>
@@ -19,13 +18,13 @@
   <div class=col-sm-2 id=journal-nav>
     <ul class="nav nav-tabs" role=tablist>
       <li class=nav-item>
-        <a class=active data-toggle=tab href="#chronological" role=tab><span class="octicon octicon-clock"></span>Time</a>
+        <a class=active data-toggle=tab href="#chronological" role=tab><span class="octicon octicon-clock"></span>&nbsp;Time&nbsp;</a>
       </li>
       <li class=nav-item>
-        <a data-toggle=tab href="#alphabetical" role=tab><span class="octicon octicon-text-size"></span>Title</a>
+        <a data-toggle=tab href="#alphabetical" role=tab><span class="octicon octicon-text-size"></span>&nbsp;Title&nbsp;</a>
       </li>
       <li class=nav-item>
-        <a data-toggle=tab href="#tag" role=tab><span class="octicon octicon-tag">Tag</span></a>
+        <a data-toggle=tab href="#tag" role=tab><span class="octicon octicon-tag">&nbsp;Tag&nbsp;</span></a>
       </li>
     </ul>
 
@@ -49,7 +48,17 @@
         <!-- TODO: Entries with colons in name should turn into openable lists e.g. Reviews: -->
         <ul class="list-group navigation-list">
           {% for link in NameLinks %}
-          <li><a href="#name/{{link.Name}}">{{link.Name}}</a></li>
+            {% if link.Sub %}
+            <li><span class="octicon octicon-chevron-right"></span><a href="#alpha-nav-{{link.Id}}" data-toggle=collapse aria-expanded=false aria-controls="#alpha-nav-{{link.Id}}">{{link.Name}}</a></li>
+            <ul class=collapse id="alpha-nav-{{link.Id}}" class="list-group navigation-list">
+              {% for link in link.Sub %}
+              <li><a href="#name/{{link.Href}}">{{link.Name}}</a></li>
+              {% endfor %}
+            </ul>
+              
+            {% else %}
+              <li><a href="#name/{{link.Name}}">{{link.Name}}</a></li>
+            {% endif %}
           {% endfor %}
         </ul>
       </div>
@@ -83,6 +92,33 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+  // Transform prefixed title links into expandable lists
+  // e.g.
+  // Review: Book1 
+  // Review: Book2
+  // becomes 
+  // Review ->
+  // -> Book1
+  // -> Book2
+  var name_links_finish = [], name_links = [
+  {% for link in NameLinks %}
+    { name: "{{link.Name}}" },
+  {% endfor %}
+  ];
+  for(var i = 0; i != name_links.length; i++) {
+    var link = name_links[i];
+    var parts = link.name.split(':');
+    if(parts.length == 2) {
+
+    } else {
+      name_links_finish.push(link);
+
+    }
+    // List is already sorted
+
+  }
+  console.log(name_links_finish)
+
   window.Journal.main();
 });
 

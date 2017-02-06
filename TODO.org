@@ -1,7 +1,4 @@
 * TODO Journal
-** TODO 
-
-* TODO Journal navigation
 * TODO Tutorial
 * TODO Add all-time streak/time counter scope
 * TODO Sequential AJAX requests

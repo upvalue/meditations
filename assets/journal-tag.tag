@@ -44,14 +44,14 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h5 class=entry-title if={Seen == 1}>{title}
-    <button class="btn btn-sm octicon octicon-x" onclick={delete_entry}></button>
-
-    <button class="btn btn-sm octicon octicon-text-size" onclick={name_entry}></button>  
-    <button if={!Wiki} class="btn btn-sm octicon octicon-cloud-upload" onclick={promote_entry}></button>  
+  <h5 class=entry-title if={Seen == 1 || Name}>{title}
   </h5>
-  <span class=pull-xs-right>
-    controls
+  <span class="journal-controls pull-xs-right">
+    <button class="journal-control btn btn-link btn-sm" title="Context">
+      <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
+    </button>
+    <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
+    <button if={!Name} class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Name entry" onclick={name_entry}></button>
   </span>
   <div id={"entry-body-"+ID} class="entry-body">
   
@@ -136,15 +136,3 @@
   }
 </entry>
 
-<tag-cloud>
-  <h1>Tags</h1>
-  <span each={opts.tags}>
-    <button class="btn btn-sm" onclick={browse_tag} data-name="{Tag.Name}" style="font-size:{Size}px;">
-      {Tag.Name}
-    </button>
-  </span>
-
-  browse_tag(e) {
-    RiotControl.trigger("browse-tag", $(e.target).attr("data-name"));
-  }
-</tag-cloud>
