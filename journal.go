@@ -163,13 +163,17 @@ func journalDeleteEntry(c *macaron.Context) {
 	c.PlainText(200, []byte("OK"))
 }
 
+func journalRemoveEntryName(c *macaron.Context) {
+	DB.Table("entries").Where("id = ?", c.ParamsInt("id")).Update("name", gorm.Expr("NULL"))
+	c.PlainText(200, []byte("OK"))
+}
+
 func journalNameEntry(c *macaron.Context) {
 	var entry Entry
 	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
 
 	entry.Name = c.Params("name")
 	DB.Save(&entry)
-
 	c.PlainText(200, []byte("ok"))
 }
 
@@ -297,6 +301,7 @@ func journalInit(m *macaron.Macaron) {
 	m.Post("/remove-tag/:id/:tag", journalRemoveTag)
 	m.Post("/delete-entry/:id", journalDeleteEntry)
 	m.Post("/name-entry/:id/:name", journalNameEntry)
+	m.Post("/name-entry/:id/", journalRemoveEntryName)
 	m.Post("/promote-entry/:id", journalPromoteEntry)
 
 	m.Get("/sync", journalSync.Handler())

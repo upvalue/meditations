@@ -44,14 +44,14 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h5 class=entry-title if={Seen == 1 || Name}>{title}
-  </h5>
+  <h5 class=entry-title if={Seen == 1 || Name}>{title}</h5>
   <span class="journal-controls pull-xs-right">
-    <button class="journal-control btn btn-link btn-sm" title="Context">
+    <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
       <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
     </button>
+    <button class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Name entry" onclick={name_entry}></button>
+    <!-- this should be last -->
     <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
-    <button if={!Name} class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Name entry" onclick={name_entry}></button>
   </span>
   <div id={"entry-body-"+ID} class="entry-body">
   
@@ -115,10 +115,8 @@
   }
 
   name_entry(e) {
-    var name = window.prompt("What would you like to name this entry?");
-    if(name) {
-      RiotControl.trigger('name-entry', self.ID, name);
-    }
+    var name = window.prompt("What would you like to name this entry? (leave empty to delete)", self.Name);
+    RiotControl.trigger('name-entry', self.ID, name);
   }
 
   promote_entry(e) {

@@ -33,6 +33,9 @@ view = (datestr) ->
       seen[entry_date] += 1
       entry.Seen = seen[entry_date]
 
+      # Do not include context link from pages with the context
+      entry.NoContext = true
+
     riot.mount 'entries',
       title: date.format('MMM YYYY')
       date: date
