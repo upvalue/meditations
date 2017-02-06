@@ -177,7 +177,6 @@ func journalTags(c *macaron.Context) {
 		}
 		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
 		row.Scan(&count.Count)
-		fmt.Printf("I got me a tag %v\n", count)
 		if count.Count > 0 {
 			results = append(results, count)
 		}
@@ -276,7 +275,26 @@ func journalIndex(c *macaron.Context) {
 		name_links = append(name_links, NameLink{Name: entry.Name})
 	}
 
+	// Display tagged navigation information
+	type TagLink struct {
+		Name  string
+		Count int
+	}
+	var tags []Tag
+	var tag_links []TagLink
+
+	DB.Order("name").Find(&tags)
+	for _, tag := range tags {
+		var count int
+		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
+		row.Scan(&count)
+		if count > 0 {
+			tag_links = append(tag_links, TagLink{Name: tag.Name, Count: count})
+		}
+	}
+
 	c.Data["Years"] = years
+	c.Data["TagLinks"] = tag_links
 	c.Data["NameLinks"] = name_links
 
 	c.HTML(200, "journal")

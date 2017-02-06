@@ -24,6 +24,9 @@
       <li class=nav-item>
         <a data-toggle=tab href="#alphabetical" role=tab><span class="octicon octicon-text-size"></span>Title</a>
       </li>
+      <li class=nav-item>
+        <a data-toggle=tab href="#tag" role=tab><span class="octicon octicon-tag">Tag</span></a>
+      </li>
     </ul>
 
     <div class=tab-content>
@@ -47,12 +50,18 @@
         <ul class="list-group navigation-list">
           {% for link in NameLinks %}
           <li><a href="#name/{{link.Name}}">{{link.Name}}</a></li>
-
           {% endfor %}
         </ul>
       </div>
 
       <!-- Tagged navigation links -->
+      <div class=tab-pane id=tag role=tabpanel>
+        <ul class="list-group navigation-list">
+          {% for link in TagLinks %}
+          <li><a href="#tag/{{link.Name}}">#{{link.Name}}</a> ({{link.Count}})</li>
+          {% endfor %}
+        </ul>
+      </div>
       <!--<p>NOTE: A new entry should be created simply by typing rather than using the calendar.</p>-->
     </div>
   </div>

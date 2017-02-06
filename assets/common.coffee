@@ -16,6 +16,7 @@ window.Common =
           buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table']
       }, args)
 
+    # Checkmark indicates whether or not the work has been saved
     editor.subscribe "focus", () ->
       $("#saved-button").removeClass "octicon-check"
       $("#saved-button").addClass "octicon-circle-slash"
