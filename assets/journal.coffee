@@ -43,6 +43,7 @@ actions =
 
   name: (name) ->
     $.get "/journal/entries/name/#{name}", (entry) ->
+      document.title = "#{name} / journal" 
       $("#journal-ui").html("<entry-single/>")
       riot.mount 'entry-single', entry_array: [entry]
 
@@ -50,41 +51,12 @@ actions =
     $.get "/journal/entries/tag/#{name}", (entries) ->
       $("#journal-ui").html("<entries/>")
       console.log "View tag #{name}"
+      document.title = "##{name} / journal"
       riot.mount('entries',
         title: name
         entries: entries
         thunk: mount_entries
       )
-
-  tags: () ->
-    $.get "/journal/tags", (results) ->
-      window.results = results
-
-      unless results
-        console.log("No tags, not doing anything")
-        return
-
-      max = results.reduce (x,y) ->
-        if x.Count
-          return x.Count
-        Math.max(x, y.Count)
-
-      min = results.reduce (x,y) ->
-        if x.Count
-          return x.Count
-        Math.min(x, y.Count)
-
-      font_min = 12
-      font_max = 24
-      for r in results
-        if r.Count == min
-          r.Size = font_min
-        else 
-          r.Size = Math.round((r.Count / max) * (font_max - font_min) + font_min)
-
-      $("#journal-ui").html("<tag-cloud/>")
-      riot.mount 'tag-cloud',
-        tags: results
 
   no_action: () -> route("view/#{moment().format('YYYY-MM')}")
 
