@@ -11,6 +11,7 @@
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year" onclick={next_year}></button>
   </span>
   <entry each={opts.entries}></entry>
+
   this.on('mount', function() {
     console.log(opts);
     if(opts.thunk) { 
@@ -46,31 +47,29 @@
 <entry id={"entry-"+ID}>
   <h5 class=entry-title if={Seen == 1 || Name}>{title}</h5>
   <span class="journal-controls pull-xs-right">
-    <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
-      <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
-    </button>
-    <button class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Name entry" onclick={name_entry}></button>
-    <!-- this should be last -->
-    <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
+    <span class=pull-xs-right>
+      <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
+        <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
+      </button>
+      <button class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name" onclick={name_entry}></button>
+      <button class="journal-control btn btn-link btn-sm octicon octicon-tag" title="Add tag" onclick={add_tag}></button>
+      <!-- this should be last -->
+      <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
+    </span>
+    <br>
+    <span class="journal-tags pull-xs-right">
+      <span class=journal-tag each={Tags}>
+        <a href ="#tag/{Name}">#{Name}</a>
+        <button class="btn btn-xs octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
+      </span>
+    </span>
   </span>
+
   <div id={"entry-body-"+ID} class="entry-body">
   
   </div>
-  <span class=entry-tags>
-    <div class=form-inline>
-      <span each={Tags}>
-        <button class="btn btn-sm" onclick={browse_tag} data-name="{Name}">
-          {Name}
-          <button class="btn btn-sm btn-link octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
-        </button>
-      </span>
-      <form class="entry-tag-form" onsubmit={new_tag}>
-        <input type=text class="form-control tag-name" size=10 placeholder="Add tag" />
-        <button class="btn btn-sm btn-link octicon octicon-plus" title="Add tag" onclick={new_tag}></button>
-      </form>
-    </div>
 
-  </span>
+  <hr>
 
   var self = this
 
@@ -102,6 +101,14 @@
     }
   });
 
+  add_tag(e) {
+    e.preventDefault();
+    var tag = window.prompt("Enter the tag's name (do not include #)");
+    if(tag && tag.length > 0) {
+      RiotControl.trigger('add-tag', self.ID, tag);
+    }
+  }
+
   new_tag(e) {
     e.preventDefault();
     RiotControl.trigger('add-tag', self.ID, $(this.root).find(".tag-name").val());
@@ -109,8 +116,9 @@
   }
 
   remove_tag(e) {
-    if(window.confirm("Are you sure you want to remove this tag?")) {
-      RiotControl.trigger('remove-tag', self.ID, $(e.target).attr("data-name"))
+    var name = $(e.target).attr("data-name");
+    if(window.confirm("Are you sure you want to remove the tag #"+name)) {
+      RiotControl.trigger('remove-tag', self.ID, name);
     }
   }
 

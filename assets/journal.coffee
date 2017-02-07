@@ -65,11 +65,16 @@ actions =
 
 class EntryStore extends common.Store
   on_journal_update: (entry) ->
+    # Extract tags from body
+    match = /(#[a-z0-9][a-z0-9\-_]*)/ig
+    tags = entry.Body.match(match)
+    body = entry.Body.replace(match, "")
     console.log entry
     common.request
       url: "/journal/update"
       success: (data) ->
-        true
+        # If saving is successful, apply tags to post
+        console.log("TAGS", tags)
 
       data: entry
 

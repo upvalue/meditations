@@ -204,6 +204,7 @@ func journalIndex(c *macaron.Context) {
 
 	var years []Link
 
+	// Display chronological navigation
 	if err == nil {
 		d := now.New(first.Date).BeginningOfMonth()
 		e := now.New(last.Date).EndOfMonth()
@@ -236,7 +237,7 @@ func journalIndex(c *macaron.Context) {
 		}
 	}
 
-	// Display alphabetical navigation information
+	// Display alphabetical navigation
 	type NameLink struct {
 		Name string
 		Id   string // HTML ID safe version of Name
