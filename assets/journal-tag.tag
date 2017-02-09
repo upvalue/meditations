@@ -12,10 +12,12 @@
   </span>
   <entry each={opts.entries}></entry>
 
+  var self = this;
+
   this.on('mount', function() {
-    console.log(opts);
     if(opts.thunk) { 
-      opts.thunk(this.root);
+      // Give some time for rendering before scroll (TODO: Is there a riot callback for after rendering is done?)
+      setTimeout(function() { opts.thunk(self.root); }, 1000);
     }
   });
 
@@ -57,12 +59,15 @@
       <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
     </span>
     <br>
-    <span class="journal-tags pull-xs-right">
-      <span class=journal-tag each={Tags}>
+    <div class="journal-timestamp pull-xs-right">
+      <a href="#view/{Context}/{ID}"><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format('hh:mm A')}</em></a>
+    </div>
+    <div class="journal-tags pull-xs-right">
+      <span class="journal-tag pull-xs-right" each={Tags}>
         <a href ="#tag/{Name}">#{Name}</a>
         <button class="btn btn-xs octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
       </span>
-    </span>
+    </div>
   </span>
 
   <div id={"entry-body-"+ID} class="entry-body">
@@ -90,7 +95,6 @@
       date.format(' Do')
     )
 
-    //$(this.root).children("h4").text(moment(this.Date, "YYYY-MM-DD").format("dddd, MMM Do"));
     $(this.root).children(".entry-body").html(this.Body);
     self.editor = window.Common.make_editor("#entry-body-" + this.ID, save, save);
   });

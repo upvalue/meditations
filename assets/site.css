@@ -100,9 +100,11 @@ ul.nav a.navbar-link-disabled {
 
 .journal-controls { background-color: #eee; padding-left:5px; padding-right: 5px; border-radius: 5px; }
 
-.journal-tags { font-size: 0.8em; }
+.journal-tags { font-size: 0.8em; clear:both; display:block; }
 
 .journal-tag { display:block; clear:both; }
+
+.journal-timestamp { display:block; clear:both; font-size:0.8em; }
 
 .journal-control { padding: 2px; }
 
