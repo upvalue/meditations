@@ -3,12 +3,6 @@
 common = window.Common
 entry_store = false
 
-initialize = () ->
-  console.log 'Journal: initializing'
-  html5.addElements('entries entry tag-cloud') if html5?
-
-  initialize = () -> false
-  true
 
 mount_entries = (root) ->
   console.log "Appending entries to", root
@@ -132,8 +126,31 @@ class EntryStore extends common.Store
   on_browse_tag: (name) ->
     route("tag/#{name}")
 
-main = () ->
-  initialize()
+main = (tutorialp) ->
+  console.log 'Journal: initializing'
+  html5.addElements('entries entry tag-cloud') if html5?
+
+  if tutorialp
+    window.Common.load_tutorial () ->
+      window.Common.tutorial [
+        selector: "#journal-link"
+        text: "This is the journal."
+      ,
+        selector: ".nav-tabs"
+        text: "Use these tabs to navigate entries."
+      ,
+        selector: "#entries-title"
+        text: "You can also use these controls to quickly navigate by month and year."
+      ,
+        selector: ".entry-title:first"
+        text: "There can be multiple entries per day"
+      ,
+        selector: ".entry-body:first"
+        text: "You can edit entries by simply clicking on them."
+      ,
+        selector: "#journal-new-entry-date"
+        text: "New entries are added by clicking here and selecting a date."
+      ]
 
   entry_store = new EntryStore
 
@@ -154,6 +171,5 @@ main = () ->
       RiotControl.trigger("journal-updated", entry)
 
 window.Journal = 
-  initialize: initialize
   main: main
   entry_store: entry_store

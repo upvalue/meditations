@@ -145,13 +145,13 @@ view = (from, bucket) ->
 
 # Initialize machinery necessary for task interaction
 initialize = (tutorial) ->
+  initialize = () -> false
   console.log 'Habits: initializing'
   html5.addElements('scope task scope-days') if html5?
 
   task_store = new TaskStore()
   window.Habits.task_store = task_store
   RiotControl.addStore(task_store)
-  initialize = () -> false
 
   # Tutorial
   if tutorial 

@@ -44,21 +44,24 @@ window.Common =
         $("#tutorial-btn").attr "disabled", false
       , 1000)
 
+  tutorial_refresh: (current_step) ->
+    $.each(window.Common.tutorial_steps, (i, step) ->
+      # Re-find elements by selector.
+      elt = $(step.selector)
+      # If tutorial is active, an element may need to have introJs css classes back to it
+      if current_step and i+1 == current_step
+        elt.addClass "introjs-showElement introjs-relativePosition"
+      window.intro._introItems[i].element = elt.get(0)
+    )
+
   tutorial_change: (selector, current_step, text) ->
     () ->
       setTimeout(() ->
         if window.intro._currentStep == current_step - 1
-          
           elt = $(selector)
           elt.attr("data-step", current_step)
           elt.attr("data-intro", text)
-          $.each(window.Common.tutorial_steps, (i, step) ->
-            # Re-find elements by selector.
-            elt = $(step.selector)
-            if i+1 == current_step
-              elt.addClass "introjs-showElement introjs-relativePosition"
-            window.intro._introItems[i].element = elt.get(0)
-          )
+          window.Common.tutorial_refresh(current_step)
           elt.click(window.Common.tutorial_change(selector, current_step, text))
       , 500)
 
@@ -78,6 +81,7 @@ window.Common =
 
   tutorial: (steps) =>
     window.intro = intro = introJs()
+    intro.onexit(window.Common.tutorial_refresh)
     $.each(steps, (i, step) =>
       window.Common.tutorial_steps.push(step)
       window.Common.tutorial_help(step.selector, step.text)
