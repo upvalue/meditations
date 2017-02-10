@@ -32,6 +32,59 @@ window.Common =
 
     editor
 
+  ##### TUTORIALS
+  tutorial_steps: []
+
+  load_tutorial: (thunk) =>
+    window.tutorial = true
+    $.getScript "/assets/vendor/intro.js/minified/intro.min.js",  () ->
+      setTimeout(() ->
+        thunk()
+        $("#tutorial-btn").text("Tutorial")
+        $("#tutorial-btn").attr "disabled", false
+      , 1000)
+
+  tutorial_change: (selector, current_step, text) ->
+    () ->
+      setTimeout(() ->
+        if window.intro._currentStep == current_step - 1
+          
+          elt = $(selector)
+          elt.attr("data-step", current_step)
+          elt.attr("data-intro", text)
+          $.each(window.Common.tutorial_steps, (i, step) ->
+            # Re-find elements by selector.
+            elt = $(step.selector)
+            if i+1 == current_step
+              elt.addClass "introjs-showElement introjs-relativePosition"
+            window.intro._introItems[i].element = elt.get(0)
+          )
+          elt.click(window.Common.tutorial_change(selector, current_step, text))
+      , 500)
+
+  tutorial_help: (() =>
+    step = 1
+    (selector, text, position) ->
+      current_step = step
+      # This is done because modifying the elements can cause introJS to lose track of things
+      elt = $(selector)
+      elt.click(window.Common.tutorial_change(selector, current_step, text))
+        
+      console.log(step, selector, text)
+      elt.attr("data-step", current_step)
+      elt.attr("data-intro", text)
+      step += 1
+  )()
+
+  tutorial: (steps) =>
+    window.intro = intro = introJs()
+    $.each(steps, (i, step) =>
+      window.Common.tutorial_steps.push(step)
+      window.Common.tutorial_help(step.selector, step.text)
+    )
+    $("#tutorial-btn").click () -> intro.start()
+
+  ##### SOCKETS
   make_socket: (location, onmessage) =>
     url = "ws://#{window.location.hostname}:#{window.location.port}/#{location}"
     socket = new WebSocket url

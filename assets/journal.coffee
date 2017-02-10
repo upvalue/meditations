@@ -56,10 +56,10 @@ view = (datestr, entry_scroll_id) ->
       date: date
       entries: entries
       thunk: () ->
-        # Scroll to selected entry, if one is given
-        offset = $("#entry-#{entry_scroll_id}").offset().top
-        $("html, body").animate({scrollTop: offset})
-        #$(window).scrollTop($("#entry-#{entry_scroll_id}").offset().top)
+        if entry_scroll_id
+          # Scroll to selected entry, if one is given
+          offset = $("#entry-#{entry_scroll_id}").offset().top
+          $("html, body").animate({scrollTop: offset})
 
 actions =
   view: view
@@ -67,7 +67,7 @@ actions =
   name: (name) ->
     $.get "/journal/entries/name/#{name}", (entry) ->
       entry = process_entry(entry)
-      document.title = "#{name} / journal" 
+      document.title = "#{name} / journal"
       $("#journal-ui").html("<entry-single/>")
       riot.mount 'entry-single', entry_array: [entry]
 

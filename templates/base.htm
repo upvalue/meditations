@@ -23,15 +23,14 @@
         <div class="collapse navbar-toggleable-xs" id="navbar-header">
           <ul class="nav navbar-nav">
             <li class="nav-item">
-              <a id=habits-link class="nav-link" href="/habits"
-                data-step=1 data-intro="This is the habits todo list, a simple todo system that keeps track of streaks, time and more to encourage positive habit formation.">Habits</a>
+              <a id=habits-link class="nav-link" href="/habits">Habits</a>
             </li>
             <li class="nav-item">
               <a id=journal-link class="nav-link" href="/journal#">Journal</a>
             </li>
             {% if Tutorial %}
             <li class=nav-item>
-              <a class="nav-link btn btn-secondary btn-sm" id="tutorial-btn" disabled=true>Tutorial (loading)</a>
+              <a class="nav-link " id="tutorial-btn" disabled=true>Tutorial (loading)</a>
             </li>
             {% endif %}
             {% block navbar_links %}{% endblock %}
@@ -56,23 +55,7 @@
     <script src="/assets/vendor/medium-editor/dist/js/medium-editor.min.js"></script>
     <script src="/assets/vendor/medium-editor-tables/dist/js/medium-editor-tables.js"></script>
 
-    <script type="text/javascript">
-$(document).ready(function() {
-  window.development = {% if Development %}true{% else %}false{% endif %};
-  {% if Tutorial %}
-  window.tutorial = true;
-  $.getScript("/assets/vendor/intro.js/minified/intro.min.js", function() {
-    setTimeout(function() {
-      // Allow things to mount
-      $.getScript("/assets/habits-tutorial.js", function() {
-        $("#tutorial-btn").text("Tutorial");
-        $("#tutorial-btn").attr("disabled", false);
-      });
-    }, 1000);
-  });
-  {% endif %}
-});
-    </script>
+    <script type="text/javascript">window.development = {% if Development %}true{% else %}false{% endif %};</script>
     <script src="/assets/common.js"></script>
     {% block script %}{% endblock %}
   </body>

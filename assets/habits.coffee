@@ -123,17 +123,6 @@ class TaskStore extends common.Store
       #riot.update()
       task
 
-# Initialize machinery necessary for task interaction
-initialize = () ->
-  console.log 'Habits: initializing'
-  html5.addElements('scope task scope-days') if html5?
-
-  task_store = new TaskStore()
-  window.Habits.task_store = task_store
-  RiotControl.addStore(task_store)
-  initialize = () -> false
-  return true
-
 # Navigation function
 view = (from, bucket) ->
   console.log('Browsing from', from)
@@ -154,10 +143,63 @@ view = (from, bucket) ->
     thunk: () ->
       task_store.mount_days from
 
-main = () ->
+# Initialize machinery necessary for task interaction
+initialize = (tutorial) ->
+  console.log 'Habits: initializing'
+  html5.addElements('scope task scope-days') if html5?
+
+  task_store = new TaskStore()
+  window.Habits.task_store = task_store
+  RiotControl.addStore(task_store)
+  initialize = () -> false
+
+  # Tutorial
+  if tutorial 
+    window.Common.load_tutorial () ->
+      window.Common.tutorial [
+          selector: "#habits-link"
+          text: "This is the habits todo list, a simple todo system that keeps track of streaks, time and more to encourage positive habit formation."
+        ,
+          selector: "section.scope:visible:first",
+          text: "This is a daily scope. All tasks belong to a scope; scopes are created for each unit of time (day, month, year) that passes."
+        ,
+          selector: "#scope-month section.scope:visible:first .pull-right",
+          text: "One can navigate through time scopes using the controls next to them."
+        ,
+          selector: "section.entry:visible:first",
+          text: "This is a task. A task is created with a name, but can have comments, success status, and time added later."
+        ,
+          selector: "section.entry:visible:first .btn:first",
+          text: "Clicking on the task's name will cycle its status through the three possible statuses: unset, complete, and incomplete."
+        ,
+          selector: "section.entry:visible:first .pull-xs-right",
+          text: "These controls are used to comment, delete, set time, and re-order tasks within a scope."
+        ,
+          selector: "#scope-month section.entry:visible:first .octicon-clippy",
+          text: "In addition, monthly and yearly scopes have a button to quickly copy tasks to the left, so names don't have to be repeatedly re-typed."
+        ,
+          selector: "#scope-year section.entry:visible:first",
+          text: "Notice that completion and time statistics in higher scopes are calculated based on what has happened in lower scopes. These statistics are based on shared names, so one-off tasks do not generate statistics."
+        ,
+          selector: "#scope-year section.entry:visible:first .streak",
+          text: "In addition, yearly scopes contain success streaks: the left number is the current active streak, and the right is the best."
+        ,
+          selector: "#scope-bucket",
+          text: "On top of time-based scopes, there are also 'bucket' scopes which can be used to track non time sensitive goals."
+        ,
+          selector: "#scope-bucket .octicon-briefcase",
+          text: "Use the bucket modal to create and change which bucket scope is visible."
+        ,
+          selector: "section.entry:visible:first .octicon-comment",
+          text: "For comment editing functionality, see: <a href=\"https://yabwe.github.io/medium-editor/\">Medium Editor documentation</a>"
+        ,
+        ]
+  return true
+
+main = (tutorialp) ->
   console.log 'Habits: installing router'
 
-  initialize()
+  initialize(tutorialp)
 
   # Install Router
   RiotControl.on "change-date", (forward, scope) ->
