@@ -8,7 +8,9 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-macaron/binding"
@@ -510,19 +512,30 @@ func export(c *macaron.Context) {
 		var status string
 		if statusp == true {
 			if t.Status == TaskComplete {
-				status = "[COMPLETE] "
+				status = "COMPLETE"
 			} else if t.Status == TaskIncomplete {
-				status = "[INCOMPLETE] "
+				status = "INCOMPLETE"
 			} else {
-				status = "[UNSET] "
+				status = "UNSET"
 			}
 		} else {
 			status = ""
 		}
-		buffer.WriteString(fmt.Sprintf("%s%s: %s\n", status, t.Date.Format(datefmt), t.Comment.Body))
+		buffer.WriteString(fmt.Sprintf("%s %s %s\n", t.Date.Format(datefmt), status, t.Comment.Body))
 	}
 
-	c.PlainText(200, buffer.Bytes())
+	// Convert HTML to markdown for plaintext readability
+	process := exec.Command("pandoc", "-f", "html", "-t", "markdown")
+	var out bytes.Buffer
+	process.Stdin = strings.NewReader(buffer.String())
+	process.Stdout = &out
+	err := process.Run()
+	if err != nil {
+		c.PlainText(200, buffer.Bytes())
+		return
+	} else {
+		c.PlainText(200, out.Bytes())
+	}
 }
 
 func habitsIndex(c *macaron.Context) {

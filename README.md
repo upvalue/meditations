@@ -12,6 +12,12 @@ you, but it is a great way to get a much more objective, overarching view of how
     $ go build
     $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial
 
+# Dependencies
+
+- Go libraries: See Godeps/Godeps.json
+- JS libraries: See bower.json; also coffeescript
+- Commands: Pandoc (only necessary for exporting task descriptions into plaintext)
+
 # Attribution
 
 The favicon.ico was used under public domain from [Tango](http://tango.freedesktop.org)
