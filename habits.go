@@ -463,22 +463,63 @@ func export(c *macaron.Context) {
 	var scopes []string
 
 	name := c.Req.PostFormValue("name")
+	before := c.Req.PostFormValue("export_before_date")
+	after := c.Req.PostFormValue("export_after_date")
+
 	if c.Req.PostFormValue("day") == "day" {
 		scopes = append(scopes, fmt.Sprintf("%d", ScopeDay))
 	}
+
 	if c.Req.PostFormValue("month") == "month" {
 		scopes = append(scopes, fmt.Sprintf("%d", ScopeMonth))
 	}
+
 	if c.Req.PostFormValue("year") == "year" {
 		scopes = append(scopes, fmt.Sprintf("%d", ScopeYear))
 	}
 
+	if before == "" {
+		before = time.Date(1990, time.January, 1, 0, 0, 0, 0, time.Local).Format(DateFormat)
+	}
+
+	if after == "" {
+		after = time.Now().Format(DateFormat)
+	}
+
+	statusp := false
+	if c.Req.PostFormValue("status") == "status" {
+		statusp = true
+	}
+
 	// Construct query
 	var tasks []Task
-	DB.Where("name = ? and scope in (?)", name, scopes).Order("date desc").Preload("Comment").Find(&tasks)
+	name = fmt.Sprintf("%%%s%%", name)
+	query := "name like ? and scope in (?) and date > date(?) and date < date(?)"
+	DB.Where(query, name, scopes, before, after).Order("date desc").Find(&tasks)
 
 	for _, t := range tasks {
-		buffer.WriteString(fmt.Sprintf("%s: %s\n", t.Date.Format(DateFormat), t.Comment.Body))
+		// These cannot be preloaded because there may be a ridiculous amount of them
+		// TODO: Terribly slow
+		DB.Preload("Comment").Find(&t)
+		datefmt := DateFormat
+		if t.Scope == ScopeYear {
+			datefmt = "2006"
+		} else if t.Scope == ScopeMonth {
+			datefmt = "2006-01"
+		}
+		var status string
+		if statusp == true {
+			if t.Status == TaskComplete {
+				status = "[COMPLETE] "
+			} else if t.Status == TaskIncomplete {
+				status = "[INCOMPLETE] "
+			} else {
+				status = "[UNSET] "
+			}
+		} else {
+			status = ""
+		}
+		buffer.WriteString(fmt.Sprintf("%s%s: %s\n", status, t.Date.Format(datefmt), t.Comment.Body))
 	}
 
 	c.PlainText(200, buffer.Bytes())

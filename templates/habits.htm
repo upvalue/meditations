@@ -44,38 +44,6 @@
   </div>
 </div>
 
-<div id=export-modal class="modal fade" tabindex=-1 role=dialog>
-  <div class=model-dialog>
-    <div class=modal-content>
-      <div class=modal-header>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Export</h4>
-      </div>
-      <div class=modal-body>
-        <form id=export-task class=form-inline action=/habits/export method=POST>
-          <div class=form-group>
-            <label for=day>Daily</label>
-            <input name=day type=checkbox value=day>
-            <label for=month>Monthly</label>
-            <input name=month type=checkbox value=month>
-            <label for=year>Yearly</label>
-            <input name=year type=checkbox value=year>
-          </div>
-
-          <div class=form-group>
-            <input name=name id=export-task-name class=form-control placeholder="Task name">
-          </div>
-          <button id=export-add type=submit class="btn btn-default">Export task</button>
-        </form>
-        <p>Hello</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div id=bucket-modal class="modal fade" tabindex=-1 role=dialog>
   <div class="modal-dialog">
     <div class="modal-content">
@@ -96,6 +64,7 @@
             <input id=bucket-add-name class=form-control placeholder=Name>
           </div>
           <button id=bucket-add type=submit class="btn btn-default" data-dismiss=modal>Add list</button>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -103,6 +72,49 @@
     </div>
   </div>
 </div>
+
+<div id=export-modal class="modal fade" tabindex=-1 role=dialog>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Export</h4>
+      </div>
+      <div class="modal-body">
+        <form id=export-task action=/habits/export method=POST>
+          <div class=form-group>
+            <label for=day>Daily</label>
+            <input name=day type=checkbox value=day>
+            <label for=month>Monthly</label>
+            <input name=month type=checkbox value=month>
+            <label for=year>Yearly</label>
+            <input name=year type=checkbox value=year>
+          </div>
+
+          <div class=form-group>
+            <input id="export-before-date" class=datepicker type=text name=export_before_date placeholder="Don't include dates before" class=form-control>
+            <input id="export-after-date" class=datepicker type=text name=export_after_date placeholder="Don't include dates after" class=form-control>
+          </div>
+
+          <div class=form-group>
+            <label for=status>Status</label>
+            <input name=status type=checkbox value=status>
+
+          </div>
+
+          <div class=form-group>
+            <input name=name id=export-task-name class=form-control placeholder="Task name">
+          </div>
+          <button id=export-add type=submit class="btn btn-default">Export task descriptions</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block script %}

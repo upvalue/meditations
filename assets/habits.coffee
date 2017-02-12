@@ -143,9 +143,9 @@ view = (from, bucket) ->
     thunk: () ->
       task_store.mount_days from
 
-# Initialize machinery necessary for task interaction
-initialize = (tutorial) ->
-  initialize = () -> false
+main = (tutorialp) ->
+  console.log 'Habits: installing router'
+
   console.log 'Habits: initializing'
   html5.addElements('scope task scope-days') if html5?
 
@@ -154,7 +154,7 @@ initialize = (tutorial) ->
   RiotControl.addStore(task_store)
 
   # Tutorial
-  if tutorial 
+  if tutorialp
     window.Common.load_tutorial () ->
       window.Common.tutorial [
           selector: "#habits-link"
@@ -194,12 +194,6 @@ initialize = (tutorial) ->
           text: "For comment editing functionality, see: <a href=\"https://yabwe.github.io/medium-editor/\">Medium Editor documentation</a>"
         ,
         ]
-  return true
-
-main = (tutorialp) ->
-  console.log 'Habits: installing router'
-
-  initialize(tutorialp)
 
   # Install Router
   RiotControl.on "change-date", (forward, scope) ->
@@ -213,6 +207,9 @@ main = (tutorialp) ->
   common.route "/habits#", "view/#{moment().format('YYYY-MM')}/0", 
     view: view
     no_action: () -> route("view/#{moment().format('YYYY-MM')}/0")
+
+  # Install modal datepickers
+  $(".datepicker").datepicker(dateFormat: 'yy-mm-dd')
 
   # Setup websocket
   task_near = (task, date2) ->
@@ -240,6 +237,5 @@ main = (tutorialp) ->
 window.Habits =
   Scope: Scope,
   Status: Status,
-  initialize: initialize,
   task_store: task_store
   main: main
