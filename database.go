@@ -22,7 +22,7 @@ func DBMigrate() {
 		// habits.go
 		&Task{}, &Comment{}, &Scope{},
 		// journal.go
-		&Entry{},
+		&Entry{}, &Tag{},
 	)
 	DBCreate()
 }

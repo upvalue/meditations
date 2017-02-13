@@ -524,6 +524,7 @@ func export(c *macaron.Context) {
 		buffer.WriteString(fmt.Sprintf("%s %s %s\n", t.Date.Format(datefmt), status, t.Comment.Body))
 	}
 
+	// TODO: Remove unsightly <br> backslashes
 	// Convert HTML to markdown for plaintext readability
 	process := exec.Command("pandoc", "-f", "html", "-t", "markdown")
 	var out bytes.Buffer
