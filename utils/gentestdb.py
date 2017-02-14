@@ -84,10 +84,12 @@ class Entry(object):
 
         self.created_at = now()
         self.date = date
+        self.name = date.strftime("Entry %Y/%m/%d")
         self.body = date.strftime("Journal entry for %Y/%m/%d")
 
     def __repr__(self):
-        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", NULL, 0, "{0.body}", NULL);'.format(self))
+        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", "{0.name}", 0, "{0.body}", NULL);\n'\
+                'INSERT INTO entry_tags values({0.id}, 1);'.format(self))
 
 random.seed("Not really random")
 
@@ -96,9 +98,13 @@ def gen_entries(days=90):
     for date in daterange(end - timedelta(days), end):
         yield Entry(date)
 
+created_at = now()
 print('BEGIN TRANSACTION;')
 [print(task) for task in gen_tasks("Exercise", status = STATUS_COMPLETE, minutes = 30)]
 [print(task) for task in gen_tasks("Diet", order = 1)]
+
+print("INSERT INTO \"tags\" values(1, \"%s\", \"%s\", NULL, \"tag1\");")
+
 [print(comment) for comment in gen_comments()]
 [print(e) for e in gen_entries()]
 print('END TRANSACTION;')
