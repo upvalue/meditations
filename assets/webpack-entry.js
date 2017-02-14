@@ -1,5 +1,8 @@
 // webpack-entry.js - entry file for webpack
 
+// CSS
+require("./site.css")
+
 // jquery
 window.$ = window.jQuery = require("jquery");
 require("./vendor/jquery-ui/ui/datepicker");

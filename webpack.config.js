@@ -23,11 +23,17 @@ const config = {
   plugins: [
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.ProvidePlugin({
-      "Tether": "Tether",
+      "Tether": "Tether", // required for bootstrap
     })
   ],
+  /* Compile riot .tag files */
   module: {
     rules: [
+      { test: /\.css$/,
+        loader: 'style-loader!css-loader',
+      },
+      { test: /\.png$|\.ttf$\.svg$/,
+        loader: 'url-loader?limit=10000' },
       { enforce: 'pre', test: /\.tag$/, exclude: /assets\/vendor/, loader: 'riotjs-loader' },
     ],
   },

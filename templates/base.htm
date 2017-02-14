@@ -10,7 +10,9 @@
     <link rel=stylesheet href="/assets/vendor/intro.js/minified/introjs.min.css" />
     {% endif %}
 
-    <link href="/assets/site.css" rel=stylesheet>
+    {% if !Config.Webpack %}
+      <link href="/assets/site.css" rel=stylesheet>
+    {% endif %}
     {% block style %}{% endblock %}
   </head>
   <body>
@@ -41,6 +43,10 @@
     </div>
 
     <div id=content class="container-fluid">
+      <noscript>
+        This application requires javascript to function.
+      </noscript>
+
       {% block content %}{% endblock %}
     </div>
 

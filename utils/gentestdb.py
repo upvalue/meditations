@@ -88,7 +88,7 @@ class Entry(object):
         self.body = date.strftime("Journal entry for %Y/%m/%d")
 
     def __repr__(self):
-        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", "{0.name}", 0, "{0.body}", NULL);\n'\
+        return ('INSERT INTO "entries" values({0.id}, "{0.created_at}", NULL, NULL, "{0.date}", "{0.name}", "{0.body}", NULL);\n'\
                 'INSERT INTO entry_tags values({0.id}, 1);'.format(self))
 
 random.seed("Not really random")
