@@ -1,3 +1,4 @@
+/* note: relative URLs will be compressed by webpack */
 @import url("vendor/bootstrap/dist/css/bootstrap.min.css");
 @import url("vendor/medium-editor/dist/css/medium-editor.min.css");
 @import url("vendor/medium-editor/dist/css/themes/bootstrap.min.css");
@@ -5,11 +6,16 @@
 @import url("vendor/jquery-ui/themes/smoothness/jquery-ui.css");
 
 @import url("/assets/vendor/octicons/octicons/octicons.css");
+@import url("/assets/vendor/bitter-fontface/bitter.css");
 @import url("/assets/vendor/open-sans-fontface/open-sans.css");
 @import url("/assets/vendor/Inconsolata/css/inconsolata.css");
 
 body {
-  font-family: "Open Sans", monospace;
+  font-family: "Open Sans", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Bitter", serif;
 }
 
 a, a:visited {
@@ -48,7 +54,7 @@ ul.nav a.navbar-link-disabled {
 }
 
 .scope task:first-of-type .entry {
-  padding-top:1em;
+  padding-top:0.2em;
 }
 
 .scope .entry {

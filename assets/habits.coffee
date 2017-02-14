@@ -1,5 +1,4 @@
 # habits.coffee - habits code
-
 common = window.Common
 current_date = false
 current_bucket = 0

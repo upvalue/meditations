@@ -32,6 +32,6 @@
     "RiotControl": "https://github.com/jimsparkman/RiotControl.git#39f2bac9d77672f9e323ddf5190b31d4648fb154",
     "medium-editor-tables": "^0.6.1",
     "tether": "^1.4.0",
-    "riot-observable": "^3.0.0"
+    "bitter-fontface": "^0.1.3"
   }
 }
