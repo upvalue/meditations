@@ -175,15 +175,6 @@ func journalNameEntry(c *macaron.Context) {
 	c.PlainText(200, []byte("ok"))
 }
 
-func journalPromoteEntry(c *macaron.Context) {
-	var entry Entry
-	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
-
-	DB.Save(&entry)
-
-	c.PlainText(200, []byte("ok"))
-}
-
 func journalIndex(c *macaron.Context) {
 	// Display chronological navigation information
 	var first, last Entry
@@ -300,7 +291,6 @@ func journalInit(m *macaron.Macaron) {
 	m.Post("/delete-entry/:id", journalDeleteEntry)
 	m.Post("/name-entry/:id/:name", journalNameEntry)
 	m.Post("/name-entry/:id/", journalRemoveEntryName)
-	m.Post("/promote-entry/:id", journalPromoteEntry)
 
 	m.Get("/sync", journalSync.Handler())
 }
