@@ -118,10 +118,15 @@
 {% endblock %}
 
 {% block script %}
-<script src="/assets/habits.js"></script>
-<script type=riot/tag src=assets/habits-tag.tag></script>
+{% if Config.Webpack %}
+  <script src="/assets/webpack-bundle-habits.js"></script>
+{% else %}
+  <script type=riot/tag src=assets/habits-tag.tag></script>
+  <script src="/assets/habits.js"></script>
 
-<script type="text/javascript">
-$(document).ready(function() {window.Habits.main({% if Tutorial %}true{% endif %});});
-</script>
+  <script type="text/javascript">
+  $(document).ready(function() {window.Habits.main({% if Tutorial %}true{% endif %});});
+  </script>
+{% endif %}
+
 {% endblock %}

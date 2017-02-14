@@ -18,7 +18,7 @@
     <task each={opts.tasks}></task>
   </section>
 
-  var self = this
+  var self = this;
 
   this.on('mount', function() {
     // These will be mounted at the beginning with no data, so hide the ones without data passed

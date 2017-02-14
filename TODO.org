@@ -1,3 +1,4 @@
+* TODO Improve example data
 * TODO Journal
 * TODO Tutorial
 * TODO Context links should go to specific entries

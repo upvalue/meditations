@@ -5,11 +5,14 @@
   "main": "index.js",
   "dependencies": {
     "bower": "1.8.0",
-    "coffee-script": "^1.12.3"
+    "coffee-loader": "^0.7.2",
+    "coffee-script": "^1.12.3",
+    "riot": "^3.1.1",
+    "riotjs-loader": "^4.0.0",
+    "webpack": "^2.2.1"
   },
-  "devDependencies": {},
   "scripts": {
-    "postinstall": "bower install --config.directory=assets/vendor && coffee -c assets/*.coffee"
+    "postinstall": "bower install --config.directory=assets/vendor && webpack -p"
   },
   "repository": {
     "type": "git",

@@ -82,12 +82,17 @@
 
 {% block script %}
 
-<script src="/assets/journal.js"></script>
-<script type=riot/tag src="/assets/journal-tag.tag"></script>
+{% if Config.Webpack %}
+  <script src="/assets/webpack-bundle-journal.js"></script>
+{% else %}
+  <script src="/assets/journal.js"></script>
+  <script type=riot/tag src="/assets/journal-tag.tag"></script>
 
-<script type="text/javascript">
-$(document).ready(function() {
-  window.Journal.main({% if Tutorial %}true{% endif %});
-});
-</script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    window.Journal.main({% if Tutorial %}true{% endif %});
+  });
+  </script>
+{% endif %}
+
 {% endblock %}

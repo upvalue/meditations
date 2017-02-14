@@ -23,6 +23,7 @@ type Configuration struct {
 	Tutorial    bool
 	Migrate     bool
 	Message     string
+	Webpack     bool
 }
 
 var Config = Configuration{
@@ -36,6 +37,7 @@ var Config = Configuration{
 	Tutorial:    false,
 	Migrate:     false,
 	Message:     "",
+	Webpack:     false,
 }
 
 func loadConfig(c *cli.Context) {
@@ -65,6 +67,10 @@ func loadConfig(c *cli.Context) {
 
 	if c.IsSet("message") == true {
 		Config.Message = c.String("message")
+	}
+
+	if c.IsSet("webpack") == true {
+		Config.Webpack = c.Bool("webpack")
 	}
 }
 
@@ -105,6 +111,7 @@ func App() *macaron.Macaron {
 		c.Data["Tutorial"] = Config.Tutorial
 		c.Data["Development"] = Config.Development
 		c.Data["Message"] = Config.Message
+		c.Data["Config"] = Config
 		c.Next()
 	})
 
@@ -158,6 +165,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "migrate",
 			Usage: "run database migration",
+		},
+		cli.BoolFlag{
+			Name:  "webpack",
+			Usage: "use webpack-bundled files (run webpack first)",
 		},
 	}
 
