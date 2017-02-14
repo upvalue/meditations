@@ -18,7 +18,6 @@ type Entry struct {
 	gorm.Model
 	Date     time.Time
 	Name     string
-	Wiki     bool
 	Body     string
 	LastBody string
 	Tags     []Tag `gorm:"many2many:entry_tags"`
@@ -45,7 +44,6 @@ func journalEntries(c *macaron.Context) {
 	}
 	var entries []Entry
 	from, to := between(date, ScopeMonth)
-	//DB.Where("(wiki = 0 or wiki is null) and date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
 	DB.Where("date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
 	c.JSON(200, entries)
 }
@@ -181,7 +179,6 @@ func journalPromoteEntry(c *macaron.Context) {
 	var entry Entry
 	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
 
-	entry.Wiki = true
 	DB.Save(&entry)
 
 	c.PlainText(200, []byte("ok"))
