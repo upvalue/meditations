@@ -37,12 +37,11 @@ window.Common =
 
   load_tutorial: (thunk) =>
     window.tutorial = true
-    $.getScript "/assets/vendor/intro.js/minified/intro.min.js",  () ->
-      setTimeout(() ->
-        thunk()
-        $("#tutorial-btn").text("Tutorial")
-        $("#tutorial-btn").attr "disabled", false
-      , 1000)
+    setTimeout(() ->
+      thunk()
+      $("#tutorial-btn").text("Tutorial")
+      $("#tutorial-btn").attr "disabled", false
+    , 1000)
 
   tutorial_refresh: (current_step) ->
     $.each(window.Common.tutorial_steps, (i, step) ->
@@ -80,7 +79,7 @@ window.Common =
   )()
 
   tutorial: (steps) =>
-    window.intro = intro = introJs()
+    window.intro = intro = window.introJs()
     intro.onexit(window.Common.tutorial_refresh)
     $.each(steps, (i, step) =>
       window.Common.tutorial_steps.push(step)

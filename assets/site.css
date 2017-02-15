@@ -4,6 +4,7 @@
 @import url("vendor/medium-editor/dist/css/themes/bootstrap.min.css");
 @import url("vendor/medium-editor-tables/dist/css/medium-editor-tables.css");
 @import url("vendor/jquery-ui/themes/smoothness/jquery-ui.css");
+@import url("vendor/intro.js/minified/introjs.min.css");
 
 @import url("vendor/octicons/octicons/octicons.css");
 @import url("vendor/bitter-fontface/bitter.css");

@@ -15,7 +15,7 @@ you, but it is a great way to get a much more objective, overarching view of how
 # Dependencies
 
 - Go libraries: See Godeps/Godeps.json
-- JS libraries: See bower.json; also coffeescript
+- JS libraries: See bower.json and package.json
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
 
 # Attribution

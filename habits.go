@@ -485,7 +485,7 @@ func export(c *macaron.Context) {
 	}
 
 	if after == "" {
-		after = time.Now().Format(DateFormat)
+		after = time.Now().AddDate(0, 0, 1).Format(DateFormat)
 	}
 
 	statusp := false

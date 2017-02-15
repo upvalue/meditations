@@ -3,6 +3,8 @@
 // CSS
 require("./site.css")
 
+window.introJs = require("./vendor/intro.js/minified/intro.min.js").introJs;
+
 // jquery
 window.$ = window.jQuery = require("jquery");
 require("./vendor/jquery-ui/ui/datepicker");
@@ -15,7 +17,7 @@ require("./vendor/bootstrap/dist/js/bootstrap.min.js");
 window.moment = require("moment");
 
 // medium editor
-window.MediumEditor = require("./vendor/medium-editor/dist/js/medium-editor.min.js");
+window.MediumEditor = require("./vendor/medium-editor/dist/js/medium-editor.js");
 window.MediumEditorTable = require("./vendor/medium-editor-tables/dist/js/medium-editor-tables.js");
 
 // riot & etc

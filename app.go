@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -103,14 +102,6 @@ func App() *macaron.Macaron {
 
 	// Expose some configuration variables to templates
 	m.Use(func(c *macaron.Context) {
-		if Config.Tutorial {
-			c.Data["SiteTitle"] = Config.SiteTitle
-		} else {
-			c.Data["SiteTitle"] = fmt.Sprintf("%s (tutorial enabled)", Config.SiteTitle)
-		}
-		c.Data["Tutorial"] = Config.Tutorial
-		c.Data["Development"] = Config.Development
-		c.Data["Message"] = Config.Message
 		c.Data["Config"] = Config
 		c.Next()
 	})

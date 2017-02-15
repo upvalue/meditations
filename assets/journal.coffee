@@ -21,7 +21,6 @@ process_entry = (entry) ->
   entry.Context = entry.DateObj.format('YYYY-MM')
   entry
 
-
 view = (datestr, entry_scroll_id) ->
   date = moment(datestr, 'YYYY-MM')
   document.title = "#{date.format('MMM YYYY')} / journal"

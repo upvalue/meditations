@@ -4,13 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
-    <title>{% block title %}{% endblock %} | {{ SiteTitle }}</title>
-
-    {% if Tutorial %}
-    <link rel=stylesheet href="/assets/vendor/intro.js/minified/introjs.min.css" />
-
-    {% endif %}
-
+    <title>{% block title %}{% endblock %} | {{ Config.SiteTitle }}</title>
     {% if !Config.Webpack %}
       <link href="/assets/site.css" rel=stylesheet>
     {% endif %}
@@ -31,7 +25,7 @@
             <li class="nav-item">
               <a id=journal-link class="nav-link" href="/journal#">Journal</a>
             </li>
-            {% if Tutorial %}
+            {% if Config.Tutorial %}
             <li class=nav-item>
               <a class="nav-link " id="tutorial-btn" disabled=true>Tutorial (loading)</a>
             </li>
@@ -63,7 +57,11 @@
       <script src="/assets/vendor/medium-editor-tables/dist/js/medium-editor-tables.js"></script>
       <script src="/assets/vendor/jquery-ui/jquery-ui.min.js"></script>
 
-      <script type="text/javascript">window.development = {% if Development %}true{% else %}false{% endif %};</script>
+      {% if Config.Tutorial %}
+      <script src="/assets/vendor/intro.js/minified/intro.min.js"></script>
+      {% endif %}
+
+      <script type="text/javascript">window.development = {% if Config.Development %}true{% else %}false{% endif %};</script>
       <script src="/assets/common.js"></script>
     {% endif %}
     {% block script %}{% endblock %}
