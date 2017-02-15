@@ -125,9 +125,10 @@ class EntryStore extends common.Store
   on_browse_tag: (name) ->
     route("tag/#{name}")
 
-main = (tutorialp) ->
+main = (name_links, tutorialp) ->
   console.log 'Journal: initializing'
-  html5.addElements('entries entry tag-cloud') if html5?
+
+  console.log name_links
 
   if tutorialp
     window.Common.load_tutorial () ->
@@ -165,10 +166,12 @@ main = (tutorialp) ->
   # Install router
   common.route "/journal#", "view/#{moment().format('YYYY-MM')}", actions
 
+  # Mount alphabetical navigation
+
   socket = window.Common.make_socket "journal/sync", (entry) ->
     if $("#entry-#{entry.ID}").length
       RiotControl.trigger("journal-updated", entry)
 
-window.Journal = 
+window.Journal =
   main: main
   entry_store: entry_store

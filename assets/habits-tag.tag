@@ -4,7 +4,7 @@
 
 <scope>
   <section class="scope">
-    <h6 class=scope-title></h6>
+    <h6 class=scope-title ref=title></h6>
     <span class="pull-right">
       <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
         <a href="#view/{opts.date.clone().subtract(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/{opts.current_bucket}"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button></a>
@@ -34,7 +34,8 @@
     }
 
     if(opts.date) {
-      $(this.root).show().children('section').children('.scope-title').text(title);
+      $(this.root).show();
+      $(this.refs.title).text(title);
     } else {
       $(this.root).hide();
     }
@@ -74,11 +75,6 @@
           RiotControl.trigger("change-bucket", scope.ID);
         });
       });
-      /*
-      $("#bucket-delete").click(function() {
-
-      });
-      */
       $("#bucket-modal").modal();
     });
   }

@@ -146,7 +146,6 @@ main = (tutorialp) ->
   console.log 'Habits: installing router'
 
   console.log 'Habits: initializing'
-  html5.addElements('scope task scope-days') if html5?
 
   task_store = new TaskStore()
   window.Habits.task_store = task_store

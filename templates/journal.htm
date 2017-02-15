@@ -90,7 +90,12 @@
 
   <script type="text/javascript">
   $(document).ready(function() {
-    window.Journal.main({% if Tutorial %}true{% endif %});
+    var name_links = [
+      {% for link in NameLinks %}
+      { name: "{{link.Name}}", id: "{{link.Id}}" },
+      {% endfor %}
+    ];
+    window.Journal.main(name_links, {% if Config.Tutorial %}true{% else %}false{% endif %});
   });
   </script>
 {% endif %}

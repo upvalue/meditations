@@ -47,6 +47,7 @@ window.Common =
     $.each(window.Common.tutorial_steps, (i, step) ->
       # Re-find elements by selector.
       elt = $(step.selector)
+      console.log(elt, step.selector)
       # If tutorial is active, an element may need to have introJs css classes back to it
       if current_step and i+1 == current_step
         elt.addClass "introjs-showElement introjs-relativePosition"
@@ -79,6 +80,7 @@ window.Common =
   )()
 
   tutorial: (steps) =>
+    console.log("Initializing tutorial with #{steps.length} steps")
     window.intro = intro = window.introJs()
     intro.onexit(window.Common.tutorial_refresh)
     $.each(steps, (i, step) =>

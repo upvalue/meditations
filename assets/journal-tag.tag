@@ -47,7 +47,7 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h5 class=entry-title if={Seen == 1 || Name}>{title}</h5>
+  <h5 class=entry-title ref=title if={Seen == 1 || Name}>{title}</h5>
   <span class="journal-controls pull-xs-right">
     <span class=pull-xs-right>
       <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
@@ -70,7 +70,7 @@
     </div>
   </span>
 
-  <div id={"entry-body-"+ID} class="entry-body">
+  <div id={"entry-body-"+ID} ref=body class="entry-body">
   
   </div>
 
@@ -87,7 +87,7 @@
 
   self.one('mount', function() {
     var date = moment(this.Date, "YYYY-MM-DD");
-    $(this.root).find('.entry-title').append(
+    $(this.refs.title).append(
       this.Name ? '<strong>'+this.Name+'</strong>' : '',
       '&nbsp;',
       date.format('dddd, '),
@@ -95,8 +95,8 @@
       date.format(' Do')
     )
 
-    $(this.root).children(".entry-body").html(this.Body);
-    self.editor = window.Common.make_editor("#entry-body-" + this.ID, save, save);
+    $(this.refs.body).html(this.Body);
+    self.editor = window.Common.make_editor('#'+this.refs.body.id, save, save);
   });
 
   RiotControl.on('journal-updated', function(data) {
@@ -111,12 +111,6 @@
     if(tag && tag.length > 0) {
       RiotControl.trigger('add-tag', self.ID, tag);
     }
-  }
-
-  new_tag(e) {
-    e.preventDefault();
-    RiotControl.trigger('add-tag', self.ID, $(this.root).find(".tag-name").val());
-    //$(this.root).find('.tag-name').val("");
   }
 
   remove_tag(e) {

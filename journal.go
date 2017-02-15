@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/go-macaron/binding"
@@ -226,6 +225,7 @@ func journalIndex(c *macaron.Context) {
 	}
 
 	// Display alphabetical navigation
+
 	type NameLink struct {
 		Name string
 		Id   string // HTML ID safe version of Name
@@ -240,17 +240,18 @@ func journalIndex(c *macaron.Context) {
 	for _, entry := range name_entries {
 		// If the name has :, accumulate it in an array so it can be put into an expandable list
 		// Note that all names are sorted, so the accumulation array is simply the end of the name_links slice
-		if strings.Contains(entry.Name, ":") {
-			// If a NameLink has no Href, it is an array for accumulating links
-			parts := strings.Split(entry.Name, ":")
-			prefix, suffix := parts[0], parts[1]
-			if len(name_links) == 0 || name_links[len(name_links)-1].Href != "" {
-				name_links = append(name_links, NameLink{Name: prefix, Id: strings.Replace(prefix, " ", "_", -1), Href: ""})
-			}
-			name_links[len(name_links)-1].Sub = append(name_links[len(name_links)-1].Sub, NameLink{Name: suffix, Href: entry.Name})
-		} else {
-			name_links = append(name_links, NameLink{Name: entry.Name, Href: entry.Name})
-		}
+		/*
+			if strings.Contains(entry.Name, ":") {
+				// If a NameLink has no Href, it is an array for accumulating links
+				parts := strings.Split(entry.Name, ":")
+				prefix, suffix := parts[0], parts[1]
+				if len(name_links) == 0 || name_links[len(name_links)-1].Href != "" {
+					name_links = append(name_links, NameLink{Name: prefix, Id: strings.Replace(prefix, " ", "_", -1), Href: ""})
+				}
+				name_links[len(name_links)-1].Sub = append(name_links[len(name_links)-1].Sub, NameLink{Name: suffix, Href: entry.Name})
+			} else {*/
+		name_links = append(name_links, NameLink{Name: entry.Name, Href: entry.Name})
+		//}
 	}
 
 	// Display tagged navigation information

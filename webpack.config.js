@@ -1,7 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 
-const config = {
+module.exports = {
   entry: {
     habits: ["./assets/webpack-entry-habits.js"],
     journal: ["./assets/webpack-entry-journal.js"],
@@ -44,4 +44,3 @@ const config = {
   'devtool': 'source-map',
 };
 
-module.exports = config;
