@@ -128,8 +128,6 @@ class EntryStore extends common.Store
 main = (name_links, tutorialp) ->
   console.log 'Journal: initializing'
 
-  console.log name_links
-
   if tutorialp
     window.Common.load_tutorial () ->
       window.Common.tutorial [
@@ -165,8 +163,6 @@ main = (name_links, tutorialp) ->
 
   # Install router
   common.route "/journal#", "view/#{moment().format('YYYY-MM')}", actions
-
-  # Mount alphabetical navigation
 
   socket = window.Common.make_socket "journal/sync", (entry) ->
     if $("#entry-#{entry.ID}").length

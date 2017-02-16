@@ -17,7 +17,6 @@ type Configuration struct {
 	DBLog       bool
 	Host        string
 	SiteTitle   string
-	Encrypted   bool
 	Development bool
 	Tutorial    bool
 	Migrate     bool
@@ -31,7 +30,6 @@ var Config = Configuration{
 	DBPath:      "development.sqlite3",
 	DBLog:       false,
 	SiteTitle:   "meditations",
-	Encrypted:   false,
 	Development: true,
 	Tutorial:    false,
 	Migrate:     false,
@@ -40,37 +38,14 @@ var Config = Configuration{
 }
 
 func loadConfig(c *cli.Context) {
-	if c.IsSet("db-log") == true {
-		Config.DBLog = c.Bool("db-log")
-	}
-
-	if c.IsSet("development") == true {
-		Config.Development = c.BoolT("development")
-	}
-
-	if c.IsSet("database") == true {
-		Config.DBPath = c.String("database")
-	}
-
-	if c.IsSet("port") == true {
-		Config.Port = c.Int("port")
-	}
-
-	if c.IsSet("tutorial") == true {
-		Config.Tutorial = c.Bool("tutorial")
-	}
-
-	if c.IsSet("migrate") == true {
-		Config.Migrate = c.Bool("migrate")
-	}
-
-	if c.IsSet("message") == true {
-		Config.Message = c.String("message")
-	}
-
-	if c.IsSet("webpack") == true {
-		Config.Webpack = c.Bool("webpack")
-	}
+	Config.DBLog = c.Bool("db-log")
+	Config.Development = c.BoolT("development")
+	Config.DBPath = c.String("database")
+	Config.Port = c.Int("port")
+	Config.Tutorial = c.Bool("tutorial")
+	Config.Migrate = c.Bool("migrate")
+	Config.Message = c.String("message")
+	Config.Webpack = c.Bool("webpack")
 }
 
 func App() *macaron.Macaron {
@@ -135,6 +110,7 @@ func main() {
 		cli.StringFlag{
 			Name:  "database",
 			Usage: "database",
+			Value: "development.sqlite3",
 		},
 		cli.StringFlag{
 			Name:  "message",
@@ -169,6 +145,17 @@ func main() {
 			Usage:  "repair out-of-order tasks in database",
 			Flags:  flags,
 			Action: func(c *cli.Context) { DBRepair() },
+		},
+		{
+			Name:  "migrate",
+			Usage: "migrate database",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				Config.DBLog = true
+				DBOpen()
+				DBMigrate()
+				DBClose()
+			},
 		},
 		{
 			Name:  "serve",
