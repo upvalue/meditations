@@ -3,7 +3,6 @@
 common = window.Common
 entry_store = false
 
-
 mount_entries = (root) ->
   console.log "Appending entries to", root
 
@@ -214,3 +213,4 @@ main = (name_links, tutorialp) ->
 window.Journal =
   main: main
   entry_store: entry_store
+

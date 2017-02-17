@@ -21,6 +21,7 @@ window.Common =
       $("#saved-button").removeClass "octicon-check"
       $("#saved-button").addClass "octicon-circle-slash"
 
+
       $(window).on("beforeunload", focus)
 
     editor.subscribe "blur", () ->
@@ -29,6 +30,20 @@ window.Common =
 
       blur()
       $(window).off("unload")
+
+    # Hack: Replace Font Awesome icons used by medium-editor-table with octicons
+    # TODO: Figure out where calling this would be optimal
+    $(".fa").removeClass("fa").addClass("octicon")
+
+    fareplace = (bef,aft) ->
+      $(".fa-#{bef}").removeClass("fa-#{bef}").addClass("octicon-#{aft}")
+    
+    fareplace 'long-arrow-up', 'arrow-up'
+    fareplace 'long-arrow-down', 'arrow-down'
+    fareplace 'long-arrow-right', 'arrow-right'
+    fareplace 'long-arrow-left', 'arrow-left'
+    fareplace 'close', 'x'
+    fareplace 'trash-o', 'trashcan'
 
     editor
 
