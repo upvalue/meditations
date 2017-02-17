@@ -58,6 +58,8 @@ actions =
   view: view
 
   name: (name) ->
+    name = decodeURI(name)
+    console.log(name)
     $.get "/journal/entries/name/#{name}", (entry) ->
       entry = process_entry(entry)
       document.title = "#{name} / journal"
@@ -164,9 +166,50 @@ main = (name_links, tutorialp) ->
   # Install router
   common.route "/journal#", "view/#{moment().format('YYYY-MM')}", actions
 
+  # Set up websocket
   socket = window.Common.make_socket "journal/sync", (entry) ->
     if $("#entry-#{entry.ID}").length
       RiotControl.trigger("journal-updated", entry)
+
+  # Split up alphabetical navigation into sublists
+  # i.e.
+  # Review: Books: How to Make Friends and Influence People
+  # becomes two uls with the last part as a li link
+  ###
+  elts = {}
+  for link in name_links
+    lists = (lnk.trim() for lnk in link.name.split(":"))
+    head = elts
+    while lists.length > 1
+      sub = lists.shift(1)
+      unless head[sub]
+        head[sub] = {}
+      head = head[sub]
+    head[lists[0]] = name: lists[0], html: $("<li>#{lists[0]}</li>"), item: true
+
+  # Sort array alphabetically
+  sort = (sub) ->
+    sub.sort (a, b) ->
+      if a.name < b.name then return -1
+      else if a.name > b.name then return 1
+      return 0
+    sub
+
+  # Convert object to sorted array
+  to_array = (name, value) ->
+    unless value.item 
+      value.sub = (to_array(k,v) for k,v of value)
+      sort(value.sub)
+    return value
+
+  elts = (to_array(k,v) for k,v of elts)
+  sort(elts)
+
+  top = $("#alphabetical-top-list")
+  top.html("")
+  console.log('mount', elts)
+  riot.mount 'title-nav', links: elts
+  ###
 
 window.Journal =
   main: main

@@ -47,7 +47,7 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h5 class=entry-title ref=title if={Seen == 1 || Name}>{title}</h5>
+  <h5 class=entry-title ref=title if={Seen == 1 || Name}></h5>
   <span class="journal-controls pull-xs-right">
     <span class=pull-xs-right>
       <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
@@ -87,13 +87,13 @@
 
   self.one('mount', function() {
     var date = moment(this.Date, "YYYY-MM-DD");
+    // Due to somewhat more complex formatting logic, dates are calculated here
     $(this.refs.title).append(
-      this.Name ? '<strong>'+this.Name+'</strong>' : '',
-      '&nbsp;',
+      this.Name ? '<strong>'+this.Name+'</strong>&nbsp;' : '',
       date.format('dddd, '),
       $('<a/>', {href: "journal#view/"+date.format('YYYY-MM'), text: date.format('MMM')}),
       date.format(' Do')
-    )
+    );
 
     $(this.refs.body).html(this.Body);
     self.editor = window.Common.make_editor('#'+this.refs.body.id, save, save);
@@ -140,3 +140,24 @@
   }
 </entry>
 
+<title-nav-sub>
+  
+</title-nav-sub>
+
+<title-nav>
+  <ul id=alphabetical-top-list class="list-group navigation-list">
+    <li each={opts.links}>
+      <span if={typeof sub == "undefined" && name}>{name}</span>
+      <span if={typeof sub != "undefined"}>
+        <a href="#">{name}</a>
+        <ul>
+
+        </ul>
+      </span>
+    </li>
+  </ul>
+
+  this.on('mount', function() {
+    console.log(opts.links);
+  });
+</title-nav>

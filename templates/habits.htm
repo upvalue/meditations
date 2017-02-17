@@ -13,9 +13,9 @@
       </span>
       {% endif %}
       {% for link in HabitYearLinks %}
-      <button type=button class="btn btn-link btn-sm">
-        <a href="/habits#view/{{link.Href}}-01/0">'{{link.Text}}</a>
-      </button>
+      <a href="/habits#view/{{link.Href}}-01/0" class="btn btn-link btn-sm">
+        '{{link.Text}}
+      </a>
       {% endfor %}
 
       <button type=button class="btn btn-primary btn-sm" data-toggle=modal data-target="#export-modal">
@@ -29,20 +29,16 @@
 {% block content %}
 <div class=row>
   <div class=col-md-3>
-    <a name="scope-day-anchor"></a>
-    <scope-days/>
+    <scope-days></scope-days>
   </div>
   <div class=col-md-3>
-    <a name="scope-month-anchor"></a>
-    <scope id="scope-month"/>
+    <scope id="scope-month"></scope>
   </div>
   <div class=col-md-3>
-    <a name="scope-year-anchor"></a>
-    <scope id="scope-year"/>
+    <scope id="scope-year"></scope>
   </div>
   <div class=col-md-3>
-    <a name="scope-bucket-anchor"></a>
-    <scope id="scope-bucket"/>
+    <scope id="scope-bucket"></scope>
   </div>
 </div>
 
@@ -59,8 +55,7 @@
         <br/>
         <button id=bucket-select-button type=button class="btn btn-default" data-dismiss=modal>Select</button>
         <!--<button id=bucket-delete type=button class="btn btn-default">Delete</button>-->
-        <br />
-        <br/>
+        <br><br>
         <form class=form-inline>
           <div class=form-group>
             <input id=bucket-add-name class=form-control placeholder=Name>
@@ -86,20 +81,20 @@
         <form id=export-task action=/habits/export method=POST>
           <div class=form-group>
             <label for=day>Daily</label>
-            <input name=day type=checkbox value=day>
+            <input id=day type=checkbox value=day>
             <label for=month>Monthly</label>
-            <input name=month type=checkbox value=month>
+            <input id=month type=checkbox value=month>
             <label for=year>Yearly</label>
-            <input name=year type=checkbox value=year>
+            <input id=year type=checkbox value=year>
           </div>
 
           <div class=form-group>
-            <input id="export-before-date" class=datepicker type=text name=export_before_date placeholder="Don't include dates before" class=form-control>
-            <input id="export-after-date" class=datepicker type=text name=export_after_date placeholder="Don't include dates after" class=form-control>
+            <input id="export-before-date" class="datepicker form-control" type=text name=export_before_date placeholder="Don't include dates before">
+            <input id="export-after-date" class="datepicker form-control" type=text name=export_after_date placeholder="Don't include dates after">
           </div>
 
           <div class=form-group>
-            <label for=status>Status</label>
+            <label>Status</label>
             <input name=status type=checkbox value=status>
 
           </div>

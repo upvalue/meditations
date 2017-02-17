@@ -33,12 +33,13 @@
       <div class="tab-pane active" id=chronological role=tabpanel>
         <ul class="list-group navigation-list">
           {% for year in Years %}
-          <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="#chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a></li>
-          <ul class=collapse id="chrono-nav-{{year.Date}}" class="list-group navigation-list">
-            {% for month in year.Sub %}
-            <li><a href="#view/{{month.Link}}">{{month.Date}} ({{month.Count}})</a></li>
-            {% endfor %}
-          </ul>
+          <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a>
+            <ul id="chrono-nav-{{year.Date}}" class="list-group navigation-list collapse">
+              {% for month in year.Sub %}
+              <li><a href="#view/{{month.Link}}">{{month.Date}} ({{month.Count}})</a></li>
+              {% endfor %}
+            </ul>
+          </li>
           {% endfor %}
         </ul>
       </div>
@@ -46,21 +47,24 @@
       <!-- Alphabetical navigation links -->
       <div class="tab-pane" id=alphabetical role=tabpanel>
         <!-- TODO: Entries with colons in name should turn into openable lists e.g. Reviews: -->
-        <ul class="list-group navigation-list">
+        <ul id=alphabetical-top-list class="list-group navigation-list">
           {% for link in NameLinks %}
             {% if link.Sub %}
-            <li><span class="octicon octicon-chevron-right"></span><a href="#alpha-nav-{{link.Id}}" data-toggle=collapse aria-expanded=false aria-controls="#alpha-nav-{{link.Id}}">{{link.Name}}</a></li>
-            <ul class=collapse id="alpha-nav-{{link.Id}}" class="list-group navigation-list">
+            <li><span class="octicon octicon-chevron-right"></span><a href="#alpha-nav-{{link.Id}}" data-toggle=collapse aria-expanded=false aria-controls="alpha-nav-{{link.Id}}">{{link.Name}}</a>
+            <ul id="alpha-nav-{{link.Id}}" class="list-group navigation-list collapse">
               {% for link in link.Sub %}
               <li><a href="#name/{{link.Href}}">{{link.Name}}</a></li>
               {% endfor %}
             </ul>
+
+            </li>
               
             {% else %}
-              <li><a href="#name/{{link.Name}}">{{link.Name}}</a></li>
+              <li><a href="#name/{{link.Href}}">{{link.Name}}</a></li>
             {% endif %}
           {% endfor %}
         </ul>
+        <title-nav></title-nav>
       </div>
 
       <!-- Tagged navigation links -->
