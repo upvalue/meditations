@@ -8,5 +8,5 @@ require("riotjs-loader!./journal-tag.tag");
 var $ = require('jquery');
 
 $(document).ready(function() {
-  window.Journal.main(true);
+  window.Journal.main([], true);
 });

@@ -12,7 +12,8 @@ you, but it is a great way to get a much more objective, overarching view of how
     $ go build
     $ npm install
     $ bower install
-    $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial
+    $ webpack -p 
+    $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial --webpack
 
 # Dependencies
 
