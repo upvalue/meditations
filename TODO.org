@@ -1,8 +1,8 @@
 * TODO Improve example data
 * TODO Journal
 * TODO Tutorial
-* TODO Context links should go to specific entries
 * TODO Add all-time streak/time counter scope
 * TODO Sequential AJAX requests
 * TODO Search
 * TODO C&Ping comments doesn't seem to work. Probably because it messes with focus in some way.
+* TODO Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.

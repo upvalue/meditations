@@ -226,7 +226,6 @@ func journalIndex(c *macaron.Context) {
 	}
 
 	// Display alphabetical navigation
-
 	type NameLink struct {
 		Name string
 		Id   string // HTML ID safe version of Name

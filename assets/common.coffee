@@ -5,6 +5,23 @@ window.Common =
     ret.data = JSON.stringify(ret.data)
     return $.ajax(ret)
 
+  initialize: () ->
+    # Hack: Replace Font Awesome icons used by medium-editor-table with octicons
+    show_back = MediumEditorTable.prototype.show
+    MediumEditorTable.prototype.show = () ->
+      $(".fa").removeClass("fa").addClass("octicon")
+
+      fareplace = (bef,aft) ->
+        $(".fa-#{bef}").removeClass("fa-#{bef}").addClass("octicon-#{aft}")
+      
+      fareplace 'long-arrow-up', 'arrow-up'
+      fareplace 'long-arrow-down', 'arrow-down'
+      fareplace 'long-arrow-right', 'arrow-right'
+      fareplace 'long-arrow-left', 'arrow-left'
+      fareplace 'close', 'x'
+      fareplace 'trash-o', 'trashcan'
+      show_back.call(this, arguments)
+
   make_editor: (selector, focus, blur, args = {}) ->
     editor = window.Common.editor = new MediumEditor selector,
       $.extend({
@@ -21,7 +38,6 @@ window.Common =
       $("#saved-button").removeClass "octicon-check"
       $("#saved-button").addClass "octicon-circle-slash"
 
-
       $(window).on("beforeunload", focus)
 
     editor.subscribe "blur", () ->
@@ -31,32 +47,26 @@ window.Common =
       blur()
       $(window).off("unload")
 
-    # Hack: Replace Font Awesome icons used by medium-editor-table with octicons
-    # TODO: Figure out where calling this would be optimal
-    $(".fa").removeClass("fa").addClass("octicon")
-
-    fareplace = (bef,aft) ->
-      $(".fa-#{bef}").removeClass("fa-#{bef}").addClass("octicon-#{aft}")
-    
-    fareplace 'long-arrow-up', 'arrow-up'
-    fareplace 'long-arrow-down', 'arrow-down'
-    fareplace 'long-arrow-right', 'arrow-right'
-    fareplace 'long-arrow-left', 'arrow-left'
-    fareplace 'close', 'x'
-    fareplace 'trash-o', 'trashcan'
-
     editor
 
   ##### TUTORIALS
   tutorial_steps: []
 
   load_tutorial: (thunk) =>
+    window.Common.tutorial_thunk = thunk
+    $("#tutorial-btn").text("Tutorial")
+    $("#tutorial-btn").attr "disabled", false
+    $("#tutorial-btn").click () ->
+      intro = window.Common.tutorial_thunk()
+      intro.start()
+    ###
     window.tutorial = true
     setTimeout(() ->
       thunk()
       $("#tutorial-btn").text("Tutorial")
       $("#tutorial-btn").attr "disabled", false
     , 1000)
+    ###
 
   tutorial_refresh: (current_step) ->
     $.each(window.Common.tutorial_steps, (i, step) ->
@@ -102,7 +112,8 @@ window.Common =
       window.Common.tutorial_steps.push(step)
       window.Common.tutorial_help(step.selector, step.text)
     )
-    $("#tutorial-btn").click () -> intro.start()
+    intro
+    #$("#tutorial-btn").click () -> intro.start()
 
   ##### SOCKETS
   make_socket: (location, onmessage) =>

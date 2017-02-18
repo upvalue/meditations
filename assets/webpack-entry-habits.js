@@ -10,3 +10,4 @@ var $ = require('jquery');
 $(document).ready(function() {
   window.Habits.main(true);
 });
+

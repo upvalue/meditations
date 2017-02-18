@@ -143,6 +143,7 @@ view = (from, bucket) ->
       task_store.mount_days from
 
 main = (tutorialp) ->
+  window.Common.initialize()
   console.log 'Habits: installing router'
 
   console.log 'Habits: initializing'

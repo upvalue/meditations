@@ -127,6 +127,7 @@ class EntryStore extends common.Store
     route("tag/#{name}")
 
 main = (name_links, tutorialp) ->
+  window.Common.initialize()
   console.log 'Journal: initializing'
 
   if tutorialp
