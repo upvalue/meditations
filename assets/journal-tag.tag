@@ -47,28 +47,30 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h5 class=entry-title ref=title if={Seen == 1 || Name}>{title}</h5>
-  <span class="journal-controls pull-xs-right">
-    <span class=pull-xs-right>
-      <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
-        <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
-      </button>
-      <button class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name" onclick={name_entry}></button>
-      <button class="journal-control btn btn-link btn-sm octicon octicon-tag" title="Add tag" onclick={add_tag}></button>
-      <!-- this should be last -->
-      <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
-    </span>
-    <br>
-    <div class="journal-timestamp pull-xs-right">
-      <a href="#view/{Context}/{ID}"><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format('hh:mm A')}</em></a>
-    </div>
-    <div class="journal-tags pull-xs-right">
-      <span class="journal-tag pull-xs-right" each={Tags}>
-        <a href ="#tag/{Name}">#{Name}</a>
-        <button class="btn btn-xs octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
+  <h5 class=entry-title>
+    <span ref=title if={Seen == 1 || Name}>{title}</span>
+    <span class="journal-controls pull-xs-right">
+      <span class=pull-xs-right>
+        <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
+          <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
+        </button>
+        <button class="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name" onclick={name_entry}></button>
+        <button class="journal-control btn btn-link btn-sm octicon octicon-tag" title="Add tag" onclick={add_tag}></button>
+        <!-- this should be last -->
+        <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
       </span>
-    </div>
-  </span>
+      <br>
+      <div class="journal-timestamp pull-xs-right">
+        <a href="#view/{Context}/{ID}"><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format('hh:mm A')}</em></a>
+      </div>
+      <div class="journal-tags pull-xs-right">
+        <span class="journal-tag pull-xs-right" each={Tags}>
+          <a href ="#tag/{Name}">#{Name}</a>
+          <button class="btn btn-xs octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
+        </span>
+      </div>
+    </span>
+  </h5>
 
   <div id={"entry-body-"+ID} ref=body class="entry-body">
   
