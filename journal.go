@@ -44,7 +44,7 @@ func journalEntries(c *macaron.Context) {
 	}
 	var entries []Entry
 	from, to := between(date, ScopeMonth)
-	DB.Where("date between ? and ?", from, to).Order("date desc, created_at desc").Preload("Tags").Find(&entries)
+	DB.Where("date between ? and ?", from, to).Order("date desc").Order("created_at desc").Preload("Tags").Find(&entries)
 	c.JSON(200, entries)
 }
 

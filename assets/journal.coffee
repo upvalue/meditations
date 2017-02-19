@@ -30,7 +30,6 @@ view = (datestr, entry_scroll_id) ->
 
     seen = {}
     # Sort by most recent
-    entries = entries.sort (a, b) -> b.ID - a.ID
     for entry in entries
       # This is so we can only display a date header once
       entry_date = entry.Date.split("T")[0]

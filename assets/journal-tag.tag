@@ -47,7 +47,7 @@
 </entry-single>
 
 <entry id={"entry-"+ID}>
-  <h5 class=entry-title ref=title if={Seen == 1 || Name}></h5>
+  <h5 class=entry-title ref=title if={Seen == 1 || Name}>{title}</h5>
   <span class="journal-controls pull-xs-right">
     <span class=pull-xs-right>
       <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
