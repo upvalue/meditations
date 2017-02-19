@@ -562,14 +562,6 @@ func habitsIndex(c *macaron.Context) {
 	}
 
 	c.Data["HabitYearLinks"] = year_links
-	/*
-		for d := first_this_year.CreatedAt; d.Month() != last.CreatedAt.Month(); d = d.AddDate(0, 1, 0) {
-			month_links = append(month_links, Link{Href: d.Format("2006-01"), Text: string(d.Format("Jan")[0])})
-			fmt.Printf("%s\n", d.Format("Jan"))
-		}
-
-		c.Data["HabitMonthLinks"] = month_links
-	*/
 
 	c.HTML(200, "habits")
 }

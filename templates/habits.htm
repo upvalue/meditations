@@ -19,7 +19,7 @@
       {% endfor %}
 
       <button type=button class="btn btn-primary btn-sm" data-toggle=modal data-target="#export-modal">
-        Export data
+        Tasks <span class="octicon octicon-arrow-right"></span> Plaintext
       </button>
       <span id="saved-button" class="btn btn-sm octicon octicon-check" title=saved></span>
     </div>
@@ -81,11 +81,11 @@
         <form id=export-task action=/habits/export method=POST>
           <div class=form-group>
             <label for=day>Daily</label>
-            <input id=day type=checkbox value=day>
+            <input id=day name=day type=checkbox value=day>
             <label for=month>Monthly</label>
-            <input id=month type=checkbox value=month>
+            <input id=month name=day type=checkbox value=month>
             <label for=year>Yearly</label>
-            <input id=year type=checkbox value=year>
+            <input id=year name=day type=checkbox value=year>
           </div>
 
           <div class=form-group>
