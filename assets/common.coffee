@@ -58,6 +58,8 @@ window.Common =
     $("#tutorial-btn").attr "disabled", false
     $("#tutorial-btn").click () ->
       intro = window.Common.tutorial_thunk()
+      $("#tutorial-btn").unbind('click').click () ->
+        intro.start()
       intro.start()
     ###
     window.tutorial = true

@@ -157,7 +157,7 @@ main = (tutorialp) ->
     window.Common.load_tutorial () ->
       window.Common.tutorial [
           selector: "#habits-link"
-          text: "This is the habits todo list, a simple todo system that keeps track of streaks, time and more to encourage positive habit formation."
+          text: "This is the habits todo list, a simple todo system that keeps track of streaks, time and more to encourage positive habit formation.<br>Note: Tutorial is presently not interactive; and it is designed to work with the provided example data."
         ,
           selector: "section.scope:visible:first",
           text: "This is a daily scope. All tasks belong to a scope; scopes are created for each unit of time (day, month, year) that passes."

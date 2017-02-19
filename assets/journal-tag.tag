@@ -66,7 +66,7 @@
       <div class="journal-tags pull-xs-right">
         <span class="journal-tag pull-xs-right" each={Tags}>
           <a href ="#tag/{Name}">#{Name}</a>
-          <button class="btn btn-xs octicon octicon-x" onclick={remove_tag} data-name="{Name}"></button>
+          <button class="btn btn-xs octicon octicon-x" title="Remove tag" onclick={remove_tag} data-name="{Name}"></button>
         </span>
       </div>
     </span>

@@ -133,7 +133,7 @@ main = (name_links, tutorialp) ->
     window.Common.load_tutorial () ->
       window.Common.tutorial [
         selector: "#journal-link"
-        text: "This is the journal."
+        text: "This is the journal. Note: Tutorial is presently not interactive; and it is designed to work with the provided example data."
       ,
         selector: ".nav-tabs"
         text: "Use these tabs to navigate entries."
@@ -149,6 +149,25 @@ main = (name_links, tutorialp) ->
       ,
         selector: "#journal-new-entry-date"
         text: "New entries are added by clicking here and selecting a date."
+      ,
+        selector: ".journal-controls:first"
+        text: "Use these controls to modify a journal entry."
+      ,
+        selector: ".journal-timestamp:first"
+        text: "This timestamp shows when an entry was created. Note that entries may be added to a day after it has already passed, for example if you want to write an entry at 1AM." 
+      ,
+        selector: ".journal-controls:first .octicon-text-size"
+        text: "Use this to add or change an entry's name"
+      ,
+        selector: ".journal-controls:first .octicon-tag"
+        text: "Use this to add a tag to a journal."
+      ,
+        selector: ".journal-controls:first button[title='Remove tag']"
+        text: "And this to remove a tag."
+      ,
+        selector: ".journal-controls:first .octicon-x:first"
+        text: "Finally, use the X button to delete a journal entry."
+      ,
       ]
 
   entry_store = new EntryStore
