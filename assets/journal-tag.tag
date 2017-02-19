@@ -61,7 +61,7 @@
       </span>
       <br>
       <div class="journal-timestamp pull-xs-right">
-        <a href="#view/{Context}/{ID}"><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format('hh:mm A')}</em></a>
+        <a href="#view/{Context}/{ID}"><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format(!NoContext ? 'M-D-YY hh:mm A' : 'hh:mm A')}</em></a>
       </div>
       <div class="journal-tags pull-xs-right">
         <span class="journal-tag pull-xs-right" each={Tags}>
