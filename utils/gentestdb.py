@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # gentestdb.py - Generate test database data for debugging and automated tests
-import random, sys
+import random, sys, os
 from datetime import datetime, timedelta
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -120,7 +120,7 @@ def diet_comment(task):
 print("INSERT INTO \"tags\" values(1, \"%s\", \"%s\", NULL, \"aeneid\");")
 
 # Create journal entries from Tom Sawyer
-lines = [x.replace('"', '\'') for x in filter(lambda x: x != "", open('utils/gentestdb-journal.txt').read().split("\n"))]
+lines = [x.replace('"', '\'') for x in filter(lambda x: x != "", open(os.path.join(os.path.dirname(__file__), 'gentestdb-journal.txt')).read().split("\n"))]
 def gen_entry_body(entry):
     line = lines.pop(0)
     entry.name = ' '.join(line.split(" ")[:3])
