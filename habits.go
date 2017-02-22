@@ -562,6 +562,7 @@ func habitsIndex(c *macaron.Context) {
 	}
 
 	c.Data["HabitYearLinks"] = year_links
+	c.Data["Page"] = "habits"
 
 	c.HTML(200, "habits")
 }
