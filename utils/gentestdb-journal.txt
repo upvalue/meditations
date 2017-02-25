@@ -92,7 +92,8 @@ Twice sev'n, the charming daughters of the main,
 Around my person wait, and bear my train:
 Succeed my wish, and second my design;
 The fairest, Deiopeia, shall be thine,
-And make thee father of a happy line."
+
+Welcome to the meditations journal. This is a demo filled with lines from Virgil's Aeneid. Try using the tutorial button at the upper right to explore its full functionality.
 
 To this the god: "'Tis yours, O queen, to will
 The work which duty binds me to fulfil.
