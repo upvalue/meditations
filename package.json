@@ -13,8 +13,8 @@
     "riotjs-loader": "^4.0.0",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
-    "webpack": "^2.2.1",
-    "webpack": "^1.5.3"
+    "webpack": "^1.5.3",
+    "webpack": "^2.2.1"
   },
   "scripts": {
     "postinstall": "bower install --config.directory=assets/vendor && webpack -p"

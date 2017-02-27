@@ -1,3 +1,5 @@
+![CircleCI Badge](https://circleci.com/gh/ioddly/meditations.png?circle-token=:circle-token&style=shield)
+
 meditations is an application for tracking life progress that builds on habit formation and long term thinking.
 
 It's fairly minimalist compared to complex time management systems; it leaves the structure of your day entirely up to
