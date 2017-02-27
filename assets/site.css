@@ -1,4 +1,4 @@
-/* note: relative URLs will be compressed by webpack */
+/* NOTE: relative URLs will be compressed by webpack */
 @import url("vendor/bootstrap/dist/css/bootstrap.min.css");
 @import url("vendor/medium-editor/dist/css/medium-editor.min.css");
 @import url("vendor/medium-editor/dist/css/themes/bootstrap.min.css");

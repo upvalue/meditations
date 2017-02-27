@@ -61,14 +61,6 @@ window.Common =
       $("#tutorial-btn").unbind('click').click () ->
         intro.start()
       intro.start()
-    ###
-    window.tutorial = true
-    setTimeout(() ->
-      thunk()
-      $("#tutorial-btn").text("Tutorial")
-      $("#tutorial-btn").attr "disabled", false
-    , 1000)
-    ###
 
   tutorial_refresh: (current_step) ->
     $.each(window.Common.tutorial_steps, (i, step) ->
