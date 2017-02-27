@@ -10,10 +10,9 @@
     "css-loader": "^0.26.1",
     "file-loader": "^0.10.0",
     "riot": "^3.1.1",
-    "riotjs-loader": "^4.0.0",
+    "riotjs-loader": "ioddly/riotjs-loader",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
-    "webpack": "^1.5.3",
     "webpack": "^2.2.1"
   },
   "scripts": {
