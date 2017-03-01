@@ -15,7 +15,7 @@
 
       <form id=task-filter class=form-inline style="display:inline;">
         <div class=form-group>
-          <input type="text" class="form-control mr-sm-2"id="task-filter-name" placeholder="Filter tasks by name">
+          <input type="text" class="form-control mr-sm-2" id="task-filter-name" placeholder="Filter tasks by name">
         </div>
       </form>
 
@@ -36,18 +36,10 @@
 
 {% block content %}
 <div class=row>
-  <div class=col-md-3>
-    <scope-days></scope-days>
-  </div>
-  <div class=col-md-3>
-    <scope id="scope-month"></scope>
-  </div>
-  <div class=col-md-3>
-    <scope id="scope-year"></scope>
-  </div>
-  <div class=col-md-3>
-    <scope id="scope-bucket"></scope>
-  </div>
+  <div class=col-md-3 data-is=scope-days></div>
+  <div class="col-md-3 scope" data-is=scope id=scope-month></div>
+  <div class="col-md-3 scope" data-is=scope id=scope-year></div>
+  <div class="col-md-3 scope" data-is=scope id=scope-bucket></div>
 </div>
 
 <div id=bucket-modal class="modal fade" tabindex=-1 role=dialog>

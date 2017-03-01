@@ -33,7 +33,7 @@ ul.nav a.navbar-link-disabled {
   color: #000 !important;
 }
 
-.navbar-brand { font-size: medium; }
+.navbar-brand { font-size: medium; text-transform: capitalize; }
 .navbar{
   font-size: small;
 }
@@ -60,7 +60,6 @@ ul.nav a.navbar-link-disabled {
 
 .scope .entry {
   clear:both;
-  padding-bottom: .15em;
 }
 
 /* Text align doesn't work properly if we don't do this to pad them from the task controls */
