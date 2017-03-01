@@ -58,7 +58,7 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 def gen_tasks(name, days=90, order=0, status = None, minutes = "NULL", comment_fn = None):
-    end = datetime.now() + timedelta(days = 1)
+    end = datetime.now() + timedelta(days =12)
     "Generate months worth of example tasks"
     month = None
     for date in daterange(end - timedelta(days), end):
@@ -72,7 +72,6 @@ def gen_tasks(name, days=90, order=0, status = None, minutes = "NULL", comment_f
             if month.year != date.year:
                 yield Task(name, date, status_n, SCOPE_YEAR, order, minutes, comment_fn)
             month = None
-            continue
         yield Task(name, date, status_n, SCOPE_DAY, order, minutes, comment_fn)
 
 class Entry(object):

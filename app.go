@@ -151,6 +151,7 @@ func main() {
 			Usage: "migrate database",
 			Flags: flags,
 			Action: func(c *cli.Context) {
+				loadConfig(c)
 				Config.DBLog = true
 				DBOpen()
 				DBMigrate()

@@ -4,6 +4,7 @@ current_date = false
 current_bucket = 0
 task_store = false
 json_request = common.json_request
+filter_name = null
 
 Scope =
   bucket: 0
@@ -209,6 +210,10 @@ main = (tutorialp) ->
 
   # Install modal datepickers
   $(".datepicker").datepicker(dateFormat: 'yy-mm-dd')
+
+  # Install filter
+  $("#task-filter").submit (e) ->
+    e.preventDefault()
 
   # Setup websocket
   task_near = (task, date2) ->

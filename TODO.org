@@ -6,3 +6,6 @@
 * TODO Search
 * TODO C&Ping comments doesn't seem to work. Probably because it messes with focus in some way.
 * TODO Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
+* TODO Add task filter (e.g. type "Exercise" in the top and see only Exercise tasks) [could also be a more reasonable export feature]
+* TODO HTML Export of some sort.
+* TODO Add date to bucket items

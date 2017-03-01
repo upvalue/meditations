@@ -8,15 +8,23 @@
       {% if Config.Message != "" %}
       <span>
         <strong>
-        {{Config.Message}}
+        {{Config.Message | safe}}
         </strong>
       </span>
       {% endif %}
+
+      <form id=task-filter class=form-inline style="display:inline;">
+        <div class=form-group>
+          <input type="text" class="form-control mr-sm-2"id="task-filter-name" placeholder="Filter tasks by name">
+        </div>
+      </form>
+
       {% for link in HabitYearLinks %}
       <a href="/habits#view/{{link.Href}}-01/0" class="btn btn-link btn-sm">
         '{{link.Text}}
       </a>
       {% endfor %}
+
 
       <button type=button class="btn btn-primary btn-sm" data-toggle=modal data-target="#export-modal">
         Tasks <span class="octicon octicon-arrow-right"></span> Plaintext
