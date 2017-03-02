@@ -1,8 +1,9 @@
 package main_test
 
 import (
-	. "meditations"
 	"net/http/httptest"
+
+	. "github.com/ioddly/meditations"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
