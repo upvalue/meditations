@@ -1,13 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/pongo2"
 	"github.com/go-macaron/session"
+	"github.com/tylerb/graceful"
 	"gopkg.in/macaron.v1"
 )
 
@@ -96,6 +100,25 @@ func App() *macaron.Macaron {
 	init("/journal", journalInit)
 
 	return m
+}
+
+func Server() *graceful.Server {
+	server := &graceful.Server{
+		Timeout: 10 * time.Second,
+		Server: &http.Server{
+			Addr:    fmt.Sprintf("%s:%v", Config.Host, Config.Port),
+			Handler: App(),
+		},
+	}
+
+	server.BeforeShutdown = func() bool {
+		log.Printf("closing database")
+		DBClose()
+		log.Printf("shutting down server")
+		return true
+	}
+
+	return server
 }
 
 func main() {
