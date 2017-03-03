@@ -128,7 +128,7 @@ view = (from, bucket) ->
   console.log('Browsing from', from)
   from = moment(from, 'YYYY-MM')
   $("#journal-link").attr "href", "/journal#view/#{from.format('YYYY-MM')}"
-  document.title = "#{from.format('MMM YYYY')} / habits"
+  document.title = "#{from.format('MMMM YYYY')} / habits"
   current_date = from.clone()
   current_bucket = parseInt(bucket)
 
@@ -142,6 +142,7 @@ view = (from, bucket) ->
   riot.mount "scope-days",
     thunk: () ->
       task_store.mount_days from
+
 
 main = (tutorialp) ->
   window.Common.initialize()

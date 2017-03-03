@@ -313,10 +313,6 @@ func tasksInDays(c *macaron.Context) {
 	c.JSON(200, results)
 }
 
-func tasksInDay(c *macaron.Context) {
-	tasksInScopeR(c, ScopeDay)
-}
-
 func tasksInMonth(c *macaron.Context) {
 	tasksInScopeR(c, ScopeMonth)
 }
@@ -572,7 +568,6 @@ func habitsInit(m *macaron.Macaron) {
 
 	m.Get("/in-year", tasksInYear)
 	m.Get("/in-month", tasksInMonth)
-	m.Get("/in-day", tasksInDay)
 	m.Get("/in-days", tasksInDays)
 	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
 	m.Get("/buckets", buckets)

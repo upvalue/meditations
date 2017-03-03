@@ -27,7 +27,10 @@ class Task(object):
         self.name = name
         self.created_at = now()
 
-        self.date = (date - timedelta(0, seconds = date.second, minutes=date.minute, hours=date.hour)).strftime(TIME_FORMAT)
+        if type(date) == str:
+            self.date = date
+        else:
+            self.date = "\"%s\"" % (date - timedelta(0, seconds = date.second, minutes=date.minute, hours=date.hour)).strftime(TIME_FORMAT)
 
         self.status = status
         self.scope = scope
@@ -37,7 +40,7 @@ class Task(object):
         self.comment = Comment("<p>Task %s</p>" % self.id if not comment_fn else comment_fn(self), 0, self.id)
 
     def __repr__(self):
-        return('INSERT INTO "tasks" VALUES({0.id}, "{0.created_at}", "{0.created_at}", NULL, "{0.name}", "{0.date}", {0.status}, {0.scope}, {0.order}, 0, {0.minutes});\n{0.comment}'.format(self))
+        return('INSERT INTO "tasks" VALUES({0.id}, "{0.created_at}", "{0.created_at}", NULL, "{0.name}", {0.date}, {0.status}, {0.scope}, {0.order}, 0, {0.minutes});\n{0.comment}'.format(self))
 
 class Comment(object):
     COUNT = 1
@@ -58,9 +61,24 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 def gen_tasks(name, days=90, order=0, status = None, minutes = "NULL", comment_fn = None):
-    end = datetime.now() + timedelta(days =12)
+    end = datetime.now()
+    begin = end - timedelta(days = days)
     "Generate months worth of example tasks"
     month = None
+
+    for day in range(days):
+        status_n = status or random.randint(1, 2)
+        yield Task(name, "strftime('%%Y-%%m-%%d 00:00:00', 'now', '-%s day')" % day, status_n, SCOPE_DAY, order, minutes, comment_fn)
+
+    for month in range(((end.year - begin.year) * 12) + (end.month - begin.month) + 1):
+        status_n = status or random.randint(1, 2)
+        yield Task(name, "strftime('%%Y-%%m-%%d 00:00:00', 'now', 'start of month', '-%s month')" % month, status_n, SCOPE_MONTH, order, minutes, comment_fn)
+
+    for year in range((end.year - begin.year) + 1):
+        status_n = status or random.randint(1, 2)
+        yield Task(name, "date('now', '-%s year')" % year, status_n, SCOPE_YEAR, order, minutes, comment_fn)
+
+    """
     for date in daterange(end - timedelta(days), end):
         status_n = status
         if not status:
@@ -73,6 +91,7 @@ def gen_tasks(name, days=90, order=0, status = None, minutes = "NULL", comment_f
                 yield Task(name, date, status_n, SCOPE_YEAR, order, minutes, comment_fn)
             month = None
         yield Task(name, date, status_n, SCOPE_DAY, order, minutes, comment_fn)
+        """
 
 class Entry(object):
     COUNT = 1
@@ -118,12 +137,12 @@ def diet_comment(task):
 
 print("INSERT INTO \"tags\" values(1, \"%s\", \"%s\", NULL, \"aeneid\");")
 
-# Create journal entries from Tom Sawyer
+# Create journal entries from the Aeneid
 lines = [x.replace('"', '\'') for x in filter(lambda x: x != "", open(os.path.join(os.path.dirname(__file__), 'gentestdb-journal.txt')).read().split("\n"))]
 def gen_entry_body(entry):
     line = lines.pop(0)
     entry.name = ' '.join(line.split(" ")[:3])
     return line
 
-[print(e) for e in gen_entries(gen_entry_body)]
+#[print(e) for e in gen_entries(gen_entry_body)]
 print('END TRANSACTION;')

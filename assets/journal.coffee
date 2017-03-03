@@ -22,7 +22,7 @@ process_entry = (entry) ->
 
 view = (datestr, entry_scroll_id) ->
   date = moment(datestr, 'YYYY-MM')
-  document.title = "#{date.format('MMM YYYY')} / journal"
+  document.title = "#{date.format('MMMM YYYY')} / journal"
   $("#habits-link").attr "href", "/habits#view/#{date.format('YYYY-MM')}/0"
   $.get "/journal/entries/date?date=#{datestr}", (entries) ->
     $("#journal-ui").html("<entries></entries>")

@@ -176,6 +176,7 @@ func main() {
 			Action: func(c *cli.Context) {
 				loadConfig(c)
 				Config.DBLog = true
+				fmt.Printf("%v\n", Config)
 				DBOpen()
 				DBMigrate()
 				DBClose()

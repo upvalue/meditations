@@ -107,6 +107,10 @@
   <section data-is=scope class=scope id="scope-day-02" visible=false></section>
   <section data-is=scope class=scope id="scope-day-01" visible=false></section>
 
+  this.on('*', function(name) {
+    console.log('scope-days event '+name);
+  });
+
   this.on('mount', function() {
     if(opts.thunk) { 
       console.log("scope-days mounted");
