@@ -7,7 +7,6 @@ machine:
 
 dependencies:
   override:
-    - go get -t -d ./...
     - rm -rf $GO_REPO_PATH
     - ln -s ~/$CIRCLE_PROJECT_REPONAME $GO_REPO_PATH
     - yarn
