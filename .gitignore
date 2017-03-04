@@ -1,3 +1,6 @@
+/bin
+/assets/copied
+/assets/*.js
 /node_modules
 *.sqlite3
 /assets/vendor

@@ -13,14 +13,12 @@ you, but it is a great way to get a much more objective, overarching view of how
 
     $ go build
     $ npm install
-    $ bower install
-    $ webpack -p 
     $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial --webpack
 
 # Dependencies
 
 - Go libraries: See Godeps/Godeps.json
-- JS libraries: See bower.json and package.json
+- JS libraries: See package.json
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
 
 # Attribution
