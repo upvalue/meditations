@@ -12,6 +12,8 @@ you, but it is a great way to get a much more objective, overarching view of how
 # Usage
 
     $ go build
+    $ yarn
+    OR
     $ npm install
     $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial --webpack
 
