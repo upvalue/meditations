@@ -69,6 +69,7 @@ func App() *macaron.Macaron {
 	} else {
 		macaron.Env = "production"
 	}
+
 	m.Use(session.Sessioner())
 	m.Use(csrf.Csrfer())
 	m.Use(pongo2.Pongoer(pongo2.Options{
@@ -78,6 +79,11 @@ func App() *macaron.Macaron {
 
 	// Serve static files from /assets
 	m.Use(macaron.Static("assets", macaron.StaticOptions{Prefix: "assets"}))
+
+	// If not using webpack, load assets from node_modules directory
+	if !Config.Webpack {
+		m.Use(macaron.Static("node_modules", macaron.StaticOptions{Prefix: "node_modules"}))
+	}
 
 	// Expose some configuration variables to templates
 	m.Use(func(c *macaron.Context) {

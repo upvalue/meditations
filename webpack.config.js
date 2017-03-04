@@ -14,10 +14,9 @@ module.exports = {
 
   resolve: {
     alias: {
-      jquery: path.resolve(__dirname, 'assets/vendor/jquery/dist/jquery.min'),
-      moment: path.resolve(__dirname, 'assets/vendor/moment/min/moment.min'),
-      Tether: path.resolve(__dirname, 'assets/vendor/tether/dist/js/tether.min'),
-      riot: path.resolve(__dirname, "assets/vendor/riot/riot+compiler.min"),
+      jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
+      moment: path.resolve(__dirname, 'node_modules/moment/min/moment.min'),
+      Tether: path.resolve(__dirname, 'node_modules/tether/dist/js/tether.min'),
     },
   },
 

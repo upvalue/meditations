@@ -9,3 +9,6 @@
 * TODO Add task filter (e.g. type "Exercise" in the top and see only Exercise tasks) [could also be a more reasonable export feature]
 * TODO HTML Export of some sort.
 * TODO Add date to bucket items
+
+* TODO Adding new journal entry and navigating to it should change URL to match
+* TODO Copying from clipboard should navigate to appropriate month (or just not be available);

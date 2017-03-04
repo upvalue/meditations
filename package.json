@@ -4,19 +4,30 @@
   "description": "meditations is an application for tracking life progress that builds on habit formation and long term thinking.",
   "main": "index.js",
   "dependencies": {
-    "bower": "1.8.0",
+    "@typopro/web-bitter": "^3.4.9",
+    "@typopro/web-inconsolata": "^3.4.9",
+    "@typopro/web-open-sans": "^3.4.9",
+    "bootstrap": "^4.0.0-alpha.5",
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.12.3",
     "css-loader": "^0.26.1",
     "file-loader": "^0.10.0",
+    "intro.js": "^2.4.0",
+    "jquery-ui": "^1.12.1",
+    "jquery-ui-themes": "^1.12.0",
+    "medium-editor": "^5.23.0",
+    "moment": "^2.17.1",
+    "octicons": "^3.5.0",
     "riot": "^3.1.1",
+    "riot-route": "^3.1.0",
+    "riotcontrol": "0.0.3",
     "riotjs-loader": "ioddly/riotjs-loader",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^2.2.1"
   },
   "scripts": {
-    "postinstall": "bower install --config.directory=assets/vendor && webpack -p"
+    "postinstall": "webpack -p"
   },
   "repository": {
     "type": "git",

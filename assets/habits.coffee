@@ -146,8 +146,6 @@ view = (from, bucket) ->
 
 main = (tutorialp) ->
   window.Common.initialize()
-  console.log 'Habits: installing router'
-
   console.log 'Habits: initializing'
 
   task_store = new TaskStore()
@@ -233,7 +231,7 @@ main = (tutorialp) ->
     if task_near(task, current_date)
       msg.wholescope = true # TODO this is a bandaid fix for time change cloneNode issue
       if msg.wholescope
-        console.log 'Mounting whole scope!'
+        #console.log 'Mounting whole scope!'
         task_store.mount_scope task.scope, date
       else
         RiotControl.trigger 'task-updated', task

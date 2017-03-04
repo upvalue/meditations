@@ -51,20 +51,21 @@
     </div>
 
     {% if !Config.Webpack %}
-      <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
-      <script src="/assets/vendor/tether/dist/js/tether.min.js"></script>
-      <script src="/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
-      <script src="/assets/vendor/moment/min/moment.min.js"></script>
+      <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+      <script src="/node_modules/tether/dist/js/tether.min.js"></script>
+      <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+      <script src="/node_modules/moment/min/moment.min.js"></script>
 
-      <script src="/assets/vendor/RiotControl/riotcontrol.js"></script>
-      <script src="/assets/vendor/riot/riot+compiler.js"></script>
-      <script src="/assets/vendor/riot-route/dist/route.min.js"></script>
-      <script src="/assets/vendor/medium-editor/dist/js/medium-editor.min.js"></script>
-      <script src="/assets/vendor/medium-editor-tables/dist/js/medium-editor-tables.js"></script>
-      <script src="/assets/vendor/jquery-ui/jquery-ui.min.js"></script>
+      <script src="/node_modules/riotcontrol/riotcontrol.js"></script>
+      <script src="/node_modules/riot/riot+compiler.min.js"></script>
+      <script src="/node_modules/riot-route/dist/route.min.js"></script>
+
+      <script src="/node_modules/medium-editor/dist/js/medium-editor.min.js"></script>
+      <script src="/node_modules/medium-editor-tables/dist/js/medium-editor-tables.min.js"></script>
+      <script src="/node_modules/jquery-ui/ui/widgets/datepicker.js"></script>
 
       {% if Config.Tutorial %}
-      <script src="/assets/vendor/intro.js/minified/intro.min.js"></script>
+      <script src="/node_modules/intro.js/minified/intro.min.js"></script>
       {% endif %}
 
       <script src="/assets/common.js"></script>

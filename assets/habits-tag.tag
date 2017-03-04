@@ -1,6 +1,6 @@
 <scope>
   <h6 class=scope-title ref=title></h6>
-  <span class="pull-right">
+  <span>
     <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
       <a href="#view/{opts.date.clone().subtract(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/{opts.current_bucket}"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button></a>
       <a href="#view/{opts.date.clone().add(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button></a>
@@ -127,7 +127,7 @@
     </span>
     <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
   </button>
-  <span class="pull-xs-right">
+  <span class="float-xs-right">
     <span if={minutes > 0 || hours > 0}>
       <i class="octicon octicon-clock"></i>
       <span if={hours > 0}>{hours}h</span>

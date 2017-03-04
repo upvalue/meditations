@@ -1,22 +1,23 @@
 /* NOTE: relative URLs will be compressed by webpack */
-@import url("vendor/bootstrap/dist/css/bootstrap.min.css");
-@import url("vendor/medium-editor/dist/css/medium-editor.min.css");
-@import url("vendor/medium-editor/dist/css/themes/bootstrap.min.css");
-@import url("vendor/medium-editor-tables/dist/css/medium-editor-tables.css");
-@import url("vendor/jquery-ui/themes/smoothness/jquery-ui.css");
-@import url("vendor/intro.js/minified/introjs.min.css");
+@import url("../node_modules/bootstrap/dist/css/bootstrap.min.css");
+@import url("../node_modules/bootstrap/dist/css/bootstrap-grid.min.css");
+@import url("../node_modules/medium-editor/dist/css/medium-editor.min.css");
+@import url("../node_modules/medium-editor/dist/css/themes/bootstrap.min.css");
+@import url("../node_modules/medium-editor-tables/dist/css/medium-editor-tables.css");
+@import url("../node_modules/jquery-ui-themes/themes/smoothness/jquery-ui.css");
+@import url("../node_modules/intro.js/minified/introjs.min.css");
 
-@import url("vendor/octicons/octicons/octicons.css");
-@import url("vendor/bitter-fontface/bitter.css");
-@import url("vendor/open-sans-fontface/open-sans.css");
-@import url("vendor/Inconsolata/css/inconsolata.css");
+@import url("../node_modules/octicons/octicons/octicons.css");
+@import url("../node_modules/@typopro/web-open-sans/TypoPRO-OpenSans.css");
+@import url("../node_modules/@typopro/web-bitter/TypoPRO-Bitter.css");
+@import url("../node_modules/@typopro/web-inconsolata/TypoPRO-Inconsolata.css");
 
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "TypoPRO Open Sans", sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, .navbar {
-  font-family: "Bitter", serif;
+  font-family: "TypoPRO Bitter", serif;
 }
 
 a, a:visited {
@@ -70,7 +71,7 @@ ul.nav a.navbar-link-disabled {
 #content input.form-control[type=text] { height:1.5em; }
 
 .comment {
-  font-family: "Inconsolata", monospace;
+  font-family: "TypoPRO Inconsolata", monospace;
 }
 
 .comment p {

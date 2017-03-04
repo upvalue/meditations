@@ -116,7 +116,7 @@ window.Common =
     socket.onopen = (m) ->
       console.log "Connected to #{url} websocket"
     socket.onmessage = (m) ->
-      console.log "#{location}: Socket message", m
+      #console.log "#{location}: Socket message", m
       onmessage $.parseJSON(m.data)
     # Reconnect to socket on failure for development re-loading
     #socket.onclose = () =>
