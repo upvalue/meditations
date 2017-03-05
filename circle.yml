@@ -17,6 +17,7 @@ dependencies:
 
 test:
   pre:
+    - cd $GOPATH/src/$IMPORT_PATH
     - go vet .
   override:
     - godep go test ./...
