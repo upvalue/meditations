@@ -9,17 +9,15 @@ dependencies:
   pre:
     - go get github.com/tools/godep
   override:
-    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
-    - mv $HOME/$CIRCLE_PROJECT_REPONAME $GOPATH/src/$IMPORT_PATH
     - yarn
   cache_directories:
     - ~/.cache/yarn
 
 test:
   pre:
-    - cd $GOPATH/src/$IMPORT_PATH && go vet .
+    -
   override:
-    - cd $GOPATH/src/$IMPORT_PATH && godep go test ./...
+    -
 
 deployment:
   production:
