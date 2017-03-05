@@ -18,7 +18,7 @@ dependencies:
 
 test:
   pre:
-    - go vet ./...
+    - go vet .
   override:
     - godep go test ./...
 
