@@ -2,20 +2,25 @@ machine:
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
     GO_REPO_PATH: $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+    IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
   node:
     version: 7.7.1
 
 dependencies:
+  pre:
+    - go get github.com/tools/godep
   override:
-    - rm -rf $GO_REPO_PATH
-    - ln -s ~/$CIRCLE_PROJECT_REPONAME $GO_REPO_PATH
+    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
+    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
     - yarn
   cache_directories:
     - ~/.cache/yarn
 
 test:
+  pre:
+    - go vet ./...
   override:
-    - go test ./...
+    - godep go test ./...
 
 deployment:
   production:
