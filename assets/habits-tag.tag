@@ -107,10 +107,6 @@
   <section data-is=scope class=scope id="scope-day-02" visible=false></section>
   <section data-is=scope class=scope id="scope-day-01" visible=false></section>
 
-  this.on('*', function(name) {
-    console.log('scope-days event '+name);
-  });
-
   this.on('mount', function() {
     if(opts.thunk) { 
       console.log("scope-days mounted");
@@ -137,6 +133,7 @@
       <i title="Current/Best streak" class="octicon octicon-dashboard"></i>
       <span>{streak}/{best_streak}</span>
     </span>
+    <span title="Added to list on" if={scope >= window.Habits.Scope.wrap}>{moment(date).format('M/D/YY')}</span>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
     <button if={scope == window.Habits.Scope.day} title="Log time"
