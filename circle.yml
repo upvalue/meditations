@@ -15,9 +15,9 @@ dependencies:
 
 test:
   pre:
-    -
+    - echo ''
   override:
-    -
+    - echo ''
 
 deployment:
   production:
