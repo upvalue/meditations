@@ -142,20 +142,9 @@
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
   </span>
-  <div class="comment" id="comment-{ID}" onclick={edit_comment} contenteditable=true></div>
+  <div class="comment" id="comment-{ID}" onclick={edit_comment} ></div>
 
   var self = this
-
-  var comment_div = function() { return $("#comment-"+self.ID); }
-
-  RiotControl.on('task-updated', function(task) {
-    if(task.ID == self.__.item.ID) {
-      self.__.item = task;
-      console.log("Updating task",task);
-      self.update(task);
-      comment_div().html(task.comment.body);
-    }
-  });
 
   var save = function() {
     console.log("Comment update", comment_div().html());
@@ -166,9 +155,33 @@
     });
   }
 
+  var comment_div = function() { return $("#comment-"+self.ID); }
+  var get_editor = function() {
+    var div = comment_div();
+    if(!self.editor) {
+      self.editor = window.Common.make_editor(div, save, save);
+    }
+    div.focus();
+    return self.editor;
+  }
+
+
+  RiotControl.on('task-updated', function(task) {
+    if(task.ID == self.__.item.ID) {
+      self.__.item = task;
+      console.log("Updating task",task);
+      self.update(task);
+      comment_div().html(task.comment.body);
+    }
+  });
+
   self.one('mount', function() {
     comment_div().html(self.comment.body);
-    self.editor = window.Common.make_editor(comment_div(), save, save);
+    comment_div().click(get_editor);
+  });
+
+  self.one('unmount', function() {
+    if(self.editor) self.editor.destroy();
   });
 
   change_status(e) {
@@ -197,7 +210,7 @@
   }
 
   edit_comment(_) {
-    comment_div().focus();
+    get_editor();
   }
 
   copy(_) {
