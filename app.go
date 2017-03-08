@@ -49,10 +49,12 @@ func loadConfig(c *cli.Context) {
 	Config.Tutorial = c.Bool("tutorial")
 	Config.Migrate = c.Bool("migrate")
 	Config.Message = c.String("message")
-	Config.Webpack = c.Bool("webpack")
 }
 
 func App() *macaron.Macaron {
+	_, err := os.Stat("./assets/webpack-bundle-habits.js")
+	Config.Webpack = !os.IsNotExist(err)
+
 	m := macaron.Classic()
 
 	DBOpen()
@@ -161,10 +163,6 @@ func main() {
 		cli.BoolFlag{
 			Name:  "migrate",
 			Usage: "run database migration",
-		},
-		cli.BoolFlag{
-			Name:  "webpack",
-			Usage: "use webpack-bundled files (run webpack first)",
 		},
 	}
 

@@ -143,7 +143,6 @@ view = (from, bucket) ->
     thunk: () ->
       task_store.mount_days from
 
-
 main = (tutorialp) ->
   window.Common.initialize()
   console.log 'Habits: initializing'

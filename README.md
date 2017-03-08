@@ -17,6 +17,11 @@ you, but it is a great way to get a much more objective, overarching view of how
     $ npm install
     $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial --webpack
 
+# Development
+
+meditations will use webpack bundled files if they are available (webpack will be run alongside npm/yarn install).
+For development, `rm assets/webpack-bundle*` or use `webpack -w`
+
 # Dependencies
 
 - Go libraries: See Godeps/Godeps.json
