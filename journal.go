@@ -155,8 +155,10 @@ func journalRemoveTag(c *macaron.Context) {
 
 func journalDeleteEntry(c *macaron.Context) {
 	var entry Entry
+	id := c.ParamsInt("id")
 
-	DB.Where("id = ?", c.ParamsInt("id")).First(&entry).Delete(&entry)
+	DB.Where("id = ?", id).First(&entry).Delete(&entry)
+	DB.Exec("DELETE FROM entry_tags WHERE entry_id = ?", id)
 
 	c.PlainText(200, []byte("OK"))
 }
