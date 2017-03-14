@@ -8,6 +8,5 @@ require("riotjs-loader!./habits-tag.tag");
 var $ = require('jquery');
 
 $(document).ready(function() {
-  window.Habits.main(true);
+  window.Habits.main();
 });
-

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,29 +17,31 @@ import (
 )
 
 type Configuration struct {
-	Port        int
-	DBPath      string
-	DBLog       bool
-	Host        string
-	SiteTitle   string
-	Development bool
-	Tutorial    bool
-	Migrate     bool
-	Message     string
-	Webpack     bool
+	Port            int
+	DBPath          string
+	DBLog           bool
+	Host            string
+	SiteTitle       string
+	Development     bool
+	Tutorial        bool
+	Migrate         bool
+	Message         string
+	Webpack         bool
+	WebsocketSecure bool
 }
 
 var Config = Configuration{
-	Host:        "",
-	Port:        8080,
-	DBPath:      "development.sqlite3",
-	DBLog:       false,
-	SiteTitle:   "meditations",
-	Development: true,
-	Tutorial:    false,
-	Migrate:     false,
-	Message:     "",
-	Webpack:     false,
+	Host:            "",
+	Port:            8080,
+	DBPath:          "development.sqlite3",
+	DBLog:           false,
+	SiteTitle:       "meditations",
+	Development:     true,
+	Tutorial:        false,
+	Migrate:         false,
+	Message:         "",
+	Webpack:         false,
+	WebsocketSecure: true,
 }
 
 func loadConfig(c *cli.Context) {
@@ -49,6 +52,7 @@ func loadConfig(c *cli.Context) {
 	Config.Tutorial = c.Bool("tutorial")
 	Config.Migrate = c.Bool("migrate")
 	Config.Message = c.String("message")
+	Config.WebsocketSecure = c.Bool("websocket-secure")
 }
 
 func App() *macaron.Macaron {
@@ -87,8 +91,15 @@ func App() *macaron.Macaron {
 		m.Use(macaron.Static("node_modules", macaron.StaticOptions{Prefix: "node_modules"}))
 	}
 
-	// Expose some configuration variables to templates
+	// Expose configuration variables to templates & javascript
+	cfg_json_, err := json.Marshal(Config)
+	cfg_json := fmt.Sprintf("%s", cfg_json_)
+	if err != nil {
+		panic(err)
+	}
+
 	m.Use(func(c *macaron.Context) {
+		c.Data["ConfigJSON"] = cfg_json
 		c.Data["Config"] = Config
 		c.Next()
 	})
@@ -163,6 +174,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "migrate",
 			Usage: "run database migration",
+		},
+		cli.BoolFlag{
+			Name:  "websocket-secure",
+			Usage: "use wss:// instead of ws://",
 		},
 	}
 

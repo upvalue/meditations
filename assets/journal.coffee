@@ -125,11 +125,11 @@ class EntryStore extends common.Store
   on_browse_tag: (name) ->
     route("tag/#{name}")
 
-main = (name_links, tutorialp) ->
+main = () ->
   window.Common.initialize()
   console.log 'Journal: initializing'
 
-  if tutorialp
+  if window.MeditationsConfig.tutorial
     window.Common.load_tutorial () ->
       window.Common.tutorial [
         selector: "#journal-link"

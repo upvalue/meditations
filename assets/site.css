@@ -55,16 +55,18 @@ ul.nav a.navbar-link-disabled {
   padding: 0 .25em .50em .25em;
 }
 
-.scope task:first-of-type .entry {
+.scope task:first-of-type .task {
   padding-top:0.2em;
 }
 
-.scope .entry {
+.scope .task {
   clear:both;
 }
 
 /* Text align doesn't work properly if we don't do this to pad them from the task controls */
-.entry div:first-of-type { padding-top:2px;}
+.task { font-size: 0.8em; }
+
+.task div:first-of-type { padding-top:2px;}
 
 #content input.form-control[type=text] { height:1.5em; }
 

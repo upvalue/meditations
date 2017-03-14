@@ -143,7 +143,7 @@ view = (from, bucket) ->
     thunk: () ->
       task_store.mount_days from
 
-main = (tutorialp) ->
+main = () ->
   window.Common.initialize()
   console.log 'Habits: initializing'
 
@@ -152,7 +152,7 @@ main = (tutorialp) ->
   RiotControl.addStore(task_store)
 
   # Tutorial
-  if tutorialp
+  if window.MeditationsConfig.Tutorial
     window.Common.load_tutorial () ->
       window.Common.tutorial [
           selector: "#habits-link"

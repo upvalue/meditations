@@ -22,6 +22,10 @@ you, but it is a great way to get a much more objective, overarching view of how
 meditations will use webpack bundled files if they are available (webpack will be run alongside npm/yarn install).
 For development, `rm assets/webpack-bundle*` or use `webpack -w`
 
+# SSL
+
+To use SSL, you'll need to set up nginx (or another webserver) as a proxy. Then pass the --websocket-secure flag.
+
 # Dependencies
 
 - Go libraries: See Godeps/Godeps.json

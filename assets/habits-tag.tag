@@ -10,7 +10,7 @@
     </span>
     <button type=submit class="btn btn-link btn-sm btn-default octicon octicon-plus" title="Add task" onclick={new_task}></button>
   </span>
-  <section class=entry data-is=task each={opts.tasks}></task>
+  <section class=task data-is=task each={opts.tasks}></task>
 
   var self = this;
 
