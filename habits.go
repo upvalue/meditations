@@ -220,7 +220,7 @@ func (task *Task) CalculateTimeAndCompletion() {
 			rows.Scan(&total, &hours, &minutes)
 		}
 	}
-	// Calculate time by converting minutes to hours and accouting for overflow
+	// Calculate time by converting minutes to hours and accounting for overflow
 	hours += (minutes / 60)
 	minutes = minutes % 60
 

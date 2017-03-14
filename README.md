@@ -15,7 +15,7 @@ you, but it is a great way to get a much more objective, overarching view of how
     $ yarn
     OR
     $ npm install
-    $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial --webpack
+    $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial 
 
 # Development
 
