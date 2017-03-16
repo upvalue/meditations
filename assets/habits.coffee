@@ -3,7 +3,6 @@ common = window.Common
 current_date = false
 current_bucket = 0
 task_store = false
-json_request = common.json_request
 filter_name = null
 
 Scope =

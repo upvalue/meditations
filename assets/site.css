@@ -84,7 +84,8 @@ ul.nav a.navbar-link-disabled {
 
 .btn-xs {
   font-size: .75rem;
-  padding: .05rem .30rem;
+  padding: .1rem .30rem;
+  border-radius:0.1rem;
 }
 
 .task-control { padding:2px;}
