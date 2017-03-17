@@ -9,9 +9,7 @@ import (
 	"time"
 
 	"github.com/codegangsta/cli"
-	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/pongo2"
-	"github.com/go-macaron/session"
 	"github.com/tylerb/graceful"
 	"gopkg.in/macaron.v1"
 )
@@ -76,8 +74,6 @@ func App() *macaron.Macaron {
 		macaron.Env = "production"
 	}
 
-	m.Use(session.Sessioner())
-	m.Use(csrf.Csrfer())
 	m.Use(pongo2.Pongoer(pongo2.Options{
 		Directory:  "templates",
 		Extensions: []string{".htm"},
