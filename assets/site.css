@@ -79,6 +79,7 @@ ul.nav a.navbar-link-disabled {
 }
 
 .comment p:first-of-type { padding-top:.25em; }
+.comment p:last-of-type { padding-bottom:.25em; }
 
 .comment:empty { display: inline;}
 
