@@ -61,7 +61,7 @@
       </span>
       <br>
       <div class="journal-timestamp float-xs-right">
-        <a href="#view/{Context}/{ID}"><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format(!NoContext ? 'M-D-YY hh:mm A' : 'hh:mm A')}</em></a>
+        <a href="#view/{Context}/{ID}" title={moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format('M-D-YY hh:mm A')}><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format(!NoContext ? 'M-D-YY hh:mm A' : 'hh:mm A')}</em></a>
       </div>
       <div class="journal-tags float-xs-right">
         <span class="journal-tag float-xs-right" each={Tags}>
