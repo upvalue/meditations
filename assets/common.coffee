@@ -111,7 +111,7 @@ window.Common =
 
   ##### SOCKETS
   make_socket: (location, onmessage) =>
-    protocol = if window.MeditationsConfig.WebsocketSecure then "wss" else "ws"
+    protocol = if window.location.protocol == 'https:' then "wss" else "ws"
     url = "#{protocol}://#{window.location.hostname}:#{window.location.port}/#{location}"
     socket = new WebSocket url
     socket.onopen = (m) ->

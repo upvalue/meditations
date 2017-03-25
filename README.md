@@ -24,7 +24,7 @@ For development, `rm assets/webpack-bundle*` or use `webpack -w`
 
 # SSL
 
-To use SSL, you'll need to set up nginx (or another webserver) as a proxy. Then pass the --websocket-secure flag.
+To use SSL, you'll need to set up nginx (or another webserver) as a proxy. 
 
 # Dependencies
 

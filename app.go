@@ -15,31 +15,29 @@ import (
 )
 
 type Configuration struct {
-	Port            int
-	DBPath          string
-	DBLog           bool
-	Host            string
-	SiteTitle       string
-	Development     bool
-	Tutorial        bool
-	Migrate         bool
-	Message         string
-	Webpack         bool
-	WebsocketSecure bool
+	Port        int
+	DBPath      string
+	DBLog       bool
+	Host        string
+	SiteTitle   string
+	Development bool
+	Tutorial    bool
+	Migrate     bool
+	Message     string
+	Webpack     bool
 }
 
 var Config = Configuration{
-	Host:            "",
-	Port:            8080,
-	DBPath:          "development.sqlite3",
-	DBLog:           false,
-	SiteTitle:       "meditations",
-	Development:     true,
-	Tutorial:        false,
-	Migrate:         false,
-	Message:         "",
-	Webpack:         false,
-	WebsocketSecure: true,
+	Host:        "",
+	Port:        8080,
+	DBPath:      "development.sqlite3",
+	DBLog:       false,
+	SiteTitle:   "meditations",
+	Development: true,
+	Tutorial:    false,
+	Migrate:     false,
+	Message:     "",
+	Webpack:     false,
 }
 
 func loadConfig(c *cli.Context) {
@@ -50,7 +48,6 @@ func loadConfig(c *cli.Context) {
 	Config.Tutorial = c.Bool("tutorial")
 	Config.Migrate = c.Bool("migrate")
 	Config.Message = c.String("message")
-	Config.WebsocketSecure = c.Bool("websocket-secure")
 }
 
 func App() *macaron.Macaron {
@@ -170,10 +167,6 @@ func main() {
 		cli.BoolFlag{
 			Name:  "migrate",
 			Usage: "run database migration",
-		},
-		cli.BoolFlag{
-			Name:  "websocket-secure",
-			Usage: "use wss:// instead of ws://",
 		},
 	}
 
