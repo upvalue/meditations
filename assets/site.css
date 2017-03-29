@@ -55,7 +55,7 @@ ul.nav a.navbar-link-disabled {
   padding: 0 .25em .50em .25em;
 }
 
-.scope task:first-of-type .task {
+.scope .task:first-of-type {
   padding-top:0.2em;
 }
 
@@ -72,6 +72,11 @@ ul.nav a.navbar-link-disabled {
 
 .comment {
   font-family: "TypoPRO Inconsolata", monospace;
+  /*
+  clear:both;
+  border-radius:2px;
+  border:1px solid #bbb;
+  */
 }
 
 .comment p {

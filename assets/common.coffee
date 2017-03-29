@@ -53,13 +53,11 @@ window.Common =
   tutorial_steps: []
 
   load_tutorial: (thunk) =>
-    window.Common.tutorial_thunk = thunk
     $("#tutorial-btn").text("Tutorial")
     $("#tutorial-btn").attr "disabled", false
     $("#tutorial-btn").click () ->
-      intro = window.Common.tutorial_thunk()
-      $("#tutorial-btn").unbind('click').click () ->
-        intro.start()
+      intro = thunk()
+      #$("#tutorial-btn").unbind('click').click () ->
       intro.start()
 
   tutorial_refresh: (current_step) ->
@@ -90,7 +88,7 @@ window.Common =
       current_step = step
       # This is done because modifying the elements can cause introJS to lose track of things
       elt = $(selector)
-      elt.click(window.Common.tutorial_change(selector, current_step, text))
+      #elt.click(window.Common.tutorial_change(selector, current_step, text))
         
       console.log(step, selector, text)
       elt.attr("data-step", current_step)
@@ -101,10 +99,12 @@ window.Common =
   tutorial: (steps) =>
     console.log("Initializing tutorial with #{steps.length} steps")
     window.intro = intro = window.introJs()
-    intro.onexit(window.Common.tutorial_refresh)
+    #intro.onexit(window.Common.tutorial_refresh)
     $.each(steps, (i, step) =>
-      window.Common.tutorial_steps.push(step)
-      window.Common.tutorial_help(step.selector, step.text)
+      console.log(step.selector, $(step.selector).get(0))
+      intro.addStep element: $(step.selector).get(0), intro: step.text
+      #window.Common.tutorial_steps.push(step)
+      #window.Common.tutorial_help(step.selector, step.text)
     )
     intro
     #$("#tutorial-btn").click () -> intro.start()
