@@ -1,4 +1,6 @@
 <entries>
+  <div class=journal-nav-controls>
+
   <span> 
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-left" title="Last year" onclick={last_year}></button>
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-chevron-left" title="Last month" onclick={last_month}></button>
@@ -10,6 +12,9 @@
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-chevron-right" title="Next month" onclick={next_month}></button>
     <button if={opts.date} class="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year" onclick={next_year}></button>
   </span>
+
+  </div>
+
   <entry each={opts.entries}></entry>
 
   var self = this;

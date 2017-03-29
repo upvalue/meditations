@@ -26,7 +26,7 @@ view = (datestr, entry_scroll_id) ->
   $("#habits-link").attr "href", "/habits#view/#{date.format('YYYY-MM')}/0"
   $.get "/journal/entries/date?date=#{datestr}", (entries) ->
     $("#journal-ui").html("<entries></entries>")
-    console.log "View date", entries
+    #console.log "View date", entries
 
     seen = {}
     # Sort by most recent
@@ -129,7 +129,7 @@ main = () ->
   window.Common.initialize()
   console.log 'Journal: initializing'
 
-  if window.MeditationsConfig.tutorial
+  if window.MeditationsConfig.Tutorial
     window.Common.load_tutorial () ->
       window.Common.tutorial [
         selector: "#journal-link"
@@ -186,7 +186,6 @@ main = () ->
 
   # Set up websocket
   socket = window.Common.make_socket "journal/sync", (entry) ->
-    console.log("journal-updated", entry)
     if $("#entry-#{entry.ID}").length
       RiotControl.trigger("journal-updated", entry)
 
