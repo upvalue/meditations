@@ -48,7 +48,7 @@
 
 <entry id={"entry-"+ID}>
   <h5 class=entry-title>
-    <span ref=title if={Seen == 1 || Name}>{title}</span>
+    <span ref=title></span>
     <span class="journal-controls float-xs-right">
       <span class=float-xs-right>
         <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
@@ -87,23 +87,28 @@
     });
   }
 
-  self.one('mount', function() {
-    var date = moment(this.Date, "YYYY-MM-DD");
+  var update = function() {
+    var date = moment(self.Date, "YYYY-MM-DD");
     // Due to somewhat more complex formatting logic, dates are calculated here
-    $(this.refs.title).append(
-      this.Name ? '<strong>'+this.Name+'</strong>&nbsp;' : '',
+    $(self.refs.title).empty().append(
+      self.Name ? '<strong>'+self.Name+'</strong>&nbsp;' : '',
       date.format('dddd, '),
       $('<a/>', {href: "journal#view/"+date.format('YYYY-MM'), text: date.format('MMM')}),
       date.format(' Do')
     );
 
-    $(this.refs.body).html(this.Body);
-    self.editor = window.Common.make_editor('#'+this.refs.body.id, save, save);
+    $(self.refs.body).html(self.Body);
+  }
+
+  self.one('mount', function() {
+    self.editor = window.Common.make_editor('#'+self.refs.body.id, save, save);
+    update();
   });
 
   RiotControl.on('journal-updated', function(data) {
     if(data.ID == self.__.item.ID) {
       self.update(data);
+      update();
     }
   });
 

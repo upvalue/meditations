@@ -170,11 +170,12 @@ func journalRemoveEntryName(c *macaron.Context) {
 
 func journalNameEntry(c *macaron.Context) {
 	var entry Entry
-	DB.Where("id = ?", c.ParamsInt("id")).First(&entry)
+	DB.Where("id = ?", c.ParamsInt("id")).Preload("Tags").First(&entry)
 
 	entry.Name = c.Params("name")
 	DB.Save(&entry)
 	c.PlainText(200, []byte("ok"))
+	syncEntry(entry)
 }
 
 func journalIndex(c *macaron.Context) {

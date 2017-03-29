@@ -186,6 +186,7 @@ main = () ->
 
   # Set up websocket
   socket = window.Common.make_socket "journal/sync", (entry) ->
+    console.log("journal-updated", entry)
     if $("#entry-#{entry.ID}").length
       RiotControl.trigger("journal-updated", entry)
 
