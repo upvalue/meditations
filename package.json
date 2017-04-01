@@ -4,7 +4,6 @@
   "description": "meditations is an application for tracking life progress that builds on habit formation and long term thinking.",
   "main": "index.js",
   "dependencies": {
-    "@typopro/web-bitter": "^3.4.9",
     "@typopro/web-inconsolata": "^3.4.9",
     "@typopro/web-open-sans": "^3.4.9",
     "bootstrap": "4.0.0-alpha.5",

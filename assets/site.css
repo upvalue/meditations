@@ -8,6 +8,7 @@
 @import url("../node_modules/intro.js/minified/introjs.min.css");
 
 @import url("../node_modules/octicons/octicons/octicons.css");
+
 @import url("../node_modules/@typopro/web-open-sans/TypoPRO-OpenSans.css");
 @import url("../node_modules/@typopro/web-bitter/TypoPRO-Bitter.css");
 @import url("../node_modules/@typopro/web-inconsolata/TypoPRO-Inconsolata.css");
@@ -17,7 +18,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, .navbar {
-  font-family: "TypoPRO Bitter", serif;
+  font-family: "TypoPRO Open Sans", serif;
+  font-weight:bold;
 }
 
 a, a:visited {

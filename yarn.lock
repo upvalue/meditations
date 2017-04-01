@@ -2,10 +2,6 @@
 # yarn lockfile v1
 
 
-"@typopro/web-bitter@^3.4.9":
-  version "3.4.9"
-  resolved "https://registry.yarnpkg.com/@typopro/web-bitter/-/web-bitter-3.4.9.tgz#338b73178066be3f3ffd75cd8e9005f6e4430b56"
-
 "@typopro/web-inconsolata@^3.4.9":
   version "3.4.9"
   resolved "https://registry.yarnpkg.com/@typopro/web-inconsolata/-/web-inconsolata-3.4.9.tgz#546ea932c4d5d5517fab7bf600786928e088ce2a"
