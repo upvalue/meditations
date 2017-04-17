@@ -28,9 +28,16 @@
             </li>
             <li class="nav-item">
               <a id=journal-link class="nav-link btn btn-sm btn-secondary" href="/journal#">
-                {% if Page != "habits" %}<strong>Journal</strong>{% else %}Journal{% endif %}
+                {% if Page == "journal" %}<strong>Journal</strong>{% else %}Journal{% endif %}
               </a>
             </li>
+            <!--
+            <li class=nav-item>
+              <a id=visual-link class="nav-link btn btn-sm btn-secondary" href="/habits/visualize">
+                Visualization
+              </a>
+            </li>
+            -->
             {% if Config.Tutorial %}
             <li class=nav-item>
               <a class="nav-link btn btn-sm btn-secondary" id="tutorial-btn" disabled=true>Tutorial (loading)</a>

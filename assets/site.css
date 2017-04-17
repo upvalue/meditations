@@ -97,6 +97,17 @@ ul.nav a.navbar-link-disabled {
 
 .task-control { padding:2px;}
 
+.bucket-select {
+  -webkit-appearance:none;
+  border:0;
+  padding:0;
+  width: auto;
+  appearance:none;
+  font-family: "TypoPRO Open Sans", serif;
+  font-weight:bold;
+  font-size:1rem;
+}
+
 /**** JOURNAL */
 
 .container-fluid h3:first-of-type { margin:0; }

@@ -54,7 +54,7 @@ class TaskStore extends common.Store
         console.log(result)
         [scope, tasks] = [result.scope, result.tasks]
 
-        result = riot.mount "#scope-bucket", { date: date, scope: scope.ID, tasks: tasks, title: scope["Name"] }
+        result = riot.mount "#scope-bucket", { date: date, scope: scope.ID, tasks: tasks, title: scope["Name"], current_bucket: current_bucket }
     else
       date = if typeof date == 'string' then moment.utc(date) else date.clone()
       fetch_date = date.clone()

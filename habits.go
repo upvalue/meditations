@@ -74,7 +74,8 @@ type Task struct {
 // Time-based scopes are built-in, but the user can add non-timed scopes to use as lists
 type Scope struct {
 	gorm.Model
-	Name string `sql:"not null;unique"`
+	Name     string `sql:"not null;unique"`
+	Selected bool   `sql:"-"`
 }
 
 type Comment struct {
@@ -448,7 +449,8 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 // Return list of all buckets by most recent
 func buckets(c *macaron.Context) {
 	var scopes []Scope
-	DB.Where("id > ?", ScopeYear).Find(&scopes)
+	DB.Where("id > ?", ScopeYear).Order("updated_at desc").Find(&scopes)
+
 	c.JSON(200, scopes)
 }
 
@@ -567,8 +569,16 @@ func habitsIndex(c *macaron.Context) {
 	c.HTML(200, "habits")
 }
 
+/*
+func habitsVisualization(c *macaron.Context) {
+	c.HTML(200, "visualize")
+}
+*/
+
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", habitsIndex)
+
+	//m.Get("/visualize", habitsVisualization)
 
 	m.Get("/in-year", tasksInYear)
 	m.Get("/in-month", tasksInMonth)

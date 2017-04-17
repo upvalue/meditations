@@ -1,11 +1,15 @@
 <scope>
-  <h6 class=scope-title ref=title></h6>
+  <h6 class=scope-title if={!Habits.Scope.bucketp(opts.scope)} ref=title></h6>
+  <button if={Habits.Scope.bucketp(opts.scope)} class="octicon octicon-chevron-down btn btn-link"></button>
+  <select ref=bucket_select if={Habits.Scope.bucketp(opts.scope)} onchange={change_bucket_select} style="display:inline !important;" class="form-control bucket-select">
+    <option>!Overall</option>
+  </select>
   <span>
     <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
       <a href="#view/{opts.date.clone().subtract(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/{opts.current_bucket}"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button></a>
       <a href="#view/{opts.date.clone().add(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button></a>
     </span>
-    <span if={opts.scope > window.Habits.Scope.year}>
+    <span if={window.Habits.Scope.bucketp(opts.scope)}>
       <button class="btn btn-link btn-sm btn-default octicon octicon-briefcase" title="Change bucket" onclick={change_bucket}></button>
     </span>
     <button type=submit class="btn btn-link btn-sm btn-default octicon octicon-plus" title="Add task" onclick={new_task}></button>
@@ -25,6 +29,44 @@
         case window.Habits.Scope.month: title = opts.date.format("MMMM"); break; 
         case window.Habits.Scope.year: title = opts.date.format("YYYY"); break;
       }
+
+    }
+
+    if(window.Habits.Scope.bucketp(opts.scope)) {
+      $.get("/habits/buckets", function(result) {
+
+        console.log(opts.current_bucket, opts.scope);
+        for(var i = 0; i != result.length; i++) {
+          var selected = false;
+          if(opts.current_bucket == 0 && i == 0) {
+            selected = true;
+          } else if(result[i].ID == opts.current_bucket) {
+            selected = true;
+          }
+          $("<option "+(selected?"selected":"")+" value="+result[i].ID+">"+result[i].Name+"</option>").appendTo($(self.refs.bucket_select));
+        }
+
+        console.log("Retrieved buckets");
+        console.log(result);
+        /*
+          $("#bucket-select").empty();
+          console.log(result);
+          for(var i = 0; i != result.length; i++) {
+            $("<option selected value="+result[i].ID+">"+result[i].Name+"</option>").appendTo($("#bucket-select"));
+          }
+          $("#bucket-select-button").click(function() {
+            var selected = parseInt($("#bucket-select option:selected").val());
+            RiotControl.trigger("change-bucket", selected);
+          });
+          $("#bucket-add").click(function() {
+            $.post("/habits/bucket-new/"+$("#bucket-add-name").val(), function(scope) {
+              RiotControl.trigger("change-bucket", scope.ID);
+            });
+          });
+          $("#bucket-modal").modal();
+          */
+      });
+
     }
 
     if(opts.date) {
@@ -71,6 +113,12 @@
       });
       $("#bucket-modal").modal();
     });
+  }
+
+  change_bucket_select(e) {
+    var selected = $(e.target).val();
+    RiotControl.trigger("change-bucket", selected);
+    console.log(selected);
   }
 </scope>
 
@@ -164,7 +212,6 @@
     div.focus();
     return self.editor;
   }
-
 
   RiotControl.on('task-updated', function(task) {
     if(task.ID == self.__.item.ID) {
