@@ -172,7 +172,7 @@
     <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
   </button>
   <span class="float-xs-right">
-    <span if={minutes > 0 || hours > 0}>
+    <span ref="time" if={minutes > 0 || hours > 0}>
       <i class="octicon octicon-clock"></i>
       <span if={hours > 0}>{hours}h</span>
       <span if={minutes > 0}>{minutes}m </span>
@@ -225,6 +225,17 @@
   self.one('mount', function() {
     comment_div().html(self.comment.body);
     comment_div().click(get_editor);
+    // TODO: Provide an average of hours
+    // Should probably just be calculated server-side
+    if(self.total_tasks_with_time) {
+      console.log("Total tasks for " + self.name + " with time tracking", self.total_tasks_with_time);
+
+      var avg_minutes = ((self.hours * 60) + self.minutes) / self.total_tasks_with_time;
+
+      var time_average = "Average time: " + Math.round(avg_minutes) + "m";
+
+      $(self.refs.time).attr("title", time_average);
+    }
   });
 
   self.one('unmount', function() {
