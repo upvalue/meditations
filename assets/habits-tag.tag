@@ -226,7 +226,7 @@
     comment_div().html(self.comment.body);
     comment_div().click(get_editor);
     // TODO: Provide an average of hours
-    // Should probably just be calculated server-side
+    // TODO: Should probably just be calculated server-side
     if(self.total_tasks_with_time) {
       console.log("Total tasks for " + self.name + " with time tracking", self.total_tasks_with_time);
 
