@@ -316,7 +316,7 @@ func tasksInDays(c *macaron.Context) {
 	for date.Month() != finish.Month() {
 		var tasks []Task
 		tasksInScope(&tasks, ScopeDay, date)
-		results = append(results, Result{date.Format("2006-01-02"), tasks})
+		results = append(results, Result{date.Format(DateFormat), tasks})
 		date = date.AddDate(0, 0, 1)
 		if date.Day() == int(limit) {
 			break
@@ -336,6 +336,66 @@ func tasksInMonth(c *macaron.Context) {
 
 func tasksInYear(c *macaron.Context) {
 	tasksInScopeR(c, ScopeYear)
+}
+
+// Return all tasks in date range
+func visualizeRange(c *macaron.Context) {
+
+	begin, err := time.Parse(DateFormat, c.Query("begin"))
+	if err != nil {
+		serverError(c, "error parsing date %s", c.Query("begin"))
+		return
+	}
+
+	end, err := time.Parse(DateFormat, c.Query("end"))
+	if err != nil {
+		serverError(c, "error parsing date %s", c.Query("end"))
+		return
+	}
+
+	/*
+		id := now.New(begin)
+		endd := now.New(end)
+	*/
+
+	var tasks []Task
+	DB.Table("tasks").Select("distinct name").Where("date between ? and ? and scope = ?", begin, end, ScopeDay).Find(&tasks)
+
+	var repeated_tasks []Task
+	for _, t := range tasks {
+		var t2 Task
+		res := DB.Table("tasks").Select("*").Group("name").Where("(date between ? and ?) and scope = ? and name = ?", begin, end, ScopeDay,
+			t.Name).Having("COUNT(name) > 5").First(&t2)
+
+		if res.RowsAffected > 0 {
+			repeated_tasks = append(repeated_tasks, t2)
+		}
+	}
+
+	for _, t := range repeated_tasks {
+		fmt.Printf("%v\n", t.Name)
+	}
+
+	/*
+		type Result struct {
+			Date  string
+			Tasks []Task
+		}
+
+		var results []Result
+
+		for !id.Equal(endd.Time) {
+			var result Result
+			result.Date = id.Format(DateFormat)
+			tasksInScope(&result.Tasks, ScopeDay, id.Time)
+			results = append(results, result)
+			//fmt.Printf("%v\n", id)
+			id.Time = id.AddDate(0, 0, 1)
+		}
+
+		c.JSON(200, results)
+	*/
+	c.PlainText(200, []byte("{}"))
 }
 
 // Update a task's fields by JSON
@@ -553,7 +613,8 @@ func export(c *macaron.Context) {
 	}
 }
 
-func habitsIndex(c *macaron.Context) {
+// Places an array in c.Data showing which years have data available
+func getYears(c *macaron.Context) {
 	var first, first_this_year, last Task
 
 	type Link struct {
@@ -576,26 +637,35 @@ func habitsIndex(c *macaron.Context) {
 	}
 
 	c.Data["HabitYearLinks"] = year_links
+}
+
+func habitsIndex(c *macaron.Context) {
 	c.Data["Page"] = "habits"
+
+	getYears(c)
 
 	c.HTML(200, "habits")
 }
 
-/*
 func habitsVisualization(c *macaron.Context) {
-	c.HTML(200, "visualize")
+	c.Data["page"] = "habits-visualize"
+
+	getYears(c)
+
+	c.HTML(200, "habits-visualize")
 }
-*/
 
 func habitsInit(m *macaron.Macaron) {
 	m.Get("/", habitsIndex)
 
-	//m.Get("/visualize", habitsVisualization)
+	m.Get("/visualize", habitsVisualization)
+	m.Get("/visualize/range", visualizeRange)
 
 	m.Get("/in-year", tasksInYear)
 	m.Get("/in-month", tasksInMonth)
 	m.Get("/in-day", tasksInDay)
 	m.Get("/in-days", tasksInDays)
+
 	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
 	m.Get("/buckets", buckets)
 

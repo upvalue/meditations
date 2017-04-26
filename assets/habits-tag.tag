@@ -228,7 +228,7 @@
     // TODO: Provide an average of hours
     // TODO: Should probably just be calculated server-side
     if(self.total_tasks_with_time) {
-      console.log("Total tasks for " + self.name + " with time tracking", self.total_tasks_with_time);
+      //console.log("Total tasks for " + self.name + " with time tracking", self.total_tasks_with_time);
 
       var avg_minutes = ((self.hours * 60) + self.minutes) / self.total_tasks_with_time;
 
