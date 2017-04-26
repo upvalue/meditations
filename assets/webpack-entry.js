@@ -7,10 +7,6 @@ require("./site.css")
 window.$ = window.jQuery = require("jquery");
 require("jquery-ui/ui/widgets/datepicker");
 
-// bootstrap
-//window.Tether = require("Tether");
-//require("bootstrap/dist/js/bootstrap.min.js");
-
 // moment
 window.moment = require("moment");
 
