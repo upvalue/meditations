@@ -38,6 +38,16 @@ module.exports = {
       { test: /\.(woff|png|ttf|svg|eot|woff2)$/,
         loader: 'file-loader?name=copied/[hash].[ext]&context=./assets&publicPath=assets/' },
       { enforce: 'pre', test: /\.tag$/, exclude: /assets\/vendor/, loader: 'riotjs-loader' },
+      { test: /\.js$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['es2015', 'react'],
+            plugins: [],
+          },
+        },
+      },
     ],
   },
   'devtool': 'source-map',

@@ -186,7 +186,10 @@
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
     <button if={scope == window.Habits.Scope.day} title="Log time"
       class="task-control btn-link btn btn-sm btn-default octicon octicon-clock" onclick={log_time}></button>
-    <button if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year)} title="Copy to present day" class="task-control btn btn-link btn-sm btn-default octicon octicon-clippy" onclick={copy}></button>
+    
+    <button if={ (((scope == window.Habits.Scope.month) && moment(date).month() == (moment().month())) || 
+      (scope == window.Habits.Scope.year ))}
+      title="Copy to present day" class="task-control btn btn-link btn-sm btn-default octicon octicon-clippy" onclick={copy}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
   </span>

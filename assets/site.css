@@ -26,7 +26,7 @@ a, a:visited {
 }
 
 ul.nav a {
-  color: #09d!important;
+  color: #09d !important;
 }
 
 .medium-editor-toolbar li button {height: auto; min-width: 0; }
@@ -142,4 +142,3 @@ div#alphabetical li { font-size:0.8em; }
 
 /***** WIKI */
 div#content h1:first-of-type { margin-top:0; }
-
