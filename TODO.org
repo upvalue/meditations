@@ -1,14 +1,19 @@
-* TODO Improve example data
-* TODO Journal
-* TODO Tutorial
-* TODO Add all-time streak/time counter scope
-* TODO Sequential AJAX requests
-* TODO Search
-* TODO C&Ping comments doesn't seem to work. Probably because it messes with focus in some way.
-* TODO Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
-* TODO Add task filter (e.g. type "Exercise" in the top and see only Exercise tasks) [could also be a more reasonable export feature]
-* TODO HTML Export of some sort.
-* TODO Add date to bucket items
+* Habits
+** TODO Collapsing
+   Or some other way of reducing visual clutter with tasks that are frequently logged but otherwise uninteresting.
+   Perhaps shift-click to register as completed and hide? Or shift-click to hide?
+   Then just a checkmark at the top to show hidden tasks or not.
 
-* TODO Adding new journal entry and navigating to it should change URL to match
-* TODO Copying from clipboard should navigate to appropriate month (or just not be available);
+** TODO Port from CoffeeScript to ES2015 or TypeScript
+** TODO D3 visualization
+** TODO Copying and pasting comments doesn't seem to work. Probably because it messes with focus in some way.
+** TODO Using ctrl-up in medium-editor reduces font size
+** TODO Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
+** TODO Add search and/or filtering. This could also be used to select entries for export
+** TODO Add a created-at date to bucket items (currently displays beginning of month)
+** TODO Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
+* Journal
+** TODO Adding a new journal entry and navigating to it should change the URL appropriately
+* Overall
+** TODO Client-side, server-side and behavioral tests
+

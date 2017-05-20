@@ -2,10 +2,11 @@
 
 meditations is an application for tracking life progress that builds on habit formation and long term thinking.
 
-It's fairly minimalist compared to complex time management systems; it leaves the structure of your day entirely up to
-you, but it is a great way to get a much more objective, overarching view of how you are doing.
+Originally a Trello board, meditations simply keeps track of how often you complete tasks, and how much time you spend
+on them (optionally). It's fairly minimalist compared to more complex time management systems, and leave the structure
+of your day entirely up to you. The goal of meditations is to get an objective, long-term view of how you are doing.
 
-![image](http://ioddly.com/images/meditations.png)
+![sample image](http://imgur.com/a/FxPLU)
 
 ## [Live Demo & Tutorial](http://meditations.ioddly.com)
 
@@ -13,8 +14,6 @@ you, but it is a great way to get a much more objective, overarching view of how
 
     $ go build
     $ yarn
-    OR
-    $ npm install
     $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial 
 
 # Development
