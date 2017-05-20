@@ -6,7 +6,7 @@ Originally a Trello board, meditations simply keeps track of how often you compl
 on them (optionally). It's fairly minimalist compared to more complex time management systems, and leave the structure
 of your day entirely up to you. The goal of meditations is to get an objective, long-term view of how you are doing.
 
-![sample image](http://imgur.com/a/FxPLU)
+![sample image](http://i.imgur.com/msy5Wnc.png)
 
 ## [Live Demo & Tutorial](http://meditations.ioddly.com)
 
