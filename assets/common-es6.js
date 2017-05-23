@@ -126,21 +126,17 @@ const Common = {
   },
 
   /**
-   * Automatically register store methods beginning with on_ to listen to RiotControl events with the same name
-   * @param {object} store
+   * An observable Store for the frontend to interact with
    */
-  register_events: (store) => {
-    for(const key in store) {
-      if(key.slice(0,3) == "on_") {
-        store.on(key.slice(3).replace(/_/g, "-"), store[key]);
-      }
-    }
-  },
-
   Store: class {
     constructor() {
       riot.observable(this);
-      Common.register_events(this);
+      // Automatically register store methods beginning with on_ to listen to RiotControl events with the same name
+      for(const key in this) {
+        if(key.slice(0,3) == "on_") {
+          this.on(key.slice(3).replace(/_/g, "-"), this[key]);
+        }
+      }
     }
   },
 }

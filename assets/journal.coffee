@@ -129,47 +129,6 @@ main = () ->
   window.Common.initialize()
   console.log 'Journal: initializing'
 
-  if window.MeditationsConfig.Tutorial
-    window.Common.load_tutorial () ->
-      window.Common.tutorial [
-        selector: "#journal-link"
-        text: "This is the journal. Note: Tutorial is presently not interactive; and it is designed to work with the provided example data."
-      ,
-        selector: ".nav-tabs"
-        text: "Use these tabs to navigate entries."
-      ,
-        selector: "#entries-title"
-        text: "You can also use these controls to quickly navigate by month and year."
-      ,
-        selector: ".entry-title:first"
-        text: "There can be multiple entries per day"
-      ,
-        selector: ".entry-body:first"
-        text: "You can edit entries by simply clicking on them."
-      ,
-        selector: "#journal-new-entry-date"
-        text: "New entries are added by clicking here and selecting a date."
-      ,
-        selector: ".journal-controls:first"
-        text: "Use these controls to modify a journal entry."
-      ,
-        selector: ".journal-timestamp:first"
-        text: "This timestamp shows when an entry was created. Note that entries may be added to a day after it has already passed, for example if you want to write an entry at 1AM." 
-      ,
-        selector: ".journal-controls:first .octicon-text-size"
-        text: "Use this to add or change an entry's name"
-      ,
-        selector: ".journal-controls:first .octicon-tag"
-        text: "Use this to add a tag to a journal."
-      ,
-        selector: ".journal-controls:first button[title='Remove tag']"
-        text: "And this to remove a tag."
-      ,
-        selector: ".journal-controls:first .octicon-x:first"
-        text: "Finally, use the X button to delete a journal entry."
-      ,
-      ]
-
   entry_store = new EntryStore
 
   RiotControl.addStore(entry_store)
@@ -188,46 +147,6 @@ main = () ->
   socket = window.Common.make_socket "journal/sync", (entry) ->
     if $("#entry-#{entry.ID}").length
       RiotControl.trigger("journal-updated", entry)
-
-  # Split up alphabetical navigation into sublists
-  # i.e.
-  # Review: Books: How to Make Friends and Influence People
-  # becomes two uls with the last part as a li link
-  ###
-  elts = {}
-  for link in name_links
-    lists = (lnk.trim() for lnk in link.name.split(":"))
-    head = elts
-    while lists.length > 1
-      sub = lists.shift(1)
-      unless head[sub]
-        head[sub] = {}
-      head = head[sub]
-    head[lists[0]] = name: lists[0], html: $("<li>#{lists[0]}</li>"), item: true
-
-  # Sort array alphabetically
-  sort = (sub) ->
-    sub.sort (a, b) ->
-      if a.name < b.name then return -1
-      else if a.name > b.name then return 1
-      return 0
-    sub
-
-  # Convert object to sorted array
-  to_array = (name, value) ->
-    unless value.item 
-      value.sub = (to_array(k,v) for k,v of value)
-      sort(value.sub)
-    return value
-
-  elts = (to_array(k,v) for k,v of elts)
-  sort(elts)
-
-  top = $("#alphabetical-top-list")
-  top.html("")
-  console.log('mount', elts)
-  riot.mount 'title-nav', links: elts
-  ###
 
 window.Journal =
   main: main
