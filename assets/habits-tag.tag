@@ -91,7 +91,7 @@
     var title = window.prompt("Task name");
     if(title != null&&title!="") {
       console.log('Adding a new task', opts.date);
-      RiotControl.trigger('task-new', opts, title, opts.date);
+      RiotControl.trigger('task-new', opts.scope, title, opts.date);
     }
   }
 
@@ -284,6 +284,6 @@
       date.month(moment().month());
       date.date(moment().date());
     }
-    RiotControl.trigger('task-new', {date: date, scope: scope}, self.__.item.name, date)
+    RiotControl.trigger('task-new', scope, self.__.item.name, date)
   }
 </task>

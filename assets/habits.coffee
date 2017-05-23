@@ -1,126 +1,15 @@
 # habits.coffee - habits code
-common = window.Common
 current_date = false
 current_bucket = 0
 task_store = false
 filter_name = null
 
-Scope =
-  bucket: 0
-  day: 1
-  month: 2
-  year: 3
-  wrap: 4
-  bucketp: (scope) -> scope == Scope.bucket or scope > Scope.year
+common = require("./common-es6").default
+HabitsES6 = require("./habits-es6").default
+Scope = HabitsES6.Scope
+Status = HabitsES6.Status
 
-Status =
-  unset: 0
-  complete: 1
-  incomplete: 2
-  wrap: 3
-
-class TaskStore extends common.Store
-  # This function mounts all days; it is only called when the month navigation is changed/on startup
-  mount_days: (date) =>
-    console.log "Mounting all days"
-    date = if typeof(date) == 'string' then moment.utc(date) else date.clone()
-    today = moment()
-
-    limit = date.daysInMonth() + 1
-
-    # If we are mounting the current month, we will not mount dates too far in advance so as not to clutter the screen
-    if today.month() == date.month() and today.year() == date.year()
-      limit = today.date() + 1
-      # But do mount the next day if it's within 4 hours before midnight
-      next = today.clone()
-      next.add(4, 'hours')
-      if next.date() != today.date()
-        limit += 1
-
-    console.log "Getting daily tasks"
-    $.get "/habits/in-days?date=#{date.format('YYYY-MM-DD')}&limit=#{limit}", (results) ->
-      results = results or []
-      for result in results
-        date = moment(result.Date, "YYYY-MM-DD")
-        opts = date: date, scope: Scope.day, tasks: result.Tasks
-        #console.log "Mounting day #scope-day-#{date.format('DD')}", opts
-        riot.mount "#scope-day-#{date.format('DD')}", opts
-
-  mount_scope: (scope, date, mount) ->
-    fetch = null
-
-    if Scope.bucketp(scope)
-      $.get "/habits/in-bucket/#{scope}", (result) ->
-        console.log(result)
-        [scope, tasks] = [result.scope, result.tasks]
-
-        result = riot.mount "#scope-bucket", { date: date, scope: scope.ID, tasks: tasks, title: scope["Name"], current_bucket: current_bucket }
-    else
-      date = if typeof date == 'string' then moment.utc(date) else date.clone()
-      fetch_date = date.clone()
-
-      [fetch, fetch_date, mount] = switch scope
-        when Scope.day then ["day", fetch_date, "#scope-day-#{date.format('DD')}"]
-        when Scope.month then ["month", fetch_date.date(1), "#scope-month"]
-        when Scope.year then ["year", fetch_date.date(1).month(0), "#scope-year"]
-
-      $.get "/habits/in-#{fetch}?date=#{fetch_date.format('YYYY-MM-DD')}", (tasks) ->
-        tasks = tasks or []
-        opts = date: date, scope: scope, tasks: tasks, current_bucket: current_bucket
-        #console.log "Mounting day", opts
-        result = riot.mount mount, opts
-
-  command: (path, task, thunk) ->
-    common.request
-      url: path
-      data: task
-      success: () => thunk(task) if thunk
-
-  on_task_new: (scope, task_name, date) ->
-    common.request
-      url: "/habits/new"
-      success: () => @mount_scope scope.scope, date
-      data:
-        name: task_name
-        scope: scope.scope
-        date: date.format "YYYY-MM-DDTHH:mm:ssZ"
-
-  on_comment_update: (task, comment) ->
-    common.request
-      url: "/habits/comment-update"
-      success: () -> false
-      data: comment
-
-  on_task_order_up: (task) -> @command '/habits/order-up', task
-  on_task_order_down: (task) -> @command '/habits/order-down', task
-
-  on_task_log_time: (task, time) ->
-    # Break down hours and minutes
-    time = time.split(":")
-    if time.length == 1
-      task["hours"] = 0
-      task["minutes"] = parseInt(time[0])
-    else if time.length == 2
-      task["hours"] = parseInt(time[0])
-      task["minutes"] = parseInt(time[1])
-    else
-      console.log("Bad time", time)
-      return
-
-    # Do not update comment
-    delete task.comment
-    @command '/habits/update', task
-
-  on_task_update: (task) ->
-    # Do not update comment
-    delete task.comment
-    @command '/habits/update', task
-
-  on_task_delete: (task) ->
-    @command '/habits/delete', task, () ->
-      $("#task-#{task.ID}").remove()
-      #riot.update()
-      task
+TaskStore = HabitsES6.TaskStore
 
 # Navigation function
 view = (from, bucket) ->
@@ -146,7 +35,7 @@ main = () ->
   window.Common.initialize()
   console.log 'Habits: initializing'
 
-  task_store = new TaskStore()
+  task_store = new HabitsES6.TaskStore()
   window.Habits.task_store = task_store
   RiotControl.addStore(task_store)
 
@@ -198,3 +87,6 @@ window.Habits =
   Status: Status,
   task_store: task_store
   main: main
+
+
+Object.assign(window.Habits, require("./habits-es6").default)

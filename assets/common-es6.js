@@ -22,6 +22,7 @@ const Common = {
    * Called at startup to monkeypatch MediumEditorTable with the appropriate icon set.
    */
   initialize: () => {
+    console.log("Meditations common code initialized");
     // Monkeypatch: Replace Font Awesome icons used by medium-editor-table with octicons
     const show_back = MediumEditorTable.prototype.show;
     MediumEditorTable.prototype.show = function() {
@@ -125,8 +126,8 @@ const Common = {
     }
   },
 
-  /**
-   * An observable Store for the frontend to interact with
+  /** An observable Store for the frontend to interact with. Automatically registers methods beginning with on_ to
+   * listen to RiotControl events. Note that this will only be done for one subclass.
    */
   Store: class {
     constructor() {
