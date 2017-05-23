@@ -15,8 +15,9 @@ module.exports = {
   resolve: {
     alias: {
       jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
+      jQuery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
       moment: path.resolve(__dirname, 'node_modules/moment/min/moment.min'),
-      Tether: path.resolve(__dirname, 'node_modules/tether/dist/js/tether.min'),
+      Tether: path.resolve(__dirname, 'node_modules/tether/dist/js/tether.min.js'),
     },
   },
 
@@ -24,8 +25,10 @@ module.exports = {
 
   plugins: [
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // For bootstrap
     new webpack.ProvidePlugin({
-      "Tether": "Tether", // required for bootstrap
+      'jQuery': 'jQuery',
+      "Tether": "Tether", 
     })
   ],
 
