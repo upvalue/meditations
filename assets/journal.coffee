@@ -1,5 +1,9 @@
 # journal.coffee - Journal code
 
+JournalES6 = require("./journal-es6").default
+
+console.log(JournalES6)
+
 common = window.Common
 entry_store = false
 
@@ -78,58 +82,12 @@ actions =
 
   no_action: () -> route("view/#{moment().format('YYYY-MM')}")
 
-class EntryStore extends common.Store
-  on_journal_update: (entry) ->
-    # Extract tags from body
-    match = /(#[a-z0-9][a-z0-9\-_]*)/ig
-    tags = entry.Body.match(match)
-    body = entry.Body.replace(match, "")
-    console.log entry
-    common.request
-      url: "/journal/update"
-      success: (data) ->
-        # If saving is successful, apply tags to post
-        console.log("TAGS", tags)
-
-      data: entry
-
-  on_add_tag: (entry_id, tag) ->
-    $.post
-      url: "/journal/add-tag/#{entry_id}/#{tag}"
-
-  on_remove_tag: (entry_id, tag) ->
-    $.post
-      url: "/journal/remove-tag/#{entry_id}/#{tag}"
-
-  on_delete_entry: (id) ->
-    $.post
-      url: "/journal/delete-entry/#{id}"
-      success: () ->
-        console.log("Success", id)
-        $("#entry-#{id}").remove()
-
-  on_name_entry: (id, name) ->
-    console.log id, name
-    $.post
-      url: "/journal/name-entry/#{id}/#{name}"
-      success: () ->
-        true
-
-  on_promote_entry: (id, name) ->
-    console.log id, name
-    $.post
-      url: "/journal/promote-entry/#{id}"
-      success: () ->
-        $("#entry-#{id}").remove()
-
-  on_browse_tag: (name) ->
-    route("tag/#{name}")
-
 main = () ->
   window.Common.initialize()
   console.log 'Journal: initializing'
 
-  entry_store = new EntryStore
+  console.log("ES6 entry store")
+  entry_store = new JournalES6.EntryStore
 
   RiotControl.addStore(entry_store)
 

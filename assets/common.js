@@ -148,6 +148,7 @@ const Common = {
 
   /** An observable Store for the frontend to interact with. Automatically registers methods beginning with on_ to
    * listen to RiotControl events. Note that this will only be done for one subclass.
+   * @class
    */
   Store: class {
     constructor() {

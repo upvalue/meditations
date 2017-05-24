@@ -78,6 +78,9 @@ class TaskStore extends Common.Store {
     });
   }
 
+  /**
+   * Mount a specific scope.
+   */
   mount_scope(scope, date, mount) {
     let fetch;
 
@@ -219,7 +222,7 @@ class TaskStore extends Common.Store {
 
 /**
  * Habits frontend functionality
- * @exports habits-es6
+ * @exports habits
  */
 const Habits = {
   Scope: Scope,

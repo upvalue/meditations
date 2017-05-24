@@ -137,10 +137,6 @@
     RiotControl.trigger('name-entry', self.ID, name);
   }
 
-  promote_entry(e) {
-    RiotControl.trigger('promote-entry', self.ID);
-  }
-
   delete_entry(e) {
     if(window.confirm("Are you sure you want to remove this entry?")) {
       RiotControl.trigger('delete-entry', self.ID);
