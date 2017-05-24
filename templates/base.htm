@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
     <title>{% block title %}{% endblock %} | {{ Config.SiteTitle }}</title>
     {% block style %}{% endblock %}
+    <link rel=stylesheet href="/assets/webpack/bundle-style.css">
     <script type=text/javascript>window.MeditationsConfig = {{ ConfigJSON | safe}}</script>
   </head>
   <body>

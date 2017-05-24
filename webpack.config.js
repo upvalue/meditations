@@ -1,5 +1,6 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -29,17 +30,21 @@ module.exports = {
     new webpack.ProvidePlugin({
       'jQuery': 'jQuery',
       "Tether": "Tether", 
-    })
+    }),
+    new ExtractTextPlugin('bundle-style.css')
   ],
 
   /* Compile riot .tag files */
   module: {
     rules: [
       { test: /\.css$/,
-        loader: 'style-loader!css-loader',
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader'
+        })
       },
       { test: /\.(woff|png|ttf|svg|eot|woff2)$/,
-        loader: 'file-loader?name=copied/[hash].[ext]&context=./assets&publicPath=assets/' },
+        loader: 'file-loader?name=../copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/' },
       { enforce: 'pre', test: /\.tag$/, exclude: /assets\/vendor/, loader: 'riotjs-loader' },
       { test: /\.js$/,
         exclude: /(node_modules)/,

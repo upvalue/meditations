@@ -1,6 +1,7 @@
 /out
 /bin
 /assets/copied
+/assets/webpack/bundle-style.css
 /assets/webpack/copied
 /assets/webpack/bundle-*.js
 /node_modules

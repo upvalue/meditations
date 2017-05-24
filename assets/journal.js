@@ -92,7 +92,6 @@ const Journal = {
    * View a specific date
    */
   view: (datestr, entry_scroll_id) => {
-    console.log(`ES6 view called`);
     const date = moment(datestr, 'YYYY-MM');
 
     document.title = `${date.format('MMMM YYYY')} / journal`;
