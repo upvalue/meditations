@@ -117,15 +117,5 @@
 {% endblock %}
 
 {% block script %}
-{% if Config.Webpack %}
-  <script src="/assets/webpack-bundle-habits.js"></script>
-{% else %}
-  <script type=riot/tag src=assets/habits-tag.tag></script>
-  <script src="/assets/habits.js"></script>
-
-  <script type="text/javascript">
-  $(document).ready(function() {window.Habits.main();});
-  </script>
-{% endif %}
-
+<script src="/assets/webpack/bundle-habits.js"></script>
 {% endblock %}

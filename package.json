@@ -16,7 +16,6 @@
     "css-loader": "^0.26.1",
     "d3": "^4.8.0",
     "file-loader": "^0.10.0",
-    "intro.js": "^2.4.0",
     "jquery-ui": "^1.12.1",
     "jquery-ui-themes": "^1.12.0",
     "medium-editor": "^5.23.0",
@@ -28,7 +27,6 @@
     "riotcontrol": "0.0.3",
     "riotjs-loader": "ioddly/riotjs-loader",
     "style-loader": "^0.13.1",
-    "url-loader": "^0.5.7",
     "webpack": "^2.2.1"
   },
   "scripts": {

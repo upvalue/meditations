@@ -141,7 +141,7 @@ main = () ->
         view(moment(date, 'YYYY-MM-DD').format('YYYY-MM'))
 
   # Install router
-  common.route "/journal#", "view/#{moment().format('YYYY-MM')}", actions
+  common.routerInitialize "/journal#", "view/#{moment().format('YYYY-MM')}", actions
 
   # Set up websocket
   socket = window.Common.make_socket "journal/sync", (entry) ->

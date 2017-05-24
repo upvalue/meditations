@@ -1,6 +1,7 @@
 /out
 /bin
 /assets/copied
+/assets/webpack/copied
 /assets/*.js
 /node_modules
 *.sqlite3

@@ -156,7 +156,6 @@
 
   this.on('mount', function() {
     if(opts.thunk) { 
-      console.log("scope-days mounted");
       opts.thunk();
     }
   });

@@ -24,7 +24,6 @@ type Configuration struct {
 	Tutorial    bool
 	Migrate     bool
 	Message     string
-	Webpack     bool
 }
 
 var Config = Configuration{
@@ -37,7 +36,6 @@ var Config = Configuration{
 	Tutorial:    false,
 	Migrate:     false,
 	Message:     "",
-	Webpack:     false,
 }
 
 func loadConfig(c *cli.Context) {
@@ -51,8 +49,10 @@ func loadConfig(c *cli.Context) {
 }
 
 func App() *macaron.Macaron {
-	_, err := os.Stat("./assets/webpack-bundle-habits.js")
-	Config.Webpack = !os.IsNotExist(err)
+	_, err := os.Stat("./assets/webpack/bundle-habits.js")
+	if os.IsNotExist(err) {
+		panic("./assets/webpack/bundle-habits.js not found; did you run webpack")
+	}
 
 	m := macaron.Classic()
 
@@ -78,11 +78,6 @@ func App() *macaron.Macaron {
 
 	// Serve static files from /assets
 	m.Use(macaron.Static("assets", macaron.StaticOptions{Prefix: "assets"}))
-
-	// If not using webpack, load assets from node_modules directory
-	if !Config.Webpack {
-		m.Use(macaron.Static("node_modules", macaron.StaticOptions{Prefix: "node_modules"}))
-	}
 
 	// Expose configuration variables to templates & javascript
 	cfg_json_, err := json.Marshal(Config)

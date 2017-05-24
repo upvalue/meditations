@@ -86,7 +86,7 @@ const Common = {
     const url = `${protocol}://${window.location.hostname}:${window.location.port}/${location}`;
 
     const socket = new WebSocket(url);
-    socket.onopen = (m) => console.log(`Connected to ${url} websocket`);
+    socket.onopen = (m) => console.log(`Common.make_socket: Connected to ${url} websocket`);
     socket.onmessage = (m) => onmessage(JSON.parse(m.data));
     return socket;
   },
@@ -133,13 +133,16 @@ const Common = {
    * Automatically register store methods beginning with on_ to listen to RiotControl events with the same name
    */
   register_events: (obj) => {
-    console.log(Object.getOwnPropertyNames(obj.__proto__));
+    const events = [];
+    //console.log(Object.getOwnPropertyNames(obj.__proto__));
     for(const key of Object.getOwnPropertyNames(obj.__proto__)) {
       // console.log(`Common.register_events method ${key}`);
       if(key.slice(0,3) == "on_") {
+        events.push(key);
         obj.on(key.slice(3).replace(/_/g, "-"), obj[key]);
       }
     }
+    console.log(`Common.registerEvents: listening for ${events}`);
   },
 
   /** An observable Store for the frontend to interact with. Automatically registers methods beginning with on_ to

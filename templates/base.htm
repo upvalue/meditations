@@ -5,9 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
     <title>{% block title %}{% endblock %} | {{ Config.SiteTitle }}</title>
-    {% if !Config.Webpack %}
-      <link href="/assets/site.css" rel=stylesheet>
-    {% endif %}
     {% block style %}{% endblock %}
     <script type=text/javascript>window.MeditationsConfig = {{ ConfigJSON | safe}}</script>
   </head>
@@ -56,26 +53,6 @@
       {% block content %}{% endblock %}
     </div>
 
-    {% if !Config.Webpack %}
-      <script src="/node_modules/jquery/dist/jquery.min.js"></script>
-      <script src="/node_modules/tether/dist/js/tether.min.js"></script>
-      <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-      <script src="/node_modules/moment/min/moment.min.js"></script>
-
-      <script src="/node_modules/riotcontrol/riotcontrol.js"></script>
-      <script src="/node_modules/riot/riot+compiler.min.js"></script>
-      <script src="/node_modules/riot-route/dist/route.min.js"></script>
-
-      <script src="/node_modules/medium-editor/dist/js/medium-editor.min.js"></script>
-      <script src="/node_modules/medium-editor-tables/dist/js/medium-editor-tables.min.js"></script>
-      <script src="/node_modules/jquery-ui/ui/widgets/datepicker.js"></script>
-
-      {% if Config.Tutorial %}
-      <script src="/node_modules/intro.js/minified/intro.min.js"></script>
-      {% endif %}
-
-      <script src="/assets/common.js"></script>
-    {% endif %}
     {% block script %}{% endblock %}
   </body>
 </html>

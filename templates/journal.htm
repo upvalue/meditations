@@ -84,23 +84,6 @@
 {% endblock %}
 
 {% block script %}
-
-{% if Config.Webpack %}
-  <script src="/assets/webpack-bundle-journal.js"></script>
-{% else %}
-  <script src="/assets/journal.js"></script>
-  <script type=riot/tag src="/assets/journal-tag.tag"></script>
-
-  <script type="text/javascript">
-  $(document).ready(function() {
-    var name_links = [
-      {% for link in NameLinks %}
-      { name: "{{link.Name}}", id: "{{link.Id}}" },
-      {% endfor %}
-    ];
-    window.Journal.main(name_links, {% if Config.Tutorial %}true{% else %}false{% endif %});
-  });
-  </script>
-{% endif %}
+<script src="/assets/webpack/bundle-journal.js"></script>
 
 {% endblock %}

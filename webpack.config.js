@@ -3,13 +3,13 @@ var webpack = require('webpack');
 
 module.exports = {
   entry: {
-    habits: ["./assets/webpack-entry-habits.js"],
-    journal: ["./assets/webpack-entry-journal.js"],
+    habits: ["./assets/webpack/habits.js"],
+    journal: ["./assets/webpack/journal.js"],
   },
 
   output: {
-    path: path.resolve(__dirname, 'assets'),
-    filename: 'webpack-bundle-[name].js'
+    path: path.resolve(__dirname, 'assets', 'webpack'),
+    filename: 'bundle-[name].js'
   },
 
   resolve: {

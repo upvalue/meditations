@@ -1,7 +1,7 @@
-// webpack-entry.js - entry file for webpack
+// entry.js - entry file for webpack
 
 // CSS
-require("./site.css")
+require("../site.css")
 
 // jquery
 window.$ = window.jQuery = require("jquery");
@@ -19,8 +19,6 @@ window.RiotControl = require("riotcontrol/riotcontrol.js");
 window.riot = require("riot/riot+compiler.min.js");
 //window.route = require("riot-route/dist/amd.route");
 
-// intro.js
-window.introJs = require("intro.js/minified/intro.min.js").introJs;
-
+window.Common = require("../common.js").default;
 // actual site code
-require("coffee-loader!./common.coffee");
+// require("coffee-loader!./common.coffee");
