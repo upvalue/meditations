@@ -1,3 +1,4 @@
+import route from 'riot-route';
 import $ from 'jquery';
 import MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
@@ -91,16 +92,18 @@ const Common = {
   },
 
   /**
-   * Shorthand for establishing routes with riot's router.
+   * Shorthand for configuring routes with riot's router
    * @param {string} base The base of the URL (eg #habits/)
    * @param {string} first An initial route to go to.
    * @param {Object} routes An object mapping names to callback functions. `no_action` will be called if no action<br>
    * is supplied in the URL.
    */
-  route: (base, first, routes) => {
+  routerInitialize: (base, first, routes) => {
+    console.log(`Common.routerInitialize called`);
     route(function() {
       // Routing callback, checks through the routes Object for appropriate actions
       const action = [].shift.apply(arguments);
+      console.log(`Common.routerInitialize: dispatching ${action}`);
       if(routes[action]) {
         routes[action].apply(this, arguments);
       } else if(action == '' && routes['no_action']) {
@@ -126,18 +129,25 @@ const Common = {
     }
   },
 
+  /**
+   * Automatically register store methods beginning with on_ to listen to RiotControl events with the same name
+   */
+  register_events: (obj) => {
+    console.log(Object.getOwnPropertyNames(obj.__proto__));
+    for(const key of Object.getOwnPropertyNames(obj.__proto__)) {
+      // console.log(`Common.register_events method ${key}`);
+      if(key.slice(0,3) == "on_") {
+        obj.on(key.slice(3).replace(/_/g, "-"), obj[key]);
+      }
+    }
+  },
+
   /** An observable Store for the frontend to interact with. Automatically registers methods beginning with on_ to
    * listen to RiotControl events. Note that this will only be done for one subclass.
    */
   Store: class {
     constructor() {
       riot.observable(this);
-      // Automatically register store methods beginning with on_ to listen to RiotControl events with the same name
-      for(const key in this) {
-        if(key.slice(0,3) == "on_") {
-          this.on(key.slice(3).replace(/_/g, "-"), this[key]);
-        }
-      }
     }
   },
 }

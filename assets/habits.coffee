@@ -6,9 +6,10 @@ filter_name = null
 
 common = require("./common-es6").default
 HabitsES6 = require("./habits-es6").default
+
+###
 Scope = HabitsES6.Scope
 Status = HabitsES6.Status
-
 TaskStore = HabitsES6.TaskStore
 
 # Navigation function
@@ -49,7 +50,7 @@ main = () ->
     route "view/#{current_date.format('YYYY-MM')}/#{bucket}"
 
   common.route "/habits#", "view/#{moment().format('YYYY-MM')}/0", 
-    view: view
+    view: HabitsES6.view
     no_action: () -> route("view/#{moment().format('YYYY-MM')}/0")
 
   # Install modal datepickers
@@ -73,7 +74,7 @@ main = () ->
     task = msg.task
     # No need to refresh if task is not in the current scope
     date = moment.utc(task.date)
-    if task_near(task, current_date)
+    if task_near(task, HabitsES6.current_date)
       msg.wholescope = true # TODO this is a bandaid fix for time change cloneNode issue
       if msg.wholescope
         #console.log 'Mounting whole scope!'
@@ -87,6 +88,9 @@ window.Habits =
   Status: Status,
   task_store: task_store
   main: main
+  ###
+
+window.Habits = HabitsES6
 
 
 Object.assign(window.Habits, require("./habits-es6").default)

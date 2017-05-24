@@ -5,9 +5,9 @@
     <option>!Overall</option>
   </select>
   <span>
-    <span if={opts.scope == window.Habits.Scope.month || opts.scope == window.Habits.Scope.year}>
-      <a href="#view/{opts.date.clone().subtract(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/{opts.current_bucket}"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button></a>
-      <a href="#view/{opts.date.clone().add(1, opts.scope == window.Habits.Scope.month ? 'months' : 'years').format('YYYY-MM')}/"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button></a>
+    <span if={opts.scope == window.Habits.Scope.MONTH || opts.scope == window.Habits.Scope.YEAR}>
+      <a href="#view/{opts.date.clone().subtract(1, opts.scope == window.Habits.Scope.MONTH ? 'months' : 'years').format('YYYY-MM')}/{opts.current_bucket}"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous" onclick={nav_left}></button></a>
+      <a href="#view/{opts.date.clone().add(1, opts.scope == window.Habits.Scope.MONTH ? 'months' : 'years').format('YYYY-MM')}/"><button class="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next" onclick={nav_right}></button></a>
     </span>
     <span if={window.Habits.Scope.bucketp(opts.scope)}>
       <button class="btn btn-link btn-sm btn-default octicon octicon-briefcase" title="Change bucket" onclick={change_bucket}></button>
@@ -25,9 +25,9 @@
       title = opts.title;
     } else {
       switch(opts.scope) {
-        case window.Habits.Scope.day: title = opts.date.format("dddd Do"); break;
-        case window.Habits.Scope.month: title = opts.date.format("MMMM"); break; 
-        case window.Habits.Scope.year: title = opts.date.format("YYYY"); break;
+        case window.Habits.Scope.DAY: title = opts.date.format("dddd Do"); break;
+        case window.Habits.Scope.MONTH: title = opts.date.format("MMMM"); break; 
+        case window.Habits.Scope.YEAR: title = opts.date.format("YYYY"); break;
       }
 
     }
@@ -46,7 +46,6 @@
           $("<option "+(selected?"selected":"")+" value="+result[i].ID+">"+result[i].Name+"</option>").appendTo($(self.refs.bucket_select));
         }
 
-        console.log("Retrieved buckets");
         console.log(result);
         /*
           $("#bucket-select").empty();
@@ -166,10 +165,10 @@
 <task id="task-{ID}">
   <button class="btn btn-xs btn-default {btn-success: status == window.Habits.Status.complete} {btn-danger: status == window.Habits.Status.incomplete}" onclick={change_status}>
     {name}
-    <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year )&& (total_tasks > 0)}>
+    <span if={ (scope == window.Habits.Scope.MONTH || scope == window.Habits.Scope.YEAR )&& (total_tasks > 0)}>
       {completed_tasks}/{total_tasks}
     </span>
-    <span if={ (scope == window.Habits.Scope.month || scope == window.Habits.Scope.year) && (completion_rate > -1) }>({completion_rate}%)</span>
+    <span if={ (scope == window.Habits.Scope.MONTH || scope == window.Habits.Scope.YEAR) && (completion_rate > -1) }>({completion_rate}%)</span>
   </button>
   <span class="float-xs-right">
     <span ref="time" if={minutes > 0 || hours > 0}>
@@ -177,18 +176,18 @@
       <span if={hours > 0}>{hours}h</span>
       <span if={minutes > 0}>{minutes}m </span>
     </span>
-    <span class="streak" if={scope == window.Habits.Scope.year && best_streak > 0}>
+    <span class="streak" if={scope == window.Habits.Scope.YEAR && best_streak > 0}>
       <i title="Current/Best streak" class="octicon octicon-dashboard"></i>
       <span>{streak}/{best_streak}</span>
     </span>
-    <span title="Added to list on" if={scope >= window.Habits.Scope.wrap}>{moment(date).format('M/D/YY')}</span>
+    <span title="Added to list on" if={scope >= window.Habits.Scope.WRAP}>{moment(date).format('M/D/YY')}</span>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-comment" title="Add comment" onclick={edit_comment}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-trashcan" title=Delete onclick={delete}></button>
-    <button if={scope == window.Habits.Scope.day} title="Log time"
+    <button if={scope == window.Habits.Scope.DAY} title="Log time"
       class="task-control btn-link btn btn-sm btn-default octicon octicon-clock" onclick={log_time}></button>
     
-    <button if={ (((scope == window.Habits.Scope.month) && moment(date).month() == (moment().month())) || 
-      (scope == window.Habits.Scope.year ))}
+    <button if={ (((scope == window.Habits.Scope.MONTH) && moment(date).month() == (moment().month())) || 
+      (scope == window.Habits.Scope.YEAR ))}
       title="Copy to present day" class="task-control btn btn-link btn-sm btn-default octicon octicon-clippy" onclick={copy}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-up" title="Move down" onclick={up}></button>
     <button class="task-control btn-link btn btn-sm btn-default octicon octicon-chevron-down" title="Move up" onclick={down}></button>
@@ -217,6 +216,7 @@
   }
 
   RiotControl.on('task-updated', function(task) {
+    console.log("TASK UPDATED");
     if(task.ID == self.__.item.ID) {
       self.__.item = task;
       console.log("Updating task",task);
@@ -278,9 +278,9 @@
     var scope = self.__.item.scope - 1
     var date = moment(self.__.item.date).utc()
     // Create task on current day from monthly task
-    if(scope == window.Habits.Scope.day) {
+    if(scope == window.Habits.Scope.DAY) {
       date.date(moment().clone().add(4, 'hour').date());
-    } else if(scope == window.Habits.Scope.month) {
+    } else if(scope == window.Habits.Scope.MONTH) {
       date.month(moment().month());
       date.date(moment().date());
     }

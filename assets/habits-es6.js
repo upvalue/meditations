@@ -1,29 +1,57 @@
+/** @module habits-es6 */
 import moment from 'moment';
+import route from 'riot-route';
+
 import Common from './common-es6';
 
-let current_bucket = 0;
+let task_store, current_bucket = 0, current_date;
 
-/** Task store, for interacting with Tasks */
+/**
+ * Task scopes
+ * @enum {number}
+ */
+const Scope = {
+  /** Represents a bucket */
+  BUCKET: 0,
+  /** Daily task */
+  DAY: 1,
+  /** Monthly task */
+  MONTH: 2, 
+  /** Yearly task */
+  YEAR: 3,
+  /** Used to check whether task is in a custom bucket */
+  WRAP: 4,
+  bucketp: ((scope) => (scope == Habits.Scope.BUCKET || scope > Habits.Scope.YEAR)),
+}
+
+/**
+ * Task statsues
+ * @enum {number}
+ */
+const Status = {
+  /** Task status has not been set */
+  unset: 0,
+  /** Task is complete */
+  complete: 1,
+  /** Task is incomplete */
+  incomplete: 2,
+  wrap: 3
+}
+
+/** Task store, for interacting with the Habits API */
 class TaskStore extends Common.Store {
   constructor() {
     super();
 
-    // TODO: Remove, only necessary while this class is being extended rather than replacing TaskStore entirely
-    /*
-    for(const key of Object.getOwnPropertyNames(TaskStore.prototype)) {
-      if(key.slice(0,3) == "on_") {
-        this.on(key.slice(3).replace(/_/g, "-"), (task, arg1, arg2) => TaskStore.prototype[key](task, arg1, arg2));
-      }
-    }
-    */
+    Common.register_events(this);
   }
 
   /**
    * Mounts all days; only called when the month navigation is changed or on startup
    */
   mount_days(date) {
-    console.log("TaskStore.mount_days: Mounting all days");
     date = (date == 'string') ? moment.utc(date) : date.clone();
+    console.log(`TaskStore.mount_days: Mounting all days for date ${date}`);
     const today = moment();
 
     let limit = date.daysInMonth() + 1;
@@ -44,7 +72,7 @@ class TaskStore extends Common.Store {
       results = results || [];
       for(const result of results) {
         const ddate = moment(result.Date, "YYYY-MM-DD");
-        const opts = { date: ddate, scope: Habits.Scope.day, tasks: result.Tasks };
+        const opts = { date: ddate, scope: Scope.DAY, tasks: result.Tasks, current_bucket: current_bucket };
         riot.mount(`#scope-day-${ddate.format('DD')}`, opts);
       }
     });
@@ -67,15 +95,15 @@ class TaskStore extends Common.Store {
 
       // Determine which method to call, which date to call it against, and where to mount the result
       let fetch, fetch_date = date.clone(), mount;
-      if(scope == Habits.Scope.day) {
+      if(scope == Habits.Scope.DAY) {
         fetch = "day";
         fetch_date = fetch_date;
         mount = `#scope-day-${date.format('DD')}`;
-      } else if(scope == Habits.Scope.month) {
+      } else if(scope == Scope.MONTH) {
         fetch = "month";
         fetch_date = fetch_date.date(1);
         mount = '#scope-month';
-      } else if(scope == Habits.Scope.year) {
+      } else if(scope == Scope.YEAR) {
         fetch = "year";
         fetch_date = fetch_date.date(1).month(0);
         mount = '#scope-year';
@@ -96,7 +124,6 @@ class TaskStore extends Common.Store {
    * @param {function(Object)} [thunk] Called after success
    */
   command(path, task, thunk) {
-    console.log(`ES6 command ${path}`);
     const request = { url: `/habits/${path}`, data: task };
     if(thunk) {
       request.success = thunk;
@@ -195,50 +222,86 @@ class TaskStore extends Common.Store {
  * @exports habits-es6
  */
 const Habits = {
-  /**
-   * Task scopes
-   * @enum {number}
-   */
-  Scope: {
-    /** Represents a bucket */
-    bucket: 0,
-    /** Daily task */
-    day: 1,
-    /** Monthly task */
-    month: 2, 
-    /** Yearly task */
-    year: 3,
-    /** Used to check whether task is in a custom bucket */
-    wrap: 4,
-    bucketp: ((scope) => (scope == Habits.Scope.bucket || scope > Habits.Scope.year)),
-  },
-
-  /**
-   * Task statsues
-   * @enum {number}
-   */
-  Status: {
-    /** Task status has not been set */
-    unset: 0,
-    /** Task is complete */
-    complete: 1,
-    /** Task is incomplete */
-    incomplete: 2,
-    wrap: 3
-  },
-
+  Scope: Scope,
+  Status: Status,
   TaskStore: TaskStore,
+  // TODO remove
+  current_date: current_date, current_bucket: current_bucket,
+
+  /**
+   * @param {string} from Date to view
+   * @param {string} bucket Current bucket
+   */
+  
+  view: (from, bucket) => {
+    console.log(`Habits.view: Browsing from ${from}`);
+    from = moment(from, 'YYYY-MM');
+    $("#journal-link").attr("href", `/journal#view/${from.format('YYYY-MM')}`);
+    document.title = `${from.format('MMMM YYYY')} / habits`;
+
+    current_date = from.clone();
+    current_bucket = parseInt(bucket);
+
+    task_store.mount_scope(Scope.MONTH, from);
+    task_store.mount_scope(Scope.YEAR, from);
+    task_store.mount_scope(current_bucket, from);
+
+    console.log(`Habits.view: Mounting <scope-days> ${from}`);
+    riot.mount("scope-days", {
+      thunk: () => task_store.mount_days(from)
+    });
+  },
 
   /**
    * Initialize Habits frontend
    */
-  /*
   main: () => {
     Common.initialize();
     console.log("Habits: initializing");
 
+    task_store = new TaskStore();
+    Habits.task_store = task_store;
+
+    RiotControl.addStore(task_store);
+
+    // Navigation
+
+    // Triggered from Scope tags
+    RiotControl.on("change-date", (forward, scope) => {
+      const date = scope.date.clone().date(1);
+      date[forward ? 'add' : 'subtract'](1, scope.scope == Scope.MONTH ? 'months' : 'years');
+      console.log(`Calling route view/${date.format('YYYY-MM')}/${current_bucket || 0}`);
+      route(`view/${date.format('YYYY-MM')}/${current_bucket || 0}`);
+    });
+
+    RiotControl.on("change-bucket", (bucket) => {
+      route(`view/${date.format('YYYY-MM')}/${bucket}`);
+    });
+
+    Common.routerInitialize("/habits#", `view/${moment().format('YYYY-MM')}/0`, {
+      view: Habits.view,
+      no_action: () => route(`view/${moment().format('YYYY-MM')}/0`)
+    });
+
+    // Setup websocket
+    const task_near = (task, date2) => {
+      let date1 = moment.utc(task.date);
+      // Only compare down to months because we don't browse by the day
+      return ((task.scope == Scope.MONTH || task.scope == Scope.DAY) && date1.month() == date2.month() && 
+        date1.year() == date2.year()) ||
+        (task.scope == Scope.YEAR && date1.year() == date2.year()) ||
+        Scope.bucketp(task.scope);
+    }
+
+    const socket = Common.make_socket("habits/sync", (msg) => {
+      const task = msg.task;
+      const date = moment.utc(task.date);
+      if(task_near(task, current_date)) {
+        // TODO: Should change tasks individually, if possible.
+        task_store.mount_scope(task.scope, date);
+      }
+    });
   },
-  */
 };
 
 export default Habits;
