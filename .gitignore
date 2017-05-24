@@ -1,9 +1,6 @@
 /jsdoc
 /bin
-/assets/copied
-/assets/webpack/bundle-style.css
-/assets/webpack/copied
-/assets/webpack/bundle-*.js
+/assets
 /node_modules
 *.sqlite3
 /assets/vendor

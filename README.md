@@ -20,20 +20,31 @@ of your day entirely up to you. The goal of meditations is to get an objective, 
 
 To use SSL, you'll need to set up nginx (or another webserver) as a proxy. 
 
+# Dependencies
+
+- Go libraries: See Godeps/Godeps.json
+- JS libraries: See package.json
+- Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
+
 # Development
 
 Note that webpack is required for development. Use `webpack -w`.
+
+Although this is a Go package, it is intended to be run directly from the repo and not installed with `go get`.
 
 # Viewing internal documentation
 
     $ yarn run jsdoc
     $ yarn run godoc
 
-# Dependencies
+# Internals
 
-- Go libraries: See Godeps/Godeps.json
-- JS libraries: See package.json
-- Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
+## Directories and files of interest
+
+- `backend/` Go backend code
+- `js/` Frontend code
+- `js/webpack` Webpack entry points
+- `main.go` Go command entry point
 
 # Attribution
 

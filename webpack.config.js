@@ -4,8 +4,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: {
-    habits: ["./assets/webpack/habits.js"],
-    journal: ["./assets/webpack/journal.js"],
+    habits: ["./js/webpack/habits.js"],
+    journal: ["./js/webpack/journal.js"],
   },
 
   output: {
@@ -44,7 +44,7 @@ module.exports = {
         })
       },
       { test: /\.(woff|png|ttf|svg|eot|woff2)$/,
-        loader: 'file-loader?name=../copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/' },
+        loader: 'file-loader?name=../../assets/copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/' },
       { enforce: 'pre', test: /\.tag$/, exclude: /assets\/vendor/, loader: 'riotjs-loader' },
       { test: /\.js$/,
         exclude: /(node_modules)/,
