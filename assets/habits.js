@@ -212,7 +212,6 @@ class TaskStore extends Common.Store {
    * Save changes to a task's comment
    */
   on_comment_update(task, comment) {
-    console.log(`ES6 on_comment_update`);
     return Common.request({
       url: "/habits/comment-update",
       data: comment

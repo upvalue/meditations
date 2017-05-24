@@ -7,9 +7,11 @@ require("bootstrap/dist/js/bootstrap.min.js");
 
 require("./entry");
 
-require("coffee-loader!../journal.coffee");
+const Journal = require("../journal.js").default;
+window.Journal = Journal;
+
 require("riotjs-loader!../journal-tag.tag");
 
 document.addEventListener('DOMContentLoaded', function() {
-  window.Journal.main();
+  Journal.main();
 });
