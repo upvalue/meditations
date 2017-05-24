@@ -54,8 +54,8 @@
 <entry id={"entry-"+ID}>
   <h5 class=entry-title>
     <span ref=title></span>
-    <span class="journal-controls float-xs-right">
-      <span class=float-xs-right>
+    <span class="journal-controls float-right">
+      <span class=float-right>
         <button if={!NoContext} class="journal-control btn btn-link btn-sm" title="Context">
           <a href="#view/{moment(this.Date, 'YYYY-MM-DD').format('YYYY-MM')}"><span class="octicon octicon-link"></span></a>
         </button>
@@ -65,11 +65,11 @@
         <button class="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete" onclick={delete_entry}></button>
       </span>
       <br>
-      <div class="journal-timestamp float-xs-right">
+      <div class="journal-timestamp float-right">
         <a href="#view/{Context}/{ID}" title={moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format('M-D-YY hh:mm A')}><em>{moment(CreatedAt, 'YYYY-MM-DD\Thh:mm').format(!NoContext ? 'M-D-YY hh:mm A' : 'hh:mm A')}</em></a>
       </div>
-      <div class="journal-tags float-xs-right">
-        <span class="journal-tag float-xs-right" each={Tags}>
+      <div class="journal-tags float-right">
+        <span class="journal-tag float-right" each={Tags}>
           <a href ="#tag/{Name}">#{Name}</a>
           <button class="btn btn-xs octicon octicon-x" title="Remove tag" onclick={remove_tag} data-name="{Name}"></button>
         </span>

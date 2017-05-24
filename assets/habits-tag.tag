@@ -169,7 +169,7 @@
     </span>
     <span if={ (scope == window.Habits.Scope.MONTH || scope == window.Habits.Scope.YEAR) && (completion_rate > -1) }>({completion_rate}%)</span>
   </button>
-  <span class="float-xs-right">
+  <span class="float-right">
     <span ref="time" if={minutes > 0 || hours > 0}>
       <i class="octicon octicon-clock"></i>
       <span if={hours > 0}>{hours}h</span>

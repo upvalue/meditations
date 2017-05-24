@@ -3,8 +3,8 @@
 {% block title %}Journal{% endblock %}
 
 {% block navigation %}
-  <div>
-    <form class="form-inline float-xs-right">
+  <div class=ml-auto>
+    <form class="form-inline">
       <div class="form-group">
         <input class="form-control" id="journal-new-entry-date" type=text placeholder="New entry on date" >
       </div>
@@ -16,7 +16,7 @@
 {% block content %}
 <div class=row>
   <div class=col-md-2 id=journal-nav>
-    <ul class="nav nav-tabs" role=tablist>
+    <ul id=journal-tab class="nav nav-tabs" role=tablist>
       <li class=nav-item>
         <a class=active data-toggle=tab href="#chronological" role=tab><span class="octicon octicon-clock"></span>&nbsp;Time&nbsp;</a>
       </li>
@@ -31,10 +31,10 @@
     <div class=tab-content>
       <!-- Chronological navigation links -->
       <div class="tab-pane active" id=chronological role=tabpanel>
-        <ul class="list-group navigation-list">
+        <ul class="navigation-list">
           {% for year in Years %}
           <li><a href="#chrono-nav-{{year.Date}}" data-toggle="collapse" aria-expanded=false aria-controls="chrono-nav-{{year.Date}}">{{year.Date}} ({{year.Count}})</a>
-            <ul id="chrono-nav-{{year.Date}}" class="list-group navigation-list collapse">
+            <ul id="chrono-nav-{{year.Date}}" class="navigation-list collapse">
               {% for month in year.Sub %}
               <li><a href="#view/{{month.Link}}">{{month.Date}} ({{month.Count}})</a></li>
               {% endfor %}
@@ -47,11 +47,11 @@
       <!-- Alphabetical navigation links -->
       <div class="tab-pane" id=alphabetical role=tabpanel>
         <!-- TODO: Entries with colons in name should turn into openable lists e.g. Reviews: -->
-        <ul id=alphabetical-top-list class="list-group navigation-list">
+        <ul id=alphabetical-top-list class="navigation-list">
           {% for link in NameLinks %}
             {% if link.Sub %}
             <li><span class="octicon octicon-chevron-right"></span><a href="#alpha-nav-{{link.Id}}" data-toggle=collapse aria-expanded=false aria-controls="alpha-nav-{{link.Id}}">{{link.Name}}</a>
-            <ul id="alpha-nav-{{link.Id}}" class="list-group navigation-list collapse">
+            <ul id="alpha-nav-{{link.Id}}" class="navigation-list collapse">
               {% for link in link.Sub %}
               <li><a href="#name/{{link.Href}}">{{link.Name}}</a></li>
               {% endfor %}
@@ -69,7 +69,7 @@
 
       <!-- Tagged navigation links -->
       <div class=tab-pane id=tag role=tabpanel>
-        <ul class="list-group navigation-list">
+        <ul class="navigation-list">
           {% for link in TagLinks %}
           <li><a href="#tag/{{link.Name}}">#{{link.Name}}</a> ({{link.Count}})</li>
           {% endfor %}
@@ -85,5 +85,4 @@
 
 {% block script %}
 <script src="/assets/webpack/bundle-journal.js"></script>
-
 {% endblock %}

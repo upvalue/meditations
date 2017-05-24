@@ -20,4 +20,4 @@
 ** TODO Fix synchronization
 * Overall
 ** TODO Client-side, server-side and behavioral tests
-
+** DONE Port to Bootstrap 4.6

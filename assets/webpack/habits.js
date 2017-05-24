@@ -2,11 +2,11 @@
 
 require("./entry");
 
-window.Habits = require("../habits.js").default;
+const Habits = require("../habits").default;
+window.Habits = Habits;
 
-// require("coffee-loader!./habits.coffee");
 require("riotjs-loader!../habits-tag.tag");
 
 document.addEventListener('DOMContentLoaded', function() {
-  window.Habits.main();
+  Habits.main();
 });

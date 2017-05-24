@@ -11,13 +11,13 @@
   <body>
     
     <div class="container-fluid">
-      <nav class="navbar navbar-light">
+      <nav class="navbar navbar-toggleable-md navbar-light">
         <a class="navbar-brand">meditations</a>
-        <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header">
-          &#9776;
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header" aria-label="Toggle navigation" aria-expanded="false">
+          <span class=navbar-toggler-icon></span>
         </button>
-        <div class="collapse navbar-toggleable-xs" id="navbar-header">
-          <ul class="nav navbar-nav">
+        <div class="collapse navbar-collapse" id="navbar-header">
+          <ul class="navbar-nav nav-pills">
             <li class="nav-item">
               <a id=habits-link class="nav-link btn btn-sm btn-secondary" href="/habits">
                 {% if Page == "habits" %}<strong>Habits</strong>{% else %}Habits{% endif %}

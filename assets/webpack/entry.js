@@ -17,8 +17,5 @@ window.MediumEditorTable = require("medium-editor-tables/dist/js/medium-editor-t
 // riot & etc
 window.RiotControl = require("riotcontrol/riotcontrol.js");
 window.riot = require("riot/riot+compiler.min.js");
-//window.route = require("riot-route/dist/amd.route");
 
 window.Common = require("../common.js").default;
-// actual site code
-// require("coffee-loader!./common.coffee");

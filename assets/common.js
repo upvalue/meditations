@@ -23,7 +23,7 @@ const Common = {
    * Called at startup to monkeypatch MediumEditorTable with the appropriate icon set.
    */
   initialize: () => {
-    console.log("Meditations common code initialized");
+    console.log("Common.initialize");
     // Monkeypatch: Replace Font Awesome icons used by medium-editor-table with octicons
     const show_back = MediumEditorTable.prototype.show;
     MediumEditorTable.prototype.show = function() {
@@ -99,6 +99,7 @@ const Common = {
    * is supplied in the URL.
    */
   routerInitialize: (base, first, routes) => {
+    window.route = route; // TODO remove after journal is ported
     console.log(`Common.routerInitialize called`);
     route(function() {
       // Routing callback, checks through the routes Object for appropriate actions

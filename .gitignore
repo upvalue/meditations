@@ -2,7 +2,7 @@
 /bin
 /assets/copied
 /assets/webpack/copied
-/assets/*.js
+/assets/webpack/bundle-*.js
 /node_modules
 *.sqlite3
 /assets/vendor
