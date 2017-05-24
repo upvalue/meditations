@@ -5,7 +5,6 @@
    Then just a checkmark at the top to show hidden tasks or not.
 
 ** TODO Reporting minute amounts over 60 should round down
-** TODO Port from CoffeeScript to ES2015 or TypeScript
 ** TODO Port from Riot to React
 ** TODO D3 visualization
 ** TODO Copying and pasting comments doesn't seem to work. Probably because it messes with focus in some way.
@@ -14,10 +13,11 @@
 ** TODO Add search and/or filtering. This could also be used to select entries for export
 ** TODO Add a created-at date to bucket items (currently displays beginning of month)
 ** TODO Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
-** TODO Visual redesign
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO Fix synchronization
 * Overall
 ** TODO Client-side, server-side and behavioral tests
 ** DONE Port to Bootstrap 4.6
+** DONE Port from CoffeeScript to ES2015 or TypeScript
+** TODO Visual redesign

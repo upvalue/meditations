@@ -1,4 +1,4 @@
-// app.go - Main functionality
+// Package backend contains the backend code for meditations
 package backend
 
 import (
@@ -17,17 +17,27 @@ import (
 
 // Configuration variables
 type Configuration struct {
-	Port        int
-	DBPath      string
-	DBLog       bool
-	Host        string
-	SiteTitle   string
+	// HTTP host
+	Host string
+	// HTTP port
+	Port int
+	// Database path
+	DBPath string
+	// If true, all SQL queries will be logged
+	DBLog bool
+	// Site title
+	SiteTitle string
+	// True if running in development mode
 	Development bool
-	Tutorial    bool
-	Migrate     bool
-	Message     string
+	// If true, show tutorial
+	Tutorial bool
+	// If true, run a database migration before starting
+	Migrate bool
+	// Message to be displayed in navbar, used in the demo site
+	Message string
 }
 
+// Config is the global application configuration
 var Config = Configuration{
 	Host:        "",
 	Port:        8080,
@@ -50,6 +60,7 @@ func loadConfig(c *cli.Context) {
 	Config.Message = c.String("message")
 }
 
+// App configures returns a meditations web application
 func App() *macaron.Macaron {
 	_, err := os.Stat("./assets/webpack/bundle-habits.js")
 	if os.IsNotExist(err) {
@@ -61,10 +72,6 @@ func App() *macaron.Macaron {
 	DBOpen()
 	if Config.Migrate == true {
 		DBMigrate()
-	}
-
-	if Config.Tutorial == true {
-		DBLoadTutorial()
 	}
 
 	if Config.Development == true {
@@ -82,14 +89,14 @@ func App() *macaron.Macaron {
 	m.Use(macaron.Static("assets", macaron.StaticOptions{Prefix: "assets"}))
 
 	// Expose configuration variables to templates & javascript
-	cfg_json_, err := json.Marshal(Config)
-	cfg_json := fmt.Sprintf("%s", cfg_json_)
+	cfgjsonc, err := json.Marshal(Config)
+	cfgjson := fmt.Sprintf("%s", cfgjsonc)
 	if err != nil {
 		panic(err)
 	}
 
 	m.Use(func(c *macaron.Context) {
-		c.Data["ConfigJSON"] = cfg_json
+		c.Data["ConfigJSON"] = cfgjson
 		c.Data["Config"] = Config
 		c.Next()
 	})
@@ -111,6 +118,7 @@ func App() *macaron.Macaron {
 	return m
 }
 
+// Server returns a server that closes gracefully
 func Server() *graceful.Server {
 	server := &graceful.Server{
 		Timeout: 10 * time.Second,
@@ -130,6 +138,7 @@ func Server() *graceful.Server {
 	return server
 }
 
+// Main is the entry point for meditations; it handles CLI options and starts
 func Main() {
 	app := cli.NewApp()
 	app.Name = "meditations"

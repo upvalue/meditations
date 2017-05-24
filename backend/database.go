@@ -1,13 +1,16 @@
-// database.go - Database open, close and migration
 package backend
+
+// database.go - Database open, close and migration
 
 import (
 	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // load sqlite3 driver
 )
 
+// DB global database handle
 var DB *gorm.DB
 
+// DBOpen open database
 func DBOpen() {
 	db, err := gorm.Open("sqlite3", Config.DBPath)
 	checkErr(err)
@@ -15,6 +18,7 @@ func DBOpen() {
 	DB.LogMode(Config.DBLog)
 }
 
+// DBMigrate run database migration
 func DBMigrate() {
 	// habits.go
 	DB.Exec("pragma foreign_keys = on;")
@@ -27,6 +31,7 @@ func DBMigrate() {
 	DBCreate()
 }
 
+// DBCreate create a new database
 func DBCreate() {
 	day, month, year, bucket := Scope{Name: "Day"}, Scope{Name: "Month"}, Scope{Name: "Year"}, Scope{Name: "Bucket"}
 
@@ -37,13 +42,12 @@ func DBCreate() {
 	DB.Create(&bucket)
 }
 
+// DBClose close database handle
 func DBClose() {
 	DB.Close()
 }
 
-func DBLoadTutorial() {
-}
-
+// DBRepair fix potential inconsistencies such as tags pointing to dead entries
 func DBRepair() {
 
 }

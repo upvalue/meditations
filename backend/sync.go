@@ -1,5 +1,6 @@
-// sync.go - Propagate database syncs across multiple open clients
 package backend
+
+// sync.go - Propagate database syncs across multiple open clients
 
 import (
 	"log"
@@ -34,7 +35,7 @@ func (c *connection) Writer() {
 	c.ws.Close()
 }
 
-// Clients connected to a particular page
+// SyncPage contains clients connected to a particular page
 type SyncPage struct {
 	connections map[*connection]bool
 	register    chan *connection
@@ -44,6 +45,7 @@ type SyncPage struct {
 	name        string
 }
 
+// Handler returns a function that can be mounted to handle HTTP requests
 func (page *SyncPage) Handler() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ws, err := page.upgrader.Upgrade(w, r, nil)
@@ -56,6 +58,7 @@ func (page *SyncPage) Handler() func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Server is a goroutine that handles websocket connections
 func (page *SyncPage) Server() {
 	for {
 		select {
@@ -82,6 +85,7 @@ func (page *SyncPage) Server() {
 	}
 }
 
+// MakeSyncPage returns a struct that represents a websocket and its connected clients
 func MakeSyncPage(name string) *SyncPage {
 	page := &SyncPage{
 		connections: make(map[*connection]bool),
@@ -97,6 +101,7 @@ func MakeSyncPage(name string) *SyncPage {
 	return page
 }
 
+// Sync sends information to all clients connected to a particular SyncPage
 func (page *SyncPage) Sync(data []byte) {
 	log.Printf("Sync[%s]: sending data", page.name)
 	select {

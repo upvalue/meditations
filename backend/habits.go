@@ -1,5 +1,6 @@
-// habits.go - habits todo list functionality
 package backend
+
+// habits.go - habits todo list functionality
 
 import (
 	"bytes"
@@ -20,33 +21,35 @@ import (
 	"gopkg.in/macaron.v1"
 )
 
-var habitSync *SyncPage = MakeSyncPage("habits")
+var habitSync = MakeSyncPage("habits")
 
+// DateFormat is the Time.Format format used in the database
 const (
 	// Date format used in database
 	DateFormat = "2006-01-02"
 )
 
 const (
-	// Scope for "bucket list" tasks and comments
+	// ScopeBucket scope of "bucket list" tasks and comments
 	ScopeBucket = iota
-	// Scope for daily tasks and journal entries
+	// ScopeDay of daily tasks and journal entries
 	ScopeDay = iota
-	// Scope for monthly tasks
+	// ScopeMonth scope of monthly tasks
 	ScopeMonth = iota
-	// Scope for yearly tasks
+	// ScopeYear scope of yearly tasks
 	ScopeYear = iota
 )
 
 const (
-	// Default task status
+	// TaskUnset when a task's status has not been set
 	TaskUnset = iota
-	// Set when a task is completed successfully
+	// TaskComplete when a task is completed successfully
 	TaskComplete = iota
-	// Set when a task is not completed successfully
+	// TaskIncomplete when a task is not completed successfully
 	TaskIncomplete = iota
 )
 
+// Task represents a task in the database
 type Task struct {
 	gorm.Model
 	Name string `json:"name" form:"name"`
@@ -72,13 +75,15 @@ type Task struct {
 	Streak             int     `json:"streak" sql:"-"`
 }
 
-// Time-based scopes are built-in, but the user can add non-timed scopes to use as lists
+// Scope represents a task scope. Time-based scopes (daily, monthly, yearly) are built-in, but the user can add
+// additional "bucket lists," each of which have their own scope.
 type Scope struct {
 	gorm.Model
 	Name     string `sql:"not null;unique"`
 	Selected bool   `sql:"-"`
 }
 
+// Comment represents a task comment.
 type Comment struct {
 	gorm.Model
 	Body   string `json:"body"`
@@ -167,15 +172,15 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 	}
 }
 
-// Find TASKS in the same scope as TASK
+// Near finds TASKS in the same scope as TASK
 func (task *Task) Near(tasks *[]Task) {
 	tasksInScope(tasks, task.Scope, task.Date)
 }
 
-// Given a yearly task, calculate a streak of days
+// CalculateStreak Given a yearly task, calculate a streak of days
 func (task *Task) CalculateStreak() {
 	var tasks []Task
-	best_streak, streak := 0, 0
+	bestStreak, streak := 0, 0
 
 	from, to := between(task.Date, task.Scope)
 
@@ -185,27 +190,27 @@ func (task *Task) CalculateStreak() {
 		if t.Status == TaskComplete {
 			streak++
 		} else if t.Status == TaskIncomplete {
-			if streak > best_streak {
-				best_streak = streak
+			if streak > bestStreak {
+				bestStreak = streak
 			}
 			streak = 0
 		}
 		// Skip unset tasks so that today's uncompleted tasks do not change the streak
 	}
 
-	if streak > best_streak {
-		best_streak = streak
+	if streak > bestStreak {
+		bestStreak = streak
 	}
 
 	task.Streak = streak
-	task.BestStreak = best_streak
+	task.BestStreak = bestStreak
 }
 
-// Given a yearly or monthly task, calculate the completion rate of all tasks in daily scopes with the same name, and
-// calculate the amount of time spent on a task
+// CalculateTimeAndCompletion Given a yearly or monthly task, calculate the completion rate of all tasks in daily
+// scopes with the same name, and calculate the amount of time spent on a task
 func (task *Task) CalculateTimeAndCompletion() {
 	var tasks []Task
-	var completed, total, total_with_time, rate float64
+	var completed, total, totalWithTime, rate float64
 	var hours, minutes int
 
 	from, to := between(task.Date, task.Scope)
@@ -229,7 +234,7 @@ func (task *Task) CalculateTimeAndCompletion() {
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
-			rows.Scan(&total_with_time)
+			rows.Scan(&totalWithTime)
 		}
 	}
 
@@ -247,9 +252,10 @@ func (task *Task) CalculateTimeAndCompletion() {
 	}
 
 	task.Hours, task.Minutes, task.CompletedTasks, task.TotalTasks, task.TotalTasksWithTime, task.CompletionRate = hours, minutes,
-		int(completed), int(total), int(total_with_time), rate
+		int(completed), int(total), int(totalWithTime), rate
 }
 
+// CalculateStats calculates all statistics
 func (task *Task) CalculateStats() {
 	task.CalculateTimeAndCompletion()
 	task.CalculateStreak()
@@ -283,12 +289,12 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 	// Calculate completion rates
 	tasksInScope(&tasks, scope, date)
 	if scope == ScopeMonth {
-		for i, _ := range tasks {
+		for i := range tasks {
 			tasks[i].CalculateTimeAndCompletion()
 		}
 	} else if scope == ScopeYear {
 		// Calculate all statistics
-		for i, _ := range tasks {
+		for i := range tasks {
 			tasks[i].CalculateStats()
 		}
 	}
@@ -361,18 +367,18 @@ func visualizeRange(c *macaron.Context) {
 	var tasks []Task
 	DB.Table("tasks").Select("distinct name").Where("date between ? and ? and scope = ?", begin, end, ScopeDay).Find(&tasks)
 
-	var repeated_tasks []Task
+	var repeatedTasks []Task
 	for _, t := range tasks {
 		var t2 Task
 		res := DB.Table("tasks").Select("*").Group("name").Where("(date between ? and ?) and scope = ? and name = ?", begin, end, ScopeDay,
 			t.Name).Having("COUNT(name) > 5").First(&t2)
 
 		if res.RowsAffected > 0 {
-			repeated_tasks = append(repeated_tasks, t2)
+			repeatedTasks = append(repeatedTasks, t2)
 		}
 	}
 
-	for _, t := range repeated_tasks {
+	for _, t := range repeatedTasks {
 		fmt.Printf("%v\n", t.Name)
 	}
 
@@ -607,7 +613,6 @@ func export(c *macaron.Context) {
 	err := process.Run()
 	if err != nil {
 		c.PlainText(200, buffer.Bytes())
-		return
 	} else {
 		c.PlainText(200, out.Bytes())
 	}
@@ -615,28 +620,28 @@ func export(c *macaron.Context) {
 
 // Places an array in c.Data showing which years have data available
 func getYears(c *macaron.Context) {
-	var first, first_this_year, last Task
+	var first, firstThisYear, last Task
 
 	type Link struct {
 		Href string
 		Text string
 	}
 
-	var year_links []Link
+	var yearLinks []Link
 
 	err := DB.Where("scope = ?", ScopeDay).Order("date asc").Limit(1).First(&first).Error
 	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
-	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&first_this_year)
+	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&firstThisYear)
 
 	if err == nil {
 		for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
-			year_links = append(year_links, Link{Href: d.Format("2006"), Text: d.Format("06")})
+			yearLinks = append(yearLinks, Link{Href: d.Format("2006"), Text: d.Format("06")})
 			fmt.Printf("%s\n", d.Format("06"))
 		}
 
 	}
 
-	c.Data["HabitYearLinks"] = year_links
+	c.Data["HabitYearLinks"] = yearLinks
 }
 
 func habitsIndex(c *macaron.Context) {

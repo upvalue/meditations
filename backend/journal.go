@@ -14,6 +14,7 @@ import (
 	"gopkg.in/macaron.v1"
 )
 
+// Entry represents a journal entry
 type Entry struct {
 	gorm.Model
 	Date     time.Time
@@ -23,12 +24,13 @@ type Entry struct {
 	Tags     []Tag `gorm:"many2many:entry_tags"`
 }
 
+// Tag represents a journal tag; many-to-many relationship with entries
 type Tag struct {
 	gorm.Model
 	Name string
 }
 
-var journalSync *SyncPage = MakeSyncPage("journal")
+var journalSync = MakeSyncPage("journal")
 
 func syncEntry(e Entry) {
 	json, err := json.Marshal(e)
@@ -54,16 +56,20 @@ func journalNamedEntry(c *macaron.Context) {
 	c.JSON(200, entry)
 }
 
+// ByDate allows sorting by date
 type ByDate []Entry
 
-func (e ByDate) Len() int {
-	return len(e)
+// Len length
+func (s ByDate) Len() int {
+	return len(s)
 }
 
+// Swap
 func (s ByDate) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
+// Less
 func (s ByDate) Less(i, j int) bool {
 	return s[i].Date.After(s[j].Date)
 }
@@ -79,10 +85,10 @@ func journalEntriesByTag(c *macaron.Context) {
 	// TODO: How to pull Entries belonging to Tags?
 	defer rows.Close()
 	for rows.Next() {
-		var entry_id int
+		var entryID int
 		var entry Entry
-		rows.Scan(&entry_id)
-		DB.Where("id = ?", entry_id).Preload("Tags").Find(&entry)
+		rows.Scan(&entryID)
+		DB.Where("id = ?", entryID).Preload("Tags").Find(&entry)
 		entries = append(entries, entry)
 	}
 
@@ -108,14 +114,14 @@ func journalNew(c *macaron.Context) {
 	c.JSON(200, entry)
 }
 
-func journalUpdate(c *macaron.Context, entry_update Entry) {
+func journalUpdate(c *macaron.Context, entryUpdate Entry) {
 	var entry Entry
-	DB.Where("id = ?", entry_update.ID).Preload("Tags").Find(&entry)
-	if entry_update.Body == "" || entry_update.Body == entry.Body {
+	DB.Where("id = ?", entryUpdate.ID).Preload("Tags").Find(&entry)
+	if entryUpdate.Body == "" || entryUpdate.Body == entry.Body {
 
 	} else {
 		entry.LastBody = entry.Body
-		entry.Body = entry_update.Body
+		entry.Body = entryUpdate.Body
 		DB.Save(&entry)
 		if entry.Name == "" {
 			DB.Exec("update entries set name = null where id = ?", entry.ID)
@@ -231,28 +237,28 @@ func journalIndex(c *macaron.Context) {
 	// Display alphabetical navigation
 	type NameLink struct {
 		Name string
-		Id   string // HTML ID safe version of Name
+		ID   string // HTML ID safe version of Name
 		Href string
 		Sub  []NameLink
 	}
 
-	var name_links []NameLink
-	var name_entries []Entry
-	DB.Where("name is not null and deleted_at is null").Order("name").Find(&name_entries)
+	var nameLinks []NameLink
+	var nameEntries []Entry
+	DB.Where("name is not null and deleted_at is null").Order("name").Find(&nameEntries)
 
-	for _, entry := range name_entries {
+	for _, entry := range nameEntries {
 		// If the name has :, accumulate it in an array so it can be put into an expandable list
-		// Note that all names are sorted, so the accumulation array is simply the end of the name_links slice
+		// Note that all names are sorted, so the accumulation array is simply the end of the nameLinks slice
 		if strings.Contains(entry.Name, ":") {
 			// If a NameLink has no Href, it is an array for accumulating links
 			parts := strings.Split(entry.Name, ":")
 			prefix, suffix := parts[0], parts[1]
-			if len(name_links) == 0 || name_links[len(name_links)-1].Href != "" {
-				name_links = append(name_links, NameLink{Name: prefix, Id: strings.Replace(prefix, " ", "_", -1), Href: ""})
+			if len(nameLinks) == 0 || nameLinks[len(nameLinks)-1].Href != "" {
+				nameLinks = append(nameLinks, NameLink{Name: prefix, ID: strings.Replace(prefix, " ", "_", -1), Href: ""})
 			}
-			name_links[len(name_links)-1].Sub = append(name_links[len(name_links)-1].Sub, NameLink{Name: suffix, Href: (entry.Name)})
+			nameLinks[len(nameLinks)-1].Sub = append(nameLinks[len(nameLinks)-1].Sub, NameLink{Name: suffix, Href: (entry.Name)})
 		} else {
-			name_links = append(name_links, NameLink{Name: entry.Name, Href: (entry.Name)})
+			nameLinks = append(nameLinks, NameLink{Name: entry.Name, Href: (entry.Name)})
 		}
 	}
 
@@ -262,7 +268,7 @@ func journalIndex(c *macaron.Context) {
 		Count int
 	}
 	var tags []Tag
-	var tag_links []TagLink
+	var tagLinks []TagLink
 
 	DB.Order("name").Find(&tags)
 	for _, tag := range tags {
@@ -270,13 +276,13 @@ func journalIndex(c *macaron.Context) {
 		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
 		row.Scan(&count)
 		if count > 0 {
-			tag_links = append(tag_links, TagLink{Name: tag.Name, Count: count})
+			tagLinks = append(tagLinks, TagLink{Name: tag.Name, Count: count})
 		}
 	}
 
 	c.Data["Years"] = years
-	c.Data["TagLinks"] = tag_links
-	c.Data["NameLinks"] = name_links
+	c.Data["TagLinks"] = tagLinks
+	c.Data["NameLinks"] = nameLinks
 
 	c.HTML(200, "journal")
 }
