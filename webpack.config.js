@@ -24,7 +24,7 @@ module.exports = {
   externals: ['window'],
 
   plugins: [
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.IgnorePlugin(/^\.\/locale$/),
     // For bootstrap
     new webpack.ProvidePlugin({
       'jQuery': 'jQuery',
