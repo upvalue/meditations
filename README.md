@@ -16,14 +16,18 @@ of your day entirely up to you. The goal of meditations is to get an objective, 
     $ yarn
     $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial 
 
-# Development
-
-meditations will use webpack bundled files if they are available (webpack will be run alongside npm/yarn install).
-For development, `rm assets/webpack-bundle*` or use `webpack -w`
-
 # SSL
 
 To use SSL, you'll need to set up nginx (or another webserver) as a proxy. 
+
+# Development
+
+Note that webpack is required for development. Use `webpack -w`.
+
+# Viewing internal documentation
+
+    $ yarn run jsdoc
+    $ yarn run godoc
 
 # Dependencies
 

@@ -1,4 +1,5 @@
-package main
+// app.go - Main functionality
+package backend
 
 import (
 	"encoding/json"
@@ -14,6 +15,7 @@ import (
 	"gopkg.in/macaron.v1"
 )
 
+// Configuration variables
 type Configuration struct {
 	Port        int
 	DBPath      string
@@ -128,7 +130,7 @@ func Server() *graceful.Server {
 	return server
 }
 
-func main() {
+func Main() {
 	app := cli.NewApp()
 	app.Name = "meditations"
 

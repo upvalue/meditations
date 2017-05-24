@@ -29,7 +29,9 @@
     "webpack": "^2.2.1"
   },
   "scripts": {
-    "postinstall": "webpack -p"
+    "postinstall": "webpack -p",
+    "jsdoc": "jsdoc assets/*.js -d jsdoc && xdg-open jsdoc/index.html",
+    "godoc": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend"
   },
   "repository": {
     "type": "git",

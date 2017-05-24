@@ -1,5 +1,5 @@
 // sync.go - Propagate database syncs across multiple open clients
-package main
+package backend
 
 import (
 	"log"

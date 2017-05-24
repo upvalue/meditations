@@ -1,3 +1,5 @@
+/** Journal functionality
+  * @module journal */
 import route from 'riot-route';
 
 import Common from './common';
@@ -29,6 +31,10 @@ const Journal = {
       Common.register_events(this);
     }
 
+    /**
+     * Delete a given entry
+     * @param {number} id
+     */
     on_delete_entry(id) {
       $.post({
         url: `/journal/delete-entry/${id}`,
@@ -36,6 +42,10 @@ const Journal = {
       });
     }
 
+    /**
+     * Update a given entry
+     * @param {Object} entry
+     */
     on_journal_update(entry) {
       Common.request({
         url: "/journal/update",
@@ -43,25 +53,48 @@ const Journal = {
       });
     }
 
+    /**
+     * Name an entry, or change the name of a named entry
+     * @param {number} id
+     * @param {string} name
+     */
     on_name_entry(id, name) {
       $.post({
         url: `/journal/name-entry/${id}/${name}`
       });
     }
 
+    /**
+     * Navigate to a specific tag
+     * @param {name} string
+     */
     on_browse_tag(name) {
       route(`tag/${name}`);
     }
 
+    /**
+     * Remove a tag from an entry
+     * @param {number} entry_id
+     * @param {string} tag
+     */
     on_remove_tag(entry_id, tag) {
       $.post({url: `/journal/remove-tag/${entry_id}/${tag}`});
     }
 
+    /**
+     * Add a tag to an entry
+     * @param {number} entry_id
+     * @param {string} tag 
+     */
     on_add_tag(entry_id, tag) {
       $.post({url: `/journal/add-tag/${entry_id}/${tag}`});
     }
   },
 
+  /**
+   * Action: view a named journal entry
+   * @param {string} name Name of the entry
+   */
   name: (name) => {
     console.log(`Name`);
     name = decodeURI(name);
@@ -74,6 +107,10 @@ const Journal = {
     });
   },
 
+  /**
+   * Action: view a specific tag
+   * @param {string} name Name of the tag
+   */
   tag: (name) => {
     console.log(`Tag`);
     $.get(`/journal/entries/tag/${name}`, (entries) => {
@@ -89,7 +126,9 @@ const Journal = {
   },
 
   /**
-   * View a specific date
+   * Action: View a specific date
+   * @param {string} datestr String of the date in YYYY-MM format
+   * @param {string} [entry_scroll_id] Optional, ID of a specific entry to scroll to, used when user clicks on context button.
    */
   view: (datestr, entry_scroll_id) => {
     const date = moment(datestr, 'YYYY-MM');

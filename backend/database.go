@@ -1,5 +1,5 @@
 // database.go - Database open, close and migration
-package main
+package backend
 
 import (
 	"github.com/jinzhu/gorm"

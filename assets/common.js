@@ -5,7 +5,7 @@ import MediumEditorTable from 'medium-editor-tables';
 
 /**
  * Functionality shared by all pages.
- * @exports common-es6
+ * @exports common
  */
 const Common = {
   /**

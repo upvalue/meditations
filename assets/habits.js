@@ -1,4 +1,4 @@
-/** @module habits-es6 */
+/** @module habits */
 import moment from 'moment';
 import route from 'riot-route';
 

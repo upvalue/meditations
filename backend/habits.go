@@ -1,5 +1,5 @@
 // habits.go - habits todo list functionality
-package main
+package backend
 
 import (
 	"bytes"
