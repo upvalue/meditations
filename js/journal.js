@@ -24,11 +24,9 @@ const Journal = {
    * Entry store.
    * @class
    */
-  EntryStore: class extends Common.Store {
+  JournalPage: class extends Common.Page {
     constructor() {
       super();
-
-      Common.register_events(this);
     }
 
     /**
@@ -172,9 +170,9 @@ const Journal = {
 
   main: () => {
     Common.initialize();
-    const entry_store = new Journal.EntryStore();
+    const journal_page = new Journal.JournalPage();
 
-    RiotControl.addStore(entry_store);
+    RiotControl.addStore(journal_page);
 
     $("#journal-new-entry-date").datepicker({
       onSelect: (datestr) => {
@@ -199,4 +197,4 @@ const Journal = {
   },
 }
 
-exports.default = Journal;
+export default Journal;

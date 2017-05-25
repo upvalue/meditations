@@ -146,13 +146,25 @@ const Common = {
     console.log(`Common.registerEvents: listening for ${events}`);
   },
 
-  /** An observable Store for the frontend to interact with. Automatically registers methods beginning with on_ to
-   * listen to RiotControl events. Note that this will only be done for one subclass.
+  /** Represents a Page. Automatically registers methods beginning with on_ to listen to RiotControl events.  Note that
+   * this can only be subclassed once.
    * @class
    */
-  Store: class {
-    constructor() {
+  Page: class {
+    constructor(vars) {
       riot.observable(this);
+
+      const events = [];
+
+      for(const key of Object.getOwnPropertyNames(this.__proto__)) {
+        // console.log(`Common.register_events method ${key}`);
+        if(key.slice(0,3) == "on_") {
+          events.push(key);
+          this.on(key.slice(3).replace(/_/g, "-"), this[key]);
+        }
+      }
+
+      console.log(`Page.constructor: listening for RiotControl events: ${events}`);
     }
   },
 }

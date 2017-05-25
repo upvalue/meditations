@@ -4,7 +4,7 @@ import route from 'riot-route';
 
 import Common from './common';
 
-let task_store, current_bucket = 0, current_date;
+let habits_page, current_bucket = 0, current_date;
 
 /**
  * Task scopes
@@ -39,19 +39,19 @@ const Status = {
 }
 
 /** Task store, for interacting with the Habits API */
-class TaskStore extends Common.Store {
+class HabitsPage extends Common.Page {
+
   constructor() {
     super();
-
-    Common.register_events(this);
   }
 
   /**
-   * Mounts all days; only called when the month navigation is changed or on startup
+   * Mounts all days in a month; only called when the month navigation is changed or on startup
+   * @param {date} string 
    */
   mount_days(date) {
     date = (date == 'string') ? moment.utc(date) : date.clone();
-    console.log(`TaskStore.mount_days: Mounting all days for date ${date}`);
+    console.log(`HabitsPage.mount_days: Mounting all days for date ${date}`);
     const today = moment();
 
     let limit = date.daysInMonth() + 1;
@@ -67,7 +67,7 @@ class TaskStore extends Common.Store {
       }
     }
 
-    console.log(`TaskStore.mount_days: Getting daily tasks`, date.format('YYYY-MM-DD'), limit);
+    console.log(`HabitsPage.mount_days: Getting daily tasks`, date.format('YYYY-MM-DD'), limit);
     $.get(`/habits/in-days?date=${date.format('YYYY-MM-DD')}&limit=${limit}`, (results) => {
       results = results || [];
       for(const result of results) {
@@ -80,8 +80,10 @@ class TaskStore extends Common.Store {
 
   /**
    * Mount a specific scope.
+   * @param {scope} number
+   * @param {date} string
    */
-  mount_scope(scope, date, mount) {
+  mount_scope(scope, date) {
     let fetch;
 
     if(Habits.Scope.bucketp(scope)) {
@@ -217,6 +219,30 @@ class TaskStore extends Common.Store {
       data: comment
     });
   }
+
+  //// VIEWS
+  view_view(from, bucket) {
+    console.log(`Habits.view: Browsing from ${from}`);
+    from = moment(from, 'YYYY-MM');
+    $("#journal-link").attr("href", `/journal#view/${from.format('YYYY-MM')}`);
+    document.title = `${from.format('MMMM YYYY')} / habits`;
+
+    current_date = from.clone();
+    current_bucket = parseInt(bucket);
+
+    habits_page.mount_scope(Scope.MONTH, from);
+    habits_page.mount_scope(Scope.YEAR, from);
+    habits_page.mount_scope(current_bucket, from);
+
+    console.log(`Habits.view: Mounting <scope-days> ${from}`);
+    riot.mount("scope-days", {
+      thunk: () => habits_page.mount_days(from)
+    });
+  }
+
+  view_no_action() {
+    route(`view/${moment().format('YYYY-MM')}/0`);
+  }
 };
 
 /**
@@ -226,7 +252,7 @@ class TaskStore extends Common.Store {
 const Habits = {
   Scope: Scope,
   Status: Status,
-  TaskStore: TaskStore,
+  HabitsPage: HabitsPage,
   // TODO remove
   current_date: current_date, current_bucket: current_bucket,
 
@@ -244,13 +270,13 @@ const Habits = {
     current_date = from.clone();
     current_bucket = parseInt(bucket);
 
-    task_store.mount_scope(Scope.MONTH, from);
-    task_store.mount_scope(Scope.YEAR, from);
-    task_store.mount_scope(current_bucket, from);
+    habits_page.mount_scope(Scope.MONTH, from);
+    habits_page.mount_scope(Scope.YEAR, from);
+    habits_page.mount_scope(current_bucket, from);
 
     console.log(`Habits.view: Mounting <scope-days> ${from}`);
     riot.mount("scope-days", {
-      thunk: () => task_store.mount_days(from)
+      thunk: () => habits_page.mount_days(from)
     });
   },
 
@@ -261,15 +287,14 @@ const Habits = {
     Common.initialize();
     console.log("Habits: initializing");
 
-    task_store = new TaskStore();
-    Habits.task_store = task_store;
+    habits_page = new HabitsPage();
+    Habits.habits_page = habits_page;
 
-    RiotControl.addStore(task_store);
+    RiotControl.addStore(habits_page);
 
     // Navigation
 
-    // TODO: This should all be reconfigured into the TaskStore class IMO
-    // And rather than Store, it should be thought of as Page.
+    // TODO: This should all be reconfigured into the HabitsPage class IMO
 
     // Triggered from Scope tags
     RiotControl.on("change-date", (forward, scope) => {
@@ -302,7 +327,7 @@ const Habits = {
       const date = moment.utc(task.date);
       if(task_near(task, current_date)) {
         // TODO: Should change tasks individually, if possible.
-        task_store.mount_scope(task.scope, date);
+        habits_page.mount_scope(task.scope, date);
       }
     });
   },
