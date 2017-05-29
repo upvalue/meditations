@@ -6,7 +6,7 @@ module.exports = {
   entry: {
     /*habits: ["./js/webpack/habits.js"],
     journal: ["./js/webpack/journal.js"],*/
-    habits: ["./src/habits.tsx"]
+    habits: ["./src/habits-entry.ts"]
   },
 
   output: {
@@ -15,6 +15,7 @@ module.exports = {
   },
 
   resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
     alias: {
       jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
       jQuery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
