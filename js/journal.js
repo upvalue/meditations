@@ -178,7 +178,7 @@ const Journal = {
       onSelect: (datestr) => {
         const date = moment(datestr, "MM/DD/YYYY").format("YYYY-MM-DD");
         $.post(`/journal/new?date=${date}`, () => {
-          view(moment(date, 'YYYY-MM-DD').format('YYYY-MM'));
+          Journal.view(moment(date, 'YYYY-MM-DD').format('YYYY-MM'));
         });
       }
     });
