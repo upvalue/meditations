@@ -4,6 +4,6 @@
 /node_modules
 *.sqlite3
 /assets/vendor
-
 *.map
 /meditations
+/typings

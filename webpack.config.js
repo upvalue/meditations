@@ -4,8 +4,9 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: {
-    habits: ["./js/webpack/habits.js"],
-    journal: ["./js/webpack/journal.js"],
+    /*habits: ["./js/webpack/habits.js"],
+    journal: ["./js/webpack/journal.js"],*/
+    habits: ["./src/habits.tsx"]
   },
 
   output: {
@@ -37,6 +38,7 @@ module.exports = {
   /* Compile riot .tag files */
   module: {
     rules: [
+      { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
       { test: /\.css$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
@@ -58,6 +60,6 @@ module.exports = {
       },
     ],
   },
-  'devtool': 'source-map',
+  devtool: 'source-map',
 };
 
