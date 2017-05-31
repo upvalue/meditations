@@ -4,8 +4,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: {
-    /*habits: ["./js/webpack/habits.js"],
-    journal: ["./js/webpack/journal.js"],*/
+    journal: ["./src/journal.tsx"],
     habits: ["./src/habits-entry.ts"]
   },
 
