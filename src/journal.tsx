@@ -18,16 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(`Dispatching ${action}`);
   });
 
-
-  /*
-  console.log("Wizard fight.");
-  console.log(route);
-  console.log(route.start);
-  */
   route.base("/journal#");
   route.start(true);
   const query = route.query();
-  //console.log(route.query());
 
   render(<JournalRoot />, document.getElementById('journal-root'));
   

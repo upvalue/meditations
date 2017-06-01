@@ -17,8 +17,9 @@ interface RouteStatic {
   exec: () => void;
   stop: () => void;
   query: () => { [key: string] : string; };
+  create(): RouteStatic;
 
-  (arg1: string | Callback, arg2?: Callback): RouteStatic;
+  (arg1: string | Callback, arg2?: string | Callback, arg3?: boolean): RouteStatic;
 }
 
 declare var route: RouteStatic;
