@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as $ from 'jquery';
 import { createStore } from 'redux';
-import common from './common';
 
 export interface Task {
   CreatedAt: string;

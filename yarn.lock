@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@types/isomorphic-fetch@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@types/isomorphic-fetch/-/isomorphic-fetch-0.0.34.tgz#3c3483e606c041378438e951464f00e4e60706d6"
+
 "@types/jquery@^2.0.45":
   version "2.0.45"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.45.tgz#cb99133aac1d997a820d6cf7258c91291c0a2adf"
@@ -11,6 +15,13 @@
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-15.5.0.tgz#7f4fb9613d4051141773242f7b6b5f1a46b34bd9"
   dependencies:
     "@types/react" "*"
+
+"@types/react-redux@^4.4.41":
+  version "4.4.41"
+  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-4.4.41.tgz#8613af4650b204682707747fe29d8aaad56c2f76"
+  dependencies:
+    "@types/react" "*"
+    redux "^3.6.0"
 
 "@types/react@*", "@types/react@^15.0.25":
   version "15.0.25"
@@ -3449,7 +3460,7 @@ webpack@^2.2.1:
     webpack-sources "^0.2.3"
     yargs "^6.0.0"
 
-whatwg-fetch@>=0.10.0:
+whatwg-fetch@>=0.10.0, whatwg-fetch@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-2.0.3.tgz#9c84ec2dcf68187ff00bc64e1274b442176e1c84"
 
