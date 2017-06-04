@@ -2,6 +2,7 @@ import * as moment from 'moment';
 import route from 'riot-route';
 
 export interface Model {
+  ID: number;
   CreatedAt: string;
   UpdatedAt: string;
   DeletedAt: string | null;
@@ -30,6 +31,22 @@ export function monthToString(time?: moment.Moment): string {
  */
 export function monthFromString(time: string): moment.Moment {
   return moment(time, MONTH_FORMAT);
+}
+
+export function makeSocket(location: string, onmessage: (s: any) => void) {
+  const protocol = window.location.protocol == 'https:' ? 'wss' : 'ws';
+  const url = `${protocol}://${window.location.hostname}:${window.location.port}/${location}`;
+  const socket = new WebSocket(url);
+
+  socket.onopen = (m) => {
+    console.log(`Common.makeSocket: Connected to ${url} WebSocket`);
+  }
+
+  socket.onmessage = (m) => {
+    onmessage(JSON.parse(m.data));
+  }
+
+  return socket;
 }
 
 export function installRouter(base: string, first: string, routes: { [key: string] : (...a: any[]) => void }) {
