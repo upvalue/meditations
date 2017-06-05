@@ -115,6 +115,10 @@ func App() *macaron.Macaron {
 	init("/habits", habitsInit)
 	init("/journal", journalInit)
 
+	m.Get("/test", func(c *macaron.Context) {
+		c.HTML(200, "test")
+	})
+
 	return m
 }
 

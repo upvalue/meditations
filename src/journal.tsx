@@ -1,5 +1,6 @@
 ///<reference path="riot-route/index.d.ts" />
 
+import * as MediumEditor from 'medium-editor';
 import * as fetch from 'isomorphic-fetch';
 import * as React from 'react';
 import * as moment from 'moment';
@@ -56,18 +57,34 @@ interface Entry extends common.Model {
   LastBody: string;
 }
 
-class CEntry extends React.Component<{entry: Entry}, undefined> {
+interface CEntryState { 
+  editor: MediumEditor.MediumEditor
+}
+
+class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.MediumEditor}> {
+  editor: any;
+
   constructor() {
     super();
-    this.changeName = this.changeName.bind(this);
+  }
+
+  componentWillMount() {
+    this.setState({});
   }
 
   changeName() {
     const name = window.prompt("What would you like to name this entry? (leave empty to delete)", this.props.entry.Name);
-
     $.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
-    // So now what?
-    console.log(name);
+  }
+
+
+  editorCreate(e: React.MouseEvent<HTMLElement>) {
+    e.preventDefault();
+    if(!this.state.editor) {
+      let editor = new MediumEditor(this.editor);
+      editor.subscribe('blur', () => console.log("BLUR"));
+      this.setState({editor: editor});
+    }
   }
 
   render() {
@@ -76,28 +93,20 @@ class CEntry extends React.Component<{entry: Entry}, undefined> {
       <span className="journal-controls float-right">
         <span className="float-right">
           <button className="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name"
-            onClick={this.changeName} />
+            onClick={(e) => this.changeName()} />
         </span>
       </span>
       <span>Title: {this.props.entry.Name}</span>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
-        dangerouslySetInnerHTML={{__html: this.props.entry.Body}}>
-      </div>
+        ref={(editor) => {this.editor = editor; }} dangerouslySetInnerHTML={{__html: this.props.entry.Body}}
+        onClick={(e) => this.editorCreate(e)} />
     </div>
   }
 }
 
-type DateTitleProps = {key: number, title: string};
-type DateTitleSFC = React.SFC<DateTitleProps>; 
-
-const DateTitle: DateTitleSFC = ({key, title}) => { 
-  return <h1 key={key}>{title}</h1>
-};
-
-
 class Entries extends React.Component<{entries: Array<Entry>}, undefined> {
   render() {
-    const res = Array<React.ReactElement<DateTitleProps> | CEntry>();
+    const res = Array<React.ReactElement<{key: number}> | CEntry>();
     let last_date : string = "";
     let key = 0;
     for(let i = 0; i != this.props.entries.length; i++) {
