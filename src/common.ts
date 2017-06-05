@@ -35,6 +35,11 @@ export function monthFromString(time: string): moment.Moment {
   return moment(time, MONTH_FORMAT);
 }
 
+export function request(url: string, datum: any) {
+  const ret = {...{'type': 'POST', url: url, contentType: 'application/json; charset=UTF-8'}, data: JSON.stringify(datum)};
+  return $.ajax(ret);
+}
+
 /**
  * makeSocket
  *
@@ -95,22 +100,21 @@ export function installRouter(base: string, first: string, routes: { [key: strin
   } 
 }
 
-export function makeEditor(elt: any, focus?: () => void, blur?: () => void, args?: any) {
-  const options = {...
-    {autoLink: true, placeholder: true, 
-        extensions: {imageDragging: {}}}, 
-    
-        toolbar: { buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
-          'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table' ] },
-    ...args};
+export function makeEditor(elt: any, focus?: () => void, blur?: () => void, opts?: MediumEditor.CoreOptions) {
+  const options = {
+    autoLink: true,
+    placeholder: true, 
+    extensions: {imageDragging: {}}, 
 
-  console.log(options);
+    toolbar: { buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table' ] },
+    ...opts};
 
   const editor = new MediumEditor(elt, options);
-  console.log(MediumEditor);
 
-  //editor.subscribe('focus', () => {
-  //});
+  editor.subscribe('focus', () => {
+    if(focus) focus();
+  });
 
   editor.subscribe('blur', () => {
     if(blur) blur();

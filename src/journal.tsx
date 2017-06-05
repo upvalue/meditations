@@ -6,49 +6,85 @@ import * as React from 'react';
 import * as moment from 'moment';
 import * as redux from 'redux';
 import * as reactredux from 'react-redux';
-import reduxThunk from 'redux-thunk';
 import { render }from 'react-dom';
 import route from 'riot-route';
 import * as $ from 'jquery';
 
+import thunk from 'redux-thunk';
+import logger from 'redux-logger';
+
 import * as common from './common';
 
 type JournalState = {
-  route: string
+  route: 'VIEW_MONTH';
+  date: moment.Moment;
   entries?: Array<Entry> | null;
 }
 
-type JournalActionType = 'MOUNT_ENTRIES' | 'MODIFY_ENTRY';
+// Redux actions are described as a discriminated union
+interface ViewMonth {
+  type: 'VIEW_MONTH';
+  date: moment.Moment;
+  entries: Array<Entry>;
+}
 
+interface MountEntries {
+  type: 'MOUNT_ENTRIES';
+  entries: Array<Entry>;
+}
+
+interface ModifyEntry {
+  type: 'MODIFY_ENTRY';
+  entry: Entry;
+};
+
+type JournalAction = ViewMonth | MountEntries | ModifyEntry;
+
+
+//type JournalActionType = 'MOUNT_ENTRIES' | 'MODIFY_ENTRY';
+
+/*
 interface JournalAction {
   type: string
   entries?: Array<Entry> | undefined;
   entry?: Entry;
 };
+*/
 
-const reducer = (state: JournalState = {route: "Hello"}, action: JournalAction): JournalState => {
+const initialState = {
+  date: moment(new Date())
+} as JournalState;
+
+const reducer = (state: JournalState = initialState, action: JournalAction): JournalState => {
   switch(action.type) {
+    case 'VIEW_MONTH':
+      return {...state,
+        route: 'VIEW_MONTH',
+        date: action.date,
+        entries: action.entries,
+      };
     case 'MOUNT_ENTRIES':
-      console.log('MOUNT_ENTRIES CALLED');
       return {...state,
         entries: action.entries,
       };
     case 'MODIFY_ENTRY':
-      const entries = (state.entries as Array<Entry>).slice();
+      const entries = (state.entries as Array<Entry>);
       const entry = (action.entry as Entry);
+      // TODO: Linear search is inefficient; could build a map at mount time, but it may not really be necessary as the
+      // UI seems speedy enough as is
       for(let i = 0; i != entries.length; i++) {
         if(entries[i].ID == entry.ID) {
-          Object.assign(entries[i], entry);          
+          const mentries = entries.slice();
+          Object.assign(mentries[i], entry);          
+          return {...state, entries: mentries};
         }
       }
-      return {...state,
-        entries: entries
-      }
+      break;
   }
   return state;
 }
 
-const store = redux.createStore(reducer, redux.applyMiddleware(reduxThunk));
+const store = redux.createStore(reducer, redux.applyMiddleware(thunk, logger));
 
 interface Entry extends common.Model {
   Date: string;
@@ -62,7 +98,7 @@ interface CEntryState {
 }
 
 class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.MediumEditor}> {
-  editor: any;
+  body: HTMLElement;
 
   constructor() {
     super();
@@ -81,14 +117,18 @@ class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.Mediu
   editorCreate(e: React.MouseEvent<HTMLElement>) {
     e.preventDefault();
     if(!this.state.editor) {
-      let editor = new MediumEditor(this.editor);
-      editor.subscribe('blur', () => console.log("BLUR"));
+      let editor = common.makeEditor(this.body, undefined, () => {
+        common.request('/journal/update', {
+          ID: this.props.entry.ID,
+          Body: $(this.body).html()
+        });
+      });
       this.setState({editor: editor});
+      $(this.body).focus();
     }
   }
 
   render() {
-    console.log(this.props.entry);
     return <div id={`entry-${this.props.entry.ID}`}>
       <span className="journal-controls float-right">
         <span className="float-right">
@@ -98,7 +138,7 @@ class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.Mediu
       </span>
       <span>Title: {this.props.entry.Name}</span>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
-        ref={(editor) => {this.editor = editor; }} dangerouslySetInnerHTML={{__html: this.props.entry.Body}}
+        ref={(body) => {this.body = body; }} dangerouslySetInnerHTML={{__html: this.props.entry.Body}}
         onClick={(e) => this.editorCreate(e)} />
     </div>
   }
@@ -127,18 +167,41 @@ class Entries extends React.Component<{entries: Array<Entry>}, undefined> {
 }
 
 class JournalRootComponent extends React.Component<JournalState, undefined> {
+  navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
+    const date = (this.props.date.clone()[method])(1, unit);
+    route(`view/${common.monthToString(date)}`);
+    /*
+    store.dispatch(dispatch => {
+      fetch(`/journal/entries/date?date=${common.monthToString(date)}`).then((response: any) => {
+        response.json().then((entries: any) => {
+          dispatch({type: 'VIEW_MONTH', entries: entries, date: date});
+        });
+      });
+    });
+    */
+  }
+
+
   render() { 
-    console.log("RENDERING JOURNAL ROOT", this.props);
-    
     return <div>
+      <button className="btn btn-link btn-sm octicon octicon-triangle-left" title="Last year"
+        onClick={() => this.navigate('subtract', 'year')} />
+
+      <button className="btn btn-link btn-sm octicon octicon-chevron-left" title="Previous month"
+        onClick={() => this.navigate('subtract', 'month')} />
+
+      <button className="btn btn-link btn-sm octicon octicon-chevron-right" title="Next month"
+        onClick={() => this.navigate('add', 'month')} />
+
+      <button className="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year"
+        onClick={() => this.navigate('add', 'year')} />
+
       {this.props.entries ? <Entries entries={this.props.entries} /> : <span></span>}
     </div>
   }
 }
 
 const JournalRoot = reactredux.connect((state) => {
-  console.log("Map state", state);
-  
   return state;
 })(JournalRootComponent);
 //JournalRoot = reactredux.connect(JournalRoot);
@@ -153,14 +216,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const date = common.monthFromString(datestr);
 
       // TODO: Update habits link to reflect current date
-      fetch(`/journal/entries/date?date=${datestr}`).then((response:any) => {
-        response.json().then((entries: any) => {
-          const jaction:JournalAction = {type: "MOUNT_ENTRIES", entries: entries};
-          console.log("DISPATCHING STORE ACTION ", jaction);
-          store.dispatch(jaction);
-          //render(<Entries entries={entries} />, document.getElementById('journal-root'));
-        });
-      })
+      store.dispatch(dispatch => {
+        fetch(`/journal/entries/date?date=${datestr}`).then((response:any) => {
+          response.json().then((entries: any) => {
+            dispatch({type: 'VIEW_MONTH', entries: entries, date: date} as JournalAction);
+          });
+        })
+      });
     }
   });
 
