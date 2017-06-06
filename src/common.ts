@@ -1,3 +1,4 @@
+///<reference path="riot-route/index.d.ts" />
 import * as moment from 'moment';
 import * as $ from 'jquery';
 import route from 'riot-route';
@@ -100,11 +101,20 @@ export function installRouter(base: string, first: string, routes: { [key: strin
   } 
 }
 
-export function makeEditor(elt: any, focus?: () => void, blur?: () => void, opts?: MediumEditor.CoreOptions) {
+/**
+ * Create an editor
+ *
+ * @param elt
+ * @param focus?
+ * @param blur? Action on blur
+ * @param opts Additional options to pass to medium editor
+ * @returns {MediumEditor.MediumEditor}
+ */
+export function makeEditor(elt: any, focus?: () => void, blur?: () => void, opts?: MediumEditor.CoreOptions): MediumEditor.MediumEditor {
   const options = {
     autoLink: true,
     placeholder: true, 
-    extensions: {imageDragging: {}}, 
+    extensions: {}, 
 
     toolbar: { buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table' ] },

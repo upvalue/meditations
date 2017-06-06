@@ -1,7 +1,6 @@
 ///<reference path="riot-route/index.d.ts" />
 
 import * as MediumEditor from 'medium-editor';
-import * as fetch from 'isomorphic-fetch';
 import * as React from 'react';
 import * as moment from 'moment';
 import * as redux from 'redux';
@@ -18,7 +17,7 @@ import * as common from './common';
 type JournalState = {
   route: 'VIEW_MONTH';
   date: moment.Moment;
-  entries?: Array<Entry> | null;
+  entries: Array<Entry>;
 }
 
 // Redux actions are described as a discriminated union
@@ -39,17 +38,6 @@ interface ModifyEntry {
 };
 
 type JournalAction = ViewMonth | MountEntries | ModifyEntry;
-
-
-//type JournalActionType = 'MOUNT_ENTRIES' | 'MODIFY_ENTRY';
-
-/*
-interface JournalAction {
-  type: string
-  entries?: Array<Entry> | undefined;
-  entry?: Entry;
-};
-*/
 
 const initialState = {
   date: moment(new Date())
@@ -93,11 +81,7 @@ interface Entry extends common.Model {
   LastBody: string;
 }
 
-interface CEntryState { 
-  editor: MediumEditor.MediumEditor
-}
-
-class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.MediumEditor}> {
+class CEntry extends React.Component<{context?: moment.Moment, entry: Entry}, {editor: MediumEditor.MediumEditor}> {
   body: HTMLElement;
 
   constructor() {
@@ -112,7 +96,6 @@ class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.Mediu
     const name = window.prompt("What would you like to name this entry? (leave empty to delete)", this.props.entry.Name);
     $.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
   }
-
 
   editorCreate(e: React.MouseEvent<HTMLElement>) {
     e.preventDefault();
@@ -135,6 +118,10 @@ class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.Mediu
           <button className="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name"
             onClick={(e) => this.changeName()} />
         </span>
+        <div className="journal-timestamp float-right">
+          <span>{this.context ? "CONTEXT" : "NO CONTEXT" }</span>
+          <a href={`#view/`}>12:43</a>
+        </div>
       </span>
       <span>Title: {this.props.entry.Name}</span>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
@@ -144,11 +131,18 @@ class CEntry extends React.Component<{entry: Entry}, {editor: MediumEditor.Mediu
   }
 }
 
-class Entries extends React.Component<{entries: Array<Entry>}, undefined> {
+// TODO: SFC
+class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Entry>}, undefined> {
+  navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
+    const date = (this.props.date.clone()[method])(1, unit);
+    route(`view/${common.monthToString(date)}`);
+  }
+
   render() {
     const res = Array<React.ReactElement<{key: number}> | CEntry>();
     let last_date : string = "";
     let key = 0;
+    // TODO: There must be a better way to do this.
     for(let i = 0; i != this.props.entries.length; i++) {
       // Insert date headers for each day present
       const entry = this.props.entries[i];
@@ -158,31 +152,10 @@ class Entries extends React.Component<{entries: Array<Entry>}, undefined> {
         res.push(<h1 key={key}>{m.format('YYYY-MM-DD')}</h1>);
         key++;
       }
-      res.push(<CEntry key={key} entry={entry} />);
+      res.push(<CEntry context={this.date} key={key} entry={entry} />);
       key++;
     }
-    // TODO: Add dates in
-    return <div>{res}</div>
-  }
-}
 
-class JournalRootComponent extends React.Component<JournalState, undefined> {
-  navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
-    const date = (this.props.date.clone()[method])(1, unit);
-    route(`view/${common.monthToString(date)}`);
-    /*
-    store.dispatch(dispatch => {
-      fetch(`/journal/entries/date?date=${common.monthToString(date)}`).then((response: any) => {
-        response.json().then((entries: any) => {
-          dispatch({type: 'VIEW_MONTH', entries: entries, date: date});
-        });
-      });
-    });
-    */
-  }
-
-
-  render() { 
     return <div>
       <button className="btn btn-link btn-sm octicon octicon-triangle-left" title="Last year"
         onClick={() => this.navigate('subtract', 'year')} />
@@ -196,7 +169,16 @@ class JournalRootComponent extends React.Component<JournalState, undefined> {
       <button className="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year"
         onClick={() => this.navigate('add', 'year')} />
 
-      {this.props.entries ? <Entries entries={this.props.entries} /> : <span></span>}
+      {res}
+    </div>
+  }
+}
+
+class JournalRootComponent extends React.Component<JournalState, undefined> {
+
+  render() { 
+    return <div>
+      {this.props.route == 'VIEW_MONTH' ? <ViewMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
     </div>
   }
 }
@@ -204,7 +186,6 @@ class JournalRootComponent extends React.Component<JournalState, undefined> {
 const JournalRoot = reactredux.connect((state) => {
   return state;
 })(JournalRootComponent);
-//JournalRoot = reactredux.connect(JournalRoot);
 
 document.addEventListener('DOMContentLoaded', () => {
   render(<reactredux.Provider store={store}><JournalRoot /></reactredux.Provider>, 
@@ -217,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // TODO: Update habits link to reflect current date
       store.dispatch(dispatch => {
-        fetch(`/journal/entries/date?date=${datestr}`).then((response:any) => {
+        window.fetch(`/journal/entries/date?date=${datestr}`).then((response:any) => {
           response.json().then((entries: any) => {
             dispatch({type: 'VIEW_MONTH', entries: entries, date: date} as JournalAction);
           });
