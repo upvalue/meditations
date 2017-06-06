@@ -1,4 +1,5 @@
 ///<reference path="riot-route/index.d.ts" />
+
 import * as moment from 'moment';
 import * as $ from 'jquery';
 import route from 'riot-route';
@@ -11,6 +12,10 @@ export interface Model {
   DeletedAt: string | null;
 };
 
+export function createdAtToMoment(m: Model) {
+  return moment(m.CreatedAt);
+}
+
 /**
  * The format used to browse by months.
  */
@@ -19,7 +24,7 @@ export const MONTH_FORMAT: string = 'YYYY-MM';
 /**
  * Returns time formatted as YYYY-MM string
  */
-export function monthToString(time?: moment.Moment): string {
+export function momentToMonth(time?: moment.Moment): string {
   if(!time) {
     time = moment();
   }
@@ -32,7 +37,7 @@ export function monthToString(time?: moment.Moment): string {
  * @param time
  * @returns {moment.Moment}
  */
-export function monthFromString(time: string): moment.Moment {
+export function monthToMoment(time: string): moment.Moment {
   return moment(time, MONTH_FORMAT);
 }
 

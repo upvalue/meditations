@@ -8,7 +8,8 @@ export interface Task {
   UpdatedAt: string;
   DeletedAt: string | null;
   ID: number;
-  date: string;
+  // TODO: Remove JSONification from Go backend
+  Date: string;
   hours: number | null;
   order: number;
   scope: number;

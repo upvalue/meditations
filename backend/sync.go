@@ -3,6 +3,7 @@ package backend
 // sync.go - Propagate database syncs across multiple open clients
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -43,6 +44,12 @@ type SyncPage struct {
 	broadcast   chan []byte
 	upgrader    *websocket.Upgrader
 	name        string
+}
+
+// SyncMessage is a typed message to the client
+type SyncMessage struct {
+	Type  string
+	Datum interface{}
 }
 
 // Handler returns a function that can be mounted to handle HTTP requests
@@ -101,11 +108,17 @@ func MakeSyncPage(name string) *SyncPage {
 	return page
 }
 
-// Sync sends information to all clients connected to a particular SyncPage
-func (page *SyncPage) Sync(data []byte) {
+// Sync sends a JSON message to all clients connected to a particular SyncPage
+func (page *SyncPage) SendData(data []byte) {
 	log.Printf("Sync[%s]: sending data", page.name)
 	select {
 	case page.broadcast <- data:
 	default:
 	}
+}
+
+func (page *SyncPage) Send(Type string, datum interface{}) {
+	json, err := json.Marshal(SyncMessage{Type, datum})
+	checkErr(err)
+	page.SendData(json)
 }

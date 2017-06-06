@@ -93,7 +93,7 @@ type Comment struct {
 ///// Synchronization
 
 // A message that will be sent to connected clients
-type syncMessage struct {
+type habitSyncMessage struct {
 	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
 	Wholescope bool `json:"wholescope"`
 	Task       Task `json:"task"`
@@ -121,13 +121,13 @@ func syncTask(t Task, scope bool) {
 			t.CalculateStreak()
 		}
 	}
-	message := syncMessage{
+	message := habitSyncMessage{
 		Wholescope: scope,
 		Task:       t,
 	}
 	json, err := json.Marshal(message)
 	checkErr(err)
-	habitSync.Sync(json)
+	habitSync.SendData(json)
 	// Recalculate stats for higher scopes
 	if t.Scope == ScopeDay {
 		syncStats(t, ScopeMonth)

@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"sort"
@@ -32,10 +31,20 @@ type Tag struct {
 
 var journalSync = MakeSyncPage("journal")
 
+// JSON socket messages
+type ModifyEntry struct {
+	Type  string
+	Entry Entry
+}
+
+type DeleteEntry struct {
+	Type string
+	ID   int
+}
+
+// syncEntry sends a modified entry to the client
 func syncEntry(e Entry) {
-	json, err := json.Marshal(e)
-	checkErr(err)
-	journalSync.Sync(json)
+	journalSync.Send("MODIFY_ENTRY", e)
 }
 
 func journalEntries(c *macaron.Context) {
@@ -168,6 +177,7 @@ func journalDeleteEntry(c *macaron.Context) {
 	DB.Exec("DELETE FROM entry_tags WHERE entry_id = ?", id)
 
 	c.PlainText(200, []byte("OK"))
+	journalSync.Send("DELETE_ENTRY", id)
 }
 
 func journalRemoveEntryName(c *macaron.Context) {

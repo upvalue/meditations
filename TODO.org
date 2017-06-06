@@ -18,6 +18,6 @@
 * Overall
 ** DONE Port to Bootstrap 4.6
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
+** TODO Simplify sync code by moving messaging stuff to sync.go
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Visual redesign
-** TODO Welcome to it dudes.
