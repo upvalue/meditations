@@ -24,7 +24,6 @@ type JournalState = {
   entries: Array<Entry>;
 }
 
-// Redux actions are described as a discriminated union
 interface ViewMonth {
   type: 'VIEW_MONTH';
   date: moment.Moment;
@@ -191,7 +190,7 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
     if(this.props.entry.Tags) {
       tags = this.props.entry.Tags.map((t, i) =>
         <div key={i}>
-          <a href={`#tag/${t.Name}`}>#{t.Name}</a>
+          <em><a href={`#tag/${t.Name}`}>#{t.Name}</a></em>
           <button className="btn btn-xs octicon octicon-x" title="Remove tag"
             onClick={(e) => this.removeTag(t)} />
         </div>
@@ -199,26 +198,31 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
     }
 
     return <div id={`entry-${this.props.entry.ID}`}>
-      <span className="journal-controls float-right">
-        <span className="float-right">
-          <button className="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name"
-            onClick={(e) => this.changeName()} />
-          <button className="journal-control btn btn-link btn-sm octicon octicon-tag" title="Add tag"
-            onClick={(e) => this.addTag()} />
-          <button className="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete entry"
-            onClick={(e) => this.deleteEntry()} />
+      <h5>
+        <span className="journal-controls float-right">
+          <span className="float-right">
+            {!this.props.context ?  // context button
+              <a className="journal-control btn btn-link btn-sm octicon octicon-link" title="Go to month"
+                href={`#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}`} /> : "" }
+            <button className="journal-control btn btn-link btn-sm octicon octicon-text-size" title="Edit name"
+              onClick={(e) => this.changeName()} />
+            <button className="journal-control btn btn-link btn-sm octicon octicon-tag" title="Add tag"
+              onClick={(e) => this.addTag()} />
+            <button className="journal-control btn btn-link btn-sm octicon octicon-x" title="Delete entry"
+              onClick={(e) => this.deleteEntry()} />
 
+          </span>
+          <div className="journal-timestamp float-right">
+            <em><a href={`#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}`}>{
+              this.props.entry.CreatedAt.format(this.props.context ? 'hh:mm A'  : 'M-D-YY hh:mm A')
+            }</a></em>
+          </div>
+          <div className="journal-tags float-right">
+            {tags}
+          </div>
         </span>
-        <div className="journal-timestamp float-right">
-          <a href={`#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}`}>{
-            this.props.entry.CreatedAt.format(this.props.context ? 'hh:mm A'  : 'M-D-YY hh:mm A')
-          }</a>
-        </div>
-        <div className="journal-tags float-right">
-          {tags}
-        </div>
-      </span>
-      <span>Title: {this.props.entry.Name}</span>
+      {this.props.entry.Name == '' ? <strong>{this.props.entry.Name}</strong> : ''}
+      </h5>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
         ref={(body) => {this.body = body; }} dangerouslySetInnerHTML={{__html: this.props.entry.Body}}
         onClick={(e) => this.editorCreate(e)} />
@@ -240,7 +244,12 @@ class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Ent
     this.props.entries.forEach((e) => {
       if(!last_date || (last_date.format(common.DAY_FORMAT) != e.Date.format(common.DAY_FORMAT))) {
         last_date = e.Date;
-        res.push(<h1 key={key++}>{last_date.format(common.DAY_FORMAT)}</h1>);
+        // Add a nicely formatted and linky date header for each day with entries
+        res.push(<h5 key={key++}>
+          {last_date.format("dddd")} {" "}
+          <a href={`view/${last_date.format(common.MONTH_FORMAT)}/${e.ID}`}>{last_date.format('MMMM')}</a>{" "}
+          {last_date.format('Do')}
+        </h5>);
       }
       res.push(<CEntry context={true} key={key++} entry={e} />);
       res.push(<hr key={key++} />);
@@ -252,6 +261,8 @@ class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Ent
 
       <button className="btn btn-link btn-sm octicon octicon-chevron-left" title="Previous month"
         onClick={() => this.navigate('subtract', 'month')} />
+        
+      <h3 id="entries-title">{this.props.date.format('MMMM YYYY')}</h3>
 
       <button className="btn btn-link btn-sm octicon octicon-chevron-right" title="Next month"
         onClick={() => this.navigate('add', 'month')} />
@@ -268,7 +279,7 @@ class ViewTag extends React.Component<{tagName: string, entries: Array<Entry>}, 
   render() {
     let entries: Array<React.ReactElement<undefined>> = [], key = 0;
     this.props.entries.forEach((e) => {
-      entries.push(<CEntry context={true} key={key++} entry={e} />);
+      entries.push(<CEntry context={false} key={key++} entry={e} />);
       entries.push(<hr key={key++} />);
     });
     return <div>
