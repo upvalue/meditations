@@ -5,41 +5,20 @@ import * as $ from 'jquery';
 import route from 'riot-route';
 import * as MediumEditor from 'medium-editor';
 
+import '../js/site.css';
+
 export interface Model {
   ID: number;
-  CreatedAt: string;
-  UpdatedAt: string;
-  DeletedAt: string | null;
+  CreatedAt: moment.Moment;
+  UpdatedAt: moment.Moment;
+  DeletedAt: moment.Moment | null;
 };
-
-export function createdAtToMoment(m: Model) {
-  return moment(m.CreatedAt);
-}
 
 /**
  * The format used to browse by months.
  */
-export const MONTH_FORMAT: string = 'YYYY-MM';
-
-/**
- * Returns time formatted as YYYY-MM string
- */
-export function momentToMonth(time?: moment.Moment): string {
-  if(!time) {
-    time = moment();
-  }
-  return time.format(MONTH_FORMAT);
-}
-
-/**
- * Converts YYYY-MM string to Moment
- *
- * @param time
- * @returns {moment.Moment}
- */
-export function monthToMoment(time: string): moment.Moment {
-  return moment(time, MONTH_FORMAT);
-}
+export const MONTH_FORMAT = 'YYYY-MM';
+export const DAY_FORMAT = 'YYYY-MM-DD';
 
 export function request(url: string, datum: any) {
   const ret = {...{'type': 'POST', url: url, contentType: 'application/json; charset=UTF-8'}, data: JSON.stringify(datum)};

@@ -4,7 +4,8 @@
 @import url("../node_modules/medium-editor/dist/css/medium-editor.min.css");
 @import url("../node_modules/medium-editor/dist/css/themes/bootstrap.min.css");
 @import url("../node_modules/medium-editor-tables/dist/css/medium-editor-tables.css");
-@import url("../node_modules/jquery-ui-themes/themes/smoothness/jquery-ui.css");
+/*TODO: remove @import url("../node_modules/jquery-ui-themes/themes/smoothness/jquery-ui.css");*/
+@import url("../node_modules/react-datepicker/dist/react-datepicker.css");
 
 @import url("../node_modules/octicons/octicons/octicons.css");
 

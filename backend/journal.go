@@ -121,6 +121,8 @@ func journalNew(c *macaron.Context) {
 	DB.Save(&entry)
 	DB.Exec("update entries set name = null where id = ?", entry.ID)
 	c.JSON(200, entry)
+
+	journalSync.Send("CREATE_ENTRY", entry)
 }
 
 func journalUpdate(c *macaron.Context, entryUpdate Entry) {

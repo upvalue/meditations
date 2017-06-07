@@ -15,9 +15,16 @@
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO Fix synchronization
+** TODO Add titled entry.
 * Overall
 ** DONE Port to Bootstrap 4.6
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
-** TODO Simplify sync code by moving messaging stuff to sync.go
+** DONE Simplify sync code by moving messaging stuff to sync.go
+** TODO Remove jQuery if possible
+** TODO Database cleanup on start
+** DONE Clean up moment code. Just use string constants in common rather than special methods.
+    Perhaps convert dates to moments when they are received.
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Visual redesign
+*** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
+
