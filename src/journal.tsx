@@ -18,6 +18,10 @@ type JournalState = {
   route: 'VIEW_MONTH';
   date: moment.Moment;
   entries: Array<Entry>;
+} | {
+  route: 'VIEW_TAG';
+  tag: string;
+  entries: Array<Entry>;
 }
 
 // Redux actions are described as a discriminated union
@@ -47,7 +51,13 @@ interface DeleteEntry {
   ID: number;
 };
 
-type JournalAction = ViewMonth | MountEntries | ModifyEntry | DeleteEntry | CreateEntry;
+interface ViewTag {
+  type: 'VIEW_TAG';
+  tag: string;
+  entries: Array<Entry>;
+}
+
+type JournalAction = ViewMonth | MountEntries | ModifyEntry | DeleteEntry | CreateEntry | ViewTag;
 
 const initialState = {
   date: moment(new Date())
@@ -61,6 +71,8 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
         date: action.date,
         entries: action.entries,
       };
+    case 'VIEW_TAG':
+      return {...state, route: 'VIEW_TAG', tag: action.tag, entries: action.entries};
     case 'MOUNT_ENTRIES':
       return {...state,
         entries: action.entries,
@@ -174,7 +186,6 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
     }
   }
 
-
   render() {
     let tags : ReadonlyArray<React.ReactElement<undefined>> = [];
     if(this.props.entry.Tags) {
@@ -253,10 +264,25 @@ class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Ent
   }
 }
 
+class ViewTag extends React.Component<{tagName: string, entries: Array<Entry>}, undefined> {
+  render() {
+    let entries: Array<React.ReactElement<undefined>> = [], key = 0;
+    this.props.entries.forEach((e) => {
+      entries.push(<CEntry context={true} key={key++} entry={e} />);
+      entries.push(<hr key={key++} />);
+    });
+    return <div>
+      <h1>{this.props.tagName}</h1>
+      {entries}
+    </div>
+  }
+}
+
 class JournalRootComponent extends React.Component<JournalState, undefined> {
   render() { 
     return <div>
       {this.props.route == 'VIEW_MONTH' ? <ViewMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
+      {this.props.route == 'VIEW_TAG' ? <ViewTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
     </div>
   }
 }
@@ -298,15 +324,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // TODO: Update habits link to reflect current date
       store.dispatch(dispatch => {
-        window.fetch(`/journal/entries/date?date=${datestr}`).then((response:any) => {
-          // TODO: Scrolling
-          response.json().then((entries: Array<Entry>) => {
-            const copies = entries.map((e:any) => Object.assign({}, e));
-            entries.forEach(EntryProcess);
-            //entries.forEach(EntryProcess);
-            dispatch({type: 'VIEW_MONTH', entries: entries, date: date} as JournalAction);
-          });
+        $.get(`/journal/entries/date?date=${datestr}`).then((entries: Array<Entry>) => {
+          entries.forEach(EntryProcess);
+          //entries.forEach(EntryProcess);
+          dispatch({type: 'VIEW_MONTH', entries: entries, date: date} as JournalAction);
         })
+      });
+    },
+
+    tag: (tagname: string) => {
+      store.dispatch(dispatch => {
+        $.get(`/journal/entries/tag/${tagname}`).then((entries: Array<Entry>) => {
+          entries.forEach(EntryProcess);
+          dispatch({type: 'VIEW_TAG', entries: entries, tag: tagname} as JournalAction);
+        });
+        
       });
     }
   });
