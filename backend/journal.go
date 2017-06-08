@@ -197,6 +197,33 @@ func journalNameEntry(c *macaron.Context) {
 	syncEntry(entry)
 }
 
+// SidebarTagLink includes tag name and count of entries with tag
+
+// SidebarInfo represents navigation information that is displayed in the sidebar
+// journalNavigationInfo builds
+func journalSidebarInfo(c *macaron.Context) {
+	type TagLink struct {
+		Name  string
+		Count int
+	}
+
+	var tags []Tag
+	var tagLinks []TagLink
+
+	DB.Order("name").Find(&tags)
+	for _, tag := range tags {
+		var count int
+		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
+		row.Scan(&count)
+		if count > 0 {
+			tagLinks = append(tagLinks, TagLink{Name: tag.Name, Count: count})
+		}
+	}
+
+	journalSync.Send("SIDEBAR", struct{ TagLinks []TagLink }{tagLinks})
+	c.PlainText(200, []byte("OK"))
+}
+
 func journalIndex(c *macaron.Context) {
 	// Display chronological navigation information
 	var first, last Entry
@@ -305,6 +332,7 @@ func journalInit(m *macaron.Macaron) {
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
 	m.Get("/entries/name/:name", journalNamedEntry)
+	m.Get("/sidebar", journalSidebarInfo)
 
 	m.Post("/new", journalNew)
 	m.Post("/update", binding.Bind(Entry{}), journalUpdate)

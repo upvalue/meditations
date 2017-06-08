@@ -13,8 +13,8 @@
 ** TODO Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
-** TODO Fix synchronization
-** TODO Add titled entry.
+** DONE Fix synchronization
+** TODO Option to add a titled entry rather than by date
 * Overall
 ** TODO D3 visualization
 ** DONE Port to Bootstrap 4.6

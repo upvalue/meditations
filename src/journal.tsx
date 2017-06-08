@@ -1,4 +1,3 @@
-
 import * as MediumEditor from 'medium-editor';
 import * as React from 'react';
 import * as moment from 'moment';
@@ -14,52 +13,51 @@ import logger from 'redux-logger';
 
 import * as common from './common';
 
+type SidebarState = {
+  mounted: boolean;
+  TagLinks: ReadonlyArray<{Name: string, Count: string}>;
+}
+
 type JournalState = {
   route: 'VIEW_MONTH';
   date: moment.Moment;
   entries: Array<Entry>;
+  sidebar: SidebarState;
 } | {
   route: 'VIEW_TAG';
   tag: string;
   entries: Array<Entry>;
-}
+  sidebar: SidebarState;
+};
 
-interface ViewMonth {
+type JournalAction = {
   type: 'VIEW_MONTH';
   date: moment.Moment;
-  entries: Array<Entry>;
-}
-
-interface MountEntries {
+  entries: Array<Entry>;  
+} | {
   type: 'MOUNT_ENTRIES';
   entries: Array<Entry>;
-}
-
-interface CreateEntry {
+} | {
   type: 'CREATE_ENTRY';
-  entry: Entry;
-};
-
-interface ModifyEntry {
+  entry: Entry;  
+} | {
   type: 'MODIFY_ENTRY';
-  entry: Entry;
-};
-
-interface DeleteEntry {
+  entry: Entry;  
+} | {
   type: 'DELETE_ENTRY';
   ID: number;
-};
-
-interface ViewTag {
+} | {
   type: 'VIEW_TAG';
   tag: string;
   entries: Array<Entry>;
-}
-
-type JournalAction = ViewMonth | MountEntries | ModifyEntry | DeleteEntry | CreateEntry | ViewTag;
+} | {
+  type: 'MOUNT_SIDEBAR';
+  sidebar: SidebarState;
+};
 
 const initialState = {
-  date: moment(new Date())
+  date: moment(new Date()),
+  sidebar: {mounted: false}
 } as JournalState;
 
 const reducer = (state: JournalState = initialState, action: JournalAction): JournalState => {
@@ -94,12 +92,13 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
       return {...state,
         entries: state.entries.slice().map((v) => v.ID == action.entry.ID ? action.entry : v)
       };
-    case 'DELETE_ENTRY': {
+    case 'DELETE_ENTRY':
       return {...state,
         entries: state.entries.slice().filter((v) => v.ID != action.ID)
-      }
-    }
-  }
+      };
+    case 'MOUNT_SIDEBAR': 
+      return {...state, sidebar: {...action.sidebar, mounted: true}};
+  };
   return state;
 }
 
@@ -298,36 +297,56 @@ class JournalRootComponent extends React.Component<JournalState, undefined> {
   }
 }
 
-class JournalNavigation_ extends React.Component<JournalState, undefined> {
-  createEntry(date: moment.Moment | null) {
-    if(date != null) {
-      $.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`);
-      date.format(common.MONTH_FORMAT);
+const JournalNavigation = connect((state) => state)(
+  class extends React.Component<JournalState, undefined> {
+    createEntry(date: moment.Moment | null) {
+      if(date != null) {
+        $.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`);
+        date.format(common.MONTH_FORMAT);
+      }
+    }
+
+    render() {
+      return <span>
+        <DatePicker className="form-control" onChange={(date) => this.createEntry(date)} 
+          placeholderText="Click to add new entry" />
+        {/*this.props.date.format('YYYY-MM-DD')*/}
+      </span>
     }
   }
+);
 
-  render() {
-    return <span>
-      <DatePicker className="form-control" onChange={(date) => this.createEntry(date)} 
-        placeholderText="Click to add new entry" />
-      {/*this.props.date.format('YYYY-MM-DD')*/}
-    </span>
+const JournalSidebar = connect((state) => { return state.sidebar; })(
+  class extends React.Component<SidebarState, undefined> {
+    render() {
+      if(this.props.mounted) {
+        return <div>
+          {this.props.TagLinks.map((l, i) => 
+            <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>)}
+        </div>
+      } else {
+        return <span>Loading...</span>
+      }
+    }
   }
-}
-
-const JournalNavigation = connect((state) => { return state; })(JournalNavigation_);
+)
 
 const JournalRoot = connect((state) => {
   return state;
 })(JournalRootComponent);
 
 document.addEventListener('DOMContentLoaded', () => {
+  ///// RENDER 
   render(<Provider store={store}><JournalRoot /></Provider>, 
     document.getElementById('journal-root'));
 
   render(<Provider store={store}><JournalNavigation /></Provider>,
     document.getElementById('navigation-root'));
+    
+  render(<Provider store={store}><JournalSidebar /></Provider>,
+    document.getElementById('journal-sidebar'));
 
+  ///// ROUTES
   // Install router. If no route was specifically given, start with #view/YYYY-MM
   common.installRouter("/journal#", `view/${moment().format(common.MONTH_FORMAT)}`, {
     view: (datestr: string, entry_scroll_id?: number) => {
@@ -354,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Connect to websocket
+  // WebSocket handling
   type JournalMessage = {
     Type: 'MODIFY_ENTRY';
     Datum: Entry;
@@ -364,6 +383,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } | {
     Type: 'CREATE_ENTRY';
     Datum: Entry;
+  } | {
+    Type: 'SIDEBAR';
+    Datum: Sidebar;
   }
 
   const socket = common.makeSocket("journal/sync", (msg: JournalMessage) => {
@@ -378,6 +400,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // TODO: Dispatch view change
       //store.dispatch({type: 'VIEW_MONTH', date: msg.Datum.Date.format(common.MONTH_FORMAT)})
       store.dispatch({type: 'CREATE_ENTRY', entry: msg.Datum} as JournalAction);
+    } else if(msg.Type == 'SIDEBAR') {
+      store.dispatch({type: 'MOUNT_SIDEBAR', sidebar: msg.Datum} as JournalAction);
+    } else {
+    
+      console.warn(`Unknown message ${msg.Type}`, msg.Datum);
     }
   });
+  
+  $.get('/journal/sidebar');
 });
