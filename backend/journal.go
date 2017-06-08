@@ -31,17 +31,6 @@ type Tag struct {
 
 var journalSync = MakeSyncPage("journal")
 
-// JSON socket messages
-type ModifyEntry struct {
-	Type  string
-	Entry Entry
-}
-
-type DeleteEntry struct {
-	Type string
-	ID   int
-}
-
 // syncEntry sends a modified entry to the client
 func syncEntry(e Entry) {
 	journalSync.Send("MODIFY_ENTRY", e)
@@ -197,7 +186,32 @@ func journalNameEntry(c *macaron.Context) {
 	syncEntry(entry)
 }
 
-// SidebarTagLink includes tag name and count of entries with tag
+///// Sidebar Management
+
+type ChronoLink struct {
+	Date  string
+	Count int
+	Sub   []ChronoLink
+	Link  string
+}
+
+type TagLink struct {
+	Name  string
+	Count int
+}
+
+type NameLink struct {
+	Name string
+	ID   string
+	Href string
+	Sub  []NameLink
+}
+
+type Sidebar struct {
+	ChronoLinks []ChronoLink
+	TagLinks    []TagLink
+	NameLinks   []NameLink
+}
 
 // SidebarInfo represents navigation information that is displayed in the sidebar
 // journalNavigationInfo builds
@@ -210,14 +224,8 @@ func journalSidebarInfo(c *macaron.Context) {
 	err := DB.Order("date").Limit(1).First(&first).Error
 	DB.Order("date desc").Limit(1).First(&last)
 	// Struct for rendering info about links
-	type Link struct {
-		Date  string
-		Count int
-		Sub   []Link
-		Link  string
-	}
 
-	var years []Link
+	var years []ChronoLink
 
 	// Display chronological navigation
 	if err == nil {
@@ -225,7 +233,7 @@ func journalSidebarInfo(c *macaron.Context) {
 		e := now.New(last.Date).EndOfMonth()
 		fmt.Printf("%v %v\n", d, e)
 
-		year := Link{Date: d.Format("2006"), Count: 0}
+		year := ChronoLink{Date: d.Format("2006"), Count: 0}
 		for ; d.Year() < e.Year() || d.Month() <= e.Month(); d = d.AddDate(0, 1, 0) {
 			rows, err := DB.Table("entries").Select("count(*)").Where("date between ? and ? and deleted_at is null", d.Format(DateFormat), d.AddDate(0, 1, 0).Format(DateFormat)).Rows()
 			if err == nil {
@@ -233,11 +241,10 @@ func journalSidebarInfo(c *macaron.Context) {
 				rows.Next()
 				rows.Scan(&count)
 				rows.Close()
-				year.Sub = append([]Link{Link{Date: d.Format("January"), Count: count, Link: d.Format("2006-01")}}, year.Sub...)
+				year.Sub = append([]ChronoLink{ChronoLink{Date: d.Format("January"), Count: count, Link: d.Format("2006-01")}}, year.Sub...)
 				// At end of year
 				if (d.Year() != d.AddDate(0, 1, 0).Year()) || (d.Year() == e.Year() && d.AddDate(0, 1, 0).Month() > e.Month()) {
 					// Get count of entries in year
-
 					rows, _ := DB.Table("Entries").Select("count(*)").Where("date between ? and ? and deleted_at is null",
 						now.New(d).BeginningOfYear().Format(DateFormat), now.New(d).EndOfYear().Format(DateFormat)).Rows()
 					rows.Next()
@@ -245,16 +252,11 @@ func journalSidebarInfo(c *macaron.Context) {
 					rows.Close()
 
 					// prepend year
-					years = append([]Link{year}, years...)
-					year = Link{Date: d.AddDate(0, 1, 0).Format("2006"), Count: 0}
+					years = append([]ChronoLink{year}, years...)
+					year = ChronoLink{Date: d.AddDate(0, 1, 0).Format("2006"), Count: 0}
 				}
 			}
 		}
-	}
-
-	type TagLink struct {
-		Name  string
-		Count int
 	}
 
 	var tags []Tag
@@ -268,14 +270,6 @@ func journalSidebarInfo(c *macaron.Context) {
 		if count > 0 {
 			tagLinks = append(tagLinks, TagLink{Name: tag.Name, Count: count})
 		}
-	}
-
-	// Display alphabetical navigation
-	type NameLink struct {
-		Name string
-		ID   string // HTML ID safe version of Name
-		Href string
-		Sub  []NameLink
 	}
 
 	var nameLinks []NameLink
@@ -298,11 +292,7 @@ func journalSidebarInfo(c *macaron.Context) {
 		}
 	}
 
-	journalSync.Send("SIDEBAR", struct {
-		ChronoLinks []Link
-		TagLinks    []TagLink
-		NameLinks   []NameLink
-	}{years, tagLinks, nameLinks})
+	journalSync.Send("SIDEBAR", Sidebar{years, tagLinks, nameLinks})
 
 	c.PlainText(200, []byte("OK"))
 }

@@ -52,7 +52,7 @@ type JournalAction = {
   type: 'CREATE_ENTRY';
   entry: Entry;  
 } | {
-  type: 'MODIFY_ENTRY';
+  type: 'UPDATE_ENTRY';
   entry: Entry;  
 } | {
   type: 'DELETE_ENTRY';
@@ -100,7 +100,7 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
       }
       entries.unshift(action.entry);
       return {...state, entries: entries}
-    case 'MODIFY_ENTRY':
+    case 'UPDATE_ENTRY':
       // TODO: Iterating over all entries to do these things is a little inefficient, but it probably doesn't matter as
       // long as the UI is snappy. Alternative would be building a map of IDs at render-time
       return {...state,
@@ -299,7 +299,7 @@ class ViewTag extends React.Component<{tagName: string, entries: Array<Entry>}, 
       entries.push(<hr key={key++} />);
     });
     return <div>
-      <h3>#{this.props.tagName}</h1>
+      <h3>#{this.props.tagName}</h3>
       {entries}
     </div>
   }
@@ -335,10 +335,6 @@ const JournalNavigation = connect((state) => state)(
 
 const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
-    browseChronologically() {
-      store.dispatch({type: "SIDEBAR_TAB", tab: 'CHRONOLOGICAL'} as JournalAction);
-    }
-    
     browse(tab: SidebarTab) {
       store.dispatch({type: 'SIDEBAR_TAB', tab: tab} as JournalAction); 
     }
@@ -349,13 +345,29 @@ const JournalSidebar = connect((state) => { return state.sidebar; })(
     }
     
     renderAlphabetically() {
-
+        //return <SortableTree
+        //  treeData={}
     }
     
     renderChronologically() {
-      return this.props.ChronoLinks.map((l, i) => {
-        return <p key={i}>Hello {l.Date} {l.Link} {l.Count}</p>
-      });
+      if(this.props.ChronoLinks) {
+        let key = 0;
+        let years: Array<JSX.Element> = [];
+        for(let year of this.props.ChronoLinks) {
+          let months: Array<JSX.Element> = [];
+          for(let month of year.Sub) {
+            months.push(<li key={key++}><a href={`#view/${month.Link}`}>{month.Date} ({month.Count})</a></li>);
+          }
+          let yearLink = <li key={key++}><a href={`#chrono-nav-${year.Date}`} data-toggle="collapse" aria-expanded="false" aria-controls={`chrono-nav-${year.Date}`}>{year.Date} ({year.Count})</a></li>
+          years.push(yearLink);          
+          years.push(<ul key={key++} id={`chrono-nav-${year.Date}`} className="navigation-list collapse">
+            {months}            
+          </ul>);
+        }
+        return <ul className="navigation-list">{years}</ul>
+      } else {
+        return <p>Loading...</p>
+      }
     }
     
     render() {
@@ -423,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // WebSocket handling
   type JournalMessage = {
-    Type: 'MODIFY_ENTRY';
+    Type: 'UPDATE_ENTRY';
     Datum: Entry;
   } | {
     Type: 'DELETE_ENTRY';
@@ -438,9 +450,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const socket = common.makeSocket("journal/sync", (msg: JournalMessage) => {
     console.log("WebSocket message",msg);
-    if(msg.Type == 'MODIFY_ENTRY') {
+    if(msg.Type == 'UPDATE_ENTRY') {
       EntryProcess(msg.Datum);
-      store.dispatch({type: 'MODIFY_ENTRY', entry: msg.Datum} as JournalAction);
+      store.dispatch({type: 'UPDATE_ENTRY', entry: msg.Datum} as JournalAction);
     } else if(msg.Type == 'DELETE_ENTRY') {
       store.dispatch({type: 'DELETE_ENTRY', ID: msg.Datum} as JournalAction);
     } else if(msg.Type == 'CREATE_ENTRY') {
@@ -453,5 +465,5 @@ document.addEventListener('DOMContentLoaded', () => {
     } 
   });
   
-  $.get('/journal/sidebar');
+  window.fetch('/journal/sidebar');
 });

@@ -108,7 +108,7 @@ func MakeSyncPage(name string) *SyncPage {
 	return page
 }
 
-// Sync sends a JSON message to all clients connected to a particular SyncPage
+// SendData sends a JSON message to all clients connected to a particular SyncPage
 func (page *SyncPage) SendData(data []byte) {
 	log.Printf("Sync[%s]: sending data", page.name)
 	select {
@@ -117,6 +117,7 @@ func (page *SyncPage) SendData(data []byte) {
 	}
 }
 
+// Send sends any object to all clients connected in the format {Type: Type, Datum: datum}
 func (page *SyncPage) Send(Type string, datum interface{}) {
 	json, err := json.Marshal(SyncMessage{Type, datum})
 	checkErr(err)

@@ -13,6 +13,8 @@
 ** TODO Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
+** TODO View a named entry
+** TODO Sidebar should reflect entry state.
 ** DONE Fix synchronization
 ** TODO Option to add a titled entry rather than by date
 * Overall
@@ -21,9 +23,13 @@
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
 ** DONE Simplify sync code by moving messaging stuff to sync.go
 ** TODO Remove jQuery if possible
+** TODO Remove a bunch of unnecessary code.
+** TODO React -> Inferno/preact?
 ** TODO Database cleanup on start
 ** DONE Clean up moment code. Just use string constants in common rather than special methods.
     Perhaps convert dates to moments when they are received.
+** TODO Nice error messages
+** TODO Nice loading indicators
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Visual redesign
 *** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
