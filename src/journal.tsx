@@ -13,9 +13,20 @@ import logger from 'redux-logger';
 
 import * as common from './common';
 
+type ChronoLink = {
+  Date: string;
+  Count: number;
+  Sub: ReadonlyArray<ChronoLink>;
+  Link: string;
+}
+
+type SidebarTab = 'TAG' | 'CHRONOLOGICAL';
 type SidebarState = {
   mounted: boolean;
+  tab: SidebarTab;
   TagLinks: ReadonlyArray<{Name: string, Count: string}>;
+  ChronoLinks: ReadonlyArray<ChronoLink>;
+  NameLinks: ReadonlyArray<{Name: string}>;
 }
 
 type JournalState = {
@@ -53,11 +64,14 @@ type JournalAction = {
 } | {
   type: 'MOUNT_SIDEBAR';
   sidebar: SidebarState;
+} | {
+  type: 'SIDEBAR_TAB';
+  tab: SidebarTab;
 };
 
 const initialState = {
   date: moment(new Date()),
-  sidebar: {mounted: false}
+  sidebar: {tab: 'CHRONOLOGICAL', mounted: false}
 } as JournalState;
 
 const reducer = (state: JournalState = initialState, action: JournalAction): JournalState => {
@@ -97,7 +111,10 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
         entries: state.entries.slice().filter((v) => v.ID != action.ID)
       };
     case 'MOUNT_SIDEBAR': 
-      return {...state, sidebar: {...action.sidebar, mounted: true}};
+      return {...state, sidebar: {...state.sidebar, ...action.sidebar, mounted: true}};
+    case 'SIDEBAR_TAB': {
+      return {...state, sidebar: {...state.sidebar, tab: action.tab}};
+    }
   };
   return state;
 }
@@ -282,7 +299,7 @@ class ViewTag extends React.Component<{tagName: string, entries: Array<Entry>}, 
       entries.push(<hr key={key++} />);
     });
     return <div>
-      <h1>{this.props.tagName}</h1>
+      <h3>#{this.props.tagName}</h1>
       {entries}
     </div>
   }
@@ -318,11 +335,42 @@ const JournalNavigation = connect((state) => state)(
 
 const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
+    browseChronologically() {
+      store.dispatch({type: "SIDEBAR_TAB", tab: 'CHRONOLOGICAL'} as JournalAction);
+    }
+    
+    browse(tab: SidebarTab) {
+      store.dispatch({type: 'SIDEBAR_TAB', tab: tab} as JournalAction); 
+    }
+    
+    renderTags() {
+      return this.props.TagLinks.map((l, i) => 
+        <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>)
+    }
+    
+    renderAlphabetically() {
+
+    }
+    
+    renderChronologically() {
+      return this.props.ChronoLinks.map((l, i) => {
+        return <p key={i}>Hello {l.Date} {l.Link} {l.Count}</p>
+      });
+    }
+    
     render() {
       if(this.props.mounted) {
         return <div>
-          {this.props.TagLinks.map((l, i) => 
-            <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>)}
+          {this.props.tab == 'TAG' ? 'Browsing by tag' : 'Browsing chronologically'}
+          
+          <button className="btn btn-link octicon octicon-tag"
+            onClick={(e) => this.browse('CHRONOLOGICAL')}>Browse chronologically</button>
+            
+          <button className="btn btn-link octicon octicon-tag"
+            onClick={((e) => this.browse('TAG'))}>Browse by tag</button>
+          
+          {this.props.tab == 'TAG' ? this.renderTags() : ''}
+          {this.props.tab == 'CHRONOLOGICAL' ? this.renderChronologically() : ''}
         </div>
       } else {
         return <span>Loading...</span>
@@ -385,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Datum: Entry;
   } | {
     Type: 'SIDEBAR';
-    Datum: Sidebar;
+    Datum: SidebarState;
   }
 
   const socket = common.makeSocket("journal/sync", (msg: JournalMessage) => {
@@ -402,10 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
       store.dispatch({type: 'CREATE_ENTRY', entry: msg.Datum} as JournalAction);
     } else if(msg.Type == 'SIDEBAR') {
       store.dispatch({type: 'MOUNT_SIDEBAR', sidebar: msg.Datum} as JournalAction);
-    } else {
-    
-      console.warn(`Unknown message ${msg.Type}`, msg.Datum);
-    }
+    } 
   });
   
   $.get('/journal/sidebar');
