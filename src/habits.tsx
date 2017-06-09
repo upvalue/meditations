@@ -1,34 +1,60 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as $ from 'jquery';
+import * as moment from 'moment';
+import { connect } from 'react-redux';
 import { createStore } from 'redux';
 
-export interface Task {
-  CreatedAt: string;
-  UpdatedAt: string;
-  DeletedAt: string | null;
+import * as common from './common';
+
+///// BACKEND INTERACTION
+
+export interface Task extends common.Model {
   ID: number;
-  // TODO: Remove JSONification from Go backend
-  Date: string;
-  hours: number | null;
-  order: number;
-  scope: number;
-  name: string;
+  Hours: number | null;
+  Order: number;
+  Scope: number;
+  Name: string;
   // Derived statistics
-  best_streak: number | null;
-  completed_tasks: number | null;
-  completion_rate: number | null;
-  total_tasks: number | null;
-  total_tasks_with_time: number | null;
+  BestStreak: number | null;
+  CompletedTasks: number | null;
+  CompletionRate: number | null;
+  TotalTasks: number | null;
+  TotalTasksWithTime: number | null;
 }
 
-export interface TaskProps {
-  task: Task;
+///// REDUX
+
+type TaskList = Array<Task>;
+
+interface ViewMonth extends common.CommonState {
+  type: 'VIEW_MONTH';
+  date: moment.Moment;
+  scope: number;
+  month: TaskList;
 }
+
+type HabitsState = ViewMonth;
+
+type HabitsAction = common.CommonAction;
+
+const initialState = {
+  type: 'VIEW_MONTH',
+  date: moment(),
+  scope: 0
+} as HabitsState;
+
+const reducer = (state: HabitsState = initialState): HabitsState => {
+  return state;
+}
+
+const store = common.makeStore(reducer);
+
+////// REACT
 
 export class CTask extends React.Component<{task: Task}, undefined>{
   render() {
-    return <p>{this.props.task.name}</p>
+    return <p>{this.props.task.Name}</p>
   }
 }
 
@@ -36,24 +62,43 @@ export class Scope extends React.Component<{tasks: Array<Task>}, undefined> {
 
 }
 
-export class HabitsRoot extends React.Component<{tasks: ReadonlyArray<Task>}, undefined> {
-  render() {
-    return <div>{this.props.tasks.map((res, i) => <CTask key={i} task={res} />)}</div>;
+const HabitsRoot = connect((state) => state)(class extends React.Component<HabitsState, undefined> {
+  dismiss() {
+    store.dispatch({type: 'NOTIFICATIONS_CLOSE'} as common.CommonAction)
   }
-}
+  
+  render() {
+    return <div>
+      {this.props.notifications ? <common.NotificationBar dismiss={() => this.dismiss()} notifications={this.props.notifications} /> : ''}
+      <p>Notification bar</p>
+    </div>
+  }
+});
 
-export default (): void => {
-  let date = '2017-05';
-  let bucket = '0';
-
-
-  $.getJSON('/habits/in-year?date=2017-01-01', (res:any) => {
-    const tasks : Array<Task> = res;
-    // Not sure what to do....
-
-    // First thing to do is navigation.
-
-    ReactDOM.render(<HabitsRoot tasks={tasks} />, document.getElementById('habits-root'));
+document.addEventListener('DOMContentLoaded', () =>  {
+  ///// INSTALL ROUTER
+  common.installRouter("/habits#", `view/${moment().format(common.MONTH_FORMAT)}/0`, {
+    view: (datestr: string, scopestr: string) => {
+      let date = moment(datestr, common.MONTH_FORMAT);
+      let scope = parseInt(scopestr, 10);
+      store.dispatch(dispatch => {
+        common.get(dispatch, `/habits/in-month?date=${date.format(common.MONTH_FORMAT)}`, ((tasks: Array<Task>) => {
+          tasks.forEach(common.processModel);          
+          console.log(tasks);
+        }));
+      })
+    }
   });
-}
-// ReactDOM.render(<p>Hello, world</p>, document.getElementById('habits-root'));
+
+  ///// INSTALL WEBSOCKET
+  type HabitMessage = {
+    type: 'UPDATE_TASK';
+  }
+
+  common.makeSocket('habits/sync', (msg: any) => {
+    console.log("Received message", msg);
+  })
+  
+  ///// RENDER
+  common.render('habits-root', store, <HabitsRoot />);
+})

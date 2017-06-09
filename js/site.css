@@ -149,6 +149,10 @@ hr{ clear:both;}
 
 .journal-control { padding: 2px; }
 
+.react-tabs__tab { border:0; color: #09d; }
+.react-tabs__tab-list { border: 0; }
+.react-tabs__tab--selected { border: 0; font-weight:bold; }
+
 div#alphabetical li { font-size:0.8em; }
 
 /* Remove spurious spacing between entries */

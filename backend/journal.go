@@ -189,8 +189,9 @@ func journalNameEntry(c *macaron.Context) {
 	syncEntry(entry)
 }
 
-///// Sidebar Management
+///// SIDEBAR MANAGEMENT
 
+// ChronoLink represents a link to view a month, or a year expandable to month links
 type ChronoLink struct {
 	Date  string
 	Count int
@@ -198,11 +199,13 @@ type ChronoLink struct {
 	Link  string
 }
 
+// TagLink is a link to a tag, including how many entries are in it
 type TagLink struct {
 	Name  string
 	Count int
 }
 
+// NameLink is a link to a named journal entry
 type NameLink struct {
 	Name string
 	ID   string
@@ -210,6 +213,7 @@ type NameLink struct {
 	Sub  []NameLink
 }
 
+// Sidebar represents all link information
 type Sidebar struct {
 	ChronoLinks []ChronoLink
 	TagLinks    []TagLink
@@ -217,7 +221,6 @@ type Sidebar struct {
 }
 
 // SidebarInfo represents navigation information that is displayed in the sidebar
-// journalNavigationInfo builds
 func journalSidebarInfo(c *macaron.Context) {
 	// TODO: Update piecemeal when possible
 
@@ -297,8 +300,8 @@ func journalInit(m *macaron.Macaron) {
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
 	m.Get("/entries/name/:name", journalNamedEntry)
-	m.Get("/sidebar", journalSidebarInfo)
 
+	m.Post("/sidebar", journalSidebarInfo)
 	m.Post("/new", journalNew)
 	m.Post("/update", binding.Bind(Entry{}), journalUpdate)
 	m.Post("/add-tag/:id/:tag", journalAddTag)

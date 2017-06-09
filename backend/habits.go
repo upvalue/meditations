@@ -52,27 +52,27 @@ const (
 // Task represents a task in the database
 type Task struct {
 	gorm.Model
-	Name string `json:"name" form:"name"`
+	Name string
 	// The actual date of the task, regardless of when it was created
-	Date time.Time `json:"date"`
+	Date time.Time
 	// The status of the task: complete, incomplete, or unset
-	Status int `json:"status" form:"status"`
+	Status int
 	// The scope of the task (monthly, yearly, daily)
-	Scope int `json:"scope" form:"scope"`
+	Scope int
 	// The task's position within that scope
-	Order int `json:"order" form:"order"`
+	Order int
 	// Comment
-	Comment Comment `json:"comment"`
+	Comment Comment
 	// Time stats (these may be set directly by the user or derived from lower scopes)
-	Hours   int `json:"hours"`
-	Minutes int `json:"minutes"`
-	// Derived statistics
-	CompletionRate     float64 `json:"completion_rate" sql:"-"`
-	CompletedTasks     int     `json:"completed_tasks" sql:"-"`
-	TotalTasks         int     `json:"total_tasks" sql:"-"`
-	TotalTasksWithTime int     `json:"total_tasks_with_time" sql:"-"`
-	BestStreak         int     `json:"best_streak" sql:"-"`
-	Streak             int     `json:"streak" sql:"-"`
+	Hours   int
+	Minutes int
+	// These statistics are derived at runtime, and not represented in SQL
+	CompletionRate     float64 `sql:"-"`
+	CompletedTasks     int     `sql:"-"`
+	TotalTasks         int     `sql:"-"`
+	TotalTasksWithTime int     `sql:"-"`
+	BestStreak         int     `sql:"-"`
+	Streak             int     `sql:"-"`
 }
 
 // Scope represents a task scope. Time-based scopes (daily, monthly, yearly) are built-in, but the user can add
@@ -86,8 +86,8 @@ type Scope struct {
 // Comment represents a task comment.
 type Comment struct {
 	gorm.Model
-	Body   string `json:"body"`
-	TaskID int    `json:"task_id"`
+	Body   string
+	TaskID int
 }
 
 ///// Synchronization
@@ -95,6 +95,7 @@ type Comment struct {
 // A message that will be sent to connected clients
 type habitSyncMessage struct {
 	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
+	Type       string
 	Wholescope bool `json:"wholescope"`
 	Task       Task `json:"task"`
 }
@@ -125,6 +126,7 @@ func syncTask(t Task, scope bool) {
 		Wholescope: scope,
 		Task:       t,
 	}
+	//habitSync.Send(
 	json, err := json.Marshal(message)
 	checkErr(err)
 	habitSync.SendData(json)
@@ -283,7 +285,7 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 	var tasks []Task
 	date, err := time.Parse(DateFormat, c.Query("date"))
 	if err != nil {
-		serverError(c, "error parsing date %s", c.Query("date"))
+		serverError(c, "malformed date %s", c.Query("date"))
 		return
 	}
 	// Calculate completion rates

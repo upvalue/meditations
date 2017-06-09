@@ -11,6 +11,7 @@
 ** TODO Add search and/or filtering. This could also be used to select entries for export
 ** TODO Add a created-at date to bucket items (currently displays beginning of month)
 ** TODO Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
+** TODO Use a ScrollView of some kind instead of scrolling off the page
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO View a named entry
@@ -22,6 +23,7 @@
 ** DONE Port to Bootstrap 4.6
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
 ** DONE Simplify sync code by moving messaging stuff to sync.go
+** TODO Title updates
 ** TODO Remove jQuery if possible
 ** TODO Remove a bunch of unnecessary code.
 ** TODO React -> Inferno/preact?

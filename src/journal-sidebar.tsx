@@ -16,18 +16,22 @@ export type SidebarState = {
   NameLinks: ReadonlyArray<{Name: string}>;
 }
 
+/** Sidebar. Contains convenient navigation methods. */
 export const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
+    /** Render tag navigation links */
     renderTags() {
       return this.props.TagLinks.map((l, i) => 
         <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>)
     }
     
+    /** Render alphabetical navigation links */
     renderAlphabetically() {
       return this.props.NameLinks.map((l, i) => 
         <div key={i}><a href={`#name/${l.Name}`}>{l.Name}</a></div>);
     }
     
+    /** Render chronological navigation links */
     renderChronologically() {
       let key = 0;
       let years: Array<JSX.Element> = [];
