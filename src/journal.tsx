@@ -252,7 +252,7 @@ class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Ent
         last_date = e.Date;
         // Add a nicely formatted and linky date header for each day with entries
         res.push(<h5 key={key++}>
-          {last_date.format("dddd")} {" "}
+          {last_date.format("dddd")}, {" "}
           <a href={`view/${last_date.format(common.MONTH_FORMAT)}/${e.ID}`}>{last_date.format('MMMM')}</a>{" "}
           {last_date.format('Do')}
         </h5>);
@@ -281,8 +281,8 @@ class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Ent
   }
 }
 
-const ViewEntry = (props: {entry: Entry}) => {
-  return <CEntry context={false} entry={props.entry} />
+const ViewEntry = (props: {entry: Entry | null}) => {
+  return props.entry ? <CEntry context={false} entry={props.entry} /> : <p>Entry deleted</p>
 }
 
 class ViewTag extends React.Component<{tagName: string, entries: Array<Entry>}, undefined> {
@@ -304,7 +304,7 @@ class JournalRootComponent extends React.Component<JournalState, undefined> {
     return <div>
       {this.props.route == 'VIEW_MONTH' ? <ViewMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
       {this.props.route == 'VIEW_TAG' ? <ViewTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
-      {this.props.route == 'VIEW_NAMED_ENTRY' ? <ViewEntry entry={this.props.entries[0]} /> : ''}
+      {this.props.route == 'VIEW_NAMED_ENTRY' ? <ViewEntry entry={this.props.entries.length == 0 ? null : this.props.entries[0]} /> : ''}
     </div>
   }
 }
@@ -322,14 +322,12 @@ const JournalNavigation = connect((state) => state)(
       return <span>
         <DatePicker className="form-control" onChange={(date) => this.createEntry(date)} 
           placeholderText="Click to add new entry" />
-        {/*this.props.date.format('YYYY-MM-DD')*/}
       </span>
     }
   }
 );
-const JournalRoot = connect((state) => {
-  return state;
-})(JournalRootComponent);
+
+const JournalRoot = connect((state) => state)(JournalRootComponent);
 
 document.addEventListener('DOMContentLoaded', () => {
   ///// RENDER 
@@ -374,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
           EntryProcess(entry);
           dispatch({type: 'VIEW_NAMED_ENTRY', entry: entry} as JournalAction);
         });
+        // TODO: Error display
       });
     }
   });

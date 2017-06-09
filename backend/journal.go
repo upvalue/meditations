@@ -32,7 +32,7 @@ var journalSync = MakeSyncPage("journal")
 
 // syncEntry sends a modified entry to the client
 func syncEntry(e Entry) {
-	journalSync.Send("MODIFY_ENTRY", e)
+	journalSync.Send("UPDATE_ENTRY", e)
 }
 
 func journalEntries(c *macaron.Context) {
@@ -50,7 +50,11 @@ func journalEntries(c *macaron.Context) {
 func journalNamedEntry(c *macaron.Context) {
 	var entry Entry
 	DB.Where("name = ?", c.Params("name")).Preload("tags").First(&entry)
-	c.JSON(200, entry)
+	if entry.ID == 0 {
+		c.PlainText(404, []byte("ENTRY NOT FOUND"))
+	} else {
+		c.JSON(200, entry)
+	}
 }
 
 // ByDate allows sorting by date
