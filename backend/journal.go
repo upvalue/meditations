@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/go-macaron/binding"
@@ -277,19 +276,7 @@ func journalSidebarInfo(c *macaron.Context) {
 	DB.Where("name is not null and deleted_at is null").Order("name").Find(&nameEntries)
 
 	for _, entry := range nameEntries {
-		// If the name has :, accumulate it in an array so it can be put into an expandable list
-		// Note that all names are sorted, so the accumulation array is simply the end of the nameLinks slice
-		if strings.Contains(entry.Name, ":") {
-			// If a NameLink has no Href, it is an array for accumulating links
-			parts := strings.Split(entry.Name, ":")
-			prefix, suffix := parts[0], parts[1]
-			if len(nameLinks) == 0 || nameLinks[len(nameLinks)-1].Href != "" {
-				nameLinks = append(nameLinks, NameLink{Name: prefix, ID: strings.Replace(prefix, " ", "_", -1), Href: ""})
-			}
-			nameLinks[len(nameLinks)-1].Sub = append(nameLinks[len(nameLinks)-1].Sub, NameLink{Name: suffix, Href: (entry.Name)})
-		} else {
-			nameLinks = append(nameLinks, NameLink{Name: entry.Name, Href: (entry.Name)})
-		}
+		nameLinks = append(nameLinks, NameLink{Name: entry.Name})
 	}
 
 	journalSync.Send("SIDEBAR", Sidebar{years, tagLinks, nameLinks})
@@ -298,105 +285,6 @@ func journalSidebarInfo(c *macaron.Context) {
 }
 
 func journalIndex(c *macaron.Context) {
-	// Display chronological navigation information
-	var first, last Entry
-
-	err := DB.Order("date").Limit(1).First(&first).Error
-	DB.Order("date desc").Limit(1).First(&last)
-
-	// Struct for rendering info about links
-	type Link struct {
-		Date  string
-		Count int
-		Sub   []Link
-		Link  string
-	}
-
-	var years []Link
-
-	// Display chronological navigation
-	if err == nil {
-		d := now.New(first.Date).BeginningOfMonth()
-		e := now.New(last.Date).EndOfMonth()
-		fmt.Printf("%v %v\n", d, e)
-
-		year := Link{Date: d.Format("2006"), Count: 0}
-		for ; d.Year() < e.Year() || d.Month() <= e.Month(); d = d.AddDate(0, 1, 0) {
-			rows, err := DB.Table("entries").Select("count(*)").Where("date between ? and ? and deleted_at is null", d.Format(DateFormat), d.AddDate(0, 1, 0).Format(DateFormat)).Rows()
-			if err == nil {
-				var count int
-				rows.Next()
-				rows.Scan(&count)
-				rows.Close()
-				year.Sub = append([]Link{Link{Date: d.Format("January"), Count: count, Link: d.Format("2006-01")}}, year.Sub...)
-				// At end of year
-				if (d.Year() != d.AddDate(0, 1, 0).Year()) || (d.Year() == e.Year() && d.AddDate(0, 1, 0).Month() > e.Month()) {
-					// Get count of entries in year
-
-					rows, _ := DB.Table("Entries").Select("count(*)").Where("date between ? and ? and deleted_at is null",
-						now.New(d).BeginningOfYear().Format(DateFormat), now.New(d).EndOfYear().Format(DateFormat)).Rows()
-					rows.Next()
-					rows.Scan(&year.Count)
-					rows.Close()
-
-					// prepend year
-					years = append([]Link{year}, years...)
-					year = Link{Date: d.AddDate(0, 1, 0).Format("2006"), Count: 0}
-				}
-			}
-		}
-	}
-
-	// Display alphabetical navigation
-	type NameLink struct {
-		Name string
-		ID   string // HTML ID safe version of Name
-		Href string
-		Sub  []NameLink
-	}
-
-	var nameLinks []NameLink
-	var nameEntries []Entry
-	DB.Where("name is not null and deleted_at is null").Order("name").Find(&nameEntries)
-
-	for _, entry := range nameEntries {
-		// If the name has :, accumulate it in an array so it can be put into an expandable list
-		// Note that all names are sorted, so the accumulation array is simply the end of the nameLinks slice
-		if strings.Contains(entry.Name, ":") {
-			// If a NameLink has no Href, it is an array for accumulating links
-			parts := strings.Split(entry.Name, ":")
-			prefix, suffix := parts[0], parts[1]
-			if len(nameLinks) == 0 || nameLinks[len(nameLinks)-1].Href != "" {
-				nameLinks = append(nameLinks, NameLink{Name: prefix, ID: strings.Replace(prefix, " ", "_", -1), Href: ""})
-			}
-			nameLinks[len(nameLinks)-1].Sub = append(nameLinks[len(nameLinks)-1].Sub, NameLink{Name: suffix, Href: (entry.Name)})
-		} else {
-			nameLinks = append(nameLinks, NameLink{Name: entry.Name, Href: (entry.Name)})
-		}
-	}
-
-	// Display tagged navigation information
-	type TagLink struct {
-		Name  string
-		Count int
-	}
-	var tags []Tag
-	var tagLinks []TagLink
-
-	DB.Order("name").Find(&tags)
-	for _, tag := range tags {
-		var count int
-		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
-		row.Scan(&count)
-		if count > 0 {
-			tagLinks = append(tagLinks, TagLink{Name: tag.Name, Count: count})
-		}
-	}
-
-	c.Data["Years"] = years
-	c.Data["TagLinks"] = tagLinks
-	c.Data["NameLinks"] = nameLinks
-
 	c.HTML(200, "journal")
 }
 

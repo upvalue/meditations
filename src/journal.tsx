@@ -6,28 +6,15 @@ import {Provider, connect} from 'react-redux';
 import { render }from 'react-dom';
 import route from 'riot-route';
 import * as $ from 'jquery';
+import {Tab, Tabs, TabList, TabPanel} from'react-tabs';
+
 import DatePicker from 'react-datepicker';
 
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 
 import * as common from './common';
-
-type ChronoLink = {
-  Date: string;
-  Count: number;
-  Sub: ReadonlyArray<ChronoLink>;
-  Link: string;
-}
-
-type SidebarTab = 'TAG' | 'CHRONOLOGICAL';
-type SidebarState = {
-  mounted: boolean;
-  tab: SidebarTab;
-  TagLinks: ReadonlyArray<{Name: string, Count: string}>;
-  ChronoLinks: ReadonlyArray<ChronoLink>;
-  NameLinks: ReadonlyArray<{Name: string}>;
-}
+import {SidebarState, JournalSidebar} from './journal-sidebar';
 
 type JournalState = {
   route: 'VIEW_MONTH';
@@ -37,6 +24,10 @@ type JournalState = {
 } | {
   route: 'VIEW_TAG';
   tag: string;
+  entries: Array<Entry>;
+  sidebar: SidebarState;
+} | {
+  route: 'VIEW_NAMED_ENTRY';
   entries: Array<Entry>;
   sidebar: SidebarState;
 };
@@ -65,13 +56,13 @@ type JournalAction = {
   type: 'MOUNT_SIDEBAR';
   sidebar: SidebarState;
 } | {
-  type: 'SIDEBAR_TAB';
-  tab: SidebarTab;
+  type: 'VIEW_NAMED_ENTRY';
+  entry: Entry;
 };
 
 const initialState = {
   date: moment(new Date()),
-  sidebar: {tab: 'CHRONOLOGICAL', mounted: false}
+  sidebar: {mounted: false}
 } as JournalState;
 
 const reducer = (state: JournalState = initialState, action: JournalAction): JournalState => {
@@ -112,9 +103,8 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
       };
     case 'MOUNT_SIDEBAR': 
       return {...state, sidebar: {...state.sidebar, ...action.sidebar, mounted: true}};
-    case 'SIDEBAR_TAB': {
-      return {...state, sidebar: {...state.sidebar, tab: action.tab}};
-    }
+    case 'VIEW_NAMED_ENTRY':
+      return {...state, route: 'VIEW_NAMED_ENTRY', entries: [action.entry]};
   };
   return state;
 }
@@ -237,7 +227,7 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
             {tags}
           </div>
         </span>
-      {this.props.entry.Name == '' ? <strong>{this.props.entry.Name}</strong> : ''}
+      {this.props.entry.Name ? <strong>{this.props.entry.Name}</strong> : ''}
       </h5>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
         ref={(body) => {this.body = body; }} dangerouslySetInnerHTML={{__html: this.props.entry.Body}}
@@ -291,6 +281,10 @@ class ViewMonth extends React.Component<{date: moment.Moment, entries: Array<Ent
   }
 }
 
+const ViewEntry = (props: {entry: Entry}) => {
+  return <CEntry context={false} entry={props.entry} />
+}
+
 class ViewTag extends React.Component<{tagName: string, entries: Array<Entry>}, undefined> {
   render() {
     let entries: Array<React.ReactElement<undefined>> = [], key = 0;
@@ -310,6 +304,7 @@ class JournalRootComponent extends React.Component<JournalState, undefined> {
     return <div>
       {this.props.route == 'VIEW_MONTH' ? <ViewMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
       {this.props.route == 'VIEW_TAG' ? <ViewTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
+      {this.props.route == 'VIEW_NAMED_ENTRY' ? <ViewEntry entry={this.props.entries[0]} /> : ''}
     </div>
   }
 }
@@ -332,65 +327,6 @@ const JournalNavigation = connect((state) => state)(
     }
   }
 );
-
-const JournalSidebar = connect((state) => { return state.sidebar; })(
-  class extends React.Component<SidebarState, undefined> {
-    browse(tab: SidebarTab) {
-      store.dispatch({type: 'SIDEBAR_TAB', tab: tab} as JournalAction); 
-    }
-    
-    renderTags() {
-      return this.props.TagLinks.map((l, i) => 
-        <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>)
-    }
-    
-    renderAlphabetically() {
-        //return <SortableTree
-        //  treeData={}
-    }
-    
-    renderChronologically() {
-      if(this.props.ChronoLinks) {
-        let key = 0;
-        let years: Array<JSX.Element> = [];
-        for(let year of this.props.ChronoLinks) {
-          let months: Array<JSX.Element> = [];
-          for(let month of year.Sub) {
-            months.push(<li key={key++}><a href={`#view/${month.Link}`}>{month.Date} ({month.Count})</a></li>);
-          }
-          let yearLink = <li key={key++}><a href={`#chrono-nav-${year.Date}`} data-toggle="collapse" aria-expanded="false" aria-controls={`chrono-nav-${year.Date}`}>{year.Date} ({year.Count})</a></li>
-          years.push(yearLink);          
-          years.push(<ul key={key++} id={`chrono-nav-${year.Date}`} className="navigation-list collapse">
-            {months}            
-          </ul>);
-        }
-        return <ul className="navigation-list">{years}</ul>
-      } else {
-        return <p>Loading...</p>
-      }
-    }
-    
-    render() {
-      if(this.props.mounted) {
-        return <div>
-          {this.props.tab == 'TAG' ? 'Browsing by tag' : 'Browsing chronologically'}
-          
-          <button className="btn btn-link octicon octicon-tag"
-            onClick={(e) => this.browse('CHRONOLOGICAL')}>Browse chronologically</button>
-            
-          <button className="btn btn-link octicon octicon-tag"
-            onClick={((e) => this.browse('TAG'))}>Browse by tag</button>
-          
-          {this.props.tab == 'TAG' ? this.renderTags() : ''}
-          {this.props.tab == 'CHRONOLOGICAL' ? this.renderChronologically() : ''}
-        </div>
-      } else {
-        return <span>Loading...</span>
-      }
-    }
-  }
-)
-
 const JournalRoot = connect((state) => {
   return state;
 })(JournalRootComponent);
@@ -429,6 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
           dispatch({type: 'VIEW_TAG', entries: entries, tag: tagname} as JournalAction);
         });
         
+      });
+    },
+    
+    name: (name: string) => {
+      store.dispatch(dispatch => {
+        $.get(`/journal/entries/name/${name}`).then((entry: Entry) => {
+          EntryProcess(entry);
+          dispatch({type: 'VIEW_NAMED_ENTRY', entry: entry} as JournalAction);
+        });
       });
     }
   });
