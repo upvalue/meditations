@@ -35,4 +35,5 @@
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Visual redesign
 *** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
+** TODO Redux MapDispatchToProps
 

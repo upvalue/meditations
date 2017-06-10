@@ -30,10 +30,9 @@ export const processModel = (e: Model) => {
   if(e.DeletedAt) {
     e.DeletedAt = moment((e.DeletedAt as any) as string);
   }
-
 }
 
-// Redux common state
+///// REDUX COMMON STATE
 type Notification = {error: boolean, message: string};
 
 export type NotificationOpen = {
@@ -41,16 +40,42 @@ export type NotificationOpen = {
   notification: Notification;
 };
 
-export type NotificationClose = {
-  type: 'NOTIFICATIONS_CLOSE';
-}
-
-export type CommonAction = NotificationOpen | NotificationClose;
+export type CommonAction = NotificationOpen | {type: "NOTIFICATIONS_DISMISS"};
 
 export type CommonState = {
+  dismissNotifications: () => void;
   notifications?: Array<Notification>;
 }
 
+function reduceReducers<S>(...reducers: Array<redux.Reducer<S>>): redux.Reducer<S> {
+  return (previous:any, current: any) =>
+    reducers.reduce((p: any, r: any) => r(p, current), previous);
+}
+
+export function commonReducer(state: CommonState, action: CommonAction): CommonState  {
+  switch(action.type) {
+    case 'NOTIFICATION_OPEN':
+      if(state.notifications) {
+        return {...state,
+          notifications: [...state.notifications, action.notification]
+        }
+      } else {
+        return {...state, notifications: [action.notification]};
+      }
+    case 'NOTIFICATIONS_DISMISS':
+      return {...state, notifications: undefined};
+  }
+  return state;
+}
+
+/**
+ * Creates a store with thunk & logger middleware applied, and a common reducer added
+ */
+export function makeStore<S>(reducer: redux.Reducer<S>) {
+  return redux.createStore<S>(reducer, redux.applyMiddleware(thunk, logger))
+}
+
+///// REACT COMMON
 /** A bar at the top which displays notifications */
 export const NotificationBar: React.SFC<{dismiss: () => void, notifications?: Array<Notification>}> = (props) => {
   if(props.notifications) {
@@ -72,17 +97,19 @@ export const NotificationBar: React.SFC<{dismiss: () => void, notifications?: Ar
   }
 }
 
+
 /**
  * Shorthand for fetch which reports errors to user
  * @param url 
  * @param then 
- * @param catchcb 
  */
-export function get<ResponseType,DispatchType>(dispatch: redux.Dispatch<DispatchType>, url: string, then: (res:ResponseType) => void, catchcb?: (response: Response) => void) {
-  let catche = catchcb ? catchcb : (res:any) => console.warn(`Fetch failed ${res}`);
-  return window.fetch(url).then((response) => {
+
+export function request<ResponseType,DispatchType>(method: string, body: any, dispatch: redux.Dispatch<DispatchType>, url: string, then?: (res:ResponseType) => void) {
+  let reqinit = body === undefined ? {method: method} : {method: method, body: body};
+
+  return window.fetch(url, reqinit).then((response) => {
     if(response.status != 200) {
-      console.warn(`Common.get: fetch failed with error `);
+      console.warn(`Common.request: ${method} fetch failed with error `);
       response.text().then((response: any) => {
         dispatch({type: 'NOTIFICATION_OPEN',
           notification: {error: true, message: `Fetch failed with message: ${response}`}})
@@ -90,45 +117,40 @@ export function get<ResponseType,DispatchType>(dispatch: redux.Dispatch<Dispatch
       });
       return;
     }
-    return response.json().then((response: any) => {
-      return then(response as ResponseType);
-    }).catch();
+    // Only GET requests will return JSON to be processed; POST requests will result in a WebSocket message if anything
+    // as they must be pushed to all clients
+    if(method == 'GET') {
+      return response.json().then((response: any) => {
+        if (then) {
+          return then(response as ResponseType);
+        }
+      });
+    }
   }).catch((reason) => {
-    console.warn(`Fetche failed ${reason}`);
+    console.warn(`Fetch failed ${reason}`);
   });
 }
 
-export function post(url: string, body?: any) {
-  let args = body ? {method: 'POST', body: body} : {method: 'POST'};
-  return window.fetch(url, args);
+export function get<ResponseType, DispatchType>(dispatch: redux.Dispatch<DispatchType>, url: string, then: (res: ResponseType) => void) {
+  return request<ResponseType,DispatchType>('GET', undefined, dispatch, url, then);
 }
 
-function reduceReducers<S>(...reducers: Array<redux.Reducer<S>>): redux.Reducer<S> {
-  return (previous:any, current: any) =>
-    reducers.reduce((p: any, r: any) => r(p, current), previous);
+
+export function post<ResponseType, DispatchType>(dispatch: redux.Dispatch<DispatchType>, url: string, body?: any) {
+  return request<ResponseType, DispatchType>('POST', undefined, dispatch, url);
 }
 
-export function commonReducer(state: CommonState, action: CommonAction): CommonState {
-  switch(action.type) {
-    case 'NOTIFICATION_OPEN':
-      if(state.notifications) {
-        return {...state,
-          notifications: [...state.notifications, action.notification]
-        }
-      } else {
-        return {...state, notifications: [action.notification]};
-      }
-    case 'NOTIFICATIONS_CLOSE':
-      return {...state, notifications: undefined};
-  }
-  return state;
+export function dismissNotifications<State extends CommonState>(dispatch: redux.Dispatch<State>) {
+  dispatch({type: "NOTIFICATIONS_DISMISS"} as CommonAction)
 }
 
-/**
- * Creates a store with thunk & logger middleware applied, and a common reducer added
- */
-export function makeStore<S>(reducer: redux.Reducer<S>): redux.Store<S> {
-  return redux.createStore<S>(reduceReducers<S>(commonReducer as redux.Reducer<S>, reducer), redux.applyMiddleware(thunk, logger));
+export function connect() {
+  return reactredux.connect(
+    (state) => state,
+    (dispatch) => {
+      return {dismissNotifications: () => dispatch({type: "NOTIFICATIONS_DISMISS"} as CommonAction)}
+    }
+  );
 }
 
 /**
@@ -147,11 +169,6 @@ export function render<State>(id: string, store: redux.Store<State>, elt: JSX.El
  */
 export const MONTH_FORMAT = 'YYYY-MM';
 export const DAY_FORMAT = 'YYYY-MM-DD';
-
-export function request(url: string, datum: any) {
-  const ret = {...{'type': 'POST', url: url, contentType: 'application/json; charset=UTF-8'}, data: JSON.stringify(datum)};
-  return $.ajax(ret);
-}
 
 /**
  * makeSocket
@@ -186,6 +203,7 @@ export function makeSocket(location: string, onmessage: (s: any) => void) {
  */
 export function installRouter(base: string, first: string, routes: { [key: string] : (...a: any[]) => void }) {
   console.log('Common.installRouter called');
+  route.base(base);
   route(function() {
     const action = [].shift.apply(arguments);
     console.log(`Common.installRouter: dispatching ${action}`);
@@ -194,7 +212,7 @@ export function installRouter(base: string, first: string, routes: { [key: strin
       routes[action].apply(this, arguments);      
     } else if(action == '' && routes['no_action']) {
       routes['no_action'].apply(this, arguments);
-    } else{
+    } else {
       if(routes['unknown']) {
         routes['unknown'].apply(this, arguments);
       } else {
@@ -203,7 +221,7 @@ export function installRouter(base: string, first: string, routes: { [key: strin
     }
   });
 
-  route.base(base);
+  console.log(`Common.installRouter: starting with base ${base}`);
   route.start(true);
 
   if(window.location.hash.length <= 2) {

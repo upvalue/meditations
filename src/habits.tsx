@@ -2,12 +2,17 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as $ from 'jquery';
 import * as moment from 'moment';
-import { connect } from 'react-redux';
-import { createStore } from 'redux';
+import * as redux from 'redux';
 
 import * as common from './common';
 
 ///// BACKEND INTERACTION
+
+export const SCOPE_BUCKET = 0;
+export const SCOPE_DAY = 1;
+export const SCOPE_MONTH = 2;
+export const SCOPE_YEAR = 3;
+export const SCOPE_WRAP = 4;
 
 export interface Task extends common.Model {
   ID: number;
@@ -36,7 +41,12 @@ interface ViewMonth extends common.CommonState {
 
 type HabitsState = ViewMonth;
 
-type HabitsAction = common.CommonAction;
+interface MountScope {
+  type: 'MOUNT_SCOPE';
+  scope: number;
+}
+
+type HabitsAction = common.CommonAction | MountScope;
 
 const initialState = {
   type: 'VIEW_MONTH',
@@ -44,7 +54,8 @@ const initialState = {
   scope: 0
 } as HabitsState;
 
-const reducer = (state: HabitsState = initialState): HabitsState => {
+const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
+  state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
   return state;
 }
 
@@ -62,15 +73,10 @@ export class Scope extends React.Component<{tasks: Array<Task>}, undefined> {
 
 }
 
-const HabitsRoot = connect((state) => state)(class extends React.Component<HabitsState, undefined> {
-  dismiss() {
-    store.dispatch({type: 'NOTIFICATIONS_CLOSE'} as common.CommonAction)
-  }
-  
+const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
   render() {
     return <div>
-      {this.props.notifications ? <common.NotificationBar dismiss={() => this.dismiss()} notifications={this.props.notifications} /> : ''}
-      <p>Notification bar</p>
+      <common.NotificationBar notifications={this.props.notifications} dismiss={this.props.dismissNotifications} />
     </div>
   }
 });
@@ -81,9 +87,10 @@ document.addEventListener('DOMContentLoaded', () =>  {
     view: (datestr: string, scopestr: string) => {
       let date = moment(datestr, common.MONTH_FORMAT);
       let scope = parseInt(scopestr, 10);
-      store.dispatch(dispatch => {
+      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         common.get(dispatch, `/habits/in-month?date=${date.format(common.MONTH_FORMAT)}`, ((tasks: Array<Task>) => {
           tasks.forEach(common.processModel);          
+          dispatch({type: 'MOUNT_SCOPE', scope: SCOPE_DAY} as HabitsAction);
           console.log(tasks);
         }));
       })

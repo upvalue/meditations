@@ -11,6 +11,7 @@ import DatePicker from 'react-datepicker';
 import * as common from './common';
 import {SidebarState, JournalSidebar} from './journal-sidebar';
 
+
 ///// BACKEND INTERACTION
 
 interface Tag {
@@ -50,6 +51,8 @@ interface ViewNamedEntry extends common.CommonState {
 
 type JournalState = ViewTag | ViewNamedEntry | ViewMonth;
 
+type JournalDispatch = redux.Dispatch<JournalState>;
+
 type JournalAction = {
   type: 'VIEW_MONTH';
   date: moment.Moment;
@@ -85,6 +88,7 @@ const initialState = {
 } as JournalState;
 
 const reducer = (state: JournalState = initialState, action: JournalAction): JournalState => {
+  state = common.commonReducer(state, action as common.CommonAction) as JournalState;
   switch(action.type) {
     case 'VIEW_MONTH':
       return {...state,
@@ -101,7 +105,7 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
     case 'CREATE_ENTRY':
       let entries = state.entries.slice();
       for(let i = 0; i != entries.length; i++) {
-        console.log(entries[i].Date, action.entry.Date);
+        //console.log(entries[i].Date, action.entry.Date);
         if(entries[i].Date > action.entry.Date) {
           console.log("Splicing in entry at ",i);
           entries = entries.splice(i, 0, action.entry);
@@ -130,6 +134,8 @@ const reducer = (state: JournalState = initialState, action: JournalAction): Jou
 
 const store = common.makeStore(reducer);
 
+///// REACT COMPONENTS
+
 class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor: MediumEditor.MediumEditor}> {
   body: HTMLElement;
 
@@ -140,7 +146,7 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
   changeName() {
     const name = window.prompt("What would you like to name this entry? (leave empty to delete)", this.props.entry.Name);
     if(name != this.props.entry.Name) {
-      common.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
+      common.post(store.dispatch, `/journal/name-entry/${this.props.entry.ID}/${name}`);
     }
   }
 
@@ -151,19 +157,18 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
       return;
     }
     
-    common.post(`/journal/add-tag/${this.props.entry.ID}/${tname}`);
+    common.post(store.dispatch, `/journal/add-tag/${this.props.entry.ID}/${tname}`);
   }
-
 
   removeTag(t: Tag)  {
     if(window.confirm(`Are you sure you want to remove the tag ${t.Name}`)) {
-      common.post(`/journal/remove-tag/${this.props.entry.ID}/${t.Name}`);
+      common.post(store.dispatch, `/journal/remove-tag/${this.props.entry.ID}/${t.Name}`);
     }
   }
 
   deleteEntry() {
     if(window.confirm("Are you sure you want to remove this entry?")) {
-      common.post(`/journal/delete-entry/${this.props.entry.ID}`);      
+      common.post(store.dispatch, `/journal/delete-entry/${this.props.entry.ID}`);      
     }
   }
 
@@ -178,7 +183,7 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
           return;
         }
 
-        common.request('/journal/update', {
+        common.post(store.dispatch, '/journal/update', {
           ID: this.props.entry.ID,
           Body: newBody
         });
@@ -296,10 +301,9 @@ class BrowseTag extends React.Component<{tagName: string, entries: Array<Entry>}
   }
 }
 
-class JournalRootComponent extends React.Component<JournalState, undefined> {
+const JournalRoot = common.connect()(class extends React.Component<JournalState, undefined> {
   render() { 
     return <div>
-      {this.props.notifications ? <common.NotificationBar notifications={this.props.notifications} /> : ''}
       <div>
         {this.props.route == 'VIEW_MONTH' ? <BrowseMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
         {this.props.route == 'VIEW_TAG' ? <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
@@ -307,14 +311,13 @@ class JournalRootComponent extends React.Component<JournalState, undefined> {
       </div>
     </div>
   }
-}
+});
 
 const JournalNavigation = connect((state) => state)(
   class extends React.Component<JournalState, undefined> {
     createEntry(date: moment.Moment | null) {
       if(date != null) {
-        common.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`);
-        date.format(common.MONTH_FORMAT);
+        common.post(store.dispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
       }
     }
 
@@ -327,7 +330,6 @@ const JournalNavigation = connect((state) => state)(
   }
 );
 
-const JournalRoot = connect((state) => state)(JournalRootComponent);
 
 document.addEventListener('DOMContentLoaded', () => {
   ///// ROUTES
@@ -337,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const date = moment(datestr, common.MONTH_FORMAT)
 
       // TODO: Update habits link to reflect current date
-      store.dispatch(dispatch => {
+      store.dispatch((dispatch: JournalDispatch) => {
         common.get(dispatch, `/journal/entries/date?date=${datestr}`, ((entries: Array<Entry>) => {
           entries.forEach(common.processModel);
           dispatch({type: 'VIEW_MONTH', entries: entries, date: date} as JournalAction);
@@ -346,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     tag: (tagname: string) => {
-      store.dispatch(dispatch => {
+      store.dispatch((dispatch: JournalDispatch) => {
         common.get(dispatch, `/journal/entries/tag/${tagname}`, ((entries: Array<Entry>) => {
           entries.forEach(common.processModel);
           dispatch({type: 'VIEW_TAG', entries: entries, tag: tagname} as JournalAction);
@@ -355,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     
     name: (name: string) => {
-      store.dispatch(dispatch => {
+      store.dispatch((dispatch: JournalDispatch) => {
         common.get(dispatch, `/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);
           dispatch({type: 'VIEW_NAMED_ENTRY', entry: entry} as JournalAction);
@@ -398,15 +400,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   ///// RENDER 
-  render(<Provider store={store}><JournalRoot /></Provider>, 
-    document.getElementById('journal-root'));
-
-  render(<Provider store={store}><JournalNavigation /></Provider>,
-    document.getElementById('navigation-root'));
-    
-  render(<Provider store={store}><JournalSidebar /></Provider>,
-    document.getElementById('journal-sidebar'));
+  common.render('journal-root', store, <JournalRoot />)
+  common.render('navigation-root', store, <JournalNavigation />)
+  common.render('journal-sidebar', store, <JournalSidebar />)
 
   // Fetch sidebar
-  common.post('/journal/sidebar');
+  common.post(store.dispatch, '/journal/sidebar');
 });
