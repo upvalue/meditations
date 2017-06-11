@@ -391,8 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
       store.dispatch({type: 'DELETE_ENTRY', ID: msg.Datum} as JournalAction);
     } else if(msg.Type == 'CREATE_ENTRY') {
       common.processModel(msg.Datum);
+      // TODO: View change?
       // TODO: Dispatch view change
-      //store.dispatch({type: 'VIEW_MONTH', date: msg.Datum.Date.format(common.MONTH_FORMAT)})
       store.dispatch({type: 'CREATE_ENTRY', entry: msg.Datum} as JournalAction);
     } else if(msg.Type == 'SIDEBAR') {
       store.dispatch({type: 'MOUNT_SIDEBAR', sidebar: msg.Datum} as JournalAction);

@@ -204,7 +204,7 @@ export function makeSocket(location: string, onmessage: (s: any) => void) {
 export function installRouter(base: string, first: string, routes: { [key: string] : (...a: any[]) => void }) {
   console.log('Common.installRouter called');
   route.base(base);
-  route(function() {
+  route(function(this: any) {
     const action = [].shift.apply(arguments);
     console.log(`Common.installRouter: dispatching ${action}`);
 
