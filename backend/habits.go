@@ -4,7 +4,6 @@ package backend
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -90,89 +89,9 @@ type Comment struct {
 	TaskID int
 }
 
-///// Synchronization
-
-// A message that will be sent to connected clients
-type habitSyncMessage struct {
-	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
-	Type       string
-	Wholescope bool `json:"wholescope"`
-	Task       Task `json:"task"`
-}
-
-// If a stat is monthly or yearly, recalculate streak and completion rate as well
-func syncStats(t Task, scope int) {
-	from, to := between(t.Date, scope)
-	var task Task
-	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).Preload("Comment").First(&task)
-	task.CalculateStats()
-	syncTask(task, false)
-}
-
-func syncTask(t Task, scope bool) {
-	if t.ID == 0 {
-		return
-	}
-
-	DB.Where("task_id = ?", t.ID).First(&t.Comment)
-
-	if t.Scope == ScopeMonth || t.Scope == ScopeYear {
-		t.CalculateTimeAndCompletion()
-		if t.Scope == ScopeYear {
-			t.CalculateStreak()
-		}
-	}
-	message := habitSyncMessage{
-		Wholescope: scope,
-		Task:       t,
-	}
-	//habitSync.Send(
-	json, err := json.Marshal(message)
-	checkErr(err)
-	habitSync.SendData(json)
-	// Recalculate stats for higher scopes
-	if t.Scope == ScopeDay {
-		syncStats(t, ScopeMonth)
-		syncStats(t, ScopeYear)
-	}
-}
-
-// Given a task's date and scope, return a range of dates that will get all tasks within the scope
-func _between(start time.Time, scope int) (time.Time, time.Time) {
-	switch scope {
-	case ScopeDay:
-		from := now.New(start).BeginningOfDay()
-		return from, from.AddDate(0, 0, 1)
-	case ScopeMonth:
-		from := now.New(start).BeginningOfMonth()
-		return from, from.AddDate(0, 1, 0)
-	case ScopeYear:
-		from := now.New(start).BeginningOfYear()
-		return from, from.AddDate(1, 0, 0)
-	case ScopeBucket:
-	}
-	if scope > ScopeYear {
-		return time.Date(1960, 1, 1, 0, 0, 0, 0, time.Local), time.Now()
-	}
-	return time.Now(), time.Now()
-}
-
-// Return a properly formatted string for sqlite (no timezone or time data included)
-func between(start time.Time, scope int) (string, string) {
-	from, to := _between(start, scope)
-	return from.Format(DateFormat), to.Format(DateFormat)
-}
-
-func tasksInScope(tasks *[]Task, scope int, start time.Time) {
-	if scope > ScopeYear {
-		DB.Where("scope = ?", scope).Preload("Comment").Find(tasks)
-	} else {
-		from, to := between(start, scope)
-
-		DB.Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("`order` asc").
-			Preload("Comment").Find(tasks)
-	}
-}
+//
+///// TASK METHODS
+//
 
 // Near finds TASKS in the same scope as TASK
 func (task *Task) Near(tasks *[]Task) {
@@ -263,6 +182,131 @@ func (task *Task) CalculateStats() {
 	task.CalculateStreak()
 }
 
+//
+///// SYNCHRONIZATION
+//
+
+// A message that will be sent to connected clients
+type habitSyncMessage struct {
+	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
+	Type       string
+	Wholescope bool `json:"wholescope"`
+	Task       Task `json:"task"`
+}
+
+// If a stat is monthly or yearly, recalculate streak and completion rate as well
+func syncStats(t Task, scope int) {
+	from, to := between(t.Date, scope)
+	var task Task
+	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).Preload("Comment").First(&task)
+	task.CalculateStats()
+	syncTask(task, false)
+}
+
+// HigherScopedTasks returns monthly and yearly tasks with the same name as a daily task, with stats calculated
+// Get tasks with the same name and higher scope as daily task
+func (t *Task) HigherScopedTasks() (Task, Task) {
+	var month, year Task
+	from, to := between(t.Date, ScopeMonth)
+	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, ScopeMonth).Preload("Comment").First(&month)
+	from, to = between(t.Date, ScopeYear)
+	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, ScopeYear).Preload("Comment").First(&year)
+	month.CalculateStats()
+	year.CalculateStats()
+	return month, year
+}
+
+type habitSyncMsg struct {
+	Wholescope bool
+	Tasks      []Task
+}
+
+// Sync takes a task that has been changed and sends all necessary new information to clients
+func (task *Task) Sync(wholescope bool /*horse */) {
+	if task.ID == 0 {
+		return
+	}
+
+	DB.Where("task_id = ?", task.ID).First(&task.Comment)
+
+	tasks := []Task{*task}
+	message := habitSyncMsg{
+		Wholescope: wholescope,
+		Tasks:      tasks,
+	}
+	habitSync.Send("UPDATE_TASKS", message)
+}
+
+func syncTask(t Task, wholescope bool) {
+	if t.ID == 0 {
+		return
+	}
+
+	DB.Where("task_id = ?", t.ID).First(&t.Comment)
+
+	// Calculate derived stats
+	if t.Scope == ScopeMonth || t.Scope == ScopeYear {
+		t.CalculateTimeAndCompletion()
+		if t.Scope == ScopeYear {
+			t.CalculateStreak()
+		}
+	}
+
+	if t.Scope == ScopeDay {
+	}
+	/*
+		message := habitSyncMessage{
+			Wholescope: scope,
+			Task:       t,
+		}
+	*/
+	if t.Scope == ScopeDay {
+
+	}
+	//habitSync.Send("UPDATE_TASK", message)
+	// Recalculate stats for higher scopes
+	if t.Scope == ScopeDay {
+		syncStats(t, ScopeMonth)
+		syncStats(t, ScopeYear)
+	}
+}
+
+// Given a task's date and scope, return a range of dates that will get all tasks within the scope
+func _between(start time.Time, scope int) (time.Time, time.Time) {
+	switch scope {
+	case ScopeDay:
+		from := now.New(start).BeginningOfDay()
+		return from, from.AddDate(0, 0, 1)
+	case ScopeMonth:
+		from := now.New(start).BeginningOfMonth()
+		return from, from.AddDate(0, 1, 0)
+	case ScopeYear:
+		from := now.New(start).BeginningOfYear()
+		return from, from.AddDate(1, 0, 0)
+	case ScopeBucket:
+	}
+	if scope > ScopeYear {
+		return time.Date(1960, 1, 1, 0, 0, 0, 0, time.Local), time.Now()
+	}
+	return time.Now(), time.Now()
+}
+
+// Return a properly formatted string for sqlite (no timezone or time data included)
+func between(start time.Time, scope int) (string, string) {
+	from, to := _between(start, scope)
+	return from.Format(DateFormat), to.Format(DateFormat)
+}
+
+func tasksInScope(tasks *[]Task, scope int, start time.Time) {
+	if scope > ScopeYear {
+		DB.Where("scope = ?", scope).Preload("Comment").Find(tasks)
+	} else {
+		from, to := between(start, scope)
+
+		DB.Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("`order` asc").
+			Preload("Comment").Find(tasks)
+	}
+}
 func tasksInBucket(c *macaron.Context) {
 	var scope Scope
 	scope.ID = uint(c.ParamsInt(":id"))
@@ -350,8 +394,7 @@ func tasksInYear(c *macaron.Context) {
 func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
-	//DB.Where("task_id = ?", task.ID).First(&task.Comment)
-	syncTask(task, false)
+	task.Sync(false)
 	c.JSON(200, task)
 }
 

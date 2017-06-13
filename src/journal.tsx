@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const date = moment(datestr, common.MONTH_FORMAT)
 
       // TODO: Update habits link to reflect current date
-      store.dispatch((dispatch: JournalDispatch) => {
+      store.dispatch(dispatch => {
         common.get(dispatch, `/journal/entries/date?date=${datestr}`, ((entries: Array<Entry>) => {
           entries.forEach(common.processModel);
           dispatch({type: 'VIEW_MONTH', entries: entries, date: date} as JournalAction);
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     tag: (tagname: string) => {
-      store.dispatch((dispatch: JournalDispatch) => {
+      store.dispatch(dispatch => {
         common.get(dispatch, `/journal/entries/tag/${tagname}`, ((entries: Array<Entry>) => {
           entries.forEach(common.processModel);
           dispatch({type: 'VIEW_TAG', entries: entries, tag: tagname} as JournalAction);
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     
     name: (name: string) => {
-      store.dispatch((dispatch: JournalDispatch) => {
+      store.dispatch(dispatch => {
         common.get(dispatch, `/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);
           dispatch({type: 'VIEW_NAMED_ENTRY', entry: entry} as JournalAction);

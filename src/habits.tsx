@@ -1,12 +1,16 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as $ from 'jquery';
 import * as moment from 'moment';
 import * as redux from 'redux';
 
 import * as common from './common';
 
 ///// BACKEND INTERACTION
+
+export const STATUS_UNSET = 0;
+export const STATUS_COMPLETE = 1;
+export const STATUS_INCOMPLETE = 2;
+export const STATUS_WRAP = 3;
 
 export const SCOPE_BUCKET = 0;
 export const SCOPE_DAY = 1;
@@ -18,6 +22,7 @@ export interface Task extends common.Model {
   ID: number;
   Hours: number | null;
   Order: number;
+  Status: number;
   Scope: number;
   Name: string;
   // Derived statistics
@@ -28,6 +33,13 @@ export interface Task extends common.Model {
   TotalTasksWithTime: number | null;
 }
 
+export interface Scope {
+  Name: string;
+  Scope: number;
+  Date: moment.Moment;
+  Tasks: Array<Task>;
+}
+
 ///// REDUX
 
 type TaskList = Array<Task>;
@@ -35,8 +47,9 @@ type TaskList = Array<Task>;
 interface ViewMonth extends common.CommonState {
   type: 'VIEW_MONTH';
   date: moment.Moment;
-  scope: number;
-  month: TaskList;
+  month: Scope;
+  year: Scope;
+  mounted: boolean;
 }
 
 type HabitsState = ViewMonth;
@@ -44,18 +57,64 @@ type HabitsState = ViewMonth;
 interface MountScope {
   type: 'MOUNT_SCOPE';
   scope: number;
+  tasks: TaskList;
+  date: moment.Moment;
 }
 
-type HabitsAction = common.CommonAction | MountScope;
+interface UpdateTasks {
+  type: 'UPDATE_TASKS';
+  wholescope: boolean;
+  tasks: Array<Task>;
+}
+
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks;
 
 const initialState = {
   type: 'VIEW_MONTH',
   date: moment(),
-  scope: 0
+  mounted: false
 } as HabitsState;
+
+const taskVisible = (state: HabitsState, task: Task): boolean =>  {
+  let date1 = moment.utc(task.Date);
+  let date2 = state.date;
+  // Check if a task is visible by seeing whether it is within the current month or year, depending on scope
+  if((((task.Scope == SCOPE_MONTH || task.Scope == SCOPE_DAY)) && date1.month() == date2.month() &&
+    date1.year() == date2.year()) ||
+    (task.Scope == SCOPE_YEAR && date1.year() == date2.year())) {
+      return true;
+    }
+  // TODO: Buckets/projects
+  return false;
+}
 
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
   state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
+  switch(action.type) {
+    case 'MOUNT_SCOPE':
+      switch(action.scope) {
+        // TODO: Code duplication
+        case SCOPE_MONTH:
+          return {...state, mounted: true, month: {Scope: SCOPE_MONTH, Date: action.date, Tasks: action.tasks} as Scope};
+        case SCOPE_YEAR:
+          return {...state, mounted: true, year: {Scope: SCOPE_YEAR, Date: action.date, Tasks: action.tasks} as Scope};
+      }
+    case 'UPDATE_TASKS': {
+      let nstate = {...state};
+      for(let task of action.tasks) {
+        // If task is not visible, no need to do anything
+        if(taskVisible(state, task)) {
+          if(task.Scope == SCOPE_MONTH) {
+            let scope = state.month;
+            nstate.month = {...state.month, 
+              Tasks: scope.Tasks.map((t) => t.ID == task.ID ? task : t)}
+            return nstate;
+          }
+        }
+      }
+      console.log("update ye tasks");
+    }
+  }
   return state;
 }
 
@@ -64,19 +123,53 @@ const store = common.makeStore(reducer);
 ////// REACT
 
 export class CTask extends React.Component<{task: Task}, undefined>{
+  cycleStatus() {
+    const task = {...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP}
+    common.post(store.dispatch, `/habits/update`, task);
+  }
+
   render() {
-    return <p>{this.props.task.Name}</p>
+    const klass = ['', 'btn-success', 'btn-danger'][this.props.task.Status];
+    return <section className="task">
+      <button className={`btn btn-xs btn-default ${klass}`} onClick={() => this.cycleStatus()}>
+        {this.props.task.Name}
+      </button>
+    </section>
   }
 }
 
-export class Scope extends React.Component<{tasks: Array<Task>}, undefined> {
-
+export class CScope extends React.Component<{date: moment.Moment, scope: Scope}, undefined> {
+  render() {
+    return <div>
+      <h6 className="scope-title">
+        {this.props.date.format(['','','MMMM', 'YYYY'][this.props.scope.Scope])}
+      </h6>
+      {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
+    </div>
+  }
 }
 
 const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
   render() {
-    return <div>
+    return <div className="container-fluid">
       <common.NotificationBar notifications={this.props.notifications} dismiss={this.props.dismissNotifications} />
+      {this.props.mounted ? 
+        <div className="row">
+          <div className="col-md-3">
+            <p>Days</p>
+          </div>
+          <div className="col-md-3">
+            {this.props.month ? 
+              <CScope date={this.props.date} scope={this.props.month} /> : ''}
+          </div>
+          <div className="col-md-3">
+            {this.props.year ?
+              <CScope date={this.props.date} scope={this.props.year} /> : ''}
+          </div>
+          <div className="col-md-3">
+            <p>Projects</p>
+          </div>
+        </div> : ''}
     </div>
   }
 });
@@ -88,21 +181,42 @@ document.addEventListener('DOMContentLoaded', () =>  {
       let date = moment(datestr, common.MONTH_FORMAT);
       let scope = parseInt(scopestr, 10);
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-        common.get(dispatch, `/habits/in-month?date=${date.format(common.MONTH_FORMAT)}`, ((tasks: Array<Task>) => {
+        common.get(dispatch, `/habits/in-month?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
           tasks.forEach(common.processModel);          
-          dispatch({type: 'MOUNT_SCOPE', scope: SCOPE_DAY} as HabitsAction);
-          console.log(tasks);
+          dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_MONTH, tasks: tasks} as HabitsAction);
         }));
       })
+
+      store.dispatch((dispatch: redux.Dispatch<HabitsState>) =>{
+        common.get(dispatch, `/habits/in-year?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
+          tasks.forEach(common.processModel);
+          dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_YEAR, tasks: tasks} as HabitsAction);
+        }));
+      });
     }
   });
 
   ///// INSTALL WEBSOCKET
   type HabitMessage = {
-    type: 'UPDATE_TASK';
+    Type: 'UPDATE_TASKS';
+    Datum: {
+      Wholescope: boolean
+      Tasks: Array<Task>
+    }
   }
 
-  common.makeSocket('habits/sync', (msg: any) => {
+  common.makeSocket('habits/sync', (msg: HabitMessage) => {
+    switch(msg.Type) {
+      case 'UPDATE_TASKS':
+        msg.Datum.Tasks.forEach(common.processModel);
+        console.log(msg.Datum);
+        store.dispatch({type: 'UPDATE_TASKS',
+          wholescope: msg.Datum.Wholescope,
+          tasks: msg.Datum.Tasks
+        })
+        break;
+
+    }
     console.log("Received message", msg);
   })
   

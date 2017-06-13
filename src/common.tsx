@@ -103,9 +103,12 @@ export const NotificationBar: React.SFC<{dismiss: () => void, notifications?: Ar
  * @param url 
  * @param then 
  */
-
 export function request<ResponseType,DispatchType>(method: string, body: any, dispatch: redux.Dispatch<DispatchType>, url: string, then?: (res:ResponseType) => void) {
-  let reqinit = body === undefined ? {method: method} : {method: method, body: body};
+  let reqinit: any = {method: method};
+  if(body !== undefined)  {
+    reqinit.headers = {'Accept': 'application/json', 'Content-Type': 'application/json'};
+    reqinit.body = JSON.stringify(body);
+  }
 
   return window.fetch(url, reqinit).then((response) => {
     if(response.status != 200) {
@@ -137,7 +140,7 @@ export function get<ResponseType, DispatchType>(dispatch: redux.Dispatch<Dispatc
 
 
 export function post<ResponseType, DispatchType>(dispatch: redux.Dispatch<DispatchType>, url: string, body?: any) {
-  return request<ResponseType, DispatchType>('POST', undefined, dispatch, url);
+  return request<ResponseType, DispatchType>('POST', body, dispatch, url);
 }
 
 export function dismissNotifications<State extends CommonState>(dispatch: redux.Dispatch<State>) {

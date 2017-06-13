@@ -1,4 +1,5 @@
 * Habits
+** TODO CalculateStats should switch intelligently on monthly and yearly tasks
 ** TODO Collapsing
    Or some other way of reducing visual clutter with tasks that are frequently logged but otherwise uninteresting.
    Perhaps shift-click to register as completed and hide? Or shift-click to hide?
