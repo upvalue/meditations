@@ -27,6 +27,7 @@ export interface Task extends common.Model {
   Scope: number;
   Name: string;
   // Derived statistics
+  Streak: number;
   BestStreak: number;
   CompletedTasks: number;
   CompletionRate: number;
@@ -89,6 +90,20 @@ const initialState = {
 } as HabitsState;
 
 /** Check whether a task is currently rendered and thus needs to be updated */
+const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): boolean =>  {
+  let date1 = moment.utc(date);
+  let date2 = state.date;
+  // Check if a scope is visible by seeing within the current month. For daily and monthly tasks/scopes.
+  if(scope == SCOPE_MONTH || scope == SCOPE_DAY) {
+    return date1.year() == date2.year() && date1.month() == date2.month();
+  }
+
+  if(scope == SCOPE_YEAR) {
+    return date1.year() == date2.year();
+  }
+
+  // TODO: Buckets & projects
+}
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   let date1 = moment.utc(task.Date);
   let date2 = state.date;
@@ -106,14 +121,18 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
   state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
   switch(action.type) {
     case 'MOUNT_SCOPE':
-      switch(action.scope) {
-        // TODO: Code duplication
-        case SCOPE_MONTH:
-          return {...state, mounted: true, month: {Scope: SCOPE_MONTH, Date: action.date, Tasks: action.tasks} as Scope};
-        case SCOPE_YEAR:
-          return {...state, mounted: true, year: {Scope: SCOPE_YEAR, Date: action.date, Tasks: action.tasks} as Scope};
+      let visible = dateVisible(state, action.scope, action.date);
+      if(!visible) {
+        console.log("Scope not visible, ignoring");
+        return state;
       }
-      return state;
+      let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
+      // TODO Check visibility
+      switch(action.scope) {
+        case SCOPE_MONTH: return {...state, mounted: true, month: scope}
+        case SCOPE_YEAR: return {...state, mounted: true, year: scope}
+      }
+      break;
     case 'MOUNT_DAYS':
       let days = Array<Scope>();
       for(let day of action.days) {
@@ -135,10 +154,8 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
           } else if(task.Scope == SCOPE_YEAR) {
             nstate.year = updateScope(nstate.year);
           } else if(task.Scope == SCOPE_DAY) {
-            console.log("UPDATING DAY");
             // Update only the specific day using diff
             nstate.days = [...state.days.map((s) => s.Date.diff(task.Date, 'days') == 0 ? updateScope(s) : s)]
-            console.log("Updating day task");
           }
         }
       }
@@ -158,6 +175,18 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     common.post(store.dispatch, `/habits/update`, task);
   }
 
+  command(path: string) {
+    common.post(store.dispatch, `/habits/${path}`, this.props.task)
+  }
+
+  orderUp() {
+    console.log("Order up!");
+  }
+
+  orderDown() {
+
+  }
+
   hasStats() {
     return this.props.task.CompletedTasks > 0;
   }
@@ -166,10 +195,19 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     return this.props.task.Hours > 0 || this.props.task.Minutes > 0;
   }
 
+  hasStreak() {
+    return this.props.task.Streak > 0;
+  }
+
   renderStats() {
     return <span>{' '}
       {this.props.task.CompletedTasks}/{this.props.task.TotalTasks} ({this.props.task.CompletionRate}%)
     </span>
+  }
+
+  renderControl(title: string, icon: string, callback: () => void) {
+    return <button className={`task-control btn-link btn btn-sm btn-default octicon octicon-${icon}`} title={title}
+      onClick = {callback} />
   }
 
   render() {
@@ -185,6 +223,13 @@ export class CTask extends React.Component<{task: Task}, undefined>{
           {this.props.task.Hours > 0 && `${this.props.task.Hours}h `}
           {this.props.task.Minutes > 0 && `${this.props.task.Minutes}m`}
         </span>}
+        {this.hasStreak() && <span className="streak">{' '}
+          <span className="octicon octicon-dashboard"></span>{' '}
+          <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
+          </span>}
+
+        {this.renderControl('Move up', 'chevron-up', () => this.command('order-up'))}
+        {this.renderControl('Move down', 'chevron-down', () => this.command('order-down'))}
       </span>
     </section>
   }
@@ -192,12 +237,12 @@ export class CTask extends React.Component<{task: Task}, undefined>{
 
 export class CScope extends React.Component<{date: moment.Moment, scope: Scope}, undefined> {
   render() {
-    return <div>
+    return <section className="scope">
       <h6 className="scope-title">
         {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
       </h6>
       {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
-    </div>
+    </section>
   }
 }
 
@@ -286,9 +331,17 @@ document.addEventListener('DOMContentLoaded', () =>  {
       Wholescope: boolean
       Tasks: Array<Task>
     }
+  } | {
+    Type: 'UPDATE_SCOPE';
+    Datum: {
+      Date: string;
+      Scope: number;
+      Tasks: Array<Task>;
+    }
   }
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
+    console.log("Received WebSocket message ${msg}");
     switch(msg.Type) {
       case 'UPDATE_TASKS':
         msg.Datum.Tasks.forEach(common.processModel);
@@ -299,6 +352,12 @@ document.addEventListener('DOMContentLoaded', () =>  {
         })
         break;
 
+      case 'UPDATE_SCOPE':
+        msg.Datum.Tasks.forEach(common.processModel);
+       //let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
+        store.dispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
+          scope: msg.Datum.Scope, tasks: msg.Datum.Tasks} as MountScope);
+        break;
     }
     console.log("Received message", msg);
   })

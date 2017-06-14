@@ -140,7 +140,6 @@ func (task *Task) CalculateTimeAndCompletion() {
 	rows, err := DB.Table("tasks").Select("count(*), sum(hours), sum(minutes)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
 
 	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ? and deleted_at is null", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
-	//DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Find(&tasks).Count(&total)
 
 	if err == nil {
 		defer rows.Close()
@@ -176,10 +175,17 @@ func (task *Task) CalculateTimeAndCompletion() {
 		int(completed), int(total), int(totalWithTime), rate
 }
 
-// CalculateStats calculates all statistics
+// CalculateStats calculates all statistics for monthly and yearly tasks
 func (task *Task) CalculateStats() {
-	task.CalculateTimeAndCompletion()
-	task.CalculateStreak()
+	// TODO: This is quite inefficient to do e.g. every time it needs to be rendered
+	// It could be cached in the database, but perhaps it would be simpler to do it in
+	// a map of some kind
+	if task.Scope == ScopeMonth || task.Scope == ScopeYear {
+		task.CalculateTimeAndCompletion()
+		if task.Scope == ScopeYear {
+			task.CalculateStreak()
+		}
+	}
 }
 
 //
@@ -222,7 +228,7 @@ type habitSyncMsg struct {
 }
 
 // Sync takes a task that has been changed and sends all necessary new information to clients
-func (task *Task) Sync(wholescope bool /*horse */) {
+func (task *Task) Sync(wholescope bool) {
 	if task.ID == 0 {
 		return
 	}
@@ -235,6 +241,30 @@ func (task *Task) Sync(wholescope bool /*horse */) {
 		Tasks:      tasks,
 	}
 	habitSync.Send("UPDATE_TASKS", message)
+}
+
+type scopeSyncMsg struct {
+	Date  string
+	Scope int
+	Tasks []Task
+}
+
+// SyncScope re-sends a task's entire scope. Necessary when order is changed or a task is deleted
+func (task *Task) SyncScope() {
+	var tasks []Task
+	task.Near(&tasks)
+
+	for i := range tasks {
+		tasks[i].CalculateStats()
+	}
+
+	message := scopeSyncMsg{
+		Date:  task.Date.Format(DateFormat),
+		Scope: task.Scope,
+		Tasks: tasks,
+	}
+
+	habitSync.Send("UPDATE_SCOPE", message)
 }
 
 func syncTask(t Task, wholescope bool) {
@@ -464,6 +494,8 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 			DB.Save(&swap).Save(&task)
 		}
 	}
+
+	task.SyncScope()
 
 	syncTask(task, true)
 	c.PlainText(http.StatusOK, []byte("OK"))
