@@ -89,7 +89,7 @@ const initialState = {
   mounted: false
 } as HabitsState;
 
-/** Check whether a task is currently rendered and thus needs to be updated */
+/** Check whether a particular scope+date combo is currently rendered and thus needs to be updated */
 const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): boolean =>  {
   let date1 = moment.utc(date);
   let date2 = state.date;
@@ -104,17 +104,10 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
 
   // TODO: Buckets & projects
 }
+
+/** Check whether a task is currently updated and thus needs to be updated  */
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
-  let date1 = moment.utc(task.Date);
-  let date2 = state.date;
-  // Check if a task is visible by seeing whether it is within the current month or year, depending on scope
-  if((((task.Scope == SCOPE_MONTH || task.Scope == SCOPE_DAY)) && date1.month() == date2.month() &&
-    date1.year() == date2.year()) ||
-    (task.Scope == SCOPE_YEAR && date1.year() == date2.year())) {
-      return true;
-    }
-  // TODO: Buckets/projects
-  return false;
+  return dateVisible(state, task.Scope, task.Date);
 }
 
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
@@ -127,8 +120,13 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
         return state;
       }
       let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
-      // TODO Check visibility
       switch(action.scope) {
+        case SCOPE_DAY: 
+          let days = state.days;
+          return {...state, 
+            days: state.days.map((s, i) => {
+              return s.Date.diff(action.date, 'days') == 0 ? scope : s;
+            })}
         case SCOPE_MONTH: return {...state, mounted: true, month: scope}
         case SCOPE_YEAR: return {...state, mounted: true, year: scope}
       }
