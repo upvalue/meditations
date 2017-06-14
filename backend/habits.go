@@ -355,7 +355,6 @@ func tasksInDays(c *macaron.Context) {
 	}
 	var results []Result
 	date, err := time.Parse(DateFormat, c.Query("date"))
-	finish := now.New(date).EndOfMonth().AddDate(0, 0, 1)
 	if err != nil {
 		serverError(c, "error parsing date %s", c.Query("date"))
 		return
@@ -364,7 +363,10 @@ func tasksInDays(c *macaron.Context) {
 	if err != nil {
 		serverError(c, "error parsing limit int %s", c.Query("limit"))
 	}
+
+	finish := now.New(date).EndOfMonth().AddDate(0, 0, 1)
 	date = now.New(date).BeginningOfMonth()
+
 	for date.Month() != finish.Month() {
 		var tasks []Task
 		tasksInScope(&tasks, ScopeDay, date)

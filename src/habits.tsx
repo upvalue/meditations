@@ -20,23 +20,29 @@ export const SCOPE_WRAP = 4;
 
 export interface Task extends common.Model {
   ID: number;
-  Hours: number | null;
+  Hours: number;
+  Minutes: number;
   Order: number;
   Status: number;
   Scope: number;
   Name: string;
   // Derived statistics
-  BestStreak: number | null;
-  CompletedTasks: number | null;
-  CompletionRate: number | null;
-  TotalTasks: number | null;
-  TotalTasksWithTime: number | null;
+  BestStreak: number;
+  CompletedTasks: number;
+  CompletionRate: number;
+  TotalTasks: number;
+  TotalTasksWithTime: number;
 }
 
 export interface Scope {
   Name: string;
   Scope: number;
   Date: moment.Moment;
+  Tasks: Array<Task>;
+}
+
+export interface Day {
+  Date: string;
   Tasks: Array<Task>;
 }
 
@@ -49,10 +55,17 @@ interface ViewMonth extends common.CommonState {
   date: moment.Moment;
   month: Scope;
   year: Scope;
+  days: Array<Scope>;
   mounted: boolean;
 }
 
 type HabitsState = ViewMonth;
+
+interface MountDays {
+  type: 'MOUNT_DAYS';
+  date: moment.Moment;
+  days: Array<Day>;
+}
 
 interface MountScope {
   type: 'MOUNT_SCOPE';
@@ -67,7 +80,7 @@ interface UpdateTasks {
   tasks: Array<Task>;
 }
 
-type HabitsAction = common.CommonAction | MountScope | UpdateTasks;
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays;
 
 const initialState = {
   type: 'VIEW_MONTH',
@@ -75,6 +88,7 @@ const initialState = {
   mounted: false
 } as HabitsState;
 
+/** Check whether a task is currently rendered and thus needs to be updated */
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   let date1 = moment.utc(task.Date);
   let date2 = state.date;
@@ -99,20 +113,36 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
         case SCOPE_YEAR:
           return {...state, mounted: true, year: {Scope: SCOPE_YEAR, Date: action.date, Tasks: action.tasks} as Scope};
       }
+      return state;
+    case 'MOUNT_DAYS':
+      let days = Array<Scope>();
+      for(let day of action.days) {
+        days.push({Date: moment(day.Date, common.DAY_FORMAT), Scope: SCOPE_DAY, Tasks: day.Tasks} as Scope)
+      }
+      return {...state, mounted: true, days: days};
     case 'UPDATE_TASKS': {
       let nstate = {...state};
       for(let task of action.tasks) {
         // If task is not visible, no need to do anything
         if(taskVisible(state, task)) {
+          let updateScope = (scope: Scope): Scope => {
+            return {...scope, 
+              Tasks: scope.Tasks.map((t) => t.ID == task.ID ? task: t)};
+          }
+
           if(task.Scope == SCOPE_MONTH) {
-            let scope = state.month;
-            nstate.month = {...state.month, 
-              Tasks: scope.Tasks.map((t) => t.ID == task.ID ? task : t)}
-            return nstate;
+            nstate.month = updateScope(nstate.month);
+          } else if(task.Scope == SCOPE_YEAR) {
+            nstate.year = updateScope(nstate.year);
+          } else if(task.Scope == SCOPE_DAY) {
+            console.log("UPDATING DAY");
+            // Update only the specific day using diff
+            nstate.days = [...state.days.map((s) => s.Date.diff(task.Date, 'days') == 0 ? updateScope(s) : s)]
+            console.log("Updating day task");
           }
         }
       }
-      console.log("update ye tasks");
+      return nstate;
     }
   }
   return state;
@@ -128,12 +158,34 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     common.post(store.dispatch, `/habits/update`, task);
   }
 
+  hasStats() {
+    return this.props.task.CompletedTasks > 0;
+  }
+  
+  hasTime() {
+    return this.props.task.Hours > 0 || this.props.task.Minutes > 0;
+  }
+
+  renderStats() {
+    return <span>{' '}
+      {this.props.task.CompletedTasks}/{this.props.task.TotalTasks} ({this.props.task.CompletionRate}%)
+    </span>
+  }
+
   render() {
     const klass = ['', 'btn-success', 'btn-danger'][this.props.task.Status];
     return <section className="task">
       <button className={`btn btn-xs btn-default ${klass}`} onClick={() => this.cycleStatus()}>
         {this.props.task.Name}
+        {this.hasStats() && this.renderStats()}
       </button>
+      <span className="float-right">
+        {this.hasTime() && <span>
+          <span className="octicon octicon-clock"></span>{' '}
+          {this.props.task.Hours > 0 && `${this.props.task.Hours}h `}
+          {this.props.task.Minutes > 0 && `${this.props.task.Minutes}m`}
+        </span>}
+      </span>
     </section>
   }
 }
@@ -142,7 +194,7 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
   render() {
     return <div>
       <h6 className="scope-title">
-        {this.props.date.format(['','','MMMM', 'YYYY'][this.props.scope.Scope])}
+        {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
       </h6>
       {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
     </div>
@@ -156,7 +208,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
       {this.props.mounted ? 
         <div className="row">
           <div className="col-md-3">
-            <p>Days</p>
+            {this.props.days && this.props.days.map((d, i) => <CScope key={i} date={this.props.date} scope={d} />)}
           </div>
           <div className="col-md-3">
             {this.props.month ? 
@@ -180,6 +232,37 @@ document.addEventListener('DOMContentLoaded', () =>  {
     view: (datestr: string, scopestr: string) => {
       let date = moment(datestr, common.MONTH_FORMAT);
       let scope = parseInt(scopestr, 10);
+
+      // Todo make this more efficeint
+      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+        let limit = date.daysInMonth() + 1;
+        const today = moment();
+        // If we are showing days for the current month, we won't render days that haven't happened yet in advance
+        if(today.month() == date.month() && today.year() == date.year()) {
+          limit = today.date() + 1;
+          // But do mount the next day if it's within 4 hours before midnight so tasks can be added at nighttime
+          const next = today.clone().add(4, 'hours');
+          if(next.date() != today.date()) {
+            limit++;
+          }
+        }
+
+        interface Day {
+          Date: string;
+          Tasks: Array<Task>;
+        }
+
+        common.get(dispatch, `/habits/in-days?date=${date.format(common.DAY_FORMAT)}&limit=${limit}`,
+          ((days: Array<Day>) => {
+            days.forEach((d) => {
+              d.Tasks.forEach(common.processModel);
+            });
+            days = days.reverse();
+            dispatch({type: 'MOUNT_DAYS', date: date, days: days})
+            console.log(days);
+          })
+        )
+      })
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         common.get(dispatch, `/habits/in-month?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
           tasks.forEach(common.processModel);          

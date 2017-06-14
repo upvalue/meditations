@@ -130,7 +130,7 @@ export function request<ResponseType,DispatchType>(method: string, body: any, di
       });
     }
   }).catch((reason) => {
-    console.warn(`Fetch failed ${reason}`);
+    console.warn(`Fetch ${url} failed ${reason}`);
   });
 }
 
