@@ -54,6 +54,11 @@ ul.nav a.navbar-link-disabled {
 
 /**** HABITS */
 
+#habits-root { 
+  margin:0;
+  padding:0;
+}
+
 .scope-title {
   display: inline;
 }

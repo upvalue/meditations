@@ -1,3 +1,4 @@
+import route from 'riot-route';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
@@ -18,6 +19,10 @@ export const SCOPE_MONTH = 2;
 export const SCOPE_YEAR = 3;
 export const SCOPE_WRAP = 4;
 
+export interface Comment extends common.Model {
+  Body: string;
+}
+
 export interface Task extends common.Model {
   ID: number;
   Hours: number;
@@ -26,6 +31,7 @@ export interface Task extends common.Model {
   Status: number;
   Scope: number;
   Name: string;
+  Comment?: Comment;
   // Derived statistics
   Streak: number;
   BestStreak: number;
@@ -62,6 +68,11 @@ interface ViewMonth extends common.CommonState {
 
 type HabitsState = ViewMonth;
 
+interface ChangeDate {
+  type: 'VIEW_DATE';
+  date: moment.Moment;
+}
+
 interface MountDays {
   type: 'MOUNT_DAYS';
   date: moment.Moment;
@@ -81,7 +92,7 @@ interface UpdateTasks {
   tasks: Array<Task>;
 }
 
-type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays;
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | ChangeDate;
 
 const initialState = {
   type: 'VIEW_MONTH',
@@ -93,8 +104,11 @@ const initialState = {
 const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): boolean =>  {
   let date1 = moment.utc(date);
   let date2 = state.date;
+
+  console.log(`Checking visibility of ${date1.format(common.DAY_FORMAT)} against ${date2.format(common.DAY_FORMAT)}`)
   // Check if a scope is visible by seeing within the current month. For daily and monthly tasks/scopes.
   if(scope == SCOPE_MONTH || scope == SCOPE_DAY) {
+
     return date1.year() == date2.year() && date1.month() == date2.month();
   }
 
@@ -103,6 +117,7 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
   }
 
   // TODO: Buckets & projects
+  return false;
 }
 
 /** Check whether a task is currently updated and thus needs to be updated  */
@@ -113,6 +128,8 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
   state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
   switch(action.type) {
+    case 'VIEW_DATE':
+      return {...state, date: action.date};
     case 'MOUNT_SCOPE':
       let visible = dateVisible(state, action.scope, action.date);
       if(!visible) {
@@ -177,14 +194,6 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     common.post(store.dispatch, `/habits/${path}`, this.props.task)
   }
 
-  orderUp() {
-    console.log("Order up!");
-  }
-
-  orderDown() {
-
-  }
-
   hasStats() {
     return this.props.task.CompletedTasks > 0;
   }
@@ -208,6 +217,12 @@ export class CTask extends React.Component<{task: Task}, undefined>{
       onClick = {callback} />
   }
 
+  renderComment() {
+    if(this.props.task.Comment) {
+      return <div className="comment" dangerouslySetInnerHTML={{__html: this.props.task.Comment.Body}} />
+    }
+  }
+
   render() {
     const klass = ['', 'btn-success', 'btn-danger'][this.props.task.Status];
     return <section className="task">
@@ -229,16 +244,30 @@ export class CTask extends React.Component<{task: Task}, undefined>{
         {this.renderControl('Move up', 'chevron-up', () => this.command('order-up'))}
         {this.renderControl('Move down', 'chevron-down', () => this.command('order-down'))}
       </span>
+      {this.props.task.Comment && this.renderComment()}
     </section>
   }
 }
 
 export class CScope extends React.Component<{date: moment.Moment, scope: Scope}, undefined> {
+  navigate(method: 'add' | 'subtract') {
+    const unit = this.props.scope.Scope == SCOPE_MONTH ? 'month' : 'year';
+    const ndate = this.props.date.clone()[method](1, unit);
+    route(`view/${ndate.format(common.MONTH_FORMAT)}`);
+  }
+
   render() {
     return <section className="scope">
       <h6 className="scope-title">
         {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
       </h6>
+      {(this.props.scope.Scope == SCOPE_MONTH || this.props.scope.Scope == SCOPE_YEAR) &&
+        <span>
+          <button className="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous"
+            onClick={() => this.navigate('subtract')} />
+          <button className="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next"
+            onClick={() => this.navigate('add')} />
+        </span>}
       {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
     </section>
   }
@@ -246,7 +275,7 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
 
 const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
   render() {
-    return <div className="container-fluid">
+    return <div id="content" className="container-fluid">
       <common.NotificationBar notifications={this.props.notifications} dismiss={this.props.dismissNotifications} />
       {this.props.mounted ? 
         <div className="row">
@@ -276,7 +305,8 @@ document.addEventListener('DOMContentLoaded', () =>  {
       let date = moment(datestr, common.MONTH_FORMAT);
       let scope = parseInt(scopestr, 10);
 
-      // Todo make this more efficeint
+      store.dispatch({type: 'VIEW_DATE', date: date} as HabitsAction)
+
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         let limit = date.daysInMonth() + 1;
         const today = moment();
@@ -306,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
           })
         )
       })
+
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         common.get(dispatch, `/habits/in-month?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
           tasks.forEach(common.processModel);          
@@ -313,6 +344,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
         }));
       })
 
+      // TODO: Do not remount year when changing month
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) =>{
         common.get(dispatch, `/habits/in-year?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
           tasks.forEach(common.processModel);
