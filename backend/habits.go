@@ -177,9 +177,11 @@ func (task *Task) CalculateTimeAndCompletion() {
 
 // CalculateStats calculates all statistics for monthly and yearly tasks
 func (task *Task) CalculateStats() {
+	// TODO: Rather than calling this ad-hoc, it should be done when a task is retrieved from the database.
+
 	// TODO: This is quite inefficient to do e.g. every time it needs to be rendered
 	// It could be cached in the database, but perhaps it would be simpler to do it in
-	// a map of some kind
+	// a data structure in memory of some kind
 	if task.Scope == ScopeMonth || task.Scope == ScopeYear {
 		task.CalculateTimeAndCompletion()
 		if task.Scope == ScopeYear {
@@ -192,55 +194,60 @@ func (task *Task) CalculateStats() {
 ///// SYNCHRONIZATION
 //
 
-// A message that will be sent to connected clients
-type habitSyncMessage struct {
-	// true if the whole scope needs to be refreshed due to e.g. reordering, deletion or insertion
-	Type       string
-	Wholescope bool `json:"wholescope"`
-	Task       Task `json:"task"`
-}
-
-// If a stat is monthly or yearly, recalculate streak and completion rate as well
-func syncStats(t Task, scope int) {
-	from, to := between(t.Date, scope)
-	var task Task
-	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, scope).Preload("Comment").First(&task)
-	task.CalculateStats()
-	syncTask(task, false)
-}
-
-// HigherScopedTasks returns monthly and yearly tasks with the same name as a daily task, with stats calculated
-// Get tasks with the same name and higher scope as daily task
-func (t *Task) HigherScopedTasks() (Task, Task) {
-	var month, year Task
-	from, to := between(t.Date, ScopeMonth)
-	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, ScopeMonth).Preload("Comment").First(&month)
-	from, to = between(t.Date, ScopeYear)
-	DB.Where("name = ? and date between ? and ? and scope = ?", t.Name, from, to, ScopeYear).Preload("Comment").First(&year)
-	month.CalculateStats()
-	year.CalculateStats()
-	return month, year
-}
-
 type habitSyncMsg struct {
-	Wholescope bool
-	Tasks      []Task
+	Tasks []Task
 }
 
-// Sync takes a task that has been changed and sends all necessary new information to clients
-func (task *Task) Sync(wholescope bool) {
+// There are several types of UI task updates
+// Updates that mean the scope may need to be re-ordered (re-ordering)
+// Updates that mean higher scopes and projects may need their stats re-calculated (status changes)
+// Updates that only effect the task in question
+
+// Combinations (e.g. deletion may require recalculation and reordering)
+
+// SyncWithStats syncs a specific task, and recalculates tasks on higher-scoped tasks if necessary
+func (task *Task) SyncWithStats(includeMainTask bool) {
 	if task.ID == 0 {
 		return
 	}
 
 	DB.Where("task_id = ?", task.ID).First(&task.Comment)
 
-	tasks := []Task{*task}
-	message := habitSyncMsg{
-		Wholescope: wholescope,
-		Tasks:      tasks,
+	var tasks []Task
+
+	if includeMainTask == true {
+		fmt.Printf("Including main task!!!!!\n")
+		fmt.Printf("Including main task!!!!!\n")
+		fmt.Printf("Including main task!!!!!\n")
+		tasks = append(tasks, *task)
 	}
-	habitSync.Send("UPDATE_TASKS", message)
+
+	if task.Scope == ScopeDay {
+		var year Task
+		from, to := between(task.Date, ScopeYear)
+		DB.Where("name = ? and date between ? and ? and scope = ?", task.Name, from, to, ScopeYear).Preload("Comment").First(&year)
+		if year.ID != 0 {
+			year.CalculateStats()
+			tasks = append(tasks, year)
+		}
+
+		var month Task
+		from, to = between(task.Date, ScopeMonth)
+		DB.Where("name = ? and date between ? and ? and scope = ?", task.Name, from, to, ScopeMonth).Preload("Comment").First(&month)
+		if month.ID != 0 {
+			month.CalculateStats()
+			tasks = append(tasks, month)
+		}
+	}
+
+	if len(tasks) != 0 {
+		// It is possible for this to result in zero tasks to send, if a task has been deleted and
+		// no stat recalculations are necessary
+		habitSync.Send("UPDATE_TASKS", habitSyncMsg{
+			Tasks: tasks,
+		})
+	}
+
 }
 
 type scopeSyncMsg struct {
@@ -267,37 +274,14 @@ func (task *Task) SyncScope() {
 	habitSync.Send("UPDATE_SCOPE", message)
 }
 
-func syncTask(t Task, wholescope bool) {
-	if t.ID == 0 {
-		return
+// Sync sends updates to the UI as necessary after a task changes
+func (task *Task) Sync(updateScope bool, recalculate bool, includeMainTask bool) {
+	if updateScope {
+		task.SyncScope()
 	}
 
-	DB.Where("task_id = ?", t.ID).First(&t.Comment)
-
-	// Calculate derived stats
-	if t.Scope == ScopeMonth || t.Scope == ScopeYear {
-		t.CalculateTimeAndCompletion()
-		if t.Scope == ScopeYear {
-			t.CalculateStreak()
-		}
-	}
-
-	if t.Scope == ScopeDay {
-	}
-	/*
-		message := habitSyncMessage{
-			Wholescope: scope,
-			Task:       t,
-		}
-	*/
-	if t.Scope == ScopeDay {
-
-	}
-	//habitSync.Send("UPDATE_TASK", message)
-	// Recalculate stats for higher scopes
-	if t.Scope == ScopeDay {
-		syncStats(t, ScopeMonth)
-		syncStats(t, ScopeYear)
+	if recalculate {
+		task.SyncWithStats(includeMainTask)
 	}
 }
 
@@ -423,10 +407,12 @@ func tasksInYear(c *macaron.Context) {
 }
 
 // Update a task's fields by JSON
+// Only used when updating statuses at the moment
 func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
-	task.Sync(false)
+
+	task.Sync(false, true, true)
 	c.JSON(200, task)
 }
 
@@ -436,13 +422,19 @@ func taskNew(c *macaron.Context, task Task) {
 	tasksInScope(&tasks, task.Scope, task.Date)
 	task.Order = len(tasks)
 	DB.Save(&task)
+
+	// If this is a project
 	if task.Scope > ScopeYear {
 		var scope Scope
 		DB.Where("id = ?", task.Scope).First(&scope)
 		scope.UpdatedAt = time.Now()
 		DB.Save(&scope)
 	}
-	syncTask(task, true)
+
+	// If this new task should have stats attached
+	task.CalculateStats()
+
+	task.Sync(false, true, true)
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
@@ -461,8 +453,6 @@ func taskDelete(c *macaron.Context, task Task) {
 		DB.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
 	}
 
-	syncTask(task, true)
-
 	// Reorder tasks after this one
 	for _, t := range tasks {
 		if t.Order > task.Order {
@@ -470,6 +460,9 @@ func taskDelete(c *macaron.Context, task Task) {
 		}
 		DB.Save(&t)
 	}
+
+	//task.Sync(true, true, true)
+	task.Sync(true, true, false)
 
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
@@ -497,7 +490,6 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 
 	task.SyncScope()
 
-	syncTask(task, true)
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
@@ -539,7 +531,6 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 		DB.Save(&comment)
 		task.Comment = comment
 	}
-	syncTask(task, false)
 	c.PlainText(200, []byte("OK"))
 }
 

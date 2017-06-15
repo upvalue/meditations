@@ -1,5 +1,5 @@
 * Habits
-** TODO CalculateStats should switch intelligently on monthly and yearly tasks
+** DONE CalculateStats should switch intelligently on monthly and yearly tasks
 ** TODO Remove comments table, collapse to tasks
 ** TODO Collapsing
    Or some other way of reducing visual clutter with tasks that are frequently logged but otherwise uninteresting.
@@ -26,7 +26,7 @@
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
 ** DONE Simplify sync code by moving messaging stuff to sync.go
 ** TODO Title updates
-** TODO Remove jQuery if possible
+** DONE Remove jQuery if possible
 ** TODO Remove a bunch of unnecessary code.
 ** TODO React -> Inferno/preact?
 ** TODO Database cleanup on start
@@ -39,3 +39,4 @@
 *** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
 ** TODO Redux MapDispatchToProps
 
+** TODO Demo XSS

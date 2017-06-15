@@ -88,7 +88,6 @@ interface MountScope {
 
 interface UpdateTasks {
   type: 'UPDATE_TASKS';
-  wholescope: boolean;
   tasks: Array<Task>;
 }
 
@@ -105,10 +104,9 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
   let date1 = moment.utc(date);
   let date2 = state.date;
 
-  console.log(`Checking visibility of ${date1.format(common.DAY_FORMAT)} against ${date2.format(common.DAY_FORMAT)}`)
+  //console.log(`Checking visibility of ${date1.format(common.DAY_FORMAT)} against ${date2.format(common.DAY_FORMAT)}`)
   // Check if a scope is visible by seeing within the current month. For daily and monthly tasks/scopes.
   if(scope == SCOPE_MONTH || scope == SCOPE_DAY) {
-
     return date1.year() == date2.year() && date1.month() == date2.month();
   }
 
@@ -116,7 +114,7 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
     return date1.year() == date2.year();
   }
 
-  // TODO: Buckets & projects
+  // TODO: Check project visibility
   return false;
 }
 
@@ -160,8 +158,22 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
         // If task is not visible, no need to do anything
         if(taskVisible(state, task)) {
           let updateScope = (scope: Scope): Scope => {
-            return {...scope, 
-              Tasks: scope.Tasks.map((t) => t.ID == task.ID ? task: t)};
+            // New tasks can also come from UPDATE_TASKS
+            // New tasks go on the end, so if it's not in the current list
+            // it can be appended afterwards
+            let append = true;
+            let tasks = scope.Tasks.map((t) => {
+              if(t.ID == task.ID) {
+                append = false;
+                return task;
+              } else {
+                return t;
+              }
+            })
+            if(append) {
+              tasks.push(task);
+            }
+            return {...scope, Tasks: tasks}
           }
 
           if(task.Scope == SCOPE_MONTH) {
@@ -194,6 +206,44 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     common.post(store.dispatch, `/habits/${path}`, this.props.task)
   }
 
+  setTime() {
+    const timestr = window.prompt("LOg time (HH:MM or minutes, 0 to clear)")
+    if(!timestr) {
+      return;
+    }
+    // Parse something like "5" (5 minutes) or "5:03" (5 hours, 3 minutes)
+    const time = timestr.split(":");
+    let hours = NaN, minutes = NaN;
+    if(time.length == 1) {
+      hours = 0;
+      minutes = parseInt(time[0], 10);
+    } else if(time.length == 2) {
+      hours = parseInt(time[0], 10);
+      minutes = parseInt(time[1], 10);
+    } 
+
+    console.log(hours, minutes);
+
+    if(isNaN(hours) || isNaN(minutes)) {
+      store.dispatch({
+        type: 'NOTIFICATION_OPEN',
+        notification: {error: true, message: `Invalid time string '${time}' (should be HH:MM or MM)`}
+      })
+      return;
+    }
+
+    // Do not update comment
+    const task = {...this.props.task, Hours: hours, Minutes: minutes}
+    delete task.Comment;
+    common.post(store.dispatch, `/habits/update`, task)
+  }
+
+  destroy() {
+    if(window.confirm("Are you sure you want to delete this task?")) {
+      common.post(store.dispatch, `/habits/delete`, this.props.task)
+    }
+  }
+
   hasStats() {
     return this.props.task.CompletedTasks > 0;
   }
@@ -203,7 +253,7 @@ export class CTask extends React.Component<{task: Task}, undefined>{
   }
 
   hasStreak() {
-    return this.props.task.Streak > 0;
+    return this.props.task.Streak > 0 || this.props.task.BestStreak > 0;
   }
 
   renderStats() {
@@ -241,6 +291,9 @@ export class CTask extends React.Component<{task: Task}, undefined>{
           <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
           </span>}
 
+        {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
+        {this.props.task.Scope == SCOPE_DAY && 
+          this.renderControl('Set time', 'clock', () => this.setTime())}
         {this.renderControl('Move up', 'chevron-up', () => this.command('order-up'))}
         {this.renderControl('Move down', 'chevron-down', () => this.command('order-down'))}
       </span>
@@ -256,6 +309,17 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
     route(`view/${ndate.format(common.MONTH_FORMAT)}`);
   }
 
+  addTask() {
+    const name = window.prompt("Enter task name (leave empty to cancel): ");
+    if(name) {
+      common.post(store.dispatch, `/habits/new`, {
+        name: name,
+        scope: this.props.scope.Scope,
+        date: this.props.scope.Date.format("YYYY-MM-DDTHH:mm:ssZ")
+      })
+    }
+  }
+
   render() {
     return <section className="scope">
       <h6 className="scope-title">
@@ -268,6 +332,8 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
           <button className="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next"
             onClick={() => this.navigate('add')} />
         </span>}
+      <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="Add"
+        onClick={() => this.addTask()} />
       {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
     </section>
   }
@@ -358,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () =>  {
   type HabitMessage = {
     Type: 'UPDATE_TASKS';
     Datum: {
-      Wholescope: boolean
       Tasks: Array<Task>
     }
   } | {
@@ -368,16 +433,20 @@ document.addEventListener('DOMContentLoaded', () =>  {
       Scope: number;
       Tasks: Array<Task>;
     }
+  } | {
+    Type: 'TASK_CREATE';
+    Datum: {
+      Task: Array<Task>;
+    }
   }
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
-    console.log("Received WebSocket message ${msg}");
+    console.log(`Received WebSocket message`, msg);
     switch(msg.Type) {
       case 'UPDATE_TASKS':
         msg.Datum.Tasks.forEach(common.processModel);
         console.log(msg.Datum);
         store.dispatch({type: 'UPDATE_TASKS',
-          wholescope: msg.Datum.Wholescope,
           tasks: msg.Datum.Tasks
         })
         break;
@@ -389,7 +458,6 @@ document.addEventListener('DOMContentLoaded', () =>  {
           scope: msg.Datum.Scope, tasks: msg.Datum.Tasks} as MountScope);
         break;
     }
-    console.log("Received message", msg);
   })
   
   ///// RENDER
