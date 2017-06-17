@@ -257,6 +257,7 @@ type scopeSyncMsg struct {
 	Date  string
 	Scope int
 	Tasks []Task
+	Name  string
 }
 
 // SyncScope re-sends a task's entire scope. Necessary when order is changed or a task is deleted
@@ -268,10 +269,21 @@ func (task *Task) SyncScope() {
 		tasks[i].CalculateStats()
 	}
 
+	var scopeName string
+
+	// If this is a project, we also need to include the name
+	if task.Scope >= ScopeProject {
+		var scope Scope
+		DB.Where("ID = ?", task.Scope).First(&scope)
+
+		scopeName = scope.Name
+	}
+
 	message := scopeSyncMsg{
 		Date:  task.Date.Format(DateFormat),
 		Scope: task.Scope,
 		Tasks: tasks,
+		Name:  scopeName,
 	}
 
 	habitSync.Send("UPDATE_SCOPE", message)
@@ -314,8 +326,8 @@ func between(start time.Time, scope int) (string, string) {
 }
 
 func tasksInScope(tasks *[]Task, scope int, start time.Time) {
-	if scope > ScopeYear {
-		DB.Where("scope = ?", scope).Preload("Comment").Find(tasks)
+	if scope >= ScopeProject {
+		DB.Where("scope = ?", scope).Preload("Comment").Order("`order` asc").Find(tasks)
 	} else {
 		from, to := between(start, scope)
 

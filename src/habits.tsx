@@ -160,9 +160,8 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
     case 'CHANGE_ROUTE':
       return {...state, date: action.date, currentProject: action.currentProject};
     case 'MOUNT_SCOPE':
-      // If name is provided, this is a project and will always be mounted
       if(action.name) {
-        return {...state, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
+        return {...state, mounted: true, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
       }
 
       // If not provided, this is a time scope and may or may not need to be mounted
@@ -476,65 +475,92 @@ document.addEventListener('DOMContentLoaded', () =>  {
       let date = moment(datestr, common.MONTH_FORMAT);
       let project = parseInt(scopestr, 10);
 
+      // There are three possible UI changes that can result from this route
+      // 1) Month and days need to be remounted (date changed by a month)
+      // 2) Months, days and year needs to be remounted (date changed by a year)
+      // 3) Project needs to be remounted (currentProject changed)
+
+      let state = store.getState() as HabitsState;
+      if(state === undefined) return;
+      let prevDate = state.date;
+      let prevProject = state.currentProject;
+
+      let timeChanged: 'NO_CHANGE' | 'CHANGE_YEAR' | 'CHANGE_MONTH' = 'NO_CHANGE';
+
+      if(state.mounted === false) {
+        // First mount, fetch everything
+        timeChanged = 'CHANGE_YEAR';
+      } else if(date.format(common.DAY_FORMAT) != prevDate.format(common.DAY_FORMAT)) {
+        timeChanged = 'CHANGE_MONTH';
+        if(date.year() != prevDate.year()) {
+          timeChanged = 'CHANGE_YEAR';
+        }
+      }
+
+      let projectChanged = prevProject != project;
+
+      //let timeChanged = date.format(common.DAY_FORMAT) != 
       store.dispatch({type: 'CHANGE_ROUTE', date: date, currentProject: project} as HabitsAction)
 
-      // TODO: Check differences
-
-      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-        let limit = date.daysInMonth() + 1;
-        const today = moment();
-        // If we are showing days for the current month, we won't render days that haven't happened yet in advance
-        if(today.month() == date.month() && today.year() == date.year()) {
-          limit = today.date() + 1;
-          // But do mount the next day if it's within 4 hours before midnight so tasks can be added at nighttime
-          const next = today.clone().add(4, 'hours');
-          if(next.date() != today.date()) {
-            limit++;
+      // Get day scopes
+      if(timeChanged == 'CHANGE_YEAR' || timeChanged == 'CHANGE_MONTH') {
+        store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+          let limit = date.daysInMonth() + 1;
+          const today = moment();
+          // If we are showing days for the current month, we won't render days that haven't happened yet in advance
+          if(today.month() == date.month() && today.year() == date.year()) {
+            limit = today.date() + 1;
+            // But do mount the next day if it's within 4 hours before midnight so tasks can be added at nighttime
+            const next = today.clone().add(4, 'hours');
+            if(next.date() != today.date()) {
+              limit++;
+            }
           }
-        }
 
-        interface Day {
-          Date: string;
-          Tasks: Array<Task>;
-        }
+          interface Day {
+            Date: string;
+            Tasks: Array<Task>;
+          }
 
-        common.get(dispatch, `/habits/in-days?date=${date.format(common.DAY_FORMAT)}&limit=${limit}`,
-          ((days: Array<Day>) => {
-            days.forEach((d) => {
-              d.Tasks.forEach(common.processModel);
-            });
-            days = days.reverse();
-            dispatch({type: 'MOUNT_DAYS', date: date, days: days})
-            console.log(days);
-          })
-        )
-      })
+          common.get(dispatch, `/habits/in-days?date=${date.format(common.DAY_FORMAT)}&limit=${limit}`,
+            ((days: Array<Day>) => {
+              days.forEach((d) => {
+                d.Tasks.forEach(common.processModel);
+              });
+              days = days.reverse();
+              dispatch({type: 'MOUNT_DAYS', date: date, days: days})
+              console.log(days);
+            })
+          )
+        })
 
-      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-        common.get(dispatch, `/habits/in-month?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
-          tasks.forEach(common.processModel);          
-          dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_MONTH, tasks: tasks} as HabitsAction);
-        }));
-      })
+        store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+          common.get(dispatch, `/habits/in-month?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
+            tasks.forEach(common.processModel);          
+            dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_MONTH, tasks: tasks} as HabitsAction);
+          }));
+        })
+      }
 
-      // TODO: Do not remount year when changing month
-      store.dispatch((dispatch: redux.Dispatch<HabitsState>) =>{
-        common.get(dispatch, `/habits/in-year?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
-          tasks.forEach(common.processModel);
-          dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_YEAR, tasks: tasks} as HabitsAction);
-        }));
-      });
+      if(timeChanged == 'CHANGE_YEAR') {
+        store.dispatch((dispatch: redux.Dispatch<HabitsState>) =>{
+          common.get(dispatch, `/habits/in-year?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
+            tasks.forEach(common.processModel);
+            dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_YEAR, tasks: tasks} as HabitsAction);
+          }));
+        });
+      }
 
+      // Retrieve and mount project list
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         common.get(dispatch, `/habits/projects`, ((response: Array<Project>) => {
-          console.log(response);
           dispatch({type: 'ADD_PROJECT_LIST', projects: response})
         }))
       })
 
+      // Retrieve and mount requested project
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         common.get(dispatch, `/habits/in-project/${project}`, ((response: {scope: {Name: String, ID: number}, tasks: Array<Task>}) => {
-          console.log(response);
           response.tasks.forEach(common.processModel);
           dispatch({type: 'MOUNT_SCOPE', date: date, name: response.scope.Name, scope: response.scope.ID, tasks: response.tasks});
         }));
