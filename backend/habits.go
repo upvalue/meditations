@@ -204,9 +204,19 @@ type habitSyncMsg struct {
 // There are several types of UI task updates
 // Updates that mean the scope may need to be re-ordered (re-ordering)
 // Updates that mean higher scopes and projects may need their stats re-calculated (status changes)
-// Updates that only effect the task in question
-
+// Updates that only effect the task in question and do not necessitate any recalculations
 // Combinations (e.g. deletion may require recalculation and reordering)
+
+// SyncOnlyTask just sends a single task; used for comment updates only
+func (task *Task) SyncOnlyTask() {
+	var tasks []Task
+	tasks = append(tasks, *task)
+
+	habitSync.Send("UPDATE_TASKS", habitSyncMsg{
+		Tasks: tasks,
+	})
+
+}
 
 // SyncWithStats syncs a specific task, and recalculates tasks on higher-scoped tasks if necessary
 func (task *Task) SyncWithStats(includeMainTask bool) {
@@ -219,9 +229,6 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 	var tasks []Task
 
 	if includeMainTask == true {
-		fmt.Printf("Including main task!!!!!\n")
-		fmt.Printf("Including main task!!!!!\n")
-		fmt.Printf("Including main task!!!!!\n")
 		tasks = append(tasks, *task)
 	}
 
@@ -476,7 +483,6 @@ func taskDelete(c *macaron.Context, task Task) {
 		DB.Save(&t)
 	}
 
-	//task.Sync(true, true, true)
 	task.Sync(true, true, false)
 
 	c.PlainText(http.StatusOK, []byte("OK"))
@@ -530,6 +536,8 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 
 	if cid == 0 && empty == true {
 		// Empty, do not create or update comment
+		c.PlainText(200, []byte("OK"))
+		return
 	} else if cid > 0 && empty == true {
 		// Delete existing comment
 		DB.Delete(&comment)
@@ -546,6 +554,7 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 		DB.Save(&comment)
 		task.Comment = comment
 	}
+	task.SyncOnlyTask()
 	c.PlainText(200, []byte("OK"))
 }
 

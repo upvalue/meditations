@@ -129,7 +129,6 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
   let date1 = moment.utc(date);
   let date2 = state.date;
 
-  //console.log(`Checking visibility of ${date1.format(common.DAY_FORMAT)} against ${date2.format(common.DAY_FORMAT)}`)
   // Check if a scope is visible by seeing within the current month. For daily and monthly tasks/scopes.
   if(scope == SCOPE_MONTH || scope == SCOPE_DAY) {
     return date1.year() == date2.year() && date1.month() == date2.month();
@@ -143,12 +142,11 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
   return false;
 }
 
-/** Check whether a task is currently updated and thus needs to be updated  */
+/** Check whether a task is currently rendered and thus needs to be updated in the UI */
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   if(scopeIsTimeBased(task.Scope)) {
     return dateVisible(state, task.Scope, task.Date);
   }
-  console.log("Scope not time based, comparing ", state.project.Scope, task.Scope)
   return task.Scope == state.project.Scope;
 }
 
@@ -157,10 +155,16 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
   switch(action.type) {
     case 'ADD_PROJECT_LIST':
       return {...state, projects: action.projects};
+
     case 'CHANGE_ROUTE':
       return {...state, date: action.date, currentProject: action.currentProject};
+
     case 'MOUNT_SCOPE':
       if(action.name) {
+        if(state.project && action.scope != state.project.Scope) {
+          console.log("Project scope not visible, ignoring");
+          return state;
+        }
         return {...state, mounted: true, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
       }
 
@@ -176,18 +180,21 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
           let days = state.days;
           return {...state, 
             days: state.days.map((s, i) => {
+              // TODO is diff okay here?
               return s.Date.diff(action.date, 'days') == 0 ? scope : s;
             })}
         case SCOPE_MONTH: return {...state, mounted: true, month: scope}
         case SCOPE_YEAR: return {...state, mounted: true, year: scope}
       }
       break;
+
     case 'MOUNT_DAYS':
       let days = Array<Scope>();
       for(let day of action.days) {
         days.push({Date: moment(day.Date, common.DAY_FORMAT), Scope: SCOPE_DAY, Tasks: day.Tasks} as Scope)
       }
       return {...state, mounted: true, days: days};
+
     case 'UPDATE_TASKS': {
       let nstate = {...state};
       for(let task of action.tasks) {
@@ -237,7 +244,13 @@ const store = common.makeStore(reducer);
 
 ////// REACT
 
-export class CTask extends React.Component<{task: Task}, undefined>{
+export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.MediumEditor}>{
+  body: HTMLElement;
+
+  componentWillMount() {
+    this.setState({});
+  }
+
   cycleStatus() {
     const task = {...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP}
     common.post(store.dispatch, `/habits/update`, task);
@@ -305,6 +318,28 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     common.post(store.dispatch, "/habits/new", task)
   }
 
+  editComment() {
+    if(!this.state.editor) {
+      let editor = common.makeEditor(this.body, undefined, () => {
+        const newBody = this.body.innerHTML;
+
+        // Do not update if nothing has changed
+        if(this.props.task.Comment && newBody == this.props.task.Comment.Body) {
+          return;
+        }
+
+        common.post(store.dispatch, `/habits/comment-update`, {
+          ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
+          Body: this.body.innerHTML,
+          TaskID: this.props.task.ID
+        })
+      });
+
+      this.setState({editor: editor})
+      this.body.focus();
+    }
+  }
+
   hasStats() {
     return this.props.task.CompletedTasks > 0;
   }
@@ -338,7 +373,7 @@ export class CTask extends React.Component<{task: Task}, undefined>{
 
   renderComment() {
     if(this.props.task.Comment) {
-      return <div className="comment" dangerouslySetInnerHTML={{__html: this.props.task.Comment.Body}} />
+      return <div className="comment" ref={(body) => this.body = body} onClick={() => this.editComment()} dangerouslySetInnerHTML={{__html: this.props.task.Comment.Body}} />
     }
   }
 
@@ -360,6 +395,7 @@ export class CTask extends React.Component<{task: Task}, undefined>{
           <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
           </span>}
 
+        {this.renderControl('Add/edit comment', 'comment', () => this.editComment())}  
         {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
         {this.props.task.Scope == SCOPE_DAY && 
           this.renderControl('Set time', 'clock', () => this.setTime())}
@@ -602,7 +638,6 @@ document.addEventListener('DOMContentLoaded', () =>  {
 
       case 'UPDATE_SCOPE':
         msg.Datum.Tasks.forEach(common.processModel);
-       //let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
         store.dispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
           scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name} as MountScope);
         break;

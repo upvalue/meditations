@@ -178,7 +178,7 @@ class CEntry extends React.Component<{context?: boolean, entry: Entry}, {editor:
       let editor = common.makeEditor(this.body, undefined, () => {
         const newBody = this.body.innerHTML;
 
-        // Do not update if  has changed
+        // Do not update if nothing has changed
         if(newBody == this.props.entry.Body) {
           return;
         }
