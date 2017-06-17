@@ -2849,10 +2849,6 @@ riot-route@^3.1.1:
   dependencies:
     riot-observable "^3.0.0"
 
-riotcontrol@0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/riotcontrol/-/riotcontrol-0.0.3.tgz#8b3d7c93002964a331d7f7bbd8490f167eca9eb2"
-
 ripemd160@^2.0.0, ripemd160@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/ripemd160/-/ripemd160-2.0.1.tgz#0f4584295c53a3628af7e6d79aca21ce57d1c6e7"

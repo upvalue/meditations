@@ -76,6 +76,16 @@ export function makeStore<S>(reducer: redux.Reducer<S>) {
 }
 
 ///// REACT COMMON
+
+/** Simple CSS loading spinner */
+export const Spinner = (props: any) => {
+  return <div className="spinner">
+    <div className="bounce1" />
+    <div className="bounce2" />
+    <div className="bounce3" />
+  </div>
+}
+
 /** A bar at the top which displays notifications */
 export const NotificationBar: React.SFC<{dismiss: () => void, notifications?: Array<Notification>}> = (props) => {
   if(props.notifications) {
@@ -96,7 +106,6 @@ export const NotificationBar: React.SFC<{dismiss: () => void, notifications?: Ar
     return <span />
   }
 }
-
 
 /**
  * Shorthand for fetch which reports errors to user

@@ -13,11 +13,15 @@ export const STATUS_COMPLETE = 1;
 export const STATUS_INCOMPLETE = 2;
 export const STATUS_WRAP = 3;
 
-export const SCOPE_BUCKET = 0;
+export const SCOPE_UNUSED = 0;
 export const SCOPE_DAY = 1;
 export const SCOPE_MONTH = 2;
 export const SCOPE_YEAR = 3;
-export const SCOPE_WRAP = 4;
+export const SCOPE_PROJECT = 4;
+
+export const scopeIsTimeBased = (scope: number) => {
+  return scope < SCOPE_PROJECT && scope > SCOPE_UNUSED;
+}
 
 export interface Comment extends common.Model {
   Body: string;
@@ -41,11 +45,17 @@ export interface Task extends common.Model {
   TotalTasksWithTime: number;
 }
 
+/** Note that this does not track the structure of the backend Scope table but is used for rendering */
 export interface Scope {
   Name: string;
   Scope: number;
   Date: moment.Moment;
   Tasks: Array<Task>;
+}
+
+export interface Project {
+  ID: number;
+  Name: string;
 }
 
 export interface Day {
@@ -59,12 +69,19 @@ type TaskList = Array<Task>;
 
 interface ViewMonth extends common.CommonState {
   type: 'VIEW_MONTH';
+  // Navigation & routing
   date: moment.Moment;
-  bucket: number;
+  currentProject: number;
+
+  // True after some UI information has been loaded
+  mounted: boolean;
+
+  // UI tree
+  projects: Array<Project>;
   month: Scope;
   year: Scope;
   days: Array<Scope>;
-  mounted: boolean;
+  project: Scope;
 }
 
 type HabitsState = ViewMonth;
@@ -72,7 +89,12 @@ type HabitsState = ViewMonth;
 interface ChangeRoute {
   type: 'CHANGE_ROUTE';
   date: moment.Moment;
-  bucket: number;
+  currentProject: number;
+}
+
+interface AddProjectList {
+  type: 'ADD_PROJECT_LIST';
+  projects: Array<Project>;
 }
 
 interface MountDays {
@@ -84,6 +106,7 @@ interface MountDays {
 interface MountScope {
   type: 'MOUNT_SCOPE';
   scope: number;
+  name?: string;
   tasks: TaskList;
   date: moment.Moment;
 }
@@ -93,7 +116,7 @@ interface UpdateTasks {
   tasks: Array<Task>;
 }
 
-type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | ChangeRoute;
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | ChangeRoute | AddProjectList;
 
 const initialState = {
   type: 'VIEW_MONTH',
@@ -122,15 +145,27 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
 
 /** Check whether a task is currently updated and thus needs to be updated  */
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
-  return dateVisible(state, task.Scope, task.Date);
+  if(scopeIsTimeBased(task.Scope)) {
+    return dateVisible(state, task.Scope, task.Date);
+  }
+  console.log("Scope not time based, comparing ", state.project.Scope, task.Scope)
+  return task.Scope == state.project.Scope;
 }
 
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
   state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
   switch(action.type) {
+    case 'ADD_PROJECT_LIST':
+      return {...state, projects: action.projects};
     case 'CHANGE_ROUTE':
-      return {...state, date: action.date, bucket: action.bucket};
+      return {...state, date: action.date, currentProject: action.currentProject};
     case 'MOUNT_SCOPE':
+      // If name is provided, this is a project and will always be mounted
+      if(action.name) {
+        return {...state, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
+      }
+
+      // If not provided, this is a time scope and may or may not need to be mounted
       let visible = dateVisible(state, action.scope, action.date);
       if(!visible) {
         console.log("Scope not visible, ignoring");
@@ -185,8 +220,13 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
           } else if(task.Scope == SCOPE_DAY) {
             // Update only the specific day using diff
             nstate.days = [...state.days.map((s) => s.Date.diff(task.Date, 'days') == 0 ? updateScope(s) : s)]
+          } else {
+            nstate.project = updateScope(nstate.project);
           }
+        } else {
+          console.log("Tasks not visible, ignoring");
         }
+
       }
       return nstate;
     }
@@ -334,11 +374,11 @@ export class CTask extends React.Component<{task: Task}, undefined>{
   }
 }
 
-export class CScope extends React.Component<{date: moment.Moment, scope: Scope}, undefined> {
+export class TimeScope extends React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope}, undefined> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope == SCOPE_MONTH ? 'month' : 'year';
-    const ndate = this.props.date.clone()[method](1, unit);
-    route(`view/${ndate.format(common.MONTH_FORMAT)}`);
+    const ndate = this.props.currentDate.clone()[method](1, unit);
+    route(`view/${ndate.format(common.MONTH_FORMAT)}/${this.props.currentProject}`);
   }
 
   addTask() {
@@ -354,9 +394,6 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
 
   render() {
     return <section className="scope">
-      <h6 className="scope-title">
-        {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
-      </h6>
       {(this.props.scope.Scope == SCOPE_MONTH || this.props.scope.Scope == SCOPE_YEAR) &&
         <span>
           <button className="btn btn-link btn-sm btn-default octicon octicon-chevron-left" title="Previous"
@@ -364,34 +401,70 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
           <button className="btn btn-link btn-sm btn-default octicon octicon-chevron-right" title="Next"
             onClick={() => this.navigate('add')} />
         </span>}
-      <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="Add"
+      <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="New task"
         onClick={() => this.addTask()} />
+      <h6 className="scope-title">
+        {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
+      </h6>
+      {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
+    </section>
+  }
+}
+
+export class ProjectScope extends React.Component<{currentProject: number, currentDate: moment.Moment, projects: Array<Project>, scope: Scope}, undefined> {
+  changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
+    e.persist();
+    let projectID = parseInt(e.currentTarget.value, 10);
+
+    route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`)
+  }
+
+  render() {
+    return <section className="scope">
+      <div>
+        <select onChange={(o) => this.changeProject(o) } className="form-control" >
+          {this.props.projects && this.props.projects.map((e, i) => <option key={i} value={e.ID} >{e.Name}</option>)}
+        </select>
+      </div>
+
+      <h6 className="scope-title">{this.props.scope.Name}</h6>
+
       {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
     </section>
   }
 }
 
 const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
+  renderTimeScope(s?: Scope, i?: number) {
+    if(s) {
+      return <TimeScope currentProject={this.props.currentProject}
+        key={i} currentDate={this.props.date} scope={s} />
+    } else {
+      return <common.Spinner />
+    }
+  }
   render() {
     return <div >
       <common.NotificationBar notifications={this.props.notifications} dismiss={this.props.dismissNotifications} />
-      {this.props.mounted ? 
+      {this.props.mounted && 
         <div className="row">
           <div className="col-md-3">
-            {this.props.days && this.props.days.map((d, i) => <CScope key={i} date={this.props.date} scope={d} />)}
+            {this.props.days ? 
+              this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
+              <common.Spinner /> }
           </div>
           <div className="col-md-3">
-            {this.props.month ? 
-              <CScope date={this.props.date} scope={this.props.month} /> : ''}
+            {this.renderTimeScope(this.props.month)}
           </div>
           <div className="col-md-3">
-            {this.props.year ?
-              <CScope date={this.props.date} scope={this.props.year} /> : ''}
+            {this.renderTimeScope(this.props.year)}
           </div>
           <div className="col-md-3">
-            <p>Projects</p>
+            {this.props.project ?
+            <ProjectScope currentProject={this.props.currentProject} currentDate={this.props.date} projects={this.props.projects} scope={this.props.project} />
+              : <common.Spinner /> }
           </div>
-        </div> : ''}
+        </div>}
     </div>
   }
 });
@@ -401,9 +474,11 @@ document.addEventListener('DOMContentLoaded', () =>  {
   common.installRouter("/habits#", `view/${moment().format(common.MONTH_FORMAT)}/0`, {
     view: (datestr: string, scopestr: string) => {
       let date = moment(datestr, common.MONTH_FORMAT);
-      let scope = parseInt(scopestr, 10);
+      let project = parseInt(scopestr, 10);
 
-      store.dispatch({type: 'CHANGE_ROUTE', date: date, bucket: 0} as HabitsAction)
+      store.dispatch({type: 'CHANGE_ROUTE', date: date, currentProject: project} as HabitsAction)
+
+      // TODO: Check differences
 
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         let limit = date.daysInMonth() + 1;
@@ -449,6 +524,21 @@ document.addEventListener('DOMContentLoaded', () =>  {
           dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_YEAR, tasks: tasks} as HabitsAction);
         }));
       });
+
+      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+        common.get(dispatch, `/habits/projects`, ((response: Array<Project>) => {
+          console.log(response);
+          dispatch({type: 'ADD_PROJECT_LIST', projects: response})
+        }))
+      })
+
+      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+        common.get(dispatch, `/habits/in-project/${project}`, ((response: {scope: {Name: String, ID: number}, tasks: Array<Task>}) => {
+          console.log(response);
+          response.tasks.forEach(common.processModel);
+          dispatch({type: 'MOUNT_SCOPE', date: date, name: response.scope.Name, scope: response.scope.ID, tasks: response.tasks});
+        }));
+      })
     }
   });
 
@@ -464,6 +554,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
       Date: string;
       Scope: number;
       Tasks: Array<Task>;
+      Name: string;
     }
   } | {
     Type: 'TASK_CREATE';
@@ -487,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
         msg.Datum.Tasks.forEach(common.processModel);
        //let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
         store.dispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
-          scope: msg.Datum.Scope, tasks: msg.Datum.Tasks} as MountScope);
+          scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name} as MountScope);
         break;
     }
   })

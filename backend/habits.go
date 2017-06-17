@@ -29,14 +29,17 @@ const (
 )
 
 const (
-	// ScopeBucket scope of "bucket list" tasks and comments
-	ScopeBucket = iota
+	// ScopeUnused was originally used to refer to a global "bucket list," but this has been superceded by project support.
+	// No tasks should have a scope of ScopeUnused.
+	ScopeUnused = iota
 	// ScopeDay of daily tasks and journal entries
 	ScopeDay = iota
 	// ScopeMonth scope of monthly tasks
 	ScopeMonth = iota
 	// ScopeYear scope of yearly tasks
 	ScopeYear = iota
+	// ScopeProject scope of projects. Note that all scopes with this or higher are projects.
+	ScopeProject = iota
 )
 
 const (
@@ -75,7 +78,7 @@ type Task struct {
 }
 
 // Scope represents a task scope. Time-based scopes (daily, monthly, yearly) are built-in, but the user can add
-// additional "bucket lists," each of which have their own scope.
+// additional "projects," each of which have their own scope with an ID of ScopeProject or greater
 type Scope struct {
 	gorm.Model
 	Name     string `sql:"not null;unique"`
@@ -297,7 +300,6 @@ func _between(start time.Time, scope int) (time.Time, time.Time) {
 	case ScopeYear:
 		from := now.New(start).BeginningOfYear()
 		return from, from.AddDate(1, 0, 0)
-	case ScopeBucket:
 	}
 	if scope > ScopeYear {
 		return time.Date(1960, 1, 1, 0, 0, 0, 0, time.Local), time.Now()
@@ -321,7 +323,8 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 			Preload("Comment").Find(tasks)
 	}
 }
-func tasksInBucket(c *macaron.Context) {
+
+func tasksInProject(c *macaron.Context) {
 	var scope Scope
 	scope.ID = uint(c.ParamsInt(":id"))
 	if scope.ID == 0 {
@@ -535,9 +538,9 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 }
 
 // Return list of all buckets by most recent
-func buckets(c *macaron.Context) {
+func getProjects(c *macaron.Context) {
 	var scopes []Scope
-	DB.Where("id > ?", ScopeYear).Order("updated_at desc").Find(&scopes)
+	DB.Where("id >= ?", ScopeProject).Order("updated_at desc").Find(&scopes)
 
 	c.JSON(200, scopes)
 }
@@ -628,36 +631,8 @@ func export(c *macaron.Context) {
 	}
 }
 
-// Places an array in c.Data showing which years have data available
-func getYears(c *macaron.Context) {
-	var first, firstThisYear, last Task
-
-	type Link struct {
-		Href string
-		Text string
-	}
-
-	var yearLinks []Link
-
-	err := DB.Where("scope = ?", ScopeDay).Order("date asc").Limit(1).First(&first).Error
-	DB.Where("scope = ?", ScopeDay).Order("date desc").Limit(1).First(&last)
-	DB.Where("scope = ? and date > ?", ScopeDay, now.New(last.CreatedAt).BeginningOfYear()).First(&firstThisYear)
-
-	if err == nil {
-		for d := first.CreatedAt; d.Year() != last.CreatedAt.Year()+1; d = d.AddDate(1, 0, 0) {
-			yearLinks = append(yearLinks, Link{Href: d.Format("2006"), Text: d.Format("06")})
-			fmt.Printf("%s\n", d.Format("06"))
-		}
-
-	}
-
-	c.Data["HabitYearLinks"] = yearLinks
-}
-
 func habitsIndex(c *macaron.Context) {
 	c.Data["Page"] = "habits"
-
-	getYears(c)
 
 	c.HTML(200, "habits")
 }
@@ -670,8 +645,8 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-day", tasksInDay)
 	m.Get("/in-days", tasksInDays)
 
-	m.Get("/in-bucket/:id([0-9]+)", tasksInBucket)
-	m.Get("/buckets", buckets)
+	m.Get("/in-project/:id([0-9]+)", tasksInProject)
+	m.Get("/projects", getProjects)
 
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/new", binding.Bind(Task{}), taskNew)
