@@ -60,6 +60,7 @@ type TaskList = Array<Task>;
 interface ViewMonth extends common.CommonState {
   type: 'VIEW_MONTH';
   date: moment.Moment;
+  bucket: number;
   month: Scope;
   year: Scope;
   days: Array<Scope>;
@@ -68,9 +69,10 @@ interface ViewMonth extends common.CommonState {
 
 type HabitsState = ViewMonth;
 
-interface ChangeDate {
-  type: 'VIEW_DATE';
+interface ChangeRoute {
+  type: 'CHANGE_ROUTE';
   date: moment.Moment;
+  bucket: number;
 }
 
 interface MountDays {
@@ -91,7 +93,7 @@ interface UpdateTasks {
   tasks: Array<Task>;
 }
 
-type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | ChangeDate;
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | ChangeRoute;
 
 const initialState = {
   type: 'VIEW_MONTH',
@@ -126,8 +128,8 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
   state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
   switch(action.type) {
-    case 'VIEW_DATE':
-      return {...state, date: action.date};
+    case 'CHANGE_ROUTE':
+      return {...state, date: action.date, bucket: action.bucket};
     case 'MOUNT_SCOPE':
       let visible = dateVisible(state, action.scope, action.date);
       if(!visible) {
@@ -207,7 +209,7 @@ export class CTask extends React.Component<{task: Task}, undefined>{
   }
 
   setTime() {
-    const timestr = window.prompt("LOg time (HH:MM or minutes, 0 to clear)")
+    const timestr = window.prompt("Log time (HH:MM or minutes, 0 to clear)")
     if(!timestr) {
       return;
     }
@@ -244,6 +246,26 @@ export class CTask extends React.Component<{task: Task}, undefined>{
     }
   }
 
+  copyLeft() {
+    let scope = this.props.task.Scope - 1;
+    let date = this.props.task.Date.utc()
+    // Create task on current day from monthly task
+    if(scope == SCOPE_DAY) {
+      date.date(moment().clone().add(4, 'hour').date())
+    } else if(scope == SCOPE_MONTH) {
+      date.month(moment().month())
+      date.date(moment().date())
+    }
+
+    const task = {
+      Name: this.props.task.Name,
+      Scope: scope,
+      Date: date.format("YYYY-MM-DDTHH:mm:ssZ")
+    }
+
+    common.post(store.dispatch, "/habits/new", task)
+  }
+
   hasStats() {
     return this.props.task.CompletedTasks > 0;
   }
@@ -254,6 +276,14 @@ export class CTask extends React.Component<{task: Task}, undefined>{
 
   hasStreak() {
     return this.props.task.Streak > 0 || this.props.task.BestStreak > 0;
+  }
+
+  hasCopy() {
+    // Copy only functions on month/year scopes
+    if(!(this.props.task.Scope == SCOPE_MONTH || this.props.task.Scope == SCOPE_YEAR)) {
+      return false;
+    };
+    return true;
   }
 
   renderStats() {
@@ -294,6 +324,8 @@ export class CTask extends React.Component<{task: Task}, undefined>{
         {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
         {this.props.task.Scope == SCOPE_DAY && 
           this.renderControl('Set time', 'clock', () => this.setTime())}
+        {this.hasCopy() &&
+          this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
         {this.renderControl('Move up', 'chevron-up', () => this.command('order-up'))}
         {this.renderControl('Move down', 'chevron-down', () => this.command('order-down'))}
       </span>
@@ -341,7 +373,7 @@ export class CScope extends React.Component<{date: moment.Moment, scope: Scope},
 
 const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
   render() {
-    return <div id="content" className="container-fluid">
+    return <div >
       <common.NotificationBar notifications={this.props.notifications} dismiss={this.props.dismissNotifications} />
       {this.props.mounted ? 
         <div className="row">
@@ -371,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
       let date = moment(datestr, common.MONTH_FORMAT);
       let scope = parseInt(scopestr, 10);
 
-      store.dispatch({type: 'VIEW_DATE', date: date} as HabitsAction)
+      store.dispatch({type: 'CHANGE_ROUTE', date: date, bucket: 0} as HabitsAction)
 
       store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
         let limit = date.daysInMonth() + 1;
