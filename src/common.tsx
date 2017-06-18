@@ -10,7 +10,7 @@ import * as reactredux from 'react-redux';
 import * as ReactDOM from 'react-dom';
 import * as MediumEditor from 'medium-editor';
 
-import '../js/site.css';
+import './site.css';
 
 /** Fields common to all models */
 export interface Model {
