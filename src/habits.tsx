@@ -150,33 +150,34 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   return task.Scope == state.project.Scope;
 }
 
-const mountScopeReducer(state: HabitsState, action: MountScope): HabitsState => {
-    if(action.name) {
-      if(state.project && action.scope != state.project.Scope) {
-        console.log("Project scope not visible, ignoring");
-        return state;
-      }
-      return {...state, mounted: true, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
-    }
-
-    // If not provided, this is a time scope and may or may not need to be mounted
-    let visible = dateVisible(state, action.scope, action.date);
-    if(!visible) {
-      console.log("Scope not visible, ignoring");
+const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState => {
+  if(action.name) {
+    if(state.project && action.scope != state.project.Scope) {
+      console.log("Project scope not visible, ignoring");
       return state;
     }
-    let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
-    switch(action.scope) {
-      case SCOPE_DAY: 
-        let days = state.days;
-        return {...state, 
-          days: state.days.map((s, i) => {
-            // TODO is diff okay here?
-            return s.Date.diff(action.date, 'days') == 0 ? scope : s;
-          })}
-      case SCOPE_MONTH: return {...state, mounted: true, month: scope}
-      case SCOPE_YEAR: return {...state, mounted: true, year: scope}
-    }
+    return {...state, mounted: true, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
+  }
+
+  // If not provided, this is a time scope and may or may not need to be mounted
+  let visible = dateVisible(state, action.scope, action.date);
+  if(!visible) {
+    console.log("Scope not visible, ignoring");
+    return state;
+  }
+  let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
+  switch(action.scope) {
+    case SCOPE_DAY: 
+      let days = state.days;
+      return {...state, 
+        days: state.days.map((s, i) => {
+          // TODO is diff okay here?
+          return s.Date.diff(action.date, 'days') == 0 ? scope : s;
+        })}
+    case SCOPE_MONTH: return {...state, mounted: true, month: scope}
+    case SCOPE_YEAR: return {...state, mounted: true, year: scope}
+  }
+  return state;
 }
 
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
