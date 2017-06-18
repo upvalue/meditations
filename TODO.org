@@ -38,5 +38,10 @@
 ** TODO Visual redesign
 *** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
 ** TODO Redux MapDispatchToProps
-
 ** TODO Demo XSS
+** TODO Fix clicking on navbar
+
+* In-order todo
+** TODO Project support
+** TODO
+

@@ -150,6 +150,35 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   return task.Scope == state.project.Scope;
 }
 
+const mountScopeReducer(state: HabitsState, action: MountScope): HabitsState => {
+    if(action.name) {
+      if(state.project && action.scope != state.project.Scope) {
+        console.log("Project scope not visible, ignoring");
+        return state;
+      }
+      return {...state, mounted: true, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
+    }
+
+    // If not provided, this is a time scope and may or may not need to be mounted
+    let visible = dateVisible(state, action.scope, action.date);
+    if(!visible) {
+      console.log("Scope not visible, ignoring");
+      return state;
+    }
+    let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
+    switch(action.scope) {
+      case SCOPE_DAY: 
+        let days = state.days;
+        return {...state, 
+          days: state.days.map((s, i) => {
+            // TODO is diff okay here?
+            return s.Date.diff(action.date, 'days') == 0 ? scope : s;
+          })}
+      case SCOPE_MONTH: return {...state, mounted: true, month: scope}
+      case SCOPE_YEAR: return {...state, mounted: true, year: scope}
+    }
+}
+
 const reducer = (state: HabitsState = initialState, action: HabitsAction): HabitsState => {
   state = common.commonReducer(state, action as common.CommonAction) as HabitsState;
   switch(action.type) {
@@ -160,33 +189,7 @@ const reducer = (state: HabitsState = initialState, action: HabitsAction): Habit
       return {...state, date: action.date, currentProject: action.currentProject};
 
     case 'MOUNT_SCOPE':
-      if(action.name) {
-        if(state.project && action.scope != state.project.Scope) {
-          console.log("Project scope not visible, ignoring");
-          return state;
-        }
-        return {...state, mounted: true, project: {Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment()}}
-      }
-
-      // If not provided, this is a time scope and may or may not need to be mounted
-      let visible = dateVisible(state, action.scope, action.date);
-      if(!visible) {
-        console.log("Scope not visible, ignoring");
-        return state;
-      }
-      let scope = {Scope: action.scope, Date: action.date, Tasks: action.tasks} as Scope;
-      switch(action.scope) {
-        case SCOPE_DAY: 
-          let days = state.days;
-          return {...state, 
-            days: state.days.map((s, i) => {
-              // TODO is diff okay here?
-              return s.Date.diff(action.date, 'days') == 0 ? scope : s;
-            })}
-        case SCOPE_MONTH: return {...state, mounted: true, month: scope}
-        case SCOPE_YEAR: return {...state, mounted: true, year: scope}
-      }
-      break;
+      return mountScopeReducer(state, action);
 
     case 'MOUNT_DAYS':
       let days = Array<Scope>();
@@ -520,6 +523,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
       if(state === undefined) return;
       let prevDate = state.date;
       let prevProject = state.currentProject;
+      const projects = state.projects;
 
       let timeChanged: 'NO_CHANGE' | 'CHANGE_YEAR' | 'CHANGE_MONTH' = 'NO_CHANGE';
 
@@ -537,12 +541,10 @@ document.addEventListener('DOMContentLoaded', () =>  {
 
       store.dispatch({type: 'CHANGE_ROUTE', date: date, currentProject: project} as HabitsAction)
 
-      // TODO: Combine calls into one
-
       // Get day scopes
       if(timeChanged == 'CHANGE_YEAR' || timeChanged == 'CHANGE_MONTH') {
         store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-          let limit = date.daysInMonth() + 1;
+          let limit = null;
           const today = moment();
           // If we are showing days for the current month, we won't render days that haven't happened yet in advance
           if(today.month() == date.month() && today.year() == date.year()) {
@@ -554,28 +556,17 @@ document.addEventListener('DOMContentLoaded', () =>  {
             }
           }
 
-          interface Day {
-            Date: string;
-            Tasks: Array<Task>;
-          }
-
-          common.get(dispatch, `/habits/in-days?date=${date.format(common.DAY_FORMAT)}&limit=${limit}`,
-            ((days: Array<Day>) => {
-              days.forEach((d) => {
+          common.get(dispatch, `/habits/in-month-and-days?date=${date.format(common.DAY_FORMAT)}${limit ? "&limit="+limit : ''}`, 
+            ((response: {Days: Array<Day>, Month: Array<Task>}) => {
+              response.Days.forEach((d) => {
                 d.Tasks.forEach(common.processModel);
               });
-              days = days.reverse();
-              dispatch({type: 'MOUNT_DAYS', date: date, days: days})
-              console.log(days);
-            })
-          )
-        })
 
-        store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-          common.get(dispatch, `/habits/in-month?date=${date.format(common.DAY_FORMAT)}`, ((tasks: Array<Task>) => {
-            tasks.forEach(common.processModel);          
-            dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_MONTH, tasks: tasks} as HabitsAction);
-          }));
+              response.Month.forEach(common.processModel);
+
+              dispatch({type: 'MOUNT_DAYS', date: date, days: response.Days})
+              dispatch({type: 'MOUNT_SCOPE', date: date, scope: SCOPE_MONTH, tasks: response.Month})
+            }));
         })
       }
 
@@ -589,19 +580,23 @@ document.addEventListener('DOMContentLoaded', () =>  {
       }
 
       // Retrieve and mount project list
-      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-        common.get(dispatch, `/habits/projects`, ((response: Array<Project>) => {
-          dispatch({type: 'ADD_PROJECT_LIST', projects: response})
-        }))
-      })
+      if(!projects) {
+        store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+          common.get(dispatch, `/habits/projects`, ((response: Array<Project>) => {
+            dispatch({type: 'ADD_PROJECT_LIST', projects: response})
+          }))
+        })
+      }
 
       // Retrieve and mount requested project
-      store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-        common.get(dispatch, `/habits/in-project/${project}`, ((response: {scope: {Name: String, ID: number}, tasks: Array<Task>}) => {
-          response.tasks.forEach(common.processModel);
-          dispatch({type: 'MOUNT_SCOPE', date: date, name: response.scope.Name, scope: response.scope.ID, tasks: response.tasks});
-        }));
-      })
+      if(projectChanged) {
+        store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
+          common.get(dispatch, `/habits/in-project/${project}`, ((response: {scope: {Name: String, ID: number}, tasks: Array<Task>}) => {
+            response.tasks.forEach(common.processModel);
+            dispatch({type: 'MOUNT_SCOPE', date: date, name: response.scope.Name, scope: response.scope.ID, tasks: response.tasks});
+          }));
+        })
+      }
     }
   });
 
