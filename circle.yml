@@ -19,9 +19,3 @@ test:
   override:
     - echo ''
 
-deployment:
-  production:
-    branch: master
-    commands:
-      - git remote add production dokku@meditations.ioddly.com:meditations
-      - git push production master
