@@ -50,7 +50,7 @@ export interface Scope {
   Name: string;
   Scope: number;
   Date: moment.Moment;
-  Tasks: Array<Task>;
+  Tasks: Task[];
 }
 
 export interface Project {
@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
       // Retrieve and mount requested project
       if(projectChanged) {
         store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-          common.get(dispatch, `/habits/in-project/${project}`, ((response: {scope: {Name: String, ID: number}, tasks: Array<Task>}) => {
+          common.get(dispatch, `/habits/in-project/${project}`, ((response: {scope: {Name: string, ID: number}, tasks: Array<Task>}) => {
             response.tasks.forEach(common.processModel);
             dispatch({type: 'MOUNT_SCOPE', date: date, name: response.scope.Name, scope: response.scope.ID, tasks: response.tasks});
           }));

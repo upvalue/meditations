@@ -387,7 +387,7 @@ func jsonTasksInScope(c *macaron.Context, scope int) {
 	}
 }
 
-// TasksInDays represents a list of dates and task arrays, representing all tasks in a set of days for a month
+// DayTasks represents a list of dates and task arrays, representing all tasks in a set of days for a month
 type DayTasks struct {
 	Date  string
 	Tasks []Task

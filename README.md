@@ -25,6 +25,7 @@ To use SSL, you'll need to set up nginx (or another webserver) as a proxy.
 - Go libraries: See Godeps/Godeps.json
 - JS libraries: See package.json
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
+- Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. Please use an up to date version of a consumer browser.
 
 # Development
 
@@ -32,18 +33,17 @@ Note that webpack is required for development. Use `webpack -w`.
 
 Although this is a Go package, it is intended to be run directly from the repo and not installed with `go get`.
 
-# Viewing internal documentation
-
-    $ yarn run jsdoc
-    $ yarn run godoc
-
 # Internals
+
+## Viewing internal documentation
+
+    $ yarn run typedoc
+    $ yarn run godoc
 
 ## Directories and files of interest
 
 - `backend/` Go backend code
-- `js/` Frontend code
-- `js/webpack` Webpack entry points
+- `src/` Frontend code
 - `main.go` Go command entry point
 
 # Attribution
