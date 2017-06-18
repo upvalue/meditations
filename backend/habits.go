@@ -228,10 +228,6 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 
 	var tasks []Task
 
-	if includeMainTask == true {
-		tasks = append(tasks, *task)
-	}
-
 	if task.Scope == ScopeDay {
 		var year Task
 		from, to := between(task.Date, ScopeYear)
@@ -248,6 +244,12 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 			month.CalculateStats()
 			tasks = append(tasks, month)
 		}
+	} else if task.Scope == ScopeYear || task.Scope == ScopeMonth {
+		task.CalculateStats()
+	}
+
+	if includeMainTask == true {
+		tasks = append(tasks, *task)
 	}
 
 	if len(tasks) != 0 {
@@ -370,15 +372,8 @@ func tasksInScopeR(c *macaron.Context, scope int) {
 	}
 	// Calculate completion rates
 	tasksInScope(&tasks, scope, date)
-	if scope == ScopeMonth {
-		for i := range tasks {
-			tasks[i].CalculateTimeAndCompletion()
-		}
-	} else if scope == ScopeYear {
-		// Calculate all statistics
-		for i := range tasks {
-			tasks[i].CalculateStats()
-		}
+	for i := range tasks {
+		tasks[i].CalculateStats()
 	}
 
 	c.JSON(http.StatusOK, tasks)
@@ -554,7 +549,7 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 		DB.Save(&comment)
 		task.Comment = comment
 	}
-	task.SyncOnlyTask()
+	task.Sync(false, true, true)
 	c.PlainText(200, []byte("OK"))
 }
 

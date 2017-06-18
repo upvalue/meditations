@@ -535,8 +535,9 @@ document.addEventListener('DOMContentLoaded', () =>  {
 
       let projectChanged = prevProject != project;
 
-      //let timeChanged = date.format(common.DAY_FORMAT) != 
       store.dispatch({type: 'CHANGE_ROUTE', date: date, currentProject: project} as HabitsAction)
+
+      // TODO: Combine calls into one
 
       // Get day scopes
       if(timeChanged == 'CHANGE_YEAR' || timeChanged == 'CHANGE_MONTH') {
