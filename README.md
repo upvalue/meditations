@@ -14,7 +14,7 @@ of your day entirely up to you. The goal of meditations is to get an objective, 
 
     $ go build
     $ yarn
-    $ ./meditations --port [PORT] --database [PATH] --migrate --tutorial 
+    $ ./meditations --port [PORT] --database [PATH] --migrate 
 
 # SSL
 
