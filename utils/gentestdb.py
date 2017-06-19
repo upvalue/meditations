@@ -144,5 +144,5 @@ def gen_entry_body(entry):
     entry.name = ' '.join(line.split(" ")[:3])
     return line
 
-#[print(e) for e in gen_entries(gen_entry_body)]
+[print(e) for e in gen_entries(gen_entry_body)]
 print('END TRANSACTION;')
