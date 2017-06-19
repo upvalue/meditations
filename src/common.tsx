@@ -27,10 +27,10 @@ export const processModel = (e: Model) => {
   e.CreatedAt = moment((e.CreatedAt as any) as string);
   e.UpdatedAt = moment((e.UpdatedAt as any) as string);
   e.Date = moment.utc((e.Date as any) as string);
-  if(e.DeletedAt) {
+  if (e.DeletedAt) {
     e.DeletedAt = moment((e.DeletedAt as any) as string);
   }
-}
+};
 
 ///// REDUX COMMON STATE
 type Notification = {error: boolean, message: string};
@@ -40,30 +40,30 @@ export type NotificationOpen = {
   notification: Notification;
 };
 
-export type CommonAction = NotificationOpen | {type: "NOTIFICATIONS_DISMISS"};
+export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' };
 
 export type CommonState = {
   dismissNotifications: () => void;
-  notifications?: Array<Notification>;
-}
+  notifications?: Notification[];
+};
 
-function reduceReducers<S>(...reducers: Array<redux.Reducer<S>>): redux.Reducer<S> {
+function reduceReducers<S>(...reducers: redux.Reducer<S>[]): redux.Reducer<S> {
   return (previous:any, current: any) =>
     reducers.reduce((p: any, r: any) => r(p, current), previous);
 }
 
 export function commonReducer(state: CommonState, action: CommonAction): CommonState  {
-  switch(action.type) {
+  switch (action.type) {
     case 'NOTIFICATION_OPEN':
-      if(state.notifications) {
+      if (state.notifications) {
         return {...state,
-          notifications: [...state.notifications, action.notification]
-        }
+          notifications: [...state.notifications, action.notification],
+        };
       } else {
-        return {...state, notifications: [action.notification]};
+        return { ...state, notifications: [action.notification] };
       }
     case 'NOTIFICATIONS_DISMISS':
-      return {...state, notifications: undefined};
+      return { ...state, notifications: undefined };
   }
   return state;
 }
@@ -72,7 +72,7 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
  * Creates a store with thunk & logger middleware applied, and a common reducer added
  */
 export function makeStore<S>(reducer: redux.Reducer<S>) {
-  return redux.createStore<S>(reducer, redux.applyMiddleware(thunk, logger))
+  return redux.createStore<S>(reducer, redux.applyMiddleware(thunk, logger));
 }
 
 ///// REACT COMMON
@@ -83,55 +83,63 @@ export const Spinner = (props: any) => {
     <div className="bounce1" />
     <div className="bounce2" />
     <div className="bounce3" />
-  </div>
-}
+  </div>;
+};
 
 /** A bar at the top which displays notifications */
-export const NotificationBar: React.SFC<{dismiss: () => void, notifications?: Array<Notification>}> = (props) => {
-  if(props.notifications) {
+interface NotificationBarProps {
+  dismiss: () => void;
+  notifications?: Notification[];
+}
+export const NotificationBar: React.SFC<NotificationBarProps> = (props) => {
+  if (props.notifications) {
     return <div>
       <button className="btn btn-outline-warning btn-sm octicon octicon-x"
         onClick={() => props.dismiss()}>Dismiss notifications</button>
       <div className="notifications card-group">
         {props.notifications.map((n, i) => {
-          return <div key={i} className={`card ${n.error ? 'card-outline-warning': '' }`}>
+          return <div key={i} className={`card ${n.error ? 'card-outline-warning' : ''}`}>
             <div className="card-block">
               {n.message}
             </div>
-          </div>
+          </div>;
         })}
       </div>
     </div>;
   } else {
-    return <span />
+    return <span />;
   }
-}
+};
 
 /**
  * Shorthand for fetch which reports errors to user
  * @param url 
  * @param then 
  */
-export function request<ResponseType,DispatchType>(method: string, body: any, dispatch: redux.Dispatch<DispatchType>, url: string, then?: (res:ResponseType) => void) {
-  let reqinit: any = {method: method};
-  if(body !== undefined)  {
-    reqinit.headers = {'Accept': 'application/json', 'Content-Type': 'application/json'};
+export function request<ResponseType,DispatchType>(
+    method: string, body: any, dispatch: redux.Dispatch<DispatchType>, url: string,
+    then?: (res:ResponseType) => void) {
+  const reqinit: any = { method };
+  if (body !== undefined) {
+    reqinit.headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
     reqinit.body = JSON.stringify(body);
   }
 
   return window.fetch(url, reqinit).then((response) => {
-    if(response.status != 200) {
+    if (response.status !== 200) {
       console.warn(`Common.request: ${method} fetch failed with error `);
       response.text().then((response: any) => {
         dispatch({type: 'NOTIFICATION_OPEN',
-          notification: {error: true, message: `Fetch failed with message: ${response}`}})
-
+          notification: { error: true, message: `Fetch failed with message: ${response}` },
+        });
       });
       return;
     }
-    // Only GET requests will return JSON to be processed; POST requests will result in a WebSocket message if anything
+    // Only GET requests will return JSON to be processed;
+    // POST requests will result in a WebSocket message if anything
     // as they must be pushed to all clients
-    if(method == 'GET') {
+
+    if (method === 'GET') {
       return response.json().then((response: any) => {
         if (then) {
           return then(response as ResponseType);
@@ -143,25 +151,31 @@ export function request<ResponseType,DispatchType>(method: string, body: any, di
   });
 }
 
-export function get<ResponseType, DispatchType>(dispatch: redux.Dispatch<DispatchType>, url: string, then: (res: ResponseType) => void) {
+export function get<ResponseType, DispatchType>(
+  dispatch: redux.Dispatch<DispatchType>, url: string, then: (res: ResponseType) => void,
+) {
   return request<ResponseType,DispatchType>('GET', undefined, dispatch, url, then);
 }
 
 
-export function post<ResponseType, DispatchType>(dispatch: redux.Dispatch<DispatchType>, url: string, body?: any) {
+export function post<ResponseType, DispatchType>(
+  dispatch: redux.Dispatch<DispatchType>, url: string, body?: any,
+) {
   return request<ResponseType, DispatchType>('POST', body, dispatch, url);
 }
 
 export function dismissNotifications<State extends CommonState>(dispatch: redux.Dispatch<State>) {
-  dispatch({type: "NOTIFICATIONS_DISMISS"} as CommonAction)
+  dispatch({ type: 'NOTIFICATIONS_DISMISS' } as CommonAction);
 }
 
 export function connect() {
   return reactredux.connect(
-    (state) => state,
+    state => state,
     (dispatch) => {
-      return {dismissNotifications: () => dispatch({type: "NOTIFICATIONS_DISMISS"} as CommonAction)}
-    }
+      return {
+        dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' } as CommonAction),
+      };
+    },
   );
 }
 
@@ -190,17 +204,17 @@ export const DAY_FORMAT = 'YYYY-MM-DD';
  * @returns {WebSocket}
  */
 export function makeSocket(location: string, onmessage: (s: any) => void) {
-  const protocol = window.location.protocol == 'https:' ? 'wss' : 'ws';
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const url = `${protocol}://${window.location.hostname}:${window.location.port}/${location}`;
   const socket = new WebSocket(url);
 
   socket.onopen = (m) => {
     console.log(`Common.makeSocket: Connected to ${url} WebSocket`);
-  }
+  };
 
   socket.onmessage = (m) => {
     onmessage(JSON.parse(m.data));
-  }
+  };
 
   return socket;
 }
@@ -211,21 +225,23 @@ export function makeSocket(location: string, onmessage: (s: any) => void) {
  * @param base Prepended to all routes on a page (e.g. "/journal#")
  * @param first The initial route to execute if none are given
  * @param routes Mapping of routes as strings to callbacks.
- * Special routes: no_action for when no route is given, and unknown for when an unknown route is given.
+ * Special routes: no_action for when no route is given
+ * unknown for when an unknown route is given.
  */
-export function installRouter(base: string, first: string, routes: { [key: string] : (...a: any[]) => void }) {
+export function installRouter(base: string, first: string,
+    routes: { [key: string] : (...a: any[]) => void }) {
   console.log('Common.installRouter called');
   route.base(base);
-  route(function(this: any) {
+  route(function (this: any) {
     const action = [].shift.apply(arguments);
     console.log(`Common.installRouter: dispatching ${action}`);
 
-    if(routes[action]) {
+    if (routes[action]) {
       routes[action].apply(this, arguments);      
-    } else if(action == '' && routes['no_action']) {
+    } else if (action === '' && routes['no_action']) {
       routes['no_action'].apply(this, arguments);
     } else {
-      if(routes['unknown']) {
+      if (routes['unknown']) {
         routes['unknown'].apply(this, arguments);
       } else {
         console.warn(`Common.installRouter: unknown action ${action}`);
@@ -236,8 +252,8 @@ export function installRouter(base: string, first: string, routes: { [key: strin
   console.log(`Common.installRouter: starting with base ${base}`);
   route.start(true);
 
-  if(window.location.hash.length <= 2) {
-    if(first) {
+  if (window.location.hash.length <= 2) {
+    if (first) {
       route(first);
     }
   } 
@@ -252,24 +268,28 @@ export function installRouter(base: string, first: string, routes: { [key: strin
  * @param opts Additional options to pass to medium editor
  * @returns {MediumEditor.MediumEditor}
  */
-export function makeEditor(elt: any, focus?: () => void, blur?: () => void, opts?: MediumEditor.CoreOptions): MediumEditor.MediumEditor {
+export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
+    opts?: MediumEditor.CoreOptions): MediumEditor.MediumEditor {
   const options = {
     autoLink: true,
     placeholder: true, 
     extensions: {}, 
 
-    toolbar: { buttons: ['bold', 'italic', 'underline', 'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table' ] },
+    toolbar: {
+      buttons: ['bold', 'italic', 'underline',
+        'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table'],
+    },
     ...opts};
 
   const editor = new MediumEditor(elt, options);
 
   editor.subscribe('focus', () => {
-    if(focus) focus();
+    if (focus) focus();
   });
 
   editor.subscribe('blur', () => {
-    if(blur) blur();
+    if (blur) blur();
   });
   
   return editor;

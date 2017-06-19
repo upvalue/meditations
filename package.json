@@ -61,5 +61,9 @@
   "bugs": {
     "url": "https://github.com/ioddly/meditations/issues"
   },
-  "homepage": "https://github.com/ioddly/meditations#readme"
+  "homepage": "https://github.com/ioddly/meditations#readme",
+  "devDependencies": {
+    "tslint": "^5.4.3",
+    "tslint-config-airbnb": "^5.1.2"
+  }
 }
