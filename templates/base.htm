@@ -29,11 +29,6 @@
                 {% if Page == "journal" %}<strong>Journal</strong>{% else %}Journal{% endif %}
               </a>
             </li>
-            {% if Config.Tutorial and (Page == "habits" or Page == "journal") %}
-            <li class=nav-item>
-              <a class="nav-link btn btn-sm btn-link" id="tutorial-btn" disabled=true>Tutorial (loading)</a>
-            </li>
-            {% endif %}
             {% block navbar_links %}{% endblock %}
           </ul>
           {% block navigation %}{% endblock %}

@@ -25,7 +25,7 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
     /** Render tag navigation links */
     renderTags() {
       return this.props.TagLinks.map((l, i) => 
-        <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>)
+        <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>);
     }
     
     /** Render alphabetical navigation links */

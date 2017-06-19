@@ -12,7 +12,7 @@
 ** TODO Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
 ** TODO Add search and/or filtering. This could also be used to select entries for export
 ** TODO Add a created-at date to bucket items (currently displays beginning of month)
-** TODO Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
+** DONE Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
 ** TODO Use a ScrollView of some kind instead of scrolling off the page
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
@@ -25,15 +25,14 @@
 ** DONE Port to Bootstrap 4.6
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
 ** DONE Simplify sync code by moving messaging stuff to sync.go
-** TODO Title updates
 ** DONE Remove jQuery if possible
-** TODO Remove a bunch of unnecessary code.
-** TODO React -> Inferno/preact?
+** DONE Remove a bunch of unnecessary code.
 ** TODO Database cleanup on start
 ** DONE Clean up moment code. Just use string constants in common rather than special methods.
     Perhaps convert dates to moments when they are received.
-** TODO Nice error messages
-** TODO Nice loading indicators
+** DONE Nice error messages
+** DONE Nice loading indicators
+** TODO Title updates
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Visual redesign
 *** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.

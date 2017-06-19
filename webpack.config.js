@@ -6,7 +6,7 @@ module.exports = {
   entry: {
     journal: ["./src/journal.tsx"],
     habits: ["./src/habits.tsx"],
-    test: ["./src/test.tsx"]
+    test: ["./src/test.tsx"],
   },
 
   output: {
@@ -25,7 +25,6 @@ module.exports = {
     new ExtractTextPlugin('bundle-style.css')
   ],
 
-  /* Compile riot .tag files */
   module: {
     rules: [
       { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
@@ -42,8 +41,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['es2015'],
-            plugins: [],
+            presets: ['es2015', {modules: false}],
           },
         },
       },
