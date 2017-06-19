@@ -110,7 +110,6 @@ ul.nav a.navbar-link-disabled {
   border:0;
   padding:0;
   width: auto;
-  appearance:none;
   font-family: "TypoPRO Open Sans", serif;
   font-weight:bold;
   font-size:1rem;
@@ -139,8 +138,9 @@ ul.nav a.navbar-link-disabled {
 #journal-nav ul.nav { display:inline; clear:none; list-style-type:none; margin:0;padding:0; }
 
 .journal-controls {
-background-color: #eee; padding-left:5px; padding-right: 5px; border-radius: 5px; font-size: 1rem; 
-font-weight: bold;
+  background-color: #eee;
+  padding-left:5px; padding-right: 5px; border-radius: 5px; font-size: 1rem; 
+  font-weight: bold;
 
 }
 
@@ -163,9 +163,24 @@ div#alphabetical li { font-size:0.8em; }
 /* Remove spurious spacing between entries */
 .entry-body p:last-of-type { margin-bottom:0; }
 
-/***** WIKI */
 div#content h1:first-of-type { margin-top:0; }
 
+.link-tree-node {
+  padding-left: 10px;
+  display:block; 
+}
+
+.link-tree-node-anchor {
+  color: #09d !important;
+}
+
+.link-tree-node-nochildren {
+  padding-left: 28px;
+}
+
+.link-tree-node-btn {
+  display: inline;
+}
 
 /***** LOADING SPINNER */
 

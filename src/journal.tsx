@@ -11,7 +11,6 @@ import DatePicker from 'react-datepicker';
 import * as common from './common';
 import { SidebarState, JournalSidebar } from './journal-sidebar';
 
-
 ///// BACKEND INTERACTION
 
 interface Tag {

@@ -49,7 +49,7 @@ func journalEntries(c *macaron.Context) {
 
 func journalNamedEntry(c *macaron.Context) {
 	var entry Entry
-	DB.Where("name = ?", c.Params("name")).Preload("tags").First(&entry)
+	DB.Where("name = ?", c.Params("name")).Preload("Tags").First(&entry)
 	if entry.ID == 0 {
 		c.PlainText(404, []byte("ENTRY NOT FOUND"))
 	} else {

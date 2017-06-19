@@ -4,7 +4,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: {
-    journal: ["./src/journal.tsx", "./node_modules/bootstrap/dist/js/bootstrap.js"],
+    journal: ["./src/journal.tsx"],
     habits: ["./src/habits.tsx"],
     test: ["./src/test.tsx"]
   },
@@ -16,23 +16,12 @@ module.exports = {
 
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
-    alias: {
-      jquery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
-      jQuery: path.resolve(__dirname, 'node_modules/jquery/dist/jquery.min'),
-      moment: path.resolve(__dirname, 'node_modules/moment/min/moment.min'),
-      Tether: path.resolve(__dirname, 'node_modules/tether/dist/js/tether.min.js'),
-    },
   },
 
   externals: ['window'],
 
   plugins: [
     new webpack.IgnorePlugin(/^\.\/locale$/),
-    // For bootstrap
-    new webpack.ProvidePlugin({
-      'jQuery': 'jQuery',
-      "Tether": "Tether", 
-    }),
     new ExtractTextPlugin('bundle-style.css')
   ],
 
@@ -48,7 +37,6 @@ module.exports = {
       },
       { test: /\.(woff|png|ttf|svg|eot|woff2)$/,
         loader: 'file-loader?name=../../assets/copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/' },
-      { enforce: 'pre', test: /\.tag$/, exclude: /assets\/vendor/, loader: 'riotjs-loader' },
       { test: /\.js$/,
         exclude: /(node_modules)/,
         use: {

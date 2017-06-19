@@ -25,8 +25,6 @@
     "css-loader": "^0.26.1",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.10.0",
-    "jquery-ui": "^1.12.1",
-    "jquery-ui-themes": "^1.12.0",
     "medium-editor": "^5.23.0",
     "medium-editor-tables": "^0.6.1",
     "moment": "^2.18.1",

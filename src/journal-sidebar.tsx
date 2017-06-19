@@ -2,6 +2,8 @@ import * as React from 'react';
 import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
 import { connect } from 'react-redux';
 
+import { Spinner } from './common';
+import LinkTree, { LinkTreeNode } from './linktree';
 
 export type ChronoLink = {
   Date: string;
@@ -20,11 +22,6 @@ export type SidebarState = {
 /** Sidebar. Contains convenient navigation methods. */
 export const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
-    componentWillMount() {
-      const tree = [{ title: 'Chicken', children: [{ title: 'Egg' }] }];
-      this.setState({ data: tree });
-    }
-
     /** Render tag navigation links */
     renderTags() {
       return this.props.TagLinks.map((l, i) => 
@@ -33,37 +30,59 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
     
     /** Render alphabetical navigation links */
     renderAlphabetically() {
-      return this.props.NameLinks.map((l, i) => 
-        <div key={i}><a href={`#name/${l.Name}`}>{l.Name}</a></div>);
+      // This code converts a list of strings like this
+
+      // Notes: Chemistry
+      // Notes: Physics
+
+      // Into a tree, based off of colons
+
+      // Originally written in JS for simplicity's sake and not properly
+      // type-annotated because I'm tired
+
+      const table: any = {};
+      for (const link of this.props.NameLinks) {
+        const elts = link.Name.split(':').map(x => x.trim());
+        let tableRef: any = table;
+        let last: any = null;
+        for (const elt of elts) {
+          if (tableRef[elt] === undefined) {
+            tableRef[elt] = {};
+            tableRef[elt].title = elt;
+          }
+          tableRef = tableRef[elt];
+          last = elt;
+        }
+        tableRef.link = link.Name;
+      }
+
+      const convertTable = (table: any) => {
+        const keys: string[] = Object.keys(table).filter(k => k !== 'title' && k !== 'link');
+        const obj: any = {};
+        if (table.title) obj.title = table.title;
+        if (table.link) obj.href = `#name/${table.link}`;
+        if (keys.length > 0) obj.children = keys.map(k => convertTable(table[k]));
+        return obj;
+      };
+
+      const tree = (convertTable(table).children) as LinkTreeNode[];
+
+      return <LinkTree data={tree} />;
     }
     
     /** Render chronological navigation links */
     renderChronologically() {
-      let key = 0;
-      const years: JSX.Element[] = [];
-      for (const year of this.props.ChronoLinks) {
-        const months: JSX.Element[] = [];
-        for (const month of year.Sub) {
-          key += 1;
-          months.push(
-            <li key={key}><a href={`#view/${month.Link}`}>{month.Date} ({month.Count})</a></li>
-           );
-        }
-        key += 1;
-        years.push(
-          <li key={key}>
-            <a href={`#chrono-nav-${year.Date}`} data-toggle="collapse"
-               aria-expanded="false" aria-controls={`chrono-nav-${year.Date}`}>
-               {year.Date} ({year.Count})
-            </a>
-          </li>);
-        key += 1;
-        years.push(
-          <ul key={key} id={`chrono-nav-${year.Date}`} className="navigation-list collapse">
-            {months}            
-          </ul>);
-      }
-      return <ul className="navigation-list">{years}</ul>;
+      // Convert to LinkTree structure
+      // TODO: No reason the Go code couldn't return this directly
+      const tree = this.props.ChronoLinks.map((y) => {
+        const year: LinkTreeNode = { title: `${y.Date} (${y.Count})` };
+        year.children = y.Sub.map((m) => {
+          return { title: `${m.Date} (${m.Count})`, href: `#view/${m.Link}` };
+        });
+        return year;
+      });
+
+      return <LinkTree data={tree} />;
     }
     
     render() {
@@ -86,7 +105,7 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
             </TabPanel>
           </Tabs>;
       } else {
-        return <span>Loading sidebar...</span>;
+        return <Spinner />;
       }
     }
   },
