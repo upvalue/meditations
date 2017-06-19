@@ -628,15 +628,14 @@ document.addEventListener('DOMContentLoaded', () =>  {
       // Retrieve and mount requested project
       if (projectChanged) {
         store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-          common.get(dispatch,
-                     `/habits/in-project/${project}`,
-                     ((response: { scope: { Name: string, ID: number }, tasks: Task[] }) => {
-                       response.tasks.forEach(common.processModel);
-                       dispatch({
-                         date, type: 'MOUNT_SCOPE', name: response.scope.Name,
-                         scope: response.scope.ID, tasks: response.tasks,
-                       });
-                     }));
+          common.get(dispatch, `/habits/in-project/${project}`,
+            ((response: { scope: { Name: string, ID: number }, tasks: Task[] }) => {
+              response.tasks.forEach(common.processModel);
+              dispatch({
+                date, type: 'MOUNT_SCOPE', name: response.scope.Name,
+                scope: response.scope.ID, tasks: response.tasks,
+              });
+            }));
         });
       }
     },

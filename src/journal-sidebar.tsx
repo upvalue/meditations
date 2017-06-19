@@ -1,24 +1,30 @@
 import * as React from 'react';
-import {TabPanel, Tab, TabList, Tabs} from 'react-tabs';
-import {connect} from 'react-redux';
+import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
+import { connect } from 'react-redux';
+
 
 export type ChronoLink = {
   Date: string;
   Count: number;
   Sub: ReadonlyArray<ChronoLink>;
   Link: string;
-}
+};
 
 export type SidebarState = {
   mounted: boolean;
   TagLinks: ReadonlyArray<{Name: string, Count: string}>;
   ChronoLinks: ReadonlyArray<ChronoLink>;
   NameLinks: ReadonlyArray<{Name: string}>;
-}
+};
 
 /** Sidebar. Contains convenient navigation methods. */
 export const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
+    componentWillMount() {
+      const tree = [{ title: 'Chicken', children: [{ title: 'Egg' }] }];
+      this.setState({ data: tree });
+    }
+
     /** Render tag navigation links */
     renderTags() {
       return this.props.TagLinks.map((l, i) => 
@@ -34,23 +40,34 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
     /** Render chronological navigation links */
     renderChronologically() {
       let key = 0;
-      let years: Array<JSX.Element> = [];
-      for(let year of this.props.ChronoLinks) {
-        let months: Array<JSX.Element> = [];
-        for(let month of year.Sub) {
-          months.push(<li key={key++}><a href={`#view/${month.Link}`}>{month.Date} ({month.Count})</a></li>);
+      const years: JSX.Element[] = [];
+      for (const year of this.props.ChronoLinks) {
+        const months: JSX.Element[] = [];
+        for (const month of year.Sub) {
+          key += 1;
+          months.push(
+            <li key={key}><a href={`#view/${month.Link}`}>{month.Date} ({month.Count})</a></li>
+           );
         }
-        let yearLink = <li key={key++}><a href={`#chrono-nav-${year.Date}`} data-toggle="collapse" aria-expanded="false" aria-controls={`chrono-nav-${year.Date}`}>{year.Date} ({year.Count})</a></li>
-        years.push(yearLink);          
-        years.push(<ul key={key++} id={`chrono-nav-${year.Date}`} className="navigation-list collapse">
-          {months}            
-        </ul>);
+        key += 1;
+        years.push(
+          <li key={key}>
+            <a href={`#chrono-nav-${year.Date}`} data-toggle="collapse"
+               aria-expanded="false" aria-controls={`chrono-nav-${year.Date}`}>
+               {year.Date} ({year.Count})
+            </a>
+          </li>);
+        key += 1;
+        years.push(
+          <ul key={key} id={`chrono-nav-${year.Date}`} className="navigation-list collapse">
+            {months}            
+          </ul>);
       }
-      return <ul className="navigation-list">{years}</ul>
+      return <ul className="navigation-list">{years}</ul>;
     }
     
     render() {
-      if(this.props.mounted) {
+      if (this.props.mounted) {
         return <Tabs>
             <TabList>
               <Tab><span className="octicon octicon-clock" />Time</Tab>
@@ -67,10 +84,10 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
             <TabPanel>
               {this.renderTags()}
             </TabPanel>
-          </Tabs>
+          </Tabs>;
       } else {
-        return <span>Loading sidebar...</span>
+        return <span>Loading sidebar...</span>;
       }
     }
-  }
-)
+  },
+);
