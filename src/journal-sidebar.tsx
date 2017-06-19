@@ -24,12 +24,18 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
     /** Render tag navigation links */
     renderTags() {
+      if(this.props.TagLinks === null) {
+        return <p>No tag links yet; have you tagged any journal entries?</p>;
+      }
       return this.props.TagLinks.map((l, i) => 
         <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>);
     }
     
     /** Render alphabetical navigation links */
     renderAlphabetically() {
+      if (this.props.ChronoLinks === null) {
+        return <p>No alphabetical links yet; have you titled any journal entries?</p>;
+      }
       // This code converts a list of strings like this
 
       // Notes: Chemistry
@@ -72,6 +78,10 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
     
     /** Render chronological navigation links */
     renderChronologically() {
+      if (this.props.ChronoLinks === null) {
+        return <p>No chronological links yet. Have you created any journal entries?</p>;
+      }
+
       // Convert to LinkTree structure
       // TODO: No reason the Go code couldn't return this directly
       const tree = this.props.ChronoLinks.map((y) => {
