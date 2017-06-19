@@ -197,19 +197,23 @@ export const MONTH_FORMAT = 'YYYY-MM';
 export const DAY_FORMAT = 'YYYY-MM-DD';
 
 /**
- * makeSocket
+ * makeSocket connects to a websocket
  *
  * @param location Address of websocket (e.g. "/journal/sync")
  * @param onmessage Callback when message is received
  * @returns {WebSocket}
  */
-export function makeSocket(location: string, onmessage: (s: any) => void) {
+export function makeSocket(location: string, onmessage: (s: any) => void,
+    onopen?: () => void) {
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const url = `${protocol}://${window.location.hostname}:${window.location.port}/${location}`;
   const socket = new WebSocket(url);
 
   socket.onopen = (m) => {
     console.log(`Common.makeSocket: Connected to ${url} WebSocket`);
+    if (onopen) {
+      onopen();
+    }
   };
 
   socket.onmessage = (m) => {

@@ -35,7 +35,7 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
       // Notes: Chemistry
       // Notes: Physics
 
-      // Into a tree, based off of colons
+      // Into a tree, based off of colon separators
 
       // Originally written in JS for simplicity's sake and not properly
       // type-annotated because I'm tired

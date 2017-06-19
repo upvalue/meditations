@@ -431,13 +431,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (msg.Type === 'SIDEBAR') {
       store.dispatch({ type: 'MOUNT_SIDEBAR', sidebar: msg.Datum } as JournalAction);
     } 
+  }, () => {
+    ///// RENDER 
+    common.render('journal-root', store, <JournalRoot />);
+    common.render('navigation-root', store, <JournalNavigation />);
+    common.render('journal-sidebar', store, <JournalSidebar />);
+
+    // Fetch sidebar
+    common.post(store.dispatch, '/journal/sidebar');
   });
   
-  ///// RENDER 
-  common.render('journal-root', store, <JournalRoot />);
-  common.render('navigation-root', store, <JournalNavigation />);
-  common.render('journal-sidebar', store, <JournalSidebar />);
-
-  // Fetch sidebar
-  common.post(store.dispatch, '/journal/sidebar');
 });
