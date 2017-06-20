@@ -223,51 +223,31 @@ func journalSidebarInfo(c *macaron.Context) {
 	// TODO: Update incrementall when possible
 
 	// Display chronological navigation information
-	var first, last Entry
-
-	err := DB.Order("date").Limit(1).First(&first).Error
-	DB.Order("date desc").Limit(1).First(&last)
-
-	// Struct for rendering info about links
 	years := []ChronoLink{}
-	// Display chronological navigation
-	if err == nil {
-		yearsindb, err := DB.Raw("SELECT distinct strftime('%Y', date) from entries order by date desc").Rows()
 
-		if err == nil {
-			defer yearsindb.Close()
-			for yearsindb.Next() {
-				sub := []ChronoLink{}
-				// Loop over years
-				var datestr string
-				yearsindb.Scan(&datestr)
+	var yearsindb []struct{ Year string }
+	DB.Raw("SELECT DISTINCT strftime('%Y', date) as year FROM entries ORDER BY date desc").Scan(&yearsindb)
 
-				if err != nil {
-					continue
-				}
+	for _, row := range yearsindb {
+		datestr := row.Year
 
-				var count struct{ Count int }
+		var count struct{ Count int }
+		sub := []ChronoLink{}
 
-				monthsindb, err := DB.Raw("SELECT distinct strftime('%Y-%m', date) from entries where strftime('%Y', date) = ? order by date desc", datestr).Rows()
-				if err == nil {
-					defer monthsindb.Close()
-					for monthsindb.Next() {
-						var monthstr string
-						monthsindb.Scan(&monthstr)
+		var monthsinyear []struct{ Datestr string }
+		DB.Raw("SELECT DISTINCT strftime('%Y-%m', date) as datestr from entries where strftime('%Y', date) = ? order by date desc", datestr).Scan(&monthsinyear)
 
-						d, _ := time.Parse("2006-01", monthstr)
+		for _, row := range monthsinyear {
+			monthstr := row.Datestr
 
-						DB.Raw("SELECT count(*) as count from entries where strftime('%Y-%m', date) = ?", monthstr).Scan(&count)
-						sub = append(sub, ChronoLink{Date: d.Format("January"), Link: d.Format("2006-01"), Count: count.Count})
-					}
-				}
-
-				DB.Raw("SELECT count(*) as count from entries where strftime('%Y', date) = ?", datestr).Scan(&count)
-
-				year := ChronoLink{Date: datestr, Count: count.Count, Sub: sub}
-				years = append(years, year)
-			}
+			d, _ := time.Parse("2006-01", monthstr)
+			DB.Raw("SELECT count(*) as count from entries where strftime('%Y-%m', date) = ?", monthstr).Scan(&count)
+			sub = append(sub, ChronoLink{Date: d.Format("January"), Link: d.Format("2006-01"), Count: count.Count})
 		}
+		DB.Raw("SELECT count(*) as count from entries where strftime('%Y', date) = ?", datestr).Scan(&count)
+
+		year := ChronoLink{Date: datestr, Count: count.Count, Sub: sub}
+		years = append(years, year)
 	}
 
 	var tags []Tag
