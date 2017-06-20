@@ -23,23 +23,33 @@ func DBMigrate() {
 	// habits.go
 	DB.Exec("pragma foreign_keys = on;")
 	DB.AutoMigrate(
+		// app.go
+		&Settings{},
 		// habits.go
 		&Task{}, &Comment{}, &Scope{},
 		// journal.go
 		&Entry{}, &Tag{},
 	)
 	DBCreate()
+
+	// By hand migrations
+	settings := Settings{Name: "settings"}
+	DB.First(&settings)
 }
 
-// DBCreate create a new database
+// DBCreate initialize a new database; will not overwrite existing settings.
 func DBCreate() {
 	day, month, year, bucket := Scope{Name: "Day"}, Scope{Name: "Month"}, Scope{Name: "Year"}, Scope{Name: "Bucket"}
 
 	// lazily create scopes
-	DB.Create(&day)
-	DB.Create(&month)
-	DB.Create(&year)
-	DB.Create(&bucket)
+	DB.FirstOrCreate(&day)
+	DB.FirstOrCreate(&month)
+	DB.FirstOrCreate(&year)
+	DB.FirstOrCreate(&bucket)
+
+	settings := Settings{Name: "settings", Schema: 1}
+
+	DB.FirstOrCreate(&settings)
 }
 
 // DBClose close database handle

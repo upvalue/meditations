@@ -16,7 +16,8 @@
 ** TODO Use a ScrollView of some kind instead of scrolling off the page
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
-** TODO View a named entry
+** TODO Add a named entry
+** TODO Add a named entry from LinkTree navigation
 ** TODO Sidebar should reflect entry state.
 ** DONE Fix synchronization
 ** TODO Option to add a titled entry rather than by date

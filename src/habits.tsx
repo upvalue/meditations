@@ -57,6 +57,7 @@ export interface Scope {
 export interface Project {
   ID: number;
   Name: string;
+  Pinned: boolean;
 }
 
 export interface Day {
@@ -72,6 +73,7 @@ interface ViewMonth extends common.CommonState {
   type: 'VIEW_MONTH';
   // Navigation & routing
   date: moment.Moment;
+  // Current project; if 0, a list of projects will be displayed instead
   currentProject: number;
 
   // True after some UI information has been loaded
@@ -156,7 +158,7 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
 
 const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState => {
   if (action.name) {
-    if (state.project && action.scope !== state.project.Scope) {
+    if (state.currentProject !== action.scope) {
       console.log('Project scope not visible, ignoring');
       return state;
     }
@@ -255,6 +257,15 @@ const reducer = (pstate: HabitsState = initialState, action: HabitsAction): Habi
 const store = common.makeStore(reducer);
 
 ////// REACT
+
+/** Convenience method; returns route argument for a given date and project. */
+const routeForView = (date: moment.Moment, project?: number) => {
+  return `view/${date.format(common.MONTH_FORMAT)}/${project ? project : 0}`;
+};
+
+const urlForView = (date: moment.Moment, project?: number) => {
+  return `#${routeForView(date, project)}`;
+};
 
 export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.MediumEditor}>{
   body: HTMLElement;
@@ -436,7 +447,7 @@ export class TimeScope extends
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
-    route(`view/${ndate.format(common.MONTH_FORMAT)}/${this.props.currentProject}`);
+    route(routeForView(ndate, this.props.currentProject));
   }
 
   addTask() {
@@ -471,9 +482,14 @@ export class TimeScope extends
   }
 }
 
-export class ProjectScope extends 
-  React.Component<{currentProject: number, currentDate: moment.Moment, projects: Project[],
-    scope: Scope}, undefined> {
+export interface ProjectScopeProps {
+  currentProject: number;
+  currentDate: moment.Moment;
+  projects: Project[];
+  scope: Scope;
+}
+
+export class ProjectScope extends React.Component<ProjectScopeProps, undefined> {
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);
@@ -497,11 +513,12 @@ export class ProjectScope extends
   render() {
     return <section className="scope">
       <div>
-        <select onChange={o => this.changeProject(o) } className="form-control" >
-          <option>Open project...</option>
-          {this.props.projects &&
-            this.props.projects.map((e, i) => <option key={i} value={e.ID} >{e.Name}</option>)}
-        </select>
+        <h6 className="scope-title">
+          {this.props.currentProject !== 0 ?
+            <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
+              Projects</a></span> :
+            <span>Projects</span> }
+          {this.props.currentProject !== 0 && <span> &gt; {this.props.scope.Name}</span>}</h6>
       </div>
 
       <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="New task"
@@ -513,8 +530,63 @@ export class ProjectScope extends
   }
 }
 
+export interface ProjectListProps {
+  projects: Project[];
+  currentDate: moment.Moment;
+}
+
+export class ProjectList extends React.Component<ProjectListProps, undefined> {
+  deleteProject(id: number) {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      common.post(store.dispatch, `/habits/projects/delete/${id}`);
+    }
+
+  }
+
+  renderProjectLink(project: Project, pinned: boolean) {
+    return <div key={project.ID}>
+      {pinned && <span className="octicon octicon-pin" /> }
+      <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
+
+      <span className="float-right">
+        <span className="task-control btn-link btn-sm btn-default octicon octicon-trashcan" 
+          onClick={() => this.deleteProject(project.ID)} />
+      </span>
+    </div>;
+  }
+
+  addProject() {
+    const name = window.prompt('New project name (leave empty to cancel)');
+    if (name) {
+      common.post(store.dispatch, `/habits/projects/new/${name}`);
+    }
+  }
+
+  render() {
+    const alphasort = (a: Project, b: Project) => {
+      if (a.Name < b.Name) return -1;
+      if (a.Name > b.Name) return 1;
+      return 0;
+    };
+
+    const pinnedProjects = this.props.projects.filter(p => p.Pinned === true).sort(alphasort);
+    const unpinnedProjects = this.props.projects.filter(p => p.Pinned === false).sort(alphasort);
+
+    return <div>
+      <button className="btn btn-link octicon octicon-plus" title="Add new project"
+        onClick={() => this.addProject()} />
+      <h6 className="scope-title">Projects</h6>
+      {pinnedProjects.map(p => this.renderProjectLink(p, true))}
+      {unpinnedProjects.map(p => this.renderProjectLink(p, false))}
+
+    </div>;
+  }
+
+}
+
 // tslint:disable-next-line:variable-name
 const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
+  /** Render time-based scope (days, months, years) */
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {
       return <TimeScope currentProject={this.props.currentProject}
@@ -523,6 +595,23 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
       return <common.Spinner />;
     }
   }
+
+  /** Render either a list of projects or the currently open project */
+  renderProjects() {
+    if (this.props.currentProject === 0) {
+      return <ProjectList currentDate={this.props.date} projects={this.props.projects} />;
+    } else {
+      if (this.props.project && this.props.currentProject === this.props.project.Scope) {
+        return <ProjectScope currentProject={this.props.currentProject}
+          currentDate={this.props.date} projects={this.props.projects}
+          scope={this.props.project} />;
+      } else {
+        // In case the route has changed, but the project scope has not been loaded yet.
+        return <common.Spinner />;
+      }
+    }
+  }
+
   render() {
     return <div >
       <common.NotificationBar notifications={this.props.notifications}
@@ -541,11 +630,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="col-md-3">
-            {this.props.project ?
-            <ProjectScope currentProject={this.props.currentProject}
-              currentDate={this.props.date} projects={this.props.projects}
-              scope={this.props.project} />
-              : <common.Spinner /> }
+            {this.props.projects ? this.renderProjects() : <common.Spinner />}
           </div>
         </div>}
     </div>;
@@ -576,6 +661,7 @@ document.addEventListener('DOMContentLoaded', () =>  {
         // First mount, fetch everything
         timeChanged = 'CHANGE_YEAR';
       } else if (date.format(common.DAY_FORMAT) !== prevDate.format(common.DAY_FORMAT)) {
+        // After first mount, fetch only what has changed
         timeChanged = 'CHANGE_MONTH';
         if (date.year() !== prevDate.year()) {
           timeChanged = 'CHANGE_YEAR';
@@ -676,6 +762,9 @@ document.addEventListener('DOMContentLoaded', () =>  {
     Datum: {
       Task: Task[];
     }
+  } | {
+    Type: 'PROJECTS';
+    Datum: Project[];
   };
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
@@ -693,6 +782,10 @@ document.addEventListener('DOMContentLoaded', () =>  {
         msg.Datum.Tasks.forEach(common.processModel);
         store.dispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
           scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name} as MountScope);
+        break;
+
+      case 'PROJECTS':
+        store.dispatch({ type: 'ADD_PROJECT_LIST', projects: msg.Datum });
         break;
     }
   });

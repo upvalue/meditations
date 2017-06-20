@@ -11,6 +11,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/go-macaron/pongo2"
+	"github.com/jinzhu/gorm"
 	"github.com/tylerb/graceful"
 	"gopkg.in/macaron.v1"
 )
@@ -29,12 +30,18 @@ type Configuration struct {
 	SiteTitle string
 	// True if running in development mode
 	Development bool
-	// If true, show tutorial
-	Tutorial bool
 	// If true, run a database migration before starting
 	Migrate bool
 	// Message to be displayed in navbar, used in the demo site
 	Message string
+}
+
+// Settings represents app settings saved in the database
+type Settings struct {
+	gorm.Model
+	Name string `gorm:"unique"`
+	// Schema version; for certain manual migrations
+	Schema int
 }
 
 // Config is the global application configuration
@@ -45,7 +52,6 @@ var Config = Configuration{
 	DBLog:       false,
 	SiteTitle:   "meditations",
 	Development: true,
-	Tutorial:    false,
 	Migrate:     false,
 	Message:     "",
 }
@@ -55,7 +61,6 @@ func loadConfig(c *cli.Context) {
 	Config.Development = c.BoolT("development")
 	Config.DBPath = c.String("database")
 	Config.Port = c.Int("port")
-	Config.Tutorial = c.Bool("tutorial")
 	Config.Migrate = c.Bool("migrate")
 	Config.Message = c.String("message")
 }
@@ -164,10 +169,6 @@ func Main() {
 		cli.BoolTFlag{
 			Name:  "development",
 			Usage: "whether development is true",
-		},
-		cli.BoolFlag{
-			Name:  "tutorial",
-			Usage: "enable tutorial",
 		},
 		cli.IntFlag{
 			Name:  "port",

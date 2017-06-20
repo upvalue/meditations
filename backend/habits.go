@@ -69,20 +69,21 @@ type Task struct {
 	Hours   int
 	Minutes int
 	// These statistics are derived at runtime, and not represented in SQL
-	CompletionRate     float64 `sql:"-"`
-	CompletedTasks     int     `sql:"-"`
-	TotalTasks         int     `sql:"-"`
-	TotalTasksWithTime int     `sql:"-"`
-	BestStreak         int     `sql:"-"`
-	Streak             int     `sql:"-"`
+	CompletionRate     float64 `gorm:"-"`
+	CompletedTasks     int     `gorm:"-"`
+	TotalTasks         int     `gorm:"-"`
+	TotalTasksWithTime int     `gorm:"-"`
+	BestStreak         int     `gorm:"-"`
+	Streak             int     `gorm:"-"`
 }
 
 // Scope represents a task scope. Time-based scopes (daily, monthly, yearly) are built-in, but the user can add
 // additional "projects," each of which have their own scope with an ID of ScopeProject or greater
 type Scope struct {
 	gorm.Model
-	Name     string `sql:"not null;unique"`
-	Selected bool   `sql:"-"`
+	Name     string `gorm:"not null;unique"`
+	Selected bool   `gorm:"-"`
+	Pinned   bool   `gorm:"not null;default:'0'"`
 }
 
 // Comment represents a task comment.
@@ -609,11 +610,46 @@ func getProjects(c *macaron.Context) {
 	c.JSON(200, scopes)
 }
 
-func bucketNew(c *macaron.Context) {
+func syncProjectList() {
+	var scopes []Scope
+	DB.Where("id >= ?", ScopeProject).Order("updated_at desc").Find(&scopes)
+	habitSync.Send("PROJECTS", scopes)
+}
+
+func projectDelete(c *macaron.Context) {
+	id, err := strconv.ParseInt(c.Params("id"), 10, 32)
+
+	if err != nil || id < 4 {
+		serverError(c, "Failed to parse ID %v", err)
+		return
+	}
+
+	var scope Scope
+	var tasks []Task
+
+	DB.Where("id = ?", id).First(&scope)
+
+	if scope.ID == 0 {
+		serverError(c, "Failed to find scope %d", id)
+		return
+	}
+
+	DB.Where("scope = ?", id).Delete(&tasks)
+
+	DB.Delete(&scope)
+
+	syncProjectList()
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
+func projectNew(c *macaron.Context) {
 	var scope Scope
 	scope.Name = c.Params("name")
+	scope.Pinned = false
 	DB.Save(&scope)
-	c.JSON(200, scope)
+
+	syncProjectList()
+	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
 // Export a summary of tasks in human readable format (e.g. to give an exercise or diet log to your trainer)
@@ -712,13 +748,15 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-project/:id([0-9]+)", tasksInProject)
 	m.Get("/projects", getProjects)
 
+	m.Post("/projects/delete/:id([0-9]+)", projectDelete)
+	m.Post("/projects/new/:name", projectNew)
+
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/new", binding.Bind(Task{}), taskNew)
 	m.Post("/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/order-up", binding.Bind(Task{}), taskOrderUp)
 	m.Post("/order-down", binding.Bind(Task{}), taskOrderDown)
 	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)
-	m.Post("/bucket-new/:name", bucketNew)
 	m.Post("/export", export)
 
 	m.Get("/sync", habitSync.Handler())

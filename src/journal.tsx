@@ -164,7 +164,7 @@ class CEntry extends React.Component<CEntryProps, CEntryState> {
     const tname = 
       window.prompt('What tag would you like to add to this entry? (leave empty to cancel)');
     // If input was empty or tag already exists, don't do anything
-    if (tname === '' ||
+    if (tname === '' || tname === null || 
       (this.props.entry.Tags && this.props.entry.Tags.some(t => t.Name === tname))) {
       return;
     }
