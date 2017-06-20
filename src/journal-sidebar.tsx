@@ -24,9 +24,10 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
   class extends React.Component<SidebarState, undefined> {
     /** Render tag navigation links */
     renderTags() {
-      if(this.props.TagLinks === null) {
+      if (this.props.TagLinks === null) {
         return <p>No tag links yet; have you tagged any journal entries?</p>;
       }
+
       return this.props.TagLinks.map((l, i) => 
         <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>);
     }

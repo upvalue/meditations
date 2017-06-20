@@ -478,6 +478,8 @@ export class ProjectScope extends
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);
 
+    if (isNaN(projectID)) return;
+
     route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
   }
 
@@ -496,6 +498,7 @@ export class ProjectScope extends
     return <section className="scope">
       <div>
         <select onChange={o => this.changeProject(o) } className="form-control" >
+          <option>Open project...</option>
           {this.props.projects &&
             this.props.projects.map((e, i) => <option key={i} value={e.ID} >{e.Name}</option>)}
         </select>

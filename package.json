@@ -25,7 +25,7 @@
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.10.0",
     "medium-editor": "^5.23.0",
-    "medium-editor-tables": "^0.6.1",
+    "medium-editor-tables": "git+https://github.com/ioddly/medium-editor-tables.git",
     "moment": "^2.18.1",
     "octicons": "^3.5.0",
     "react": "^15.5.4",

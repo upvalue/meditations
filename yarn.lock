@@ -1979,9 +1979,9 @@ math-expression-evaluator@^1.2.14:
   version "1.2.17"
   resolved "https://registry.yarnpkg.com/math-expression-evaluator/-/math-expression-evaluator-1.2.17.tgz#de819fdbcd84dccd8fae59c6aeb79615b9d266ac"
 
-medium-editor-tables@^0.6.1:
+"medium-editor-tables@git+https://github.com/ioddly/medium-editor-tables.git":
   version "0.6.1"
-  resolved "https://registry.yarnpkg.com/medium-editor-tables/-/medium-editor-tables-0.6.1.tgz#08a59982f61d238929e12fe18accc23062e96cf3"
+  resolved "git+https://github.com/ioddly/medium-editor-tables.git#f8fc7d7b8560261ce0cd4126650c7cd6577275ed"
 
 medium-editor@^5.23.0:
   version "5.23.0"

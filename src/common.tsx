@@ -1,4 +1,5 @@
 ///<reference path="riot-route/index.d.ts" />
+///<reference path="medium-editor-tables/index.d.ts" />
 
 import * as moment from 'moment';
 import * as redux from 'redux';
@@ -9,6 +10,7 @@ import * as React from 'react';
 import * as reactredux from 'react-redux';
 import * as ReactDOM from 'react-dom';
 import * as MediumEditor from 'medium-editor';
+import MediumEditorTable from 'medium-editor-tables';
 
 import './site.css';
 
@@ -277,12 +279,15 @@ export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
   const options = {
     autoLink: true,
     placeholder: true, 
-    extensions: {}, 
 
     toolbar: {
       buttons: ['bold', 'italic', 'underline',
         'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table'],
+    },
+
+    extensions: {
+      table: new MediumEditorTable(),
     },
     ...opts};
 
