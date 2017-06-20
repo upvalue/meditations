@@ -57,7 +57,7 @@ func DBClose() {
 	DB.Close()
 }
 
-// DBRepair fix potential inconsistencies such as tags pointing to dead entries
+// DBRepair fix potential inconsistencies such as tags pointing to dead entries, out-of-order tasks etc
 func DBRepair() {
 
 }

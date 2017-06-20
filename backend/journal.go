@@ -1,14 +1,12 @@
 package backend
 
 import (
-	"fmt"
 	"log"
 	"sort"
 	"time"
 
 	"github.com/go-macaron/binding"
 	"github.com/jinzhu/gorm"
-	"github.com/jinzhu/now"
 	"gopkg.in/macaron.v1"
 )
 
@@ -222,45 +220,52 @@ type Sidebar struct {
 
 // SidebarInfo represents navigation information that is displayed in the sidebar
 func journalSidebarInfo(c *macaron.Context) {
-	// TODO: Update piecemeal when possible
+	// TODO: Update incrementall when possible
 
 	// Display chronological navigation information
 	var first, last Entry
 
 	err := DB.Order("date").Limit(1).First(&first).Error
 	DB.Order("date desc").Limit(1).First(&last)
+
 	// Struct for rendering info about links
-
-	var years []ChronoLink
-
+	years := []ChronoLink{}
 	// Display chronological navigation
 	if err == nil {
-		d := now.New(first.Date).BeginningOfMonth()
-		e := now.New(last.Date).EndOfMonth()
-		fmt.Printf("%v %v\n", d, e)
+		yearsindb, err := DB.Raw("SELECT distinct strftime('%Y', date) from entries order by date desc").Rows()
 
-		year := ChronoLink{Date: d.Format("2006"), Count: 0}
-		for ; d.Year() < e.Year() || d.Month() <= e.Month(); d = d.AddDate(0, 1, 0) {
-			rows, err := DB.Table("entries").Select("count(*)").Where("date between ? and ? and deleted_at is null", d.Format(DateFormat), d.AddDate(0, 1, 0).Format(DateFormat)).Rows()
-			if err == nil {
-				var count int
-				rows.Next()
-				rows.Scan(&count)
-				rows.Close()
-				year.Sub = append([]ChronoLink{ChronoLink{Date: d.Format("January"), Count: count, Link: d.Format("2006-01")}}, year.Sub...)
-				// At end of year
-				if (d.Year() != d.AddDate(0, 1, 0).Year()) || (d.Year() == e.Year() && d.AddDate(0, 1, 0).Month() > e.Month()) {
-					// Get count of entries in year
-					rows, _ := DB.Table("Entries").Select("count(*)").Where("date between ? and ? and deleted_at is null",
-						now.New(d).BeginningOfYear().Format(DateFormat), now.New(d).EndOfYear().Format(DateFormat)).Rows()
-					rows.Next()
-					rows.Scan(&year.Count)
-					rows.Close()
+		if err == nil {
+			defer yearsindb.Close()
+			for yearsindb.Next() {
+				sub := []ChronoLink{}
+				// Loop over years
+				var datestr string
+				yearsindb.Scan(&datestr)
 
-					// prepend year
-					years = append([]ChronoLink{year}, years...)
-					year = ChronoLink{Date: d.AddDate(0, 1, 0).Format("2006"), Count: 0}
+				if err != nil {
+					continue
 				}
+
+				var count struct{ Count int }
+
+				monthsindb, err := DB.Raw("SELECT distinct strftime('%Y-%m', date) from entries where strftime('%Y', date) = ? order by date desc", datestr).Rows()
+				if err == nil {
+					defer monthsindb.Close()
+					for monthsindb.Next() {
+						var monthstr string
+						monthsindb.Scan(&monthstr)
+
+						d, _ := time.Parse("2006-01", monthstr)
+
+						DB.Raw("SELECT count(*) as count from entries where strftime('%Y-%m', date) = ?", monthstr).Scan(&count)
+						sub = append(sub, ChronoLink{Date: d.Format("January"), Link: d.Format("2006-01"), Count: count.Count})
+					}
+				}
+
+				DB.Raw("SELECT count(*) as count from entries where strftime('%Y', date) = ?", datestr).Scan(&count)
+
+				year := ChronoLink{Date: datestr, Count: count.Count, Sub: sub}
+				years = append(years, year)
 			}
 		}
 	}

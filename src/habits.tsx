@@ -345,6 +345,7 @@ export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.
   }
 
   editComment() {
+    // TODO code duplication with journal code.
     if (!this.state.editor) {
       const editor = common.makeEditor(this.body, undefined, () => {
         const newBody = this.body.innerHTML;
@@ -606,7 +607,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
           currentDate={this.props.date} projects={this.props.projects}
           scope={this.props.project} />;
       } else {
-        // In case the route has changed, but the project scope has not been loaded yet.
+        // In case the route has changed, but the project data has not been loaded yet.
         return <common.Spinner />;
       }
     }
