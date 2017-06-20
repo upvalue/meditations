@@ -481,6 +481,17 @@ export class ProjectScope extends
     route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
   }
 
+  addTask() {
+    const name = window.prompt('Enter task name (leave empty to cancel): ');
+    if (name) {
+      common.post(store.dispatch, `/habits/new`, {
+        name,
+        date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
+        scope: this.props.scope.Scope,
+      });
+    }
+  }
+
   render() {
     return <section className="scope">
       <div>
@@ -490,6 +501,8 @@ export class ProjectScope extends
         </select>
       </div>
 
+      <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="New task"
+        onClick={() => this.addTask()} />
       <h6 className="scope-title">{this.props.scope.Name}</h6>
 
       {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}

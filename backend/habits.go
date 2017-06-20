@@ -323,7 +323,7 @@ func _between(start time.Time, scope int) (time.Time, time.Time) {
 		return from, from.AddDate(1, 0, 0)
 	}
 	if scope > ScopeYear {
-		return time.Date(1960, 1, 1, 0, 0, 0, 0, time.Local), time.Now()
+		return time.Date(1960, 1, 1, 0, 0, 0, 0, time.Local), time.Now().AddDate(0, 0, 1)
 	}
 	return time.Now(), time.Now()
 }
@@ -534,13 +534,13 @@ func taskDelete(c *macaron.Context, task Task) {
 // Change task ordering within scope
 func taskSwapOrder(c *macaron.Context, change int, task Task) {
 	DB.Where("id = ?", task.ID).First(&task)
-	log.Printf("%d %+v", change, task)
 
 	if (change == -1 && task.Order > 0) || change == 1 {
 		var swap Task
 
 		from, to := between(task.Date, task.Scope)
 
+		// Find a task to swap with
 		DB.Where("date between ? and ? and scope = ? and `order` = ?", from, to, task.Scope, task.Order+change).First(&swap)
 
 		// If there is something to swap it with
@@ -557,17 +557,17 @@ func taskSwapOrder(c *macaron.Context, change int, task Task) {
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
-// Move task up in order within scope
+// taskOrderUp moves a task up within a scope
 func taskOrderUp(c *macaron.Context, t Task) {
 	taskSwapOrder(c, -1, t)
 }
 
-// Move task down in order within scope
+// taskOrderDown moves a task down in order within scope
 func taskOrderDown(c *macaron.Context, t Task) {
 	taskSwapOrder(c, 1, t)
 }
 
-// Update or create a comment
+// commentUpdate updates or creates a comment
 func commentUpdate(c *macaron.Context, comment Comment) {
 	var task Task
 
