@@ -220,7 +220,7 @@ type Sidebar struct {
 
 // SidebarInfo represents navigation information that is displayed in the sidebar
 func journalSidebarInfo(c *macaron.Context) {
-	// TODO: Update incrementall when possible
+	// TODO: Update incrementally when possible
 
 	// Display chronological navigation information
 	years := []ChronoLink{}
@@ -250,6 +250,7 @@ func journalSidebarInfo(c *macaron.Context) {
 		years = append(years, year)
 	}
 
+	// Return tagged entries
 	var tags []Tag
 	var tagLinks []TagLink
 
@@ -263,6 +264,7 @@ func journalSidebarInfo(c *macaron.Context) {
 		}
 	}
 
+	// Return named entries
 	var nameLinks []NameLink
 	var nameEntries []Entry
 	DB.Where("name is not null and deleted_at is null").Order("name").Find(&nameEntries)

@@ -105,8 +105,7 @@ const reducer = (pstate: JournalState = initialState, action: JournalAction): Jo
       let entries = state.entries.slice();
       for (let i = 0; i !== entries.length; i += 1) {
         if (entries[i].Date > action.entry.Date) {
-          console.log('Splicing in entry at ',i);
-          entries = entries.splice(i, 0, action.entry);
+          entries.splice(i, 0, action.entry);
           return { ...state, entries };
         }
       }
