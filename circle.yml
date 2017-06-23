@@ -14,7 +14,7 @@ dependencies:
     # move directory to go workspace for godep to work
     - rm -rf "$GO_WORKSPACE/src/$IMPORT_PATH"
     - mkdir -p "$GO_WORKSPACE/src/$IMPORT_PATH"
-    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
+    - rsync -azC ./ "$GO_WORKSPACE/src/$IMPORT_PATH"
     - go get github.com/tools/godep
   override:
     - yarn
