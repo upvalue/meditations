@@ -17,5 +17,4 @@ test:
   pre:
     - echo ''
   override:
-    - echo ''
-
+    - yarn run test-backend

@@ -102,7 +102,7 @@ const reducer = (pstate: JournalState = initialState, action: JournalAction): Jo
         entries: action.entries,
       };
     case 'CREATE_ENTRY':
-      let entries = state.entries.slice();
+      const entries = state.entries.slice();
       for (let i = 0; i !== entries.length; i += 1) {
         if (entries[i].Date > action.entry.Date) {
           entries.splice(i, 0, action.entry);
