@@ -2,7 +2,7 @@ machine:
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
     IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
-    GO_WORKSPACE: "~/.go_workspace"
+    GO_WORKSPACE: "${HOME}/.go_workspace"
   node:
     version: 8.1.2
 
