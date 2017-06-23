@@ -15,10 +15,11 @@ dependencies:
     - rm -rf "$GO_WORKSPACE/src/$IMPORT_PATH"
     - mkdir -p "$GO_WORKSPACE/src/$IMPORT_PATH"
     - rsync -azC ./ "$GO_WORKSPACE/src/$IMPORT_PATH"
+    - cd "$GO_WORKSPACE/src/$IMPORT_PATH"
     - go get github.com/tools/godep
   override:
     - yarn
-    - godep go build
+    - godep go build ./...
   cache_directories:
     - ~/.cache/yarn
 
