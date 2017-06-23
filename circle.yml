@@ -3,13 +3,20 @@ machine:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
     IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
   node:
-    version: 7.7.1
+    version: 8.1.2
 
 dependencies:
   pre:
+    - echo $GOPATH
+    - echo $IMPORT_PATH
+    # move directory to go workspace for godep to work
+    - rm -rf "$GOPATH/src/$IMPORT_PATH"
+    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
+    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
     - go get github.com/tools/godep
   override:
     - yarn
+    - godep go build
   cache_directories:
     - ~/.cache/yarn
 
