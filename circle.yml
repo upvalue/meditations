@@ -27,4 +27,4 @@ test:
   pre:
     - echo ''
   override:
-    - godep go test ./backend
+    - cd "$GO_WORKSPACE/src/$IMPORT_PATH" && godep go test ./backend
