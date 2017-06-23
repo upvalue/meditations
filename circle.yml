@@ -2,6 +2,7 @@ machine:
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
     IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+    GO_WORKSPACE: "~/.go_workspace"
   node:
     version: 8.1.2
 
@@ -9,9 +10,10 @@ dependencies:
   pre:
     - echo $GOPATH
     - echo $IMPORT_PATH
+    - echo $GO_WORKSPACE
     # move directory to go workspace for godep to work
-    - rm -rf "$GOPATH/src/$IMPORT_PATH"
-    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
+    - rm -rf "$GO_WORKSPACE/src/$IMPORT_PATH"
+    - mkdir -p "$GO_WORKSPACE/src/$IMPORT_PATH"
     - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
     - go get github.com/tools/godep
   override:
