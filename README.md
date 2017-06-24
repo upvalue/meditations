@@ -46,7 +46,7 @@ Although this is a Go package, it is intended to be run directly from the repo a
 - `backend/backend_test.go` Backend test suite
 - `src/` Frontend code
 - `main.go` Go command entry point
-- `__tests__` Frontend test suite
+- `tests` Frontend test suite
 
 # Attribution
 

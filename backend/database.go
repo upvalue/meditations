@@ -52,6 +52,11 @@ func DBCreate() {
 	DB.FirstOrCreate(&settings)
 }
 
+// DBSeed seeds the database with example data, suitable for testing or the demo application
+func DBSeed() {
+
+}
+
 // DBClose close database handle
 func DBClose() {
 	DB.Close()

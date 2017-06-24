@@ -1,3 +1,5 @@
+# this mess is required because circleci checks out the git repo directly into home rather than
+# into the go workspace
 machine:
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
