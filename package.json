@@ -7,23 +7,11 @@
     "postinstall": "webpack -p",
     "typedoc": "typedoc --out doc",
     "godoc": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",
-    "test-backend": "go test -v ./backend",
-    "test-frontend": "mocha --opts tests/mocha.opts tests/*.ts"
+    "test-backend": "go test -v ./backend"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ioddly/meditations.git"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "transform": {
-      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$"
   },
   "keywords": [],
   "author": "",
@@ -53,13 +41,13 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
     "bootstrap": "4.0.0-alpha.6",
-    "chai": "^4.0.2",
     "css-loader": "^0.26.1",
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.10.0",
     "medium-editor": "^5.23.0",
     "medium-editor-tables": "git+https://github.com/ioddly/medium-editor-tables.git",
     "moment": "^2.18.1",
+    "node-sass": "^4.5.3",
     "octicons": "^3.5.0",
     "react": "^15.5.4",
     "react-datepicker": "^0.46.0",
@@ -70,16 +58,9 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "riot-route": "^3.1.1",
+    "sass-loader": "^6.0.6",
     "style-loader": "^0.13.1",
     "typescript": "^2.3.3",
     "webpack": "^2.2.1"
-  },
-  "devDependencies": {
-    "@types/chai": "^4.0.1",
-    "@types/mocha": "^2.2.41",
-    "mocha": "^3.4.2",
-    "ts-node": "^3.1.0",
-    "tslint": "^5.4.3",
-    "tslint-config-airbnb": "^5.1.2"
   }
 }

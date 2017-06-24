@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "es2015",
+        "module": "commonJS",
         "moduleResolution": "node",
         "target": "es5",
         "sourceMap": true,

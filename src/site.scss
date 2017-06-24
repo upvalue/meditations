@@ -12,22 +12,34 @@
 @import url("../node_modules/@typopro/web-open-sans/TypoPRO-OpenSans.css");
 @import url("../node_modules/@typopro/web-inconsolata/TypoPRO-Inconsolata.css");
 
+$linkColor: #09d;
+$bodyFont: "TypoPRO Open Sans";
+$commentFont: "TypoPRO Inconsolata", monospace;
+
+//
+///// GLOBAL ELEMENT STYLING
+//
+
 body, button, input, optgroup, select, textarea {
-  font-family: "TypoPRO Open Sans", sans-serif;
+  font-family: $bodyFont, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, .navbar {
-  font-family: "TypoPRO Open Sans", serif;
+  font-family: $bodyFont, serif;
   font-weight:bold;
 }
 
 a, a:visited {
-  color: #09d;
+  color: $linkColor;
 }
+
+//
+///// NAVBAR
+//
 
 /***** NAVBAR STYLING ****/
 ul.nav a, .navbar-light .navbar-nav .nav-link {
-  color: #09d !important;
+  color: $linkColor !important;
 }
 
 .navbar .nav-item { margin-left: 1rem; display:inline; }
@@ -41,7 +53,6 @@ ul.nav a.navbar-link-disabled {
 
 .navbar-brand {
   font-size: medium;
-  text-transform: capitalize; 
   margin-right: 0;
 }
 .navbar {
@@ -52,6 +63,9 @@ ul.nav a.navbar-link-disabled {
   font-size: small !important;  
 }
 
+//
+///// HABITS
+//
 /**** HABITS */
 
 #habits-root { 
@@ -85,7 +99,7 @@ ul.nav a.navbar-link-disabled {
 #content input.form-control[type=text] { height:1.5em; }
 
 .comment {
-  font-family: "TypoPRO Inconsolata", monospace;
+  font-family: $commentFont;
 }
 
 .comment p {
@@ -115,7 +129,9 @@ ul.nav a.navbar-link-disabled {
   font-size:1rem;
 }
 
-/**** JOURNAL */
+//
+///// JOURNAL
+//
 
 .nav .nav-item { display:inline; }
 
@@ -154,7 +170,7 @@ hr{ clear:both;}
 
 .journal-control { padding: 2px; }
 
-.react-tabs__tab { border:0; color: #09d; }
+.react-tabs__tab { border:0; color: $linkColor; }
 .react-tabs__tab-list { border: 0; }
 .react-tabs__tab--selected { border: 0; font-weight:bold; }
 
@@ -171,7 +187,7 @@ div#content h1:first-of-type { margin-top:0; }
 }
 
 .link-tree-node-anchor {
-  color: #09d !important;
+  color: $linkColor !important;
 }
 
 .link-tree-node-nochildren {
@@ -182,7 +198,9 @@ div#content h1:first-of-type { margin-top:0; }
   display: inline;
 }
 
-/***** LOADING SPINNER */
+//
+///// LOADING SPINNER ANIMATION
+//
 
 .spinner {
   margin: 100px auto 0;

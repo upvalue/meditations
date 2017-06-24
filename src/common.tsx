@@ -12,7 +12,7 @@ import * as ReactDOM from 'react-dom';
 import * as MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
 
-import './site.css';
+import './site.scss';
 
 /** Fields common to all models */
 export interface Model {

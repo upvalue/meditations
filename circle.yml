@@ -29,5 +29,5 @@ test:
   pre:
     - echo ''
   override:
-    - yarn run test-frontend
+    #- yarn run test-frontend
     - cd "$GO_WORKSPACE/src/$IMPORT_PATH" && godep go test ./backend
