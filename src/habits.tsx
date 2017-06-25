@@ -544,12 +544,20 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
   }
 
+  pinProject(id: number) {
+    if (window.confirm('Are you sure you want to (un)pin this project?')) {
+      common.post(store.dispatch, `/habits/projects/toggle-pin/${id}`);
+    }
+  }
+
   renderProjectLink(project: Project, pinned: boolean) {
     return <div key={project.ID}>
       {pinned && <span className="octicon octicon-pin" /> }
       <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
 
       <span className="float-right">
+        <span className="task-control btn-link btn-sm btn-default octicon octicon-pin"
+          onClick={() => this.pinProject(project.ID) } />
         <span className="task-control btn-link btn-sm btn-default octicon octicon-trashcan" 
           onClick={() => this.deleteProject(project.ID)} />
       </span>
@@ -578,6 +586,7 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
         onClick={() => this.addProject()} />
       <h6 className="scope-title">Projects</h6>
       {pinnedProjects.map(p => this.renderProjectLink(p, true))}
+      <hr />
       {unpinnedProjects.map(p => this.renderProjectLink(p, false))}
 
     </div>;
@@ -638,6 +647,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
   }
 });
 
+/** Habits entry point. Sets up router, socket, and renders root. */
 export const main = () => {
   ///// INSTALL ROUTER
   common.installRouter('/habits#', `view/${moment().format(common.MONTH_FORMAT)}/0`, {

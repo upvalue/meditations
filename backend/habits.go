@@ -4,6 +4,7 @@ package backend
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -616,21 +617,33 @@ func syncProjectList() {
 	habitSync.Send("PROJECTS", scopes)
 }
 
-func projectDelete(c *macaron.Context) {
+// projectPost parses a project ID and fetches it from the DB, returning an error if it can't be
+// found
+func projectPost(c *macaron.Context, scope *Scope) (int64, error) {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 32)
 
 	if err != nil || id < 4 {
-		serverError(c, "Failed to parse ID %v", err)
-		return
+		serverError(c, "Failed to parse ID '%s' (or ID is <4) %v", c.Params("id"), err)
+		return 0, err
 	}
-
-	var scope Scope
-	var tasks []Task
 
 	DB.Where("id = ?", id).First(&scope)
 
 	if scope.ID == 0 {
 		serverError(c, "Failed to find scope %d", id)
+		return 0, errors.New("Failed to find scope")
+	}
+
+	return id, nil
+}
+
+func projectDelete(c *macaron.Context) {
+	var scope Scope
+	var tasks []Task
+
+	id, err := projectPost(c, &scope)
+
+	if err != nil {
 		return
 	}
 
@@ -638,6 +651,23 @@ func projectDelete(c *macaron.Context) {
 
 	DB.Delete(&scope)
 
+	syncProjectList()
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
+// projectTogglePin pins or unpins a project
+func projectTogglePin(c *macaron.Context) {
+	var scope Scope
+
+	_, err := projectPost(c, &scope)
+
+	if err != nil {
+		return
+	}
+
+	scope.Pinned = !scope.Pinned
+
+	DB.Save(&scope)
 	syncProjectList()
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
@@ -750,6 +780,7 @@ func habitsInit(m *macaron.Macaron) {
 
 	m.Post("/projects/delete/:id([0-9]+)", projectDelete)
 	m.Post("/projects/new/:name", projectNew)
+	m.Post("/projects/toggle-pin/:id([0-9]+)", projectTogglePin)
 
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/new", binding.Bind(Task{}), taskNew)
