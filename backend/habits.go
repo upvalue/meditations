@@ -603,18 +603,30 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 	c.PlainText(200, []byte("OK"))
 }
 
-// Return list of all buckets by most recent
-func getProjects(c *macaron.Context) {
-	var scopes []Scope
-	DB.Where("id >= ?", ScopeProject).Order("updated_at desc").Find(&scopes)
-
-	c.JSON(200, scopes)
+// ProjectListMsg is sent both as a result of GETting /habits/projects and syncing project list
+// through the socket
+type ProjectListMsg struct {
+	Pinned   []Scope
+	Unpinned []Scope
 }
 
+func getProjectList() ProjectListMsg {
+	var pinnedProjects []Scope
+	var unpinnedProjects []Scope
+
+	DB.Where("id >= ? and pinned = 1", ScopeProject).Order("name").Find(&pinnedProjects)
+	DB.Where("id >= ? and pinned = 0", ScopeProject).Order("name").Find(&unpinnedProjects)
+
+	return ProjectListMsg{pinnedProjects, unpinnedProjects}
+}
+
+func getProjects(c *macaron.Context) {
+	c.JSON(200, getProjectList())
+}
+
+// syncProjectList sends an updated list of projects over the socket
 func syncProjectList() {
-	var scopes []Scope
-	DB.Where("id >= ?", ScopeProject).Order("updated_at desc").Find(&scopes)
-	habitSync.Send("PROJECTS", scopes)
+	habitSync.Send("PROJECTS", getProjectList())
 }
 
 // projectPost parses a project ID and fetches it from the DB, returning an error if it can't be

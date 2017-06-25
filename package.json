@@ -4,6 +4,7 @@
   "description": "meditations is an application for tracking life progress that builds on habit formation and long term thinking.",
   "main": "index.js",
   "scripts": {
+    "cloc": "cloc src/**/*.ts src/*.tsx backend/*.go",
     "postinstall": "webpack -p",
     "typedoc": "typedoc --out doc",
     "godoc": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",

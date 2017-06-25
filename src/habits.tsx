@@ -80,7 +80,8 @@ interface ViewMonth extends common.CommonState {
   mounted: boolean;
 
   // UI tree
-  projects: Project[];
+  pinnedProjects: Project[];
+  unpinnedProjects: Project[];
   month: Scope;
   year: Scope;
   days: Scope[];
@@ -96,8 +97,9 @@ interface ChangeRoute {
 }
 
 interface AddProjectList {
-  type: 'ADD_PROJECT_LIST';
-  projects: Project[];
+  type: 'PROJECT_LIST';
+  pinnedProjects: Project[];
+  unpinnedProjects: Project[];
 }
 
 interface MountDays {
@@ -190,8 +192,9 @@ const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState 
 const reducer = (pstate: HabitsState = initialState, action: HabitsAction): HabitsState => {
   const state = common.commonReducer(pstate, action as common.CommonAction) as HabitsState;
   switch (action.type) {
-    case 'ADD_PROJECT_LIST':
-      return { ...state, projects: action.projects };
+    case 'PROJECT_LIST':
+      return { ...state, pinnedProjects: action.pinnedProjects,
+        unpinnedProjects: action.unpinnedProjects };
 
     case 'CHANGE_ROUTE':
       return { ...state, date: action.date, currentProject: action.currentProject };
@@ -484,9 +487,9 @@ export class TimeScope extends
 }
 
 export interface ProjectScopeProps {
-  currentProject: number;
   currentDate: moment.Moment;
-  projects: Project[];
+  pinnedProjects: Project[];
+  unpinnedProjects: Project[];
   scope: Scope;
 }
 
@@ -515,11 +518,9 @@ export class ProjectScope extends React.Component<ProjectScopeProps, undefined> 
     return <section className="scope">
       <div>
         <h6 className="scope-title">
-          {this.props.currentProject !== 0 ?
-            <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
-              Projects</a></span> :
-            <span>Projects</span> }
-          {this.props.currentProject !== 0 && <span> &gt; {this.props.scope.Name}</span>}</h6>
+          <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
+            Projects</a></span> 
+          <span> &gt; {this.props.scope.Name}</span></h6>
       </div>
 
       <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="New task"
@@ -532,7 +533,8 @@ export class ProjectScope extends React.Component<ProjectScopeProps, undefined> 
 }
 
 export interface ProjectListProps {
-  projects: Project[];
+  pinnedProjects: Project[];
+  unpinnedProjects: Project[];
   currentDate: moment.Moment;
 }
 
@@ -544,8 +546,8 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
   }
 
-  pinProject(id: number) {
-    if (window.confirm('Are you sure you want to (un)pin this project?')) {
+  pinProject(id: number, pinned: boolean) {
+    if (window.confirm(`Are you sure you want to ${pinned ? 'unpin' : 'pin'} this project?`)) {
       common.post(store.dispatch, `/habits/projects/toggle-pin/${id}`);
     }
   }
@@ -557,7 +559,7 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
       <span className="float-right">
         <span className="task-control btn-link btn-sm btn-default octicon octicon-pin"
-          onClick={() => this.pinProject(project.ID) } />
+          onClick={() => this.pinProject(project.ID, pinned) } />
         <span className="task-control btn-link btn-sm btn-default octicon octicon-trashcan" 
           onClick={() => this.deleteProject(project.ID)} />
       </span>
@@ -572,22 +574,13 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
   }
 
   render() {
-    const alphasort = (a: Project, b: Project) => {
-      if (a.Name < b.Name) return -1;
-      if (a.Name > b.Name) return 1;
-      return 0;
-    };
-
-    const pinnedProjects = this.props.projects.filter(p => p.Pinned === true).sort(alphasort);
-    const unpinnedProjects = this.props.projects.filter(p => p.Pinned === false).sort(alphasort);
-
     return <div>
       <button className="btn btn-link octicon octicon-plus" title="Add new project"
         onClick={() => this.addProject()} />
       <h6 className="scope-title">Projects</h6>
-      {pinnedProjects.map(p => this.renderProjectLink(p, true))}
+      {this.props.pinnedProjects.map(p => this.renderProjectLink(p, true))}
       <hr />
-      {unpinnedProjects.map(p => this.renderProjectLink(p, false))}
+      {this.props.unpinnedProjects.map(p => this.renderProjectLink(p, false))}
 
     </div>;
   }
@@ -609,11 +602,15 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
   /** Render either a list of projects or the currently open project */
   renderProjects() {
     if (this.props.currentProject === 0) {
-      return <ProjectList currentDate={this.props.date} projects={this.props.projects} />;
+      return <ProjectList currentDate={this.props.date}
+        pinnedProjects={this.props.pinnedProjects}
+        unpinnedProjects ={this.props.unpinnedProjects} />;
     } else {
       if (this.props.project && this.props.currentProject === this.props.project.Scope) {
-        return <ProjectScope currentProject={this.props.currentProject}
-          currentDate={this.props.date} projects={this.props.projects}
+        return <ProjectScope 
+          currentDate={this.props.date}
+          pinnedProjects={this.props.pinnedProjects}
+          unpinnedProjects={this.props.unpinnedProjects}
           scope={this.props.project} />;
       } else {
         // In case the route has changed, but the project data has not been loaded yet.
@@ -640,7 +637,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="col-md-3">
-            {this.props.projects ? this.renderProjects() : <common.Spinner />}
+            {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
           </div>
         </div>}
     </div>;
@@ -651,6 +648,10 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
 export const main = () => {
   ///// INSTALL ROUTER
   common.installRouter('/habits#', `view/${moment().format(common.MONTH_FORMAT)}/0`, {
+    no_action: () => {
+      route(routeForView(moment(), 0));
+    },
+    habits: () => {},
     view: (datestr: string, scopestr: string) => {
       const date = moment(datestr, common.MONTH_FORMAT);
       const project = parseInt(scopestr, 10);
@@ -664,7 +665,6 @@ export const main = () => {
       if (state === undefined) return;
       const prevDate = state.date;
       const prevProject = state.currentProject;
-      const projects = state.projects;
 
       let timeChanged: 'NO_CHANGE' | 'CHANGE_YEAR' | 'CHANGE_MONTH' = 'NO_CHANGE';
 
@@ -730,10 +730,12 @@ export const main = () => {
       }
 
       // Retrieve and mount project list
-      if (!projects) {
+      if (!state.pinnedProjects) {
         store.dispatch((dispatch: redux.Dispatch<HabitsState>) => {
-          common.get(dispatch, `/habits/projects`, ((response: Project[]) => {
-            dispatch({ type: 'ADD_PROJECT_LIST', projects: response });
+          common.get(dispatch, `/habits/projects`, ((response:
+            { Pinned: Project[], Unpinned: Project[] }) => {
+            dispatch({ type: 'PROJECT_LIST', pinnedProjects: response.Pinned,
+              unpinnedProjects: response.Unpinned });
           }));
         });
       }
@@ -775,7 +777,10 @@ export const main = () => {
     }
   } | {
     Type: 'PROJECTS';
-    Datum: Project[];
+    Datum: {
+      Pinned: Project[];
+      Unpinned: Project[];
+    }
   };
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
@@ -796,7 +801,8 @@ export const main = () => {
         break;
 
       case 'PROJECTS':
-        store.dispatch({ type: 'ADD_PROJECT_LIST', projects: msg.Datum });
+        store.dispatch({ type: 'PROJECT_LIST', pinnedProjects: msg.Datum.Pinned,
+          unpinnedProjects: msg.Datum.Unpinned});
         break;
     }
   });
