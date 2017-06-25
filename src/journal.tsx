@@ -365,7 +365,7 @@ const JournalNavigation = connect(state => state)(
 );
 
 
-document.addEventListener('DOMContentLoaded', () => {
+export const main = () => {
   ///// ROUTES
   // Install router. If no route was specifically given, start with #view/YYYY-MM
   common.installRouter('/journal#', `view/${moment().format(common.MONTH_FORMAT)}`, {
@@ -439,5 +439,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch sidebar
     common.post(store.dispatch, '/journal/sidebar');
   });
-  
-});
+};

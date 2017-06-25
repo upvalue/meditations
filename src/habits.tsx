@@ -638,7 +638,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
   }
 });
 
-document.addEventListener('DOMContentLoaded', () =>  {
+export const main = () => {
   ///// INSTALL ROUTER
   common.installRouter('/habits#', `view/${moment().format(common.MONTH_FORMAT)}/0`, {
     view: (datestr: string, scopestr: string) => {
@@ -793,4 +793,4 @@ document.addEventListener('DOMContentLoaded', () =>  {
   
   ///// RENDER
   common.render('habits-root', store, <HabitsRoot />);
-});
+};
