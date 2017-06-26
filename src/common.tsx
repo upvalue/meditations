@@ -274,8 +274,6 @@ export function installRouter(base: string, first: string,
  */
 export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
     opts?: MediumEditor.CoreOptions): MediumEditor.MediumEditor {
-  console.log('Horse');
-  console.log(MediumEditorTable);
   const options = {
     autoLink: true,
     placeholder: true, 

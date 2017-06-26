@@ -496,7 +496,10 @@ export class TimeScope extends
 
 /** Returns project activity indicator */
 const projectActivityIcon = (p: Project) => { 
-  const recentActivity = Math.ceil(p.CompletedTasks / (PROJECT_ACTIVITY_BENCHMARK / 4));
+  const fraction = PROJECT_ACTIVITY_BENCHMARK / 4;
+  const recentActivity = (Math.min(p.CompletedTasks, PROJECT_ACTIVITY_BENCHMARK) -
+    (p.CompletedTasks % fraction)) / 6;
+  // const recentActivity = Math.ceil(p.CompletedTasks / (PROJECT_ACTIVITY_BENCHMARK / 4));
   const recentActivityString = 
     ['little activity', 'some activity', 'lots of activity', 'immense activity'][recentActivity];
   return <span className = {`octicon octicon-flame project-activity-${recentActivity}`}
