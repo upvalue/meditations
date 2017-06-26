@@ -19,6 +19,8 @@ export const SCOPE_MONTH = 2;
 export const SCOPE_YEAR = 3;
 export const SCOPE_PROJECT = 4;
 
+export const PROJECT_ACTIVITY_BENCHMARK = 24;
+
 export const scopeIsTimeBased = (scope: number) => {
   return scope < SCOPE_PROJECT && scope > SCOPE_UNUSED;
 };
@@ -54,11 +56,17 @@ export interface Scope {
   Tasks: Task[];
 }
 
-export interface Project {
+export type Project = {
   ID: number;
   Name: string;
-  Pinned: boolean;
-}
+  Pinned: false;
+  CompletedTasks: number;
+} | {
+  ID: number;
+  Name: string;
+  Pinned: true;
+  CompletedTasks: number;
+};
 
 export interface Day {
   Date: string;
@@ -486,10 +494,17 @@ export class TimeScope extends
   }
 }
 
+/** Returns project activity indicator */
+const projectActivityIcon = (p: Project) => { 
+  const recentActivity = Math.ceil(p.CompletedTasks / (PROJECT_ACTIVITY_BENCHMARK / 4));
+  const recentActivityString = 
+    ['little activity', 'some activity', 'lots of activity', 'immense activity'][recentActivity];
+  return <span className = {`octicon octicon-flame project-activity-${recentActivity}`}
+    title={``} />;
+};
+
 export interface ProjectScopeProps {
   currentDate: moment.Moment;
-  pinnedProjects: Project[];
-  unpinnedProjects: Project[];
   scope: Scope;
 }
 
@@ -538,6 +553,7 @@ export interface ProjectListProps {
   currentDate: moment.Moment;
 }
 
+
 export class ProjectList extends React.Component<ProjectListProps, undefined> {
   deleteProject(id: number) {
     if (window.confirm('Are you sure you want to delete this project?')) {
@@ -546,20 +562,35 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
   }
 
-  pinProject(id: number, pinned: boolean) {
-    if (window.confirm(`Are you sure you want to ${pinned ? 'unpin' : 'pin'} this project?`)) {
-      common.post(store.dispatch, `/habits/projects/toggle-pin/${id}`);
-    }
+  pinProject(p: Project) {
+    common.post(store.dispatch, `/habits/projects/toggle-pin/${p.ID}`);
   }
 
-  renderProjectLink(project: Project, pinned: boolean) {
+  copyLeft(p: Project) {
+    const task = {
+      Name: p.Name,
+      Scope: SCOPE_DAY,
+      Date: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
+    };
+
+    common.post(store.dispatch, '/habits/new', task);
+
+  }
+
+  renderProjectLink(project: Project) {
     return <div key={project.ID}>
-      {pinned && <span className="octicon octicon-pin" /> }
+      {project.Pinned && projectActivityIcon(project)}
+
       <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
 
       <span className="float-right">
+        <span className="task"> {/* used for smaller font*/}
+          {project.CompletedTasks}
+        </span>
+        <span className="task-control btn-link btn-sm btn-default octicon octicon-clippy"
+          onClick={() => this.copyLeft(project) } />
         <span className="task-control btn-link btn-sm btn-default octicon octicon-pin"
-          onClick={() => this.pinProject(project.ID, pinned) } />
+          onClick={() => this.pinProject(project) } />
         <span className="task-control btn-link btn-sm btn-default octicon octicon-trashcan" 
           onClick={() => this.deleteProject(project.ID)} />
       </span>
@@ -578,9 +609,9 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
       <button className="btn btn-link octicon octicon-plus" title="Add new project"
         onClick={() => this.addProject()} />
       <h6 className="scope-title">Projects</h6>
-      {this.props.pinnedProjects.map(p => this.renderProjectLink(p, true))}
+      {this.props.pinnedProjects.map(p => this.renderProjectLink(p))}
       <hr />
-      {this.props.unpinnedProjects.map(p => this.renderProjectLink(p, false))}
+      {this.props.unpinnedProjects.map(p => this.renderProjectLink(p))}
 
     </div>;
   }
@@ -607,11 +638,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
         unpinnedProjects ={this.props.unpinnedProjects} />;
     } else {
       if (this.props.project && this.props.currentProject === this.props.project.Scope) {
-        return <ProjectScope 
-          currentDate={this.props.date}
-          pinnedProjects={this.props.pinnedProjects}
-          unpinnedProjects={this.props.unpinnedProjects}
-          scope={this.props.project} />;
+        return <ProjectScope  currentDate={this.props.date} scope={this.props.project} />;
       } else {
         // In case the route has changed, but the project data has not been loaded yet.
         return <common.Spinner />;

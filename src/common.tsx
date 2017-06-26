@@ -238,7 +238,7 @@ export function installRouter(base: string, first: string,
   route.base(base);
   route(function (this: any) {
     const action = [].shift.apply(arguments);
-    console.log(`Common.installRouter: dispatching ${action}`);
+    console.log(`Common.installRouter: dispatching ${action ? action : 'base'}`);
 
     if (routes[action]) {
       routes[action].apply(this, arguments);      

@@ -119,14 +119,22 @@ ul.nav a.navbar-link-disabled {
 
 .task-control { padding:2px;}
 
-.bucket-select {
-  -webkit-appearance:none;
-  border:0;
-  padding:0;
-  width: auto;
-  font-family: "TypoPRO Open Sans", serif;
-  font-weight:bold;
-  font-size:1rem;
+.project-activity-0 {
+  color: #ccc;
+}
+
+.project-activity-1 {
+  color: #ffcd38;
+  font-size: 1.4em;
+}
+
+.project-activity-2 {
+  color: #ff6e26;
+  font-size: 1.8em;
+}
+.project-activity-3 {
+  color: #f00;
+  font-size: 2em;
 }
 
 //

@@ -66,7 +66,8 @@ type Task struct {
 	Order int
 	// Comment
 	Comment Comment
-	// Time stats (these may be set directly by the user or derived from lower scopes)
+	// Time stats (in day-scoped tasks, these are set directly by the user; in monthly/yearly scopes,
+	// they are calculated from daily tasks)
 	Hours   int
 	Minutes int
 	// These statistics are derived at runtime, and not represented in SQL
@@ -78,13 +79,22 @@ type Task struct {
 	Streak             int     `gorm:"-"`
 }
 
-// Scope represents a task scope. Time-based scopes (daily, monthly, yearly) are built-in, but the user can add
-// additional "projects," each of which have their own scope with an ID of ScopeProject or greater
+const (
+	// ProjectDays is used when calculating how many days in the past to include in project recent
+	// activity information
+	ProjectDays = 72
+)
+
+// Scope represents a task's scope. Time-based scopes (daily, monthly, yearly) are built-in, but the
+// user can add additional "projects," each of which have their own scope with an ID of ScopeProject
+// or greater
 type Scope struct {
 	gorm.Model
 	Name     string `gorm:"not null;unique"`
 	Selected bool   `gorm:"-"`
 	Pinned   bool   `gorm:"not null;default:'0'"`
+	// Derived statistics
+	CompletedTasks int `gorm:"-"`
 }
 
 // Comment represents a task comment.
@@ -610,12 +620,35 @@ type ProjectListMsg struct {
 	Unpinned []Scope
 }
 
+// CalculateProjectStats calculates project statistics
+func (project *Scope) CalculateProjectStats() {
+	var past time.Time
+	if project.Pinned == true {
+		past = time.Now().AddDate(0, 0, -ProjectDays)
+	} else {
+		past = time.Now().AddDate(-30, 0, 0)
+	}
+
+	var count struct{ Count int }
+	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ?",
+		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
+	project.CompletedTasks = count.Count
+}
+
 func getProjectList() ProjectListMsg {
 	var pinnedProjects []Scope
 	var unpinnedProjects []Scope
 
 	DB.Where("id >= ? and pinned = 1", ScopeProject).Order("name").Find(&pinnedProjects)
 	DB.Where("id >= ? and pinned = 0", ScopeProject).Order("name").Find(&unpinnedProjects)
+
+	for i := range pinnedProjects {
+		pinnedProjects[i].CalculateProjectStats()
+	}
+
+	for i := range unpinnedProjects {
+		unpinnedProjects[i].CalculateProjectStats()
+	}
 
 	return ProjectListMsg{pinnedProjects, unpinnedProjects}
 }

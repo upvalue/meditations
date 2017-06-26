@@ -369,6 +369,8 @@ export const main = () => {
   ///// ROUTES
   // Install router. If no route was specifically given, start with #view/YYYY-MM
   common.installRouter('/journal#', `view/${moment().format(common.MONTH_FORMAT)}`, {
+    no_action: () => route(`view/${moment().format(common.MONTH_FORMAT)}`),
+    journal: () => {}, // Dummy, called if journal is clicked from navbar
     view: (datestr: string, entryScrollId?: number) => {
       const date = moment(datestr, common.MONTH_FORMAT);
 
