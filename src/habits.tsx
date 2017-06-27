@@ -19,6 +19,12 @@ export const SCOPE_MONTH = 2;
 export const SCOPE_YEAR = 3;
 export const SCOPE_PROJECT = 4;
 
+/** 
+ * Used to measure recent project activity, combined with ProjectDays on the backend such that e.g.
+ * 24 out of the last 72 days having a project-related task in them would be considered extremely
+ * active, 18 somewhat active, and so on. Should be divisible by 4.
+ */
+
 export const PROJECT_ACTIVITY_BENCHMARK = 24;
 
 export const scopeIsTimeBased = (scope: number) => {
@@ -499,7 +505,6 @@ const projectActivityIcon = (p: Project) => {
   const fraction = PROJECT_ACTIVITY_BENCHMARK / 4;
   const recentActivity = (Math.min(p.CompletedTasks, PROJECT_ACTIVITY_BENCHMARK) -
     (p.CompletedTasks % fraction)) / 6;
-  // const recentActivity = Math.ceil(p.CompletedTasks / (PROJECT_ACTIVITY_BENCHMARK / 4));
   const recentActivityString = 
     ['little activity', 'some activity', 'lots of activity', 'immense activity'][recentActivity];
   return <span className = {`octicon octicon-flame project-activity-${recentActivity}`}

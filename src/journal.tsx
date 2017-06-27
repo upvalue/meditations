@@ -350,7 +350,7 @@ const JournalRoot = common.connect()(class extends React.Component<JournalState,
 const JournalNavigation = connect(state => state)(
   class extends React.Component<JournalState, undefined> {
     createEntry(date: moment.Moment | null) {
-      if (date != null) {
+      if (date !== null) {
         common.post(store.dispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
       }
     }
