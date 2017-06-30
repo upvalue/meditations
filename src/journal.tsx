@@ -144,13 +144,7 @@ interface CEntryState {
   editor: MediumEditor.MediumEditor;
 }
 
-class CEntry extends React.Component<CEntryProps, CEntryState> {
-  body: HTMLElement;
-
-  componentWillMount() {
-    this.setState({});
-  }
-
+class CEntry extends common.Editable<CEntryProps> {
   changeName() {
     const name = window.prompt('What would you like to name this entry? (leave empty to delete)',
       this.props.entry.Name);
@@ -183,25 +177,15 @@ class CEntry extends React.Component<CEntryProps, CEntryState> {
     }
   }
 
-  editorCreate(e: React.MouseEvent<HTMLElement>) {
-    e.preventDefault();
-    if (!this.state.editor) {
-      const editor = common.makeEditor(this.body, undefined, () => {
-        const newBody = this.body.innerHTML;
+  editorUpdated() {
+    return this.props.entry.Body !== this.body.innerHTML;
+  }
 
-        // Do not update if nothing has changed
-        if (newBody === this.props.entry.Body) {
-          return;
-        }
-
-        common.post(store.dispatch, '/journal/update', {
-          ID: this.props.entry.ID,
-          Body: newBody,
-        });
-      });
-      this.setState({ editor });
-      this.body.focus();
-    }
+  editorSave() {
+    common.post(store.dispatch, '/journal/update', {
+      ID: this.props.entry.ID,
+      Body: this.body.innerHTML,
+    });
   }
 
   btnClass(title: string) {
@@ -253,7 +237,7 @@ class CEntry extends React.Component<CEntryProps, CEntryState> {
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
         ref={(body) => { this.body = body; }}
         dangerouslySetInnerHTML={{ __html: this.props.entry.Body }}
-        onClick={e => this.editorCreate(e)} />
+        onClick={e => this.editorOpen(e)} />
     </div>;
   }
 }
@@ -364,13 +348,13 @@ const JournalNavigation = connect(state => state)(
   },
 );
 
-
 export const main = () => {
   ///// ROUTES
   // Install router. If no route was specifically given, start with #view/YYYY-MM
   common.installRouter('/journal#', `view/${moment().format(common.MONTH_FORMAT)}`, {
     no_action: () => route(`view/${moment().format(common.MONTH_FORMAT)}`),
     journal: () => {}, // Dummy, called if journal is clicked from navbar
+
     view: (datestr: string, entryScrollId?: number) => {
       const date = moment(datestr, common.MONTH_FORMAT);
 

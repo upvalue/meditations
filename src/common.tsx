@@ -71,8 +71,9 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
 /**
  * Creates a store with thunk & logger middleware applied, and a common reducer added
  */
-export function makeStore<S>(reducer: redux.Reducer<S>) {
-  return redux.createStore<S>(reducer, redux.applyMiddleware(thunk, logger));
+export function makeStore<State>(reducer: redux.Reducer<State>) {
+  const store = redux.createStore<State>(reducer, redux.applyMiddleware(thunk, logger));
+  return store;
 }
 
 ///// REACT COMMON
@@ -91,6 +92,7 @@ interface NotificationBarProps {
   dismiss: () => void;
   notifications?: Notification[];
 }
+
 export const NotificationBar: React.SFC<NotificationBarProps> = (props) => {
   if (props.notifications) {
     return <div>
@@ -112,11 +114,13 @@ export const NotificationBar: React.SFC<NotificationBarProps> = (props) => {
 };
 
 /**
- * Shorthand for fetch which reports errors to user
- * @param url 
- * @param then 
+ * Shorthand for fetch which reports errors to user via redux
+ * @param method get or post
+ * @param body data
+ * @param dispatch Callback to dispatch a Redux action
+ * @param url URL of the request
  */
-export function request<ResponseType,DispatchType>(
+export function request<ResponseType, DispatchType>(
     method: string, body: any, dispatch: redux.Dispatch<DispatchType>, url: string,
     then?: (res:ResponseType) => void) {
   const reqinit: any = { method };
@@ -126,6 +130,7 @@ export function request<ResponseType,DispatchType>(
   }
 
   return window.fetch(url, reqinit).then((response) => {
+    // The response has failed, put up a notification
     if (response.status !== 200) {
       console.warn(`Common.request: ${method} fetch failed with error `);
       response.text().then((response: any) => {
@@ -135,18 +140,19 @@ export function request<ResponseType,DispatchType>(
       });
       return;
     }
+
     // Only GET requests will return JSON to be processed;
     // POST requests will result in a WebSocket message if anything
     // as they must be pushed to all clients
-
     if (method === 'GET') {
-      return response.json().then((response: any) => {
-        if (then) {
-          return then(response as ResponseType);
-        }
-      });
+      return response.json().then(then);
     }
   }).catch((reason) => {
+    dispatch({type: 'NOTIFICATION_OPEN',
+      notification: { error: true, message: `Fetch failed with message: ${reason}` },
+    });
+
+
     console.warn(`Fetch ${url} failed ${reason}`);
   });
 }
@@ -264,7 +270,7 @@ export function installRouter(base: string, first: string,
 }
 
 /**
- * Create an editor
+ * Create a medium-editor instance on a given element
  *
  * @param elt
  * @param focus?
@@ -300,4 +306,48 @@ export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
   });
   
   return editor;
+}
+
+/** An item that has an editable body. Used for task comments and journal entries */
+export class Editable<Props> extends React.Component<Props, {editor: MediumEditor.MediumEditor}> {
+  /** 
+   * Reference to the HTML element that the MediumEditor will be installed on; should be set in
+   * subclass's render method */
+  body: HTMLElement;
+
+  componentWillMount() {
+    this.setState({});
+  }
+
+  /** Abstract method; should compare body against model to determine if an update is warranted */
+  editorUpdated() {
+    console.warn('editorUpdated not implemented');
+    return false;
+  }
+
+  /** Abstract method; dispatch an asynchronous update of the Editable in question */
+  editorSave() {
+    console.warn('editorSave not implemented');
+  }
+
+  /** Lazily create an editor; if it already exists, focus on it */
+  editorOpen(e?: React.MouseEvent<HTMLElement>) {
+    if (!this.state.editor) {
+      const editor = makeEditor(this.body, undefined, () => {
+        // Called on editor blur, check if anything needs to be updated and call the appropriate
+        // method if so.
+        const newBody = this.body.innerHTML;
+
+        // Do not update if nothing has changed
+        if (!this.editorUpdated()) {
+          return;
+        }
+        
+        this.editorSave();
+      });
+      this.setState({ editor });
+    } 
+    this.body.focus();
+  }
+
 }

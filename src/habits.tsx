@@ -27,6 +27,11 @@ export const SCOPE_PROJECT = 4;
 
 export const PROJECT_ACTIVITY_BENCHMARK = 24;
 
+/**
+ * Determines at what point in time the next day's scope will be made available. The default of 4
+ * hours means it will be available at 8PM local time. */
+export const MOUNT_NEXT_DAY_TIME = 4;
+
 export const scopeIsTimeBased = (scope: number) => {
   return scope < SCOPE_PROJECT && scope > SCOPE_UNUSED;
 };
@@ -284,9 +289,7 @@ const urlForView = (date: moment.Moment, project?: number) => {
   return `#${routeForView(date, project)}`;
 };
 
-export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.MediumEditor}>{
-  body: HTMLElement;
-
+export class CTask extends common.Editable<{task: Task}> {
   componentWillMount() {
     this.setState({});
   }
@@ -346,7 +349,7 @@ export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.
     const date = this.props.task.Date.utc();
     // Create task on current day from monthly task
     if (scope === SCOPE_DAY) {
-      date.date(moment().clone().add(4, 'hour').date());
+      date.date(moment().clone().add(MOUNT_NEXT_DAY_TIME, 'hour').date());
     } else if (scope === SCOPE_MONTH) {
       date.month(moment().month());
       date.date(moment().date());
@@ -361,27 +364,16 @@ export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.
     common.post(store.dispatch, '/habits/new', task);
   }
 
-  editComment() {
-    // TODO code duplication with journal code.
-    if (!this.state.editor) {
-      const editor = common.makeEditor(this.body, undefined, () => {
-        const newBody = this.body.innerHTML;
+  editorUpdated() {
+    return !this.props.task.Comment || this.body.innerHTML !== this.props.task.Comment.Body;
+  }
 
-        // Do not update if nothing has changed
-        if (this.props.task.Comment && newBody === this.props.task.Comment.Body) {
-          return;
-        }
-
-        common.post(store.dispatch, `/habits/comment-update`, {
-          ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
-          Body: this.body.innerHTML,
-          TaskID: this.props.task.ID,
-        });
-      });
-
-      this.setState({ editor });
-      this.body.focus();
-    }
+  editorSave() {
+    common.post(store.dispatch, `/habits/comment-update`, {
+      ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
+      Body: this.body.innerHTML,
+      TaskID: this.props.task.ID,
+    });
   }
 
   hasStats() {
@@ -423,7 +415,7 @@ export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.
       return <div
         className="comment"
         ref={body => this.body = body} 
-        onClick={() => this.editComment()}
+        onClick={e => this.editorOpen(e)}
         dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />;
     }
   }
@@ -446,7 +438,7 @@ export class CTask extends React.Component<{task: Task}, {editor?: MediumEditor.
           <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
           </span>}
 
-        {this.renderControl('Add/edit comment', 'comment', () => this.editComment())}  
+        {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
         {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
         {this.props.task.Scope === SCOPE_DAY && 
           this.renderControl('Set time', 'clock', () => this.setTime())}
@@ -729,7 +721,7 @@ export const main = () => {
             limit = today.date() + 1;
             // But do mount the next day if it's within 4 hours before midnight so tasks can be
             // added at nighttime
-            const next = today.clone().add(4, 'hours');
+            const next = today.clone().add(MOUNT_NEXT_DAY_TIME, 'hours');
             if (next.date() !== today.date()) {
               limit += 1;
             }
