@@ -419,7 +419,7 @@ export const main = () => {
   }, () => {
     ///// RENDER 
     common.render('journal-root', store, <JournalRoot />);
-    common.render('navigation-root', store, <JournalNavigation />);
+    common.render('controls', store, <JournalNavigation />);
     common.render('journal-sidebar', store, <JournalSidebar />);
 
     // Fetch sidebar

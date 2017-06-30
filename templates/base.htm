@@ -10,31 +10,18 @@
     <script type=text/javascript>window.MeditationsConfig = {{ ConfigJSON | safe}}</script>
   </head>
   <body>
-    
-    <div id="navbar-container" class="container-fluid">
-      <nav class="navbar navbar-toggleable-md navbar-light">
-        <a class="navbar-brand">meditations</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header" aria-label="Toggle navigation" aria-expanded="false">
-          <span class=navbar-toggler-icon></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbar-header">
-          <ul class="navbar-nav nav-pills">
-            <li class="nav-item">
-              <a id=habits-link class="nav-link btn btn-sm btn-secondary" href="/habits#">
-                {% if Page == "habits" %}<strong>Habits</strong>{% else %}Habits{% endif %}
-              </a>
-            </li>
-            <li class="nav-item">
-              <a id=journal-link class="nav-link btn btn-sm btn-secondary" href="/journal#">
-                {% if Page == "journal" %}<strong>Journal</strong>{% else %}Journal{% endif %}
-              </a>
-            </li>
-            {% block navbar_links %}{% endblock %}
-          </ul>
-          {% block navigation %}{% endblock %}
-        </div>
-      </nav>
+    <div id="navigation" class="container-fluid">
+      <span id="navigation-brand">meditations</span>
+      <a id="habits-link" class="navigation-link{% if Page == "habits"%}-active{% endif %} btn btn-sm btn-secondary" href="/habits#">
+        Habits
+      </a>
+      <a id="habits-link" class="navigation-link{% if Page == "journal"%}-active{% endif %} btn btn-sm btn-secondary" href="/journal#">
+        Journal
+      </a>
     </div>
+
+    {% block controls %}
+    {% endblock %}
 
     <div id=content class="container-fluid">
       <noscript>

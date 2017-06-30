@@ -13,6 +13,7 @@
 @import url("../node_modules/@typopro/web-inconsolata/TypoPRO-Inconsolata.css");
 
 $linkColor: #09d;
+$bodyBg: #fff;
 $bodyFont: "TypoPRO Open Sans";
 $commentFont: "TypoPRO Inconsolata", monospace;
 
@@ -37,36 +38,46 @@ a, a:visited {
 ///// NAVBAR
 //
 
-/***** NAVBAR STYLING ****/
-ul.nav a, .navbar-light .navbar-nav .nav-link {
-  color: $linkColor !important;
+#navigation {
+  background-color: darken($bodyBg, 5%);
+  padding: 5px;
+  padding-left: 25px; /* align with first elements on page */
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0px;
 }
 
-.navbar .nav-item { margin-left: 1rem; display:inline; }
-.navbar .nav-item:first { margin-left: 1rem; }
-
-.medium-editor-toolbar li button {height: auto; min-width: 0; }
-
-ul.nav a.navbar-link-disabled {
-  color: #000 !important;
+.navigation-link {
+  margin-bottom: -1px;
+  background-color: darken($bodyBg, 5%);
 }
 
-.navbar-brand {
-  font-size: medium;
-  margin-right: 0;
+.navigation-link-active {
+  background-color: $bodyBg;
+  border-bottom: 1px solid $bodyBg;
+  margin-bottom: -1px;
+  font-weight: bold;
 }
-.navbar {
+
+#navigation-brand {
+  font-weight: bold;
+  padding-right: 5px;
+}
+
+#controls {
+  padding: 5px;
+  padding-left: 25px;
   font-size: small;
 }
 
-.controls {
-  font-size: small !important;  
-}
+//
+///// MEDIUM EDITOR
+//
+
+.medium-editor-toolbar li button {height: auto; min-width: 0; }
 
 //
 ///// HABITS
 //
-/**** HABITS */
 
 #habits-root { 
   margin:0;
@@ -168,7 +179,7 @@ ul.nav a.navbar-link-disabled {
 
 }
 
-hr{ clear:both;}
+hr { clear:both; }
 
 .journal-tags { font-size: 0.8em; clear:both; display:block; }
 

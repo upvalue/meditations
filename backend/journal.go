@@ -279,6 +279,7 @@ func journalSidebarInfo(c *macaron.Context) {
 }
 
 func journalIndex(c *macaron.Context) {
+	c.Data["Page"] = "journal"
 	c.HTML(200, "journal")
 }
 
