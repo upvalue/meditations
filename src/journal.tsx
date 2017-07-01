@@ -334,6 +334,7 @@ const JournalNavigation = connect(state => state)
 const JournalRoot = common.connect()(class extends React.Component<JournalState, undefined> {
   render() { 
     return <div>
+      <common.CommonUI {...this.props} />
       <div id="controls">
         <JournalNavigation />
       </div>

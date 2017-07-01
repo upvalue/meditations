@@ -114,31 +114,30 @@ export const Spinner = (props: any) => {
   </div>;
 };
 
-/** A bar at the top which displays notifications */
-interface NotificationBarProps {
-  dismiss: () => void;
-  notifications?: Notification[];
-}
-
-export const NotificationBar: React.SFC<NotificationBarProps> = (props) => {
-  if (props.notifications) {
-    return <div>
-      <button className="btn btn-outline-warning btn-sm octicon octicon-x"
-        onClick={() => props.dismiss()}>Dismiss notifications</button>
-      <div className="notifications card-group">
-        {props.notifications.map((n, i) => {
-          return <div key={i} className={`card ${n.error ? 'card-outline-warning' : ''}`}>
-            <div className="card-block">
-              {n.message}
-            </div>
-          </div>;
-        })}
-      </div>
-    </div>;
-  } else {
-    return <span />;
+/**
+ * Common UI elements (currently just a notification bar that appears at the top)
+ */
+export class CommonUI extends React.Component<CommonState, undefined> {
+  render() {
+    if (this.props.notifications) {
+      return <div>
+        <button className="btn btn-outline-warning btn-sm octicon octicon-x"
+          onClick={() => this.props.dismissNotifications()}>Dismiss notifications</button>
+        <div className="notifications card-group">
+          {this.props.notifications.map((n, i) => {
+            return <div key={i} className={`card ${n.error ? 'card-outline-warning' : ''}`}>
+              <div className="card-block">
+                {n.message}
+              </div>
+            </div>;
+          })}
+        </div>
+      </div>;
+    } else {
+      return <span />;
+    }
   }
-};
+}
 
 /**
  * Shorthand for fetch which reports errors to user via redux

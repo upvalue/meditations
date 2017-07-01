@@ -646,8 +646,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
 
   render() {
     return <div id="habits-root-sub">
-      <common.NotificationBar notifications={this.props.notifications}
-        dismiss={this.props.dismissNotifications} />
+      <common.CommonUI {...this.props} />
       {this.props.mounted && 
         <div className="row">
           <div id="habits-scope-daily" className="col-md-3">
@@ -835,4 +834,7 @@ export const main = () => {
   
   ///// RENDER
   common.render('habits-root', store, <HabitsRoot />);
+
+
 };
+
