@@ -73,7 +73,7 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
  * @param reducer 
  * @param initialState 
  * @returns a tuple containing the store, a dispatcher that type-checks synchronous actions,
- * and a dispatcher that type-checks redux-thunk actions
+ * and a dispatcher that calls redux-thunk actions with an appropriately typed dispatcher.
  */
 export function createStore<State extends CommonState, Action extends redux.Action>(
     reducer: (s: State,  a: Action) => State, initialState: State):
@@ -83,9 +83,9 @@ export function createStore<State extends CommonState, Action extends redux.Acti
        ] {
 
 
+  // Apply common reducer to all actions
   const combinedReducer = (pstate: State = initialState, action: redux.Action): State => {
     let state = commonReducer(pstate as CommonState, action as any as CommonAction) ;
-    console.log('combinedReducer', state);
     state = reducer(state as State, action as Action);
     return state as State;
   };
@@ -97,7 +97,7 @@ export function createStore<State extends CommonState, Action extends redux.Acti
   };
 
   const thunkDispatch = (dispatcher: (thunk: (action: Action) => void) => void) => {
-    store.dispatch(dispatcher as any);
+    store.dispatch(dispatcher);
   };
 
   return [store, typedDispatch, thunkDispatch];
@@ -196,16 +196,12 @@ export function post<ResponseType>(
   return request<ResponseType>('POST', body, dispatch, url);
 }
 
-export function dismissNotifications<State extends CommonState>(dispatch: redux.Dispatch<State>) {
-  dispatch({ type: 'NOTIFICATIONS_DISMISS' } as CommonAction);
-}
-
 export function connect() {
   return reactredux.connect(
     state => state,
-    (dispatch) => {
+    (dispatch: (a: CommonAction) => void) => {
       return {
-        dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' } as CommonAction),
+        dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' }),
       };
     },
   );

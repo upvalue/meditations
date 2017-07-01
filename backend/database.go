@@ -3,6 +3,8 @@ package backend
 // database.go - Database open, close and migration
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3" // load sqlite3 driver
 )
@@ -52,17 +54,88 @@ func DBCreate() {
 	DB.FirstOrCreate(&settings)
 }
 
-// DBSeed seeds the database with example data, suitable for testing or the demo application
+// DBSeed seeds the database with example data, suitable for testing or the demo/tutorial
+// application
 func DBSeed() {
 
+}
+
+// repairScope repairs a specific scope
+func repairScope(repair bool, scope int, datefmt string, date string) (int, int) {
+	outOfOrderTasks := 0
+
+	var tasks []Task
+	if scope < ScopeProject {
+		DB.Where("strftime(?, date) = ? AND scope = ?", datefmt, date, scope).Order("`order` asc").Find(&tasks)
+	} else {
+		DB.Where("scope = ?", scope).Order("`order` asc").Find(&tasks)
+	}
+
+	for i, t := range tasks {
+		if t.Order != i {
+			outOfOrderTasks++
+			fmt.Printf("Task %v scope %v %v: expected task at position %v but order is %v\n", t.ID, scope, date, i, t.Order)
+			if repair == true {
+				t.Order = i
+				DB.Save(&t)
+			}
+		}
+	}
+
+	if outOfOrderTasks > 0 {
+		return 1, outOfOrderTasks
+	}
+
+	return 0, 0
+}
+
+// repairRange repairs a range of DB scopes
+func repairRange(repair bool, scope int, datefmt string) (int, int) {
+	var dates []struct{ Date string }
+	DB.Raw("SELECT DISTINCT strftime(?, date) as date FROM tasks WHERE deleted_at is NULL AND scope = ? ORDER BY date asc", datefmt, scope).Scan(&dates)
+	cs, ct := 0, 0
+	for _, row := range dates {
+		ds, dt := repairScope(repair, scope, datefmt, row.Date)
+		cs += ds
+		ct += dt
+	}
+	return cs, ct
+}
+
+// DBRepair checks for database issues (such as out-of-order tasks) that may have been caused by
+// using a bugged version of meditations
+func DBRepair(repair bool) {
+	//var tasks []Task
+
+	outOfOrderTasks, outOfOrderScopes := 0, 0
+
+	fmt.Printf("!!! Fixing out of order tasks\n")
+
+	ds, dt := repairRange(repair, ScopeDay, "%Y-%m-%d")
+	outOfOrderScopes += ds
+	outOfOrderTasks += dt
+
+	ds, dt = repairRange(repair, ScopeMonth, "%Y-%m")
+	outOfOrderScopes += ds
+	outOfOrderTasks += dt
+
+	ds, dt = repairRange(repair, ScopeYear, "%Y")
+	outOfOrderScopes += ds
+	outOfOrderTasks += dt
+
+	var projectScopes []struct{ Scope int }
+	DB.Raw("SELECT DISTINCT scope as scope FROM tasks WHERE scope >= ?", ScopeProject).Scan(&projectScopes)
+	for _, row := range projectScopes {
+		ds, dt := repairScope(repair, row.Scope, "", "Project scope")
+
+		outOfOrderScopes += ds
+		outOfOrderTasks += dt
+	}
+
+	fmt.Printf("!!! REPORT: %v scopes out of order, %v tasks out of order\n", outOfOrderScopes, outOfOrderTasks)
 }
 
 // DBClose close database handle
 func DBClose() {
 	DB.Close()
-}
-
-// DBRepair fix potential inconsistencies such as tags pointing to dead entries, out-of-order tasks etc
-func DBRepair() {
-
 }

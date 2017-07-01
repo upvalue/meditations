@@ -46,12 +46,12 @@ a, a:visited {
   padding-bottom: 0px;
 }
 
-.navigation-link {
+.navigation-link, .navigation-link:hover {
   margin-bottom: -1px;
   background-color: darken($bodyBg, 5%);
 }
 
-.navigation-link-active {
+.navigation-link-active, .navigation-link-active:hover {
   background-color: $bodyBg;
   border-bottom: 1px solid $bodyBg;
   margin-bottom: -1px;

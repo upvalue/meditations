@@ -183,11 +183,28 @@ func Main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:   "repair",
-			Usage:  "repair out-of-order tasks in database",
-			Flags:  flags,
-			Action: func(c *cli.Context) { DBRepair() },
+			Name:  "repair",
+			Usage: "repair database errors where possible",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				loadConfig(c)
+				Config.DBLog = true
+				DBOpen()
+				DBRepair(true)
+			},
 		},
+		{
+			Name:  "check",
+			Usage: "check database for errors",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				loadConfig(c)
+				Config.DBLog = true
+				DBOpen()
+				DBRepair(false)
+			},
+		},
+
 		{
 			Name:  "migrate",
 			Usage: "migrate database",

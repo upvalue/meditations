@@ -50,7 +50,6 @@ interface ViewNamedEntry extends common.CommonState {
 
 type JournalState = ViewTag | ViewNamedEntry | ViewMonth;
 
-type JournalDispatch = redux.Dispatch<JournalState>;
 
 type JournalAction = {
   type: 'VIEW_MONTH';
@@ -315,39 +314,46 @@ class BrowseTag extends React.Component<{tagName: string, entries: Entry[]}, und
   }
 }
 
+
 // tslint:disable-next-line:variable-name
-const JournalRoot = common.connect()(class extends React.Component<JournalState, undefined> {
-  render() { 
-    return <div>
-      <div>
-        {this.props.route === 'VIEW_MONTH' ?
-          <BrowseMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
-        {this.props.route === 'VIEW_TAG' ? 
-          <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
-        {this.props.route === 'VIEW_NAMED_ENTRY' ?
-          <ViewEntry entry={this.props.entries.length === 0 ? null : this.props.entries[0]} /> : ''}
-      </div>
-    </div>;
+const JournalNavigation = connect(state => state)
+(class extends React.Component<JournalState, undefined> {
+  createEntry(date: moment.Moment | null) {
+    if (date !== null) {
+      common.post(typedDispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
+    }
+  }
+
+  render() {
+    return <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
+      placeholderText="Click to add new entry" />;
   }
 });
 
 // tslint:disable-next-line:variable-name
-const JournalNavigation = connect(state => state)(
-  class extends React.Component<JournalState, undefined> {
-    createEntry(date: moment.Moment | null) {
-      if (date !== null) {
-        common.post(typedDispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
-      }
-    }
-
-    render() {
-      return <span>
-        <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
-          placeholderText="Click to add new entry" />
-      </span>;
-    }
-  },
-);
+const JournalRoot = common.connect()(class extends React.Component<JournalState, undefined> {
+  render() { 
+    return <div>
+      <div id="controls">
+        <JournalNavigation />
+      </div>
+      <div className="row">
+        <div className="col-md-2" id="journal-sidebar">
+          <JournalSidebar />
+        </div>
+        <div className="col-md-10">
+          {this.props.route === 'VIEW_MONTH' ?
+            <BrowseMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
+          {this.props.route === 'VIEW_TAG' ?
+            <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
+          {this.props.route === 'VIEW_NAMED_ENTRY' ?
+            <ViewEntry entry={this.props.entries.length === 0 ? null
+              : this.props.entries[0]} /> : ''}
+        </div>
+      </div>
+    </div>;
+  }
+});
 
 export const main = () => {
   ///// ROUTES
@@ -425,9 +431,8 @@ export const main = () => {
     } 
   }, () => {
     ///// RENDER 
+    // After socket connects
     common.render('journal-root', store, <JournalRoot />);
-    common.render('controls', store, <JournalNavigation />);
-    common.render('journal-sidebar', store, <JournalSidebar />);
 
     // Fetch sidebar
     common.post(typedDispatch, '/journal/sidebar');
