@@ -481,6 +481,7 @@ func tasksInMonthAndDays(c *macaron.Context) {
 
 		}
 	}
+
 }
 
 // Update a task's fields by JSON
@@ -490,7 +491,7 @@ func taskUpdate(c *macaron.Context, task Task) {
 	DB.Save(&task)
 
 	task.Sync(false, true, true)
-	c.JSON(200, task)
+	c.PlainText(200, []byte("OK"))
 }
 
 func taskNew(c *macaron.Context, task Task) {

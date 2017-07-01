@@ -86,8 +86,8 @@ const initialState = {
   sidebar: { mounted: false },
 } as JournalState;
 
-const reducer = (pstate: JournalState = initialState, action: JournalAction): JournalState => {
-  const state = common.commonReducer(pstate, action as common.CommonAction) as JournalState;
+const reducer = (state: JournalState, action: JournalAction): JournalState => {
+  console.log(state);
   switch (action.type) {
     case 'VIEW_MONTH':
       return {...state,
@@ -131,7 +131,8 @@ const reducer = (pstate: JournalState = initialState, action: JournalAction): Jo
   return state;
 };
 
-const store = common.makeStore(reducer);
+
+const [store, typedDispatch, thunkDispatch] = common.createStore(reducer, initialState);
 
 ///// REACT COMPONENTS
 
@@ -149,7 +150,7 @@ class CEntry extends common.Editable<CEntryProps> {
     const name = window.prompt('What would you like to name this entry? (leave empty to delete)',
       this.props.entry.Name);
     if (name !== this.props.entry.Name) {
-      common.post(store.dispatch, `/journal/name-entry/${this.props.entry.ID}/${name}`);
+      common.post(typedDispatch, `/journal/name-entry/${this.props.entry.ID}/${name}`);
     }
   }
 
@@ -162,18 +163,18 @@ class CEntry extends common.Editable<CEntryProps> {
       return;
     }
     
-    common.post(store.dispatch, `/journal/add-tag/${this.props.entry.ID}/${tname}`);
+    common.post(typedDispatch, `/journal/add-tag/${this.props.entry.ID}/${tname}`);
   }
 
   removeTag(t: Tag)  {
     if (window.confirm(`Are you sure you want to remove the tag ${t.Name}`)) {
-      common.post(store.dispatch, `/journal/remove-tag/${this.props.entry.ID}/${t.Name}`);
+      common.post(typedDispatch, `/journal/remove-tag/${this.props.entry.ID}/${t.Name}`);
     }
   }
 
   deleteEntry() {
     if (window.confirm('Are you sure you want to remove this entry?')) {
-      common.post(store.dispatch, `/journal/delete-entry/${this.props.entry.ID}`);      
+      common.post(typedDispatch, `/journal/delete-entry/${this.props.entry.ID}`);      
     }
   }
 
@@ -182,7 +183,7 @@ class CEntry extends common.Editable<CEntryProps> {
   }
 
   editorSave() {
-    common.post(store.dispatch, '/journal/update', {
+    common.post(typedDispatch, '/journal/update', {
       ID: this.props.entry.ID,
       Body: this.body.innerHTML,
     });
@@ -335,7 +336,7 @@ const JournalNavigation = connect(state => state)(
   class extends React.Component<JournalState, undefined> {
     createEntry(date: moment.Moment | null) {
       if (date !== null) {
-        common.post(store.dispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
+        common.post(typedDispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
       }
     }
 
@@ -359,30 +360,36 @@ export const main = () => {
       const date = moment(datestr, common.MONTH_FORMAT);
 
       // TODO: Update habits link to reflect current date
-      store.dispatch((dispatch) => {
+      thunkDispatch((dispatch) => {
         common.get(dispatch, `/journal/entries/date?date=${datestr}`, ((entries: Entry[]) => {
           entries.forEach(common.processModel);
-          dispatch({ date, entries, type: 'VIEW_MONTH' } as JournalAction);
+          dispatch({ date, entries, type: 'VIEW_MONTH' });
+        }));
+      });
+
+      thunkDispatch((dispatch) => {
+        common.get(dispatch, `/journal/entries/date?date=${datestr}`, ((entries: Entry[]) => {
+          entries.forEach(common.processModel);
+          dispatch({ date, entries, type: 'VIEW_MONTH' });
         }));
       });
     },
 
     tag: (tagname: string) => {
-      store.dispatch((dispatch) => {
+      thunkDispatch((dispatch) => {
         common.get(dispatch, `/journal/entries/tag/${tagname}`, ((entries: Entry[]) => {
           entries.forEach(common.processModel);
-          dispatch({ entries, type: 'VIEW_TAG', tag: tagname } as JournalAction);
+          dispatch({ entries, type: 'VIEW_TAG', tag: tagname });
         }));
       });
     },
     
     name: (name: string) => {
-      store.dispatch((dispatch) => {
+      thunkDispatch((dispatch) => {
         common.get(dispatch, `/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);
-          dispatch({ entry, type: 'VIEW_NAMED_ENTRY' } as JournalAction);
+          dispatch({ entry, type: 'VIEW_NAMED_ENTRY' });
         });
-        // TODO: Error display
       });
     },
   });
@@ -405,16 +412,16 @@ export const main = () => {
   const socket = common.makeSocket('journal/sync', (msg: JournalMessage) => {
     if (msg.Type === 'UPDATE_ENTRY') {
       common.processModel(msg.Datum);
-      store.dispatch({ type: 'UPDATE_ENTRY', entry: msg.Datum } as JournalAction);
+      typedDispatch({ type: 'UPDATE_ENTRY', entry: msg.Datum });
     } else if (msg.Type === 'DELETE_ENTRY') {
-      store.dispatch({ type: 'DELETE_ENTRY', ID: msg.Datum } as JournalAction);
+      typedDispatch({ type: 'DELETE_ENTRY', ID: msg.Datum });
     } else if (msg.Type === 'CREATE_ENTRY') {
       common.processModel(msg.Datum);
       // TODO: View change?
       // TODO: Dispatch view change
-      store.dispatch({ type: 'CREATE_ENTRY', entry: msg.Datum } as JournalAction);
+      typedDispatch({ type: 'CREATE_ENTRY', entry: msg.Datum });
     } else if (msg.Type === 'SIDEBAR') {
-      store.dispatch({ type: 'MOUNT_SIDEBAR', sidebar: msg.Datum } as JournalAction);
+      typedDispatch({ type: 'MOUNT_SIDEBAR', sidebar: msg.Datum });
     } 
   }, () => {
     ///// RENDER 
@@ -423,6 +430,6 @@ export const main = () => {
     common.render('journal-sidebar', store, <JournalSidebar />);
 
     // Fetch sidebar
-    common.post(store.dispatch, '/journal/sidebar');
+    common.post(typedDispatch, '/journal/sidebar');
   });
 };

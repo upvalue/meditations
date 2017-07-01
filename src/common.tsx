@@ -69,11 +69,38 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
 }
 
 /**
- * Creates a store with thunk & logger middleware applied, and a common reducer added
+ * This creates a store with thunk & logger middleware applied and a common reducer added. 
+ * @param reducer 
+ * @param initialState 
+ * @returns a tuple containing the store, a dispatcher that type-checks synchronous actions,
+ * and a dispatcher that type-checks redux-thunk actions
  */
-export function makeStore<State>(reducer: redux.Reducer<State>) {
-  const store = redux.createStore<State>(reducer, redux.applyMiddleware(thunk, logger));
-  return store;
+export function createStore<State extends CommonState, Action extends redux.Action>(
+    reducer: (s: State,  a: Action) => State, initialState: State):
+      [redux.Store<State>,
+       (action: Action) => void,
+       (dispatcher: (thunk: (action: Action) => void) => void) => void
+       ] {
+
+
+  const combinedReducer = (pstate: State = initialState, action: redux.Action): State => {
+    let state = commonReducer(pstate as CommonState, action as any as CommonAction) ;
+    console.log('combinedReducer', state);
+    state = reducer(state as State, action as Action);
+    return state as State;
+  };
+
+  const store = redux.createStore<State>(combinedReducer, redux.applyMiddleware(thunk, logger));
+
+  const typedDispatch = (action: Action) => {
+    return store.dispatch(action);
+  };
+
+  const thunkDispatch = (dispatcher: (thunk: (action: Action) => void) => void) => {
+    store.dispatch(dispatcher as any);
+  };
+
+  return [store, typedDispatch, thunkDispatch];
 }
 
 ///// REACT COMMON
@@ -120,8 +147,8 @@ export const NotificationBar: React.SFC<NotificationBarProps> = (props) => {
  * @param dispatch Callback to dispatch a Redux action
  * @param url URL of the request
  */
-export function request<ResponseType, DispatchType>(
-    method: string, body: any, dispatch: redux.Dispatch<DispatchType>, url: string,
+export function request<ResponseType>(
+    method: string, body: any, dispatch: (a: CommonAction) => void, url: string,
     then?: (res:ResponseType) => void) {
   const reqinit: any = { method };
   if (body !== undefined) {
@@ -152,22 +179,21 @@ export function request<ResponseType, DispatchType>(
       notification: { error: true, message: `Fetch failed with message: ${reason}` },
     });
 
-
     console.warn(`Fetch ${url} failed ${reason}`);
   });
 }
 
-export function get<ResponseType, DispatchType>(
-  dispatch: redux.Dispatch<DispatchType>, url: string, then: (res: ResponseType) => void,
+export function get<ResponseType>(
+  dispatch: (action: CommonAction) => void, url: string, then: (res: ResponseType) => void,
 ) {
-  return request<ResponseType,DispatchType>('GET', undefined, dispatch, url, then);
+  return request<ResponseType>('GET', undefined, dispatch, url, then);
 }
 
 
-export function post<ResponseType, DispatchType>(
-  dispatch: redux.Dispatch<DispatchType>, url: string, body?: any,
+export function post<ResponseType>(
+  dispatch: (action: CommonAction) => void, url: string, body?: any,
 ) {
-  return request<ResponseType, DispatchType>('POST', body, dispatch, url);
+  return request<ResponseType>('POST', body, dispatch, url);
 }
 
 export function dismissNotifications<State extends CommonState>(dispatch: redux.Dispatch<State>) {
@@ -349,5 +375,4 @@ export class Editable<Props> extends React.Component<Props, {editor: MediumEdito
     } 
     this.body.focus();
   }
-
 }
