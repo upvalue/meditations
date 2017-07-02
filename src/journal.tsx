@@ -232,7 +232,7 @@ class CEntry extends common.Editable<CEntryProps> {
             {tags}
           </div>
         </span>
-      {this.props.entry.Name ? <strong>{this.props.entry.Name}</strong> : ''}
+      #{this.props.entry.ID} {this.props.entry.Name && <strong>{this.props.entry.Name}</strong>}
       </h5>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
         ref={(body) => { this.body = body; }}

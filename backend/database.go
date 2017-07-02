@@ -1,6 +1,6 @@
 package backend
 
-// database.go - Database open, close and migration
+// database.go - Database open, close, migration, and repair
 
 import (
 	"fmt"
@@ -105,9 +105,9 @@ func repairRange(repair bool, scope int, datefmt string) (int, int) {
 // DBRepair checks for database issues (such as out-of-order tasks) that may have been caused by
 // using a bugged version of meditations
 func DBRepair(repair bool) {
-	//var tasks []Task
-
+	// Check for out-of-order tasks
 	outOfOrderTasks, outOfOrderScopes := 0, 0
+	DB.LogMode(false)
 
 	fmt.Printf("!!! Fixing out of order tasks\n")
 
@@ -133,6 +133,26 @@ func DBRepair(repair bool) {
 	}
 
 	fmt.Printf("!!! REPORT: %v scopes out of order, %v tasks out of order\n", outOfOrderScopes, outOfOrderTasks)
+
+	var entryTags []struct {
+		EntryID int
+		TagID   int
+	}
+	DB.Raw("SELECT entry_id, tag_id FROM entry_tags").Scan(&entryTags)
+	DB.LogMode(false)
+	deadEntries := 0
+	for _, row := range entryTags {
+		var count struct{ Count int }
+		DB.Raw("SELECT count(*) as count FROM entries WHERE id = ? AND deleted_at IS NOT NULL", row.EntryID).Scan(&count)
+		if count.Count > 0 {
+			fmt.Printf("tag %v references deleted entry %v\n", row.TagID, row.EntryID)
+			deadEntries++
+			if repair == true {
+				DB.Exec("DELETE FROM entry_tags WHERE entry_id = ? and tag_id = ?", row.EntryID, row.TagID)
+			}
+		}
+	}
+	fmt.Printf("!!! REPORT: %v dead entries", deadEntries)
 }
 
 // DBClose close database handle

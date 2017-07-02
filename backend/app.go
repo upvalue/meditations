@@ -9,10 +9,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/codegangsta/cli"
 	"github.com/go-macaron/pongo2"
 	"github.com/jinzhu/gorm"
 	"github.com/tylerb/graceful"
+	"github.com/urfave/cli"
 	"gopkg.in/macaron.v1"
 )
 
@@ -155,11 +155,11 @@ func Main() {
 	flags := []cli.Flag{
 		cli.BoolFlag{
 			Name:  "db-log",
-			Usage: "verbosely log SQL",
+			Usage: "log SQL queries",
 		},
 		cli.StringFlag{
 			Name:  "database",
-			Usage: "database",
+			Usage: "database path",
 			Value: "development.sqlite3",
 		},
 		cli.StringFlag{

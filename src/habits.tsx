@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as redux from 'redux';
 import route from 'riot-route';
+import * as ReactDnd from 'react-dnd';
 
 import * as common from './common';
 
@@ -284,16 +285,14 @@ const routeForView = (date: moment.Moment, project?: number) => {
   return `view/${date.format(common.MONTH_FORMAT)}/${project ? project : 0}`;
 };
 
+/** Returns URL to link to a given date and project */
 const urlForView = (date: moment.Moment, project?: number) => {
   return `#${routeForView(date, project)}`;
 };
 
-export class CTask extends common.Editable<{task: Task}> {
-  componentWillMount() {
-    this.setState({});
-  }
 
-  cycleStatus() {
+export class CTask extends common.Editable<{task: Task}> {
+  private cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP };
     common.post(typedDispatch, `/habits/update`, task);
   }
@@ -834,7 +833,5 @@ export const main = () => {
   
   ///// RENDER
   common.render('habits-root', store, <HabitsRoot />);
-
-
 };
 

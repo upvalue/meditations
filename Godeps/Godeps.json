@@ -9,11 +9,6 @@
 			"Rev": "28b053d5a2923b87ce8c5a08f3af779894a72758"
 		},
 		{
-			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "v1.19.1-2-g8f6a367",
-			"Rev": "8f6a3675e11d69c50a82670c4a570e06d41094b7"
-		},
-		{
 			"ImportPath": "github.com/flosch/pongo2",
 			"Comment": "v1.0-rc1-211-g22499f9",
 			"Rev": "22499f94d3d56c7238591344a6902715d0b8fbbf"
@@ -57,6 +52,11 @@
 			"ImportPath": "github.com/tylerb/graceful",
 			"Comment": "v1.2.13-4-gd37e108",
 			"Rev": "d37e108c89765a8e307f15b8fb2ecd10575da6bb"
+		},
+		{
+			"ImportPath": "github.com/urfave/cli",
+			"Comment": "v1.19.1-52-gb892ba3",
+			"Rev": "b892ba3809cd07fcf2b064e166b0c2e16e0147bd"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
