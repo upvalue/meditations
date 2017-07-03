@@ -5,7 +5,6 @@
    Or some other way of reducing visual clutter with tasks that are frequently logged but otherwise uninteresting.
    Perhaps shift-click to register as completed and hide? Or shift-click to hide?
    Then just a checkmark at the top to show hidden tasks or not.
-
 ** TODO Reporting minute amounts over 60 should round down
 ** TODO Copying and pasting comments doesn't seem to work. Probably because it messes with focus in some way.
 ** TODO Using ctrl-up in medium-editor reduces font size
@@ -39,10 +38,3 @@
 *** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
 ** TODO Redux MapDispatchToProps
 ** TODO Demo XSS
-** TODO Fix clicking on navbar
-
-* In-order todo
-** TODO Project support
-** TODO
-** TODO TSlint
-

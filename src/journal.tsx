@@ -366,6 +366,8 @@ export const main = () => {
     view: (datestr: string, entryScrollId?: number) => {
       const date = moment(datestr, common.MONTH_FORMAT);
 
+      common.setTitle('Journal', `${date.format('MMMM YYYY')}`);
+
       // TODO: Update habits link to reflect current date
       thunkDispatch((dispatch) => {
         common.get(dispatch, `/journal/entries/date?date=${datestr}`, ((entries: Entry[]) => {
@@ -383,6 +385,7 @@ export const main = () => {
     },
 
     tag: (tagname: string) => {
+      common.setTitle('Journal', `Tag #${tagname}`);
       thunkDispatch((dispatch) => {
         common.get(dispatch, `/journal/entries/tag/${tagname}`, ((entries: Entry[]) => {
           entries.forEach(common.processModel);
@@ -392,6 +395,7 @@ export const main = () => {
     },
     
     name: (name: string) => {
+      common.setTitle('Journal', `${name}`);
       thunkDispatch((dispatch) => {
         common.get(dispatch, `/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);

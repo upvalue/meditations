@@ -252,6 +252,15 @@ export function makeSocket(location: string, onmessage: (s: any) => void,
 }
 
 /**
+ * Set the document title.
+ * @param page Page (habits, journal, etc)
+ * @param title Actual title
+ */
+export function setTitle(page: string, title: string) {
+  document.title = `${title} | ${page} | meditations`;
+}
+
+/**
  * Starts riot-route and executes callbacks from a given object.
  *
  * @param base Prepended to all routes on a page (e.g. "/journal#")

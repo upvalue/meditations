@@ -572,6 +572,11 @@ const CTaskFactory = React.createFactory(CTask);
 
 // Finally, this method is used to create instances of CTask in a type-checked way
 
+/**
+ * Creates an instance of CTask suitable for rendering in an array
+ * @param key indice of array loop
+ * @param task task data
+ */
 const createCTask = (key: number, task: Task) => {
   return CTaskFactory({ key, task } as any);
 };
@@ -839,6 +844,7 @@ export const main = () => {
 
       const projectChanged = prevProject !== project;
 
+      common.setTitle("Habits", `${date.format('MMMM YYYY')}`);
       typedDispatch({ date, type: 'CHANGE_ROUTE', currentProject: project });
 
       // Get day scopes
@@ -860,7 +866,6 @@ export const main = () => {
 
           let qs = `/habits/in-month-and-days?date=${date.format(common.DAY_FORMAT)}`;
           qs += `${limit ? '&limit=' + limit : ''}`;
-
 
           common.get(dispatch, qs,
             ((response: { Days: Day[], Month: Task[] }) => {
