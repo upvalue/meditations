@@ -548,6 +548,8 @@ export class CTaskImpl extends common.Editable<TaskProps> {
   }
 } // CTaskImpl
 
+// Apply DND decorators to CTaskImpl
+
 // Decorate task component as a drag source
 const CTaskImplDraggable = ReactDnd.DragSource('TASK', taskSource, (connect, monitor) => {
   return {
@@ -566,8 +568,13 @@ const CTask = ReactDnd.DropTarget('TASK', taskTarget, (connect, monitor) => {
   };
 })(CTaskImplDraggable);
 
-// Finally, CTaskFactory is used in order to create instances of this
 const CTaskFactory = React.createFactory(CTask);
+
+// Finally, this method is used to create instances of CTask in a type-checked way
+
+const createCTask = (key: number, task: Task) => {
+  return CTaskFactory({ key, task } as any);
+};
 
 export class TimeScope extends
   React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope}, undefined> {
@@ -590,7 +597,7 @@ export class TimeScope extends
 
   render() {
     const tasks = this.props.scope.Tasks.map((t, i) => {
-      return CTaskFactory({ key: i, task: t } as any);
+      return createCTask(i, t);
     });
 
     return <section className="scope">
@@ -651,6 +658,9 @@ export class ProjectScope extends React.Component<ProjectScopeProps, undefined> 
   }
 
   render() {
+    const tasks = this.props.scope.Tasks.map((t, i) => {
+      return createCTask(i, t);
+    });
     return <section className="scope">
       <div>
         <h6 className="scope-title">
@@ -663,8 +673,9 @@ export class ProjectScope extends React.Component<ProjectScopeProps, undefined> 
         onClick={() => this.addTask()} />
       <h6 className="scope-title">{this.props.scope.Name}</h6>
 
+      {...tasks}
+
     </section>;
-      // {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
   }
 }
 
