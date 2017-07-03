@@ -27,14 +27,16 @@
 ** DONE Simplify sync code by moving messaging stuff to sync.go
 ** DONE Remove jQuery if possible
 ** DONE Remove a bunch of unnecessary code.
-** TODO Database cleanup on start
+** DONE Database cleanup on start
 ** DONE Clean up moment code. Just use string constants in common rather than special methods.
     Perhaps convert dates to moments when they are received.
 ** DONE Nice error messages
 ** DONE Nice loading indicators
-** TODO Title updates
+** DONE Title updates
 ** TODO Client-side, server-side and behavioral tests
-** TODO Visual redesign
-*** TODO Different navigation styles. A pull-out drawer on the left that allows you to pull alphabetical, chronological etc.
-** TODO Redux MapDispatchToProps
 ** TODO Demo XSS
+
+* 0.1
+** TODO Write manual
+** TODO Visual redesign
+** TODO Built-in tutorial

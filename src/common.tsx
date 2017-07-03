@@ -321,6 +321,7 @@ export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table'],
     },
 
+    paste: { cleanPastedHTML: true, forcePlainText: false },
     extensions: {
       table: new MediumEditorTable(),
     },
@@ -365,6 +366,12 @@ export class Editable<Props> extends React.Component<Props, {editor: MediumEdito
   editorOpen(e?: React.MouseEvent<HTMLElement>) {
     if (!this.state.editor) {
       const editor = makeEditor(this.body, undefined, () => {
+        // It is possible that blur may have been called because copy-paste causes MediumEditor to
+        // create a 'pastebin' element, in which case we do not want to trigger a save.
+        if (document.activeElement.id.startsWith('medium-editor-pastebin')) {
+          return;
+        }
+
         // Called on editor blur, check if anything needs to be updated and call the appropriate
         // method if so.
         const newBody = this.body.innerHTML;
