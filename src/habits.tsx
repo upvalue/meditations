@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom';
 import * as redux from 'redux';
 import route from 'riot-route';
 import * as ReactDnd from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
 import * as common from './common';
 
@@ -92,7 +93,7 @@ type TaskList = Task[];
 interface ViewMonth extends common.CommonState {
   type: 'VIEW_MONTH';
   // Navigation & routing
-  date: moment.Moment;
+  currentDate: moment.Moment;
   // Current project; if 0, a list of projects will be displayed instead
   currentProject: number;
 
@@ -145,7 +146,7 @@ type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays |
   ChangeRoute | AddProjectList;
 
 const initialState = {
-  date: moment(),
+  currentDate: moment(),
   mounted: false,
   type: 'VIEW_MONTH',
 } as HabitsState;
@@ -154,9 +155,9 @@ const initialState = {
  * currently rendered and thus needs to be updated */
 const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): boolean =>  {
   const date1 = moment.utc(date);
-  const date2 = state.date;
+  const date2 = state.currentDate;
 
-  // Check if a scope is visible by seeing within the current month.
+  // Check if a scope is visible by looking within the current month.
   // For daily and monthly tasks/scopes.
   if (scope === SCOPE_MONTH || scope === SCOPE_DAY) {
     return date1.year() === date2.year() && date1.month() === date2.month();
@@ -170,6 +171,30 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
   return false;
 };
 
+/** Check whether a given task is in the same scope as another task */
+const taskSameScope = (left: Task, right: Task) => {
+  if (left.Scope !== right.Scope) {
+    return false;
+  }
+
+  // If task is part of the same project, then date is irrelevant
+  if (left.Scope >= SCOPE_PROJECT) {
+    return true;
+  }
+
+  // It is possible for tasks to have different Dates and still be in the same scope, e.g.
+  // one yearly task has been created in January, the other in February, and thus their dates are
+  // different.
+  let fmt = '';
+  switch (left.Scope) {
+    case SCOPE_DAY: fmt = 'YYYY-MM-DD';
+    case SCOPE_MONTH: fmt = 'YYYY-MM';
+    case SCOPE_YEAR: fmt = 'YYYY';
+  }
+
+  return left.Date.format(fmt) === right.Date.format(fmt);
+};
+
 /** Check whether a task is currently rendered and thus needs to be updated in the UI */
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   if (scopeIsTimeBased(task.Scope)) {
@@ -181,7 +206,7 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
 const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState => {
   if (action.name) {
     if (state.currentProject !== action.scope) {
-      console.log('Project scope not visible, ignoring');
+      // console.log('Project scope not visible, ignoring');
       return state;
     }
     return {...state, mounted: true, project:
@@ -216,7 +241,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
         unpinnedProjects: action.unpinnedProjects };
 
     case 'CHANGE_ROUTE':
-      return { ...state, date: action.date, currentProject: action.currentProject };
+      return { ...state, currentDate: action.date, currentProject: action.currentProject };
 
     case 'MOUNT_SCOPE':
       return mountScopeReducer(state, action);
@@ -291,8 +316,59 @@ const urlForView = (date: moment.Moment, project?: number) => {
 };
 
 
-export class CTask extends common.Editable<{task: Task}> {
-  private cycleStatus() {
+export interface TaskProps {
+  // Drag and drop implementation props
+  connectDropTarget: ReactDnd.ConnectDropTarget;
+  connectDragSource: ReactDnd.ConnectDragSource;
+  connectDragPreview: ReactDnd.ConnectDragPreview;
+  isDragging: boolean;
+  isOver: boolean;
+  isOverCurrent: boolean;
+  
+  // Actual props
+  task: Task;
+}
+
+// Drag and drop implementation details
+const taskSource: ReactDnd.DragSourceSpec<TaskProps> = {
+  beginDrag: (props, monitor, component) => {
+    // Make the task data available when this task is dropped
+    return {
+      task: props.task,
+    };
+  },
+
+};
+
+const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
+  drop(props, monitor, component) {
+    // Possible cases:
+
+    if (component && monitor) {
+      const src = (monitor.getItem() as any).task;
+      console.log(monitor.getItemType());
+      const target = props.task;
+      
+      // Do not allow dropping on self
+      if (src.ID === target.ID) {
+        return;
+      }
+
+      if (taskSameScope(src, target)) {
+        // Task dropped on task in same scope; trigger a re-order
+        common.post(typedDispatch, `/habits/reorder/${src.ID}/${target.ID}`);
+      }
+    }
+  },
+};
+
+/**
+ * Component representing a task.
+ * This is decorated immediately after using react-dnd methods;
+ * for some reason using them directly as decorators fails.
+ */
+export class CTaskImpl extends common.Editable<TaskProps> {
+  cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP };
     common.post(typedDispatch, `/habits/update`, task);
   }
@@ -306,6 +382,7 @@ export class CTask extends common.Editable<{task: Task}> {
     if (!timestr) {
       return;
     }
+
     // Parse something like "5" (5 minutes) or "5:03" (5 hours, 3 minutes)
     const time = timestr.split(':');
     let hours = NaN;
@@ -419,12 +496,33 @@ export class CTask extends common.Editable<{task: Task}> {
   }
 
   render() {
+    const { isDragging, connectDragSource, connectDragPreview, connectDropTarget,
+      isOver, isOverCurrent } = this.props;
+    // Create a draggable task button.
     const klass = ['', 'btn-success', 'btn-danger'][this.props.task.Status];
-    return <section className="task">
+    const taskButton_ =
       <button className={`btn btn-xs btn-default ${klass}`} onClick={() => this.cycleStatus()}>
         {this.props.task.Name}
         {this.hasStats() && this.renderStats()}
-      </button>
+      </button>;
+
+    const taskButton = 
+      connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
+
+    const opacity = isDragging ? 0.5 : 1;
+    const backgroundColor = isOver ? '#cccccc' : '';
+    const style = { opacity } as any;
+
+    // If a dragged task is hovering over this, draw a black border beneath it
+    if (isOver) {
+      style['border'] = '0px';
+      style['borderBottom'] = '2px';
+      style['borderColor'] = 'black';
+      style['borderStyle'] = 'solid';
+    }
+
+    const result =  <section className="task" style={style}>
+      {taskButton}
       <span className="float-right">
         {this.hasTime() && <span>
           <span className="octicon octicon-clock"></span>{' '}
@@ -447,8 +545,31 @@ export class CTask extends common.Editable<{task: Task}> {
       </span>
       {this.props.task.Comment && this.renderComment()}
     </section>;
+
+    return connectDropTarget(result);
   }
-}
+} // CTaskImpl
+
+// Decorate task component as a drag source
+const CTaskImplDraggable = ReactDnd.DragSource('TASK', taskSource, (connect, monitor) => {
+  return {
+    connectDragSource: connect.dragSource(),
+    connectDragPreview: connect.dragPreview(),
+    isDragging: monitor.isDragging(),
+  };
+})(CTaskImpl);
+
+// Decorate task component as a drop target
+const CTask = ReactDnd.DropTarget('TASK', taskTarget, (connect, monitor) => {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    isOverCurrent: monitor.isOver({ shallow: true }),
+  };
+})(CTaskImplDraggable);
+
+// Finally, CTaskFactory is used in order to create instances of this
+const CTaskFactory = React.createFactory(CTask);
 
 export class TimeScope extends
   React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope}, undefined> {
@@ -470,6 +591,10 @@ export class TimeScope extends
   }
 
   render() {
+    const tasks = this.props.scope.Tasks.map((t, i) => {
+      return CTaskFactory({ key: i, task: t } as any);
+    });
+
     return <section className="scope">
       {(this.props.scope.Scope === SCOPE_MONTH || this.props.scope.Scope === SCOPE_YEAR) &&
         <span>
@@ -485,7 +610,7 @@ export class TimeScope extends
       <h6 className="scope-title">
         {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
       </h6>
-      {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
+      {...tasks}
     </section>;
   }
 }
@@ -540,8 +665,8 @@ export class ProjectScope extends React.Component<ProjectScopeProps, undefined> 
         onClick={() => this.addTask()} />
       <h6 className="scope-title">{this.props.scope.Name}</h6>
 
-      {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
     </section>;
+      // {this.props.scope.Tasks.map((e, i) => <CTask key={i} task={e} />)}
   }
 }
 
@@ -550,7 +675,6 @@ export interface ProjectListProps {
   unpinnedProjects: Project[];
   currentDate: moment.Moment;
 }
-
 
 export class ProjectList extends React.Component<ProjectListProps, undefined> {
   deleteProject(id: number) {
@@ -615,13 +739,15 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
 }
 
+
 // tslint:disable-next-line:variable-name
-const HabitsRoot = common.connect()(class extends React.Component<HabitsState, undefined> {
+const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
+common.connect()(class extends React.Component<HabitsState, undefined> {
   /** Render time-based scope (days, months, years) */
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {
       return <TimeScope currentProject={this.props.currentProject}
-        key={i} currentDate={this.props.date} scope={s} />;
+        key={i} currentDate={this.props.currentDate} scope={s} />;
     } else {
       return <common.Spinner />;
     }
@@ -630,12 +756,12 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
   /** Render either a list of projects or the currently open project */
   renderProjects() {
     if (this.props.currentProject === 0) {
-      return <ProjectList currentDate={this.props.date}
+      return <ProjectList currentDate={this.props.currentDate}
         pinnedProjects={this.props.pinnedProjects}
         unpinnedProjects ={this.props.unpinnedProjects} />;
     } else {
       if (this.props.project && this.props.currentProject === this.props.project.Scope) {
-        return <ProjectScope  currentDate={this.props.date} scope={this.props.project} />;
+        return <ProjectScope  currentDate={this.props.currentDate} scope={this.props.project} />;
       } else {
         // In case the route has changed, but the project data has not been loaded yet.
         return <common.Spinner />;
@@ -665,7 +791,7 @@ const HabitsRoot = common.connect()(class extends React.Component<HabitsState, u
         </div>}
     </div>;
   }
-});
+}));
 
 /** Habits entry point. Sets up router, socket, and renders root. */
 export const main = () => {
@@ -686,7 +812,7 @@ export const main = () => {
 
       const state = store.getState() as HabitsState;
       if (state === undefined) return;
-      const prevDate = state.date;
+      const prevDate = state.currentDate;
       const prevProject = state.currentProject;
 
       let timeChanged: 'NO_CHANGE' | 'CHANGE_YEAR' | 'CHANGE_MONTH' = 'NO_CHANGE';
@@ -834,4 +960,3 @@ export const main = () => {
   ///// RENDER
   common.render('habits-root', store, <HabitsRoot />);
 };
-

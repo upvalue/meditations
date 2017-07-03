@@ -333,13 +333,14 @@ func _between(start time.Time, scope int) (time.Time, time.Time) {
 	return time.Now(), time.Now()
 }
 
-// Return a properly formatted string for sqlite (no timezone or time data included)
+// between returns a range of dates to find all tasks within a scope
+// This is the primary method of building a query that targets all tasks within a scope.
 func between(start time.Time, scope int) (string, string) {
 	from, to := _between(start, scope)
 	return from.Format(DateFormat), to.Format(DateFormat)
 }
 
-// tasksInScope returns all the tasks in a given scope and timeframe
+// tasksInScope returns all the tasks in a given scope and timeframe, ordered by order
 func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 	if scope >= ScopeProject {
 		DB.Where("scope = ?", scope).Preload("Comment").Order("`order` asc").Find(tasks)

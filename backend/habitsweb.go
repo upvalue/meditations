@@ -203,6 +203,58 @@ func taskDelete(c *macaron.Context, task Task) {
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
+// taskSwapOrdering places a task (the src) after a given task (the target), and reorders the entire
+// scope as appropriate
+func taskReorder(c *macaron.Context) {
+	var src, target Task
+
+	DB.LogMode(true)
+	DB.Where("id = ?", c.ParamsInt("src")).Find(&src)
+	DB.Where("id = ?", c.ParamsInt("target")).Find(&target)
+	DB.LogMode(false)
+
+	srcOrder := src.Order
+	fmt.Printf("SRC ORDER %v TARGET ORDER %v\n", srcOrder, target.Order)
+
+	if src.ID == 0 || target.ID == 0 {
+		serverError(c, fmt.Sprintf("Task re-ordering failed, could not find one of task %s,%s",
+			c.Params("src"), c.Params("target")))
+		return
+	}
+
+	var scopeTasks []Task
+	tasksInScope(&scopeTasks, target.Scope, target.Date)
+
+	// Remove src from scope
+	for i, t := range scopeTasks {
+		if t.ID == src.ID {
+			scopeTasks = append(scopeTasks[:i], scopeTasks[i+1:]...)
+		}
+	}
+
+	// Reinsert after target
+	for i, t := range scopeTasks {
+		if t.ID == target.ID {
+			scopeTasks = append(scopeTasks[:i+1], append([]Task{src}, scopeTasks[i+1:]...)...)
+			break
+		}
+	}
+
+	// Recreate order list
+	for i := range scopeTasks {
+		scopeTasks[i].Order = i
+	}
+
+	fmt.Printf("Re-ordered tasks\n")
+	for _, t := range scopeTasks {
+		fmt.Printf("%d %s\n", t.Order, t.Name)
+		DB.Save(&t)
+	}
+
+	src.SyncScope()
+	c.PlainText(200, []byte("OK"))
+}
+
 // Change task ordering within scope
 func taskSwapOrder(c *macaron.Context, change int, task Task) {
 	DB.Where("id = ?", task.ID).First(&task)
@@ -279,13 +331,8 @@ func getProjects(c *macaron.Context) {
 
 // projectPost parses a project ID and fetches it from the DB, returning an error if it can't be
 // found
-func projectPost(c *macaron.Context, scope *Scope) (int64, error) {
-	id, err := strconv.ParseInt(c.Params("id"), 10, 32)
-
-	if err != nil || id < 4 {
-		serverError(c, "Failed to parse ID '%s' (or ID is <4) %v", c.Params("id"), err)
-		return 0, err
-	}
+func projectPost(c *macaron.Context, scope *Scope) (int, error) {
+	id := c.ParamsInt("id")
 
 	DB.Where("id = ?", id).First(&scope)
 
@@ -435,16 +482,17 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-days", jsonTasksInDays)
 	m.Get("/in-month-and-days", tasksInMonthAndDays)
 
-	m.Get("/in-project/:id([0-9]+)", tasksInProject)
+	m.Get("/in-project/:id:int", tasksInProject)
 	m.Get("/projects", getProjects)
 
-	m.Post("/projects/delete/:id([0-9]+)", projectDelete)
+	m.Post("/projects/delete/:id:int", projectDelete)
 	m.Post("/projects/new/:name", projectNew)
-	m.Post("/projects/toggle-pin/:id([0-9]+)", projectTogglePin)
+	m.Post("/projects/toggle-pin/:id:int", projectTogglePin)
 
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/new", binding.Bind(Task{}), taskNew)
 	m.Post("/delete", binding.Bind(Task{}), taskDelete)
+	m.Post("/reorder/:src:int/:target:int", taskReorder)
 	m.Post("/order-up", binding.Bind(Task{}), taskOrderUp)
 	m.Post("/order-down", binding.Bind(Task{}), taskOrderDown)
 	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)

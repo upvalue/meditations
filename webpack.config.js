@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const { CheckerPlugin } = require('awesome-typescript-loader');
 
 module.exports = {
   entry: {
@@ -22,6 +23,7 @@ module.exports = {
   plugins: [
     new webpack.IgnorePlugin(/^\.\/locale$/),
     new ExtractTextPlugin('bundle-style.css'),
+    new CheckerPlugin(), // async typescript error reporting
   ],
 
   module: {

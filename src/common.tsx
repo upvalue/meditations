@@ -174,6 +174,7 @@ export function request<ResponseType>(
       return response.json().then(then);
     }
   }).catch((reason) => {
+    // TODO this reports all errors as "fetch" errors
     dispatch({type: 'NOTIFICATION_OPEN',
       notification: { error: true, message: `Fetch failed with message: ${reason}` },
     });
