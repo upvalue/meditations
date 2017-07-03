@@ -540,8 +540,6 @@ export class CTaskImpl extends common.Editable<TaskProps> {
           this.renderControl('Set time', 'clock', () => this.setTime())}
         {this.hasCopy() &&
           this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
-        {this.renderControl('Move up', 'chevron-up', () => this.command('order-up'))}
-        {this.renderControl('Move down', 'chevron-down', () => this.command('order-down'))}
       </span>
       {this.props.task.Comment && this.renderComment()}
     </section>;

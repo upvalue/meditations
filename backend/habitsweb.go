@@ -255,42 +255,6 @@ func taskReorder(c *macaron.Context) {
 	c.PlainText(200, []byte("OK"))
 }
 
-// Change task ordering within scope
-func taskSwapOrder(c *macaron.Context, change int, task Task) {
-	DB.Where("id = ?", task.ID).First(&task)
-
-	if (change == -1 && task.Order > 0) || change == 1 {
-		var swap Task
-
-		from, to := between(task.Date, task.Scope)
-
-		// Find a task to swap with
-		DB.Where("date between ? and ? and scope = ? and `order` = ?", from, to, task.Scope, task.Order+change).First(&swap)
-
-		// If there is something to swap it with
-		if swap.ID > 0 {
-			b := swap.Order
-			swap.Order = task.Order
-			task.Order = b
-			DB.Save(&swap).Save(&task)
-		}
-	}
-
-	task.SyncScope()
-
-	c.PlainText(http.StatusOK, []byte("OK"))
-}
-
-// taskOrderUp moves a task up within a scope
-func taskOrderUp(c *macaron.Context, t Task) {
-	taskSwapOrder(c, -1, t)
-}
-
-// taskOrderDown moves a task down in order within scope
-func taskOrderDown(c *macaron.Context, t Task) {
-	taskSwapOrder(c, 1, t)
-}
-
 // commentUpdate updates or creates a comment
 func commentUpdate(c *macaron.Context, comment Comment) {
 	var task Task
@@ -389,7 +353,8 @@ func projectNew(c *macaron.Context) {
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
-// Export a summary of tasks in human readable format (e.g. to give an exercise or diet log to your trainer)
+// export a summary of tasks in human readable format (e.g. to give an exercise or diet log to your
+// trainer)
 func export(c *macaron.Context) {
 	var buffer bytes.Buffer
 	var scopes []string
@@ -493,8 +458,6 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/new", binding.Bind(Task{}), taskNew)
 	m.Post("/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/reorder/:src:int/:target:int", taskReorder)
-	m.Post("/order-up", binding.Bind(Task{}), taskOrderUp)
-	m.Post("/order-down", binding.Bind(Task{}), taskOrderDown)
 	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)
 	m.Post("/export", export)
 
