@@ -844,7 +844,7 @@ export const main = () => {
 
       const projectChanged = prevProject !== project;
 
-      common.setTitle("Habits", `${date.format('MMMM YYYY')}`);
+      common.setTitle('Habits', `${date.format('MMMM YYYY')}`);
       typedDispatch({ date, type: 'CHANGE_ROUTE', currentProject: project });
 
       // Get day scopes

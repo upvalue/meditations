@@ -58,7 +58,7 @@
   dependencies:
     "@types/react-dnd" "*"
 
-"@types/react-dnd@*", "@types/react-dnd@^2.0.33":
+"@types/react-dnd@*":
   version "2.0.33"
   resolved "https://registry.yarnpkg.com/@types/react-dnd/-/react-dnd-2.0.33.tgz#b7ce466ef3dfba48c3e11d7151f21b02e0472f58"
   dependencies:
