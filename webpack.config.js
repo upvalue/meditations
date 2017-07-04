@@ -5,8 +5,8 @@ const { CheckerPlugin } = require('awesome-typescript-loader');
 
 module.exports = {
   entry: {
-    journal: ['./src/entry/journal.ts'],
-    habits: ['./src/entry/habits.ts'],
+    journal: ['./src/entry/journal.ts', './src/site.scss'],
+    habits: ['./src/entry/habits.ts', './src/site.scss'],
   },
 
   output: {
@@ -44,12 +44,6 @@ module.exports = {
 
       { test: /\.(woff|png|ttf|svg|eot|woff2)$/,
         loader: 'file-loader?name=../../assets/copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/' },
-      { test: /\.js$/,
-        exclude: /(node_modules)/,
-        use: {
-          loader: 'babel-loader',
-        },
-      },
     ],
   },
   devtool: 'source-map',

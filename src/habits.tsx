@@ -4,9 +4,11 @@ import * as ReactDOM from 'react-dom';
 import * as redux from 'redux';
 import route from 'riot-route';
 import * as ReactDnd from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 
 import * as common from './common';
+
+const HTML5Backend = require('react-dnd-html5-backend');
+// TODO: Remove once react-dnd TS bindings are fixed
 
 ///// BACKEND INTERACTION
 
