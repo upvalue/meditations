@@ -210,6 +210,7 @@ class CEntry extends common.Editable<CEntryProps> {
 
     return <div id={`entry-${this.props.entry.ID}`}>
       <h5>
+      #{this.props.entry.ID} {this.props.entry.Name && <strong>{this.props.entry.Name}</strong>}
         <span className="journal-controls float-right">
           <span className="float-right">
             {!this.props.context ?  // context button
@@ -225,14 +226,13 @@ class CEntry extends common.Editable<CEntryProps> {
           </span>
           <div className="journal-timestamp float-right">
             <em><a href={ctxLink}>{
-              this.props.entry.CreatedAt.format(this.props.context ? 'hh:mm A'  : 'M-D-YY hh:mm A')
+              this.props.entry.CreatedAt.format(this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
             }</a></em>
           </div>
           <div className="journal-tags float-right">
             {tags}
           </div>
         </span>
-      #{this.props.entry.ID} {this.props.entry.Name && <strong>{this.props.entry.Name}</strong>}
       </h5>
       <div id={`entry-body-${this.props.entry.ID}`} className="entry-body"
         ref={(body) => { this.body = body; }}

@@ -34,9 +34,9 @@
 ** DONE Nice loading indicators
 ** DONE Title updates
 ** TODO Client-side, server-side and behavioral tests
-** TODO Demo XSS
 
 * 0.1
 ** TODO Write manual
 ** TODO Visual redesign
 ** TODO Built-in tutorial
+** TODO Windows build

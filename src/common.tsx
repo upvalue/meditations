@@ -35,6 +35,7 @@ export const processModel = (e: Model) => {
 ///// REDUX COMMON STATE
 type Notification = {error: boolean, message: string};
 
+/** Action that causes a new notification to be opened */
 export type NotificationOpen = {
   type: 'NOTIFICATION_OPEN'
   notification: Notification;
@@ -55,6 +56,7 @@ function reduceReducers<S>(...reducers: redux.Reducer<S>[]): redux.Reducer<S> {
 export function commonReducer(state: CommonState, action: CommonAction): CommonState  {
   switch (action.type) {
     case 'NOTIFICATION_OPEN':
+      // Append to list of notifications, or create it if it doesn't exist.
       if (state.notifications) {
         return {...state,
           notifications: [...state.notifications, action.notification],
@@ -320,6 +322,8 @@ export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
         'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table'],
     },
+
+    keyboardCommands: false,
 
     paste: { cleanPastedHTML: true, forcePlainText: false },
     extensions: {

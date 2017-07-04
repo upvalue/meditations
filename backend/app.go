@@ -69,7 +69,7 @@ func loadConfig(c *cli.Context) {
 func App() *macaron.Macaron {
 	_, err := os.Stat("./assets/webpack/bundle-habits.js")
 	if os.IsNotExist(err) {
-		panic("./assets/webpack/bundle-habits.js not found; did you run webpack")
+		panic("./assets/webpack/bundle-habits.js not found; did you run webpack?")
 	}
 
 	m := macaron.Classic()
