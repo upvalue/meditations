@@ -35,8 +35,10 @@
 ** DONE Title updates
 ** TODO Client-side, server-side and behavioral tests
 
-* 0.1
-** TODO Write manual
+* 0.1 roadmap
+** DONE Write manual
 ** TODO Visual redesign
+** TODO Search
+** TODO Interactive timer
 ** TODO Built-in tutorial
-** TODO Windows build
+** TODO Windows & linux build

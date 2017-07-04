@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom';
 import * as redux from 'redux';
 import route from 'riot-route';
 import * as ReactDnd from 'react-dnd';
+import DatePicker from 'react-datepicker';
 
 import * as common from './common';
 
@@ -74,12 +75,7 @@ export interface Scope {
 export type Project = {
   ID: number;
   Name: string;
-  Pinned: false;
-  CompletedTasks: number;
-} | {
-  ID: number;
-  Name: string;
-  Pinned: true;
+  Pinned: boolean;
   CompletedTasks: number;
 };
 
@@ -91,6 +87,13 @@ export interface Day {
 ///// REDUX
 
 type TaskList = Task[];
+
+interface FilterState {
+  name?: string;
+  begin?: moment.Moment | null;
+  /** Filter ending date */
+  end?: moment.Moment | null;
+}
 
 interface ViewMonth extends common.CommonState {
   type: 'VIEW_MONTH';
@@ -109,6 +112,9 @@ interface ViewMonth extends common.CommonState {
   year: Scope;
   days: Scope[];
   project: Scope;
+
+  // Filtering
+  filter: FilterState;
 }
 
 type HabitsState = ViewMonth;
@@ -144,13 +150,31 @@ interface UpdateTasks {
   tasks: Task[];
 }
 
+/** Update state to filter tasks by name */
+interface FilterByName {
+  type: 'FILTER_BY_NAME';
+  name?: string;
+}
+
+/** Update state to add a beginning or end date to the filter */
+interface FilterByDate {
+  type: 'FILTER_BY_DATE';
+  date: moment.Moment | null;
+  end: boolean;
+}
+
+interface FilterClear {
+  type: 'FILTER_CLEAR';
+}
+
 type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | 
-  ChangeRoute | AddProjectList;
+  ChangeRoute | AddProjectList | FilterByName | FilterByDate | FilterClear;
 
 const initialState = {
   currentDate: moment(),
   mounted: false,
   type: 'VIEW_MONTH',
+  filter: {},
 } as HabitsState;
 
 /** Check whether a particular scope+date combo is
@@ -298,6 +322,19 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
 
       }
       return nstate;
+    }
+    case 'FILTER_BY_NAME': {
+      return { ...state, filter: { ...state.filter, name: action.name } };
+    }
+
+    case 'FILTER_CLEAR': {
+      return { ...state, filter: { name: state.filter.name } };
+    }
+
+    case 'FILTER_BY_DATE': {
+      const nfilter = { ...state.filter };
+      nfilter[action.end ? 'end' : 'begin'] = action.date;
+      return { ...state, filter: nfilter };
     }
   }
   return state;
@@ -537,11 +574,11 @@ export class CTaskImpl extends common.Editable<TaskProps> {
           </span>}
 
         {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
-        {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
         {this.props.task.Scope === SCOPE_DAY && 
           this.renderControl('Set time', 'clock', () => this.setTime())}
         {this.hasCopy() &&
           this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
+        {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
       </span>
       {this.props.task.Comment && this.renderComment()}
     </section>;
@@ -584,7 +621,8 @@ const createCTask = (key: number, task: Task) => {
 };
 
 export class TimeScope extends
-  React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope}, undefined> {
+  React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope,
+    filter: FilterState}, undefined> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -603,7 +641,26 @@ export class TimeScope extends
   }
 
   render() {
-    const tasks = this.props.scope.Tasks.map((t, i) => {
+    let filteredTasks = this.props.scope.Tasks;
+
+    // Apply filters
+    if (this.props.filter.name) {
+      const filterName = this.props.filter.name;
+      filteredTasks = filteredTasks.filter((t, i) => {
+        return t.Name.toLowerCase().startsWith(filterName.toLowerCase());
+      });
+    }
+
+    if (this.props.filter.begin && this.props.filter.end) {
+      const filterBegin = this.props.filter.begin;
+      const filterEnd = this.props.filter.end;
+
+      filteredTasks = filteredTasks.filter((t, i) => {
+        return t.Date >= filterBegin && t.Date <= filterEnd;
+      });
+    }
+
+    const tasks = filteredTasks.map((t, i) => {
       return createCTask(i, t);
     });
 
@@ -725,11 +782,11 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
           {project.CompletedTasks}
         </span>
         <span className="task-control btn-link btn-sm btn-default octicon octicon-clippy"
-          onClick={() => this.copyLeft(project) } />
+          title="Copy to left" onClick={() => this.copyLeft(project) } />
         <span className="task-control btn-link btn-sm btn-default octicon octicon-pin"
-          onClick={() => this.pinProject(project) } />
+          title="Pin project" onClick={() => this.pinProject(project) } />
         <span className="task-control btn-link btn-sm btn-default octicon octicon-trashcan" 
-          onClick={() => this.deleteProject(project.ID)} />
+          title="Delete project" onClick={() => this.deleteProject(project.ID)} />
       </span>
     </div>;
   }
@@ -755,15 +812,94 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
 }
 
+export class HabitsControlBar extends React.Component<HabitsState, undefined> {
+  filterByName(name: string) {
+    typedDispatch({ name, type: 'FILTER_BY_NAME' });
+  }
+
+  filterByDate(end: boolean, date: moment.Moment | null) {
+    if (date) {
+      typedDispatch({ date, end, type: 'FILTER_BY_DATE' });
+    }
+  }
+
+  clearFilter() {
+    typedDispatch({ type: 'FILTER_CLEAR' });
+  }
+
+  exportTasks() {
+    const name = this.props.filter.name;
+    const begin = this.props.filter.begin && this.props.filter.begin.format(common.DAY_FORMAT);
+    const end = this.props.filter.end && this.props.filter.end.format(common.DAY_FORMAT);
+
+    const body: any = { day: true };
+
+    if (this.props.filter.name) {
+      body.Name = this.props.filter.name;
+    }
+
+    if (this.props.filter.begin) {
+      body.Begin = this.props.filter.begin.format(common.DAY_FORMAT);
+    }
+
+    if (this.props.filter.end) {
+      body.End = this.props.filter.end.format(common.DAY_FORMAT);
+    }
+
+    common.post(typedDispatch, '/habits/export', body);
+  }
+
+  renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
+    return <DatePicker 
+      className="form-control"
+      onChange={date => this.filterByDate(end, date)}
+      isClearable={true}
+      placeholderText={placeholder ? placeholder.format(common.DAY_FORMAT) : defaultPlaceholder}
+      openToDate={this.props.currentDate} />;
+  }
+
+  render() {
+    const placeholderBegin = this.props.filter.begin ?
+      this.props.filter.begin.format(common.HUMAN_DAY_FORMAT) : 'Filter from...';
+
+    const placeholderEnd = this.props.filter.end ?
+      this.props.filter.end.format(common.HUMAN_DAY_FORMAT) : '...to';
+
+    let buttons = <span></span>;
+
+    // If any filters have been entered, we'll render a clear button
+    if (this.props.filter.name || this.props.filter.begin || this.props.filter.end) {
+      // And if a name and/or a date RANGE have been entered, we'll allow export
+      buttons = <span>
+        <button className="btn btn-sm btn-primary"
+          onClick={() => this.clearFilter()}>Clear date filter</button>
+        <button className="btn btn-sm btn-secondary"
+          onClick={() => this.exportTasks()}>Export selected tasks</button>
+      </span>;
+    }
+
+    // TODO: Datepicker onClearable9
+    return <div id="controls" className="form-inline">
+      <input type="text" placeholder="Filter by name" className="form-control"
+        onChange={e => this.filterByName(e.target.value)} />
+      {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
+      {this.renderDatePicker(true, '...to', this.props.filter.end)}
+      {buttons}
+    </div>;
+  }
+}
+
 
 // tslint:disable-next-line:variable-name
-const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
+export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
 common.connect()(class extends React.Component<HabitsState, undefined> {
   /** Render time-based scope (days, months, years) */
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {
+      // TODO: Filter by date?
       return <TimeScope currentProject={this.props.currentProject}
-        key={i} currentDate={this.props.currentDate} scope={s} />;
+        key={i} currentDate={this.props.currentDate} scope={s}
+        filter={this.props.filter} />;
     } else {
       return <common.Spinner />;
     }
@@ -788,6 +924,7 @@ common.connect()(class extends React.Component<HabitsState, undefined> {
   render() {
     return <div id="habits-root-sub">
       <common.CommonUI {...this.props} />
+      <HabitsControlBar {...this.props} />
       {this.props.mounted && 
         <div className="row">
           <div id="habits-scope-daily" className="col-md-3">

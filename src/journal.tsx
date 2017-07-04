@@ -314,7 +314,6 @@ class BrowseTag extends React.Component<{tagName: string, entries: Entry[]}, und
   }
 }
 
-
 // tslint:disable-next-line:variable-name
 const JournalNavigation = connect(state => state)
 (class extends React.Component<JournalState, undefined> {

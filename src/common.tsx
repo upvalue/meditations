@@ -224,7 +224,10 @@ export function render<State>(id: string, store: redux.Store<State>, elt: JSX.El
  * The format used in the URL when browsing journal & habits by months
  */
 export const MONTH_FORMAT = 'YYYY-MM';
+/** Internal format of dates */
 export const DAY_FORMAT = 'YYYY-MM-DD';
+/** Nice printing of dates */
+export const HUMAN_DAY_FORMAT = 'MMMM Do, YYYY';
 
 /**
  * makeSocket connects to a websocket

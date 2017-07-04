@@ -80,6 +80,11 @@ Projects can also contain tasks, which can be accessed like the time-based tasks
 project name. These do not count towards the flame indicator but can be used to track major
 milestones.
 
+The point of all of this is to track these things with as little friction as possible; I have
+my browser open meditations on startup, and I leave it open throughout the day. Generally I
+simply note things down as I complete them, and at the end of the day I copy from the monthly to
+the daily list to plan the next day. I re-assess my daily tasks and progress at the end of each month.
+
 *** Journal
 
 Journal is, well, just a journal. It's use should be fairly obvious: navigation is on the left,

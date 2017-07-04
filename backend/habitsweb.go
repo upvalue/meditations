@@ -4,6 +4,7 @@ package backend
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -359,64 +360,71 @@ func export(c *macaron.Context) {
 	var buffer bytes.Buffer
 	var scopes []string
 
-	name := c.Req.PostFormValue("name")
-	before := c.Req.PostFormValue("export_before_date")
-	after := c.Req.PostFormValue("export_after_date")
+	body := struct {
+		Name  string
+		Begin string
+		End   string
+		Day   bool
+	}{"", "", "", false}
 
-	if c.Req.PostFormValue("day") == "day" {
+	bodybytes, _ := c.Req.Body().Bytes()
+	err := json.Unmarshal(bodybytes, &body)
+
+	if err != nil {
+		serverError(c, "export: Could not unmarshal JSON body")
+		return
+	}
+
+	name := body.Name
+	begin := body.Begin
+	end := body.End
+
+	// Build a list of scopes
+	if body.Day == true {
 		scopes = append(scopes, fmt.Sprintf("%d", ScopeDay))
 	}
 
-	if c.Req.PostFormValue("month") == "month" {
-		scopes = append(scopes, fmt.Sprintf("%d", ScopeMonth))
+	// If dates are not provided, include everything in the DB
+	if begin == "" {
+		begin = time.Date(1960, time.January, 1, 0, 0, 0, 0, time.Local).Format(DateFormat)
 	}
 
-	if c.Req.PostFormValue("year") == "year" {
-		scopes = append(scopes, fmt.Sprintf("%d", ScopeYear))
+	if end == "" {
+		end = time.Now().AddDate(0, 0, 1).Format(DateFormat)
+	} else {
+		// Increment by a day so search is inclusive; e.g. a search ending with July 2, 2017 will include
+		// tasks created on July 2, 2017.
+
+		endDate, _ := time.Parse(DateFormat, body.End)
+		end = endDate.AddDate(0, 0, 1).Format(DateFormat)
 	}
 
-	if before == "" {
-		before = time.Date(1990, time.January, 1, 0, 0, 0, 0, time.Local).Format(DateFormat)
-	}
-
-	if after == "" {
-		after = time.Now().AddDate(0, 0, 1).Format(DateFormat)
-	}
-
-	statusp := false
-	if c.Req.PostFormValue("status") == "status" {
-		statusp = true
-	}
-
-	// Construct query
-	var tasks []Task
 	name = fmt.Sprintf("%%%s%%", name)
-	query := "name like ? and scope in (?) and date > date(?) and date < date(?)"
-	DB.Where(query, name, scopes, before, after).Order("date desc").Find(&tasks)
 
-	for _, t := range tasks {
-		// These cannot be preloaded because there may be a ridiculous amount of them
-		// TODO: Terribly slow
-		DB.Preload("Comment").Find(&t)
-		datefmt := DateFormat
+	query := "name like ? and scope in (?) and date >= date(?) and date < date(?)"
+
+	// Necessary to declare a custom struct here; I couldn't figure out how to coax the results of a
+	// join into the Task.Comment struct.
+
+	var results []struct {
+		Name    string
+		Date    time.Time
+		Scope   int
+		Status  int
+		Comment string
+	}
+
+	DB.Table("tasks").Select("name, scope, status, date, comments.body as comment").Joins("left join comments on comments.task_id = tasks.id").
+		Where(query, name, scopes, begin, end).Scan(&results)
+
+	for _, t := range results {
+		datefmt := "Monday, January _2, 2006"
 		if t.Scope == ScopeYear {
 			datefmt = "2006"
 		} else if t.Scope == ScopeMonth {
 			datefmt = "2006-01"
 		}
-		var status string
-		if statusp == true {
-			if t.Status == TaskComplete {
-				status = "COMPLETE"
-			} else if t.Status == TaskIncomplete {
-				status = "INCOMPLETE"
-			} else {
-				status = "UNSET"
-			}
-		} else {
-			status = ""
-		}
-		buffer.WriteString(fmt.Sprintf("%s %s %s\n", t.Date.Format(datefmt), status, t.Comment.Body))
+		buffer.WriteString(fmt.Sprintf("%s %s %s\r\n", t.Name, t.Date.Format(datefmt), t.Comment))
 	}
 
 	// TODO: Remove unsightly <br> backslashes
@@ -425,11 +433,13 @@ func export(c *macaron.Context) {
 	var out bytes.Buffer
 	process.Stdin = strings.NewReader(buffer.String())
 	process.Stdout = &out
-	err := process.Run()
+	err = process.Run()
 	if err != nil {
+		// If pandoc failed, just output HTML
 		c.PlainText(200, buffer.Bytes())
 	} else {
-		c.PlainText(200, out.Bytes())
+		bytes := out.Bytes()
+		c.PlainText(200, bytes)
 	}
 }
 
