@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Meditations Manual</title>
-<!-- 2017-07-03 Mon 23:28 -->
+<!-- 2017-07-03 Mon 23:40 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <style type="text/css">
@@ -154,7 +154,7 @@ for the JavaScript code in this tag.
 </li>
 <li><a href="#sec-1-3">1.3. Architecture</a>
 <ul>
-<li><a href="#sec-1-3-1">1.3.1. Internal documentation</a></li>
+<li><a href="#sec-1-3-1">1.3.1. API documentation</a></li>
 <li><a href="#sec-1-3-2">1.3.2. Database</a></li>
 <li><a href="#sec-1-3-3">1.3.3. Code organization</a></li>
 <li><a href="#sec-1-3-4">1.3.4. SSL &amp; Encryption</a></li>
@@ -327,14 +327,14 @@ and Redux on the frontend.
 </div>
 
 <div id="outline-container-sec-1-3-1" class="outline-4">
-<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> Internal documentation</h4>
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> API documentation</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <p>
-Both the TypeScript and Go APIs are semi-documented. Use `yarn run typedoc`
+Both the TypeScript and Go APIs are semi-documented. Use `yarn run doc-frontend` and `yarn run
+doc-backend` to open them.
 </p>
 </div>
 </div>
-
 
 <div id="outline-container-sec-1-3-2" class="outline-4">
 <h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> Database</h4>
@@ -397,17 +397,28 @@ Frontend code is located in src/
 </p>
 
 <ul class="org-ul">
-<li>common.tsx contains all methods used by both Habits and Journal
+<li>entry/ contains the entry points for habits and journal
+</li>
+<li>common.tsx contains all methods used by both Habits and Journal.
 </li>
 <li>habits.tsx contains all Habits frontend code
 </li>
 <li>linktree.tsx contains a component that is a tree of links. It's used to navigate journal named
 entries.
 </li>
-
 <li>journal-sidebar.tsx contains the Journal sidebar
 </li>
+<li>journal.tsx contains the remainder of Journal code.
+</li>
+<li>site.scss contains the stylesheets.
+</li>
 </ul>
+
+<p>
+Meditations contains some ad-hoc TypeScript bindings for medium-editor-tables and riot-route,
+which don't have officially maintained bindings. It contains slightly modified bindings for
+react-dnd, whose bindings haven't been updated for TypeScript 2.4 as of this writing.
+</p>
 
 <p>
 Meditations uses WebSockets to synchronize UI across multiple clients. GET requests result in
@@ -441,7 +452,7 @@ Meditations is developed by <a href="https://upvalue.io">upvalue()</a>.</p>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2017-07-03 Mon 23:28</p>
+<p class="date">Created: 2017-07-03 Mon 23:40</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.2.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>

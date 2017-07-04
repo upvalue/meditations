@@ -33,7 +33,7 @@ Although this is a Go package, it is intended to be run directly from the repo a
 
 # Further information
 
-See the manual at [docs/manual.html](docs/manual.html) or `yarn run manual-open` from command
+See the manual at [docs/manual.org](docs/manual.org) or `yarn run manual-open` from command
 line to view your local copy.
 
 # Attribution
