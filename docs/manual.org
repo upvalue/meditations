@@ -1,0 +1,166 @@
+#+HTML_HEAD: <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css">
+#+TITLE: Meditations Manual
+
+* meditations
+
+[[https://github.com/ioddly/meditations][Meditations on GitHub]]
+
+meditations is an application for tracking life progress that builds on the principles of habit
+formation.
+
+Originally a Trello board, meditations simply keeps track of how often you complete tasks, and
+how much time you spend on them (optionally). It's fairly minimalist compared to more complex
+time management systems, and leave the structure of your day entirely up to you. The goal of
+meditations is to get an objective, long-term view of how you are doing.
+
+It's currently divided into two separate pieces of functionality: Habits (a todo list) and
+Journal (a journal, go figure).
+
+** Browser support
+
+Meditations is currently developed against the latest version of Chrome, and does not include
+polyfills. Please let me know if this causes any issues.
+
+** Usage
+
+*** Tutorial
+
+There is a built-in walkthrough that can be accessed through the application, which is the best
+way to learn the user interface.
+
+*** Habits
+
+Habits is a todo list based on habit formation through completion of repeated tasks.
+
+The view is divided into four different scopes, from left to right: daily, monthly, yearly and
+project-based tasks. This is intended to give you a quick overview of your goals in both the
+short and long term.
+
+Within a scope, each task is represented by a button. Clicking the button will cycle the task
+between unset, complete and incomplete status. These statuses are used to calculate long-term
+statistics.
+
+Task statistics are calculated based on shared task names across scopes.
+
+For example, say you have a New Years resolution of exercising four times a week. You would first
+add an "Exercise" task to the scope for this year; copy it to the current month using the
+clipboard button. Then you would copy it from the month on each day you want to exercise.
+
+When you begin marking these daily tasks as complete or incomplete, you will get a percentage of
+tasks completed for months and years. For example, if you set out to exercise 14 days in January
+and successfully did it 50% of the time, you would see "Exercise 7/14 (50%)" on both the monthly
+and yearly summary.
+
+You also get a streak indicator, so if you exercised successfully seven days in a row at the end
+of the month, you will see 7/7 meaning that your best streak and current streak are both seven
+days. Streaks only break when a task is incomplete, so if your goal is to exercise on
+non-consecutive days (say Monday/Wednesday/Friday).
+
+The goal, of course, is to get this completion as close to 100% as possible. The benefit of using
+meditations comes in triaging multiple goals by getting a quick visual overview of progress. For
+example, if you have five current goals and none of them are doing well, it may be time to focus
+on only two or three.
+
+It is also beneficial in tracking things that you are good at doing and simply trying to maintain
+and log. For example, say you are happy with how you generally eat, but you end up violating your
+rules when eating out with friends or coworkers. In a case like this, you might add a daily task
+like "Diet" representing whether or not you eat well, and only become concerned if completion
+drops below 80% (meaning you're going off-diet more than one out of every five days).
+
+Not every long-term task involves daily repetition, for which meditations has the concept of
+projects, which are displayed on the far right. Active projects should be "pinned"; pinned
+projects have a flame indicator next to them which indicates projects. The flame is calculated by
+how many tasks with the project's name have been completed in the last few weeks.
+
+So for example if you create a project "Refurbish bathroom", then daily tasks would be created
+with the name "Refurbish bathroom" each time you completed an hour or so of work towards the
+project.
+
+Projects can also contain tasks, which can be accessed like the time-based tasks by clicking on a
+project name. These do not count towards the flame indicator but can be used to track major
+milestones.
+
+*** Journal
+
+Journal is, well, just a journal. It's use should be fairly obvious: navigation is on the left,
+entries are added from the bar at the top.
+
+Entries can be named and tagged, and entries can be browsed chronologically, alphabetically, or
+by their tags. There are convenience buttons at the top to go back or forward by a month or a
+year in the chronological view.
+
+Named entries can be subdivided in the navigation by using colons in the name. For example
+"Notes: Physics" and "Notes: Chemistry" will result in a "Notes" list in the alphabetical
+navigation-list, of which Physics and Chemistry will be links leading to the relevant entries.
+
+** Architecture
+
+Meditations is written with Go, Macaron and GORM+sqlite3 on the backend, and TypeScript, React
+and Redux on the frontend.
+
+*** API documentation
+
+Both the TypeScript and Go APIs are semi-documented. Use `yarn run doc-frontend` and `yarn run
+doc-backend` to open them.
+
+*** Database
+
+There are three tables relating to habits: tasks, comments (one-to-one relationship with tasks),
+and scopes.
+
+In the documentation and code comments, a "scope" is considered a time-based or project-based
+container of tasks. So July 3, 2017 could be a daily scope, July 2017 could be a monthly scope,
+there could be a project called "Bucket List" which is also referred to as a scope, and so on.
+
+The scope table contains three dummy rows for daily, monthly, and yearly tasks and an unlimited
+number of rows after that which are used to store project names.
+
+So a task's scope is, in actuality, a combination of its SCOPE and DATE columns. For example, a
+daily task created on July 3, 2017 would have a SCOPE of 1 and a DATE of 2017-07-03, and
+meditations would mount it under the daily task column by querying for all tasks with this date
+and scope.
+
+This is somewhat confusing and the database is organized this way mostly for historical reasons.
+
+The journal has three tables: entries, tags, and entrytags, whose meaning is self-evident.
+
+*** Code organization
+
+Backend code is located in backend/
+
++ app.go contains the entry point and command line interface
++ habits.go contains the bulk of the habits backend code, but
++ habitsweb.go contains the web interface
++ journal.go contains both the backend and web interface of the journal
++ sync.go contains convenience method for establishing WebSockets
+
+Frontend code is located in src/
+
++ entry/ contains the entry points for habits and journal
++ common.tsx contains all methods used by both Habits and Journal.
++ habits.tsx contains all Habits frontend code
++ linktree.tsx contains a component that is a tree of links. It's used to navigate journal named
+  entries.
++ journal-sidebar.tsx contains the Journal sidebar
++ journal.tsx contains the remainder of Journal code.
++ site.scss contains the stylesheets.
+
+Meditations contains some ad-hoc TypeScript bindings for medium-editor-tables and riot-route,
+which don't have officially maintained bindings. It contains slightly modified bindings for
+react-dnd, whose bindings haven't been updated for TypeScript 2.4 as of this writing.
+
+Meditations uses WebSockets to synchronize UI across multiple clients. GET requests result in
+JSON data being sent in response, and are used to do things like initialize the UI. POST requests
+result in new information being sent over the relevant WebSocket, if any needs to be sent in
+response to an action that has occurred. Contra REST, POST methods do not necessarily result in
+data being created or modified.
+
+*** SSL & Encryption
+
+Meditations is intended to be run on a local network; SSL can be achieved using nginx as a
+reverse proxy, but this is mainly useful for the demo instance. Meditations does not support
+encryption directly, but works fine with an sqlite database mounted on EncFS.
+
+*** About
+
+Meditations is developed by [[https://upvalue.io][upvalue()]].

@@ -6,10 +6,12 @@
   "scripts": {
     "cloc": "cloc src/**/*.ts src/*.tsx backend/*.go",
     "postinstall": "webpack -p",
-    "typedoc": "typedoc --out doc",
-    "godoc": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",
+    "doc-frontend": "typedoc --out docs",
+    "doc-backend": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",
     "test-backend": "go test -v ./backend",
-    "test-frontend": "./node_modules/.bin/jest"
+    "test-frontend": "./node_modules/.bin/jest",
+    "manual-build": "emacs docs/manual.org --batch -f org-html-export-to-html",
+    "manual-open": "xdg-open docs/manual.html"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -6,47 +6,35 @@ Originally a Trello board, meditations simply keeps track of how often you compl
 on them (optionally). It's fairly minimalist compared to more complex time management systems, and leave the structure
 of your day entirely up to you. The goal of meditations is to get an objective, long-term view of how you are doing.
 
+In addition, it has a journal that supports tagging and organizing entries by named categories.
+
 ![sample image](http://i.imgur.com/msy5Wnc.png)
 
-## [Live Demo & Tutorial](http://meditations.ioddly.com)
+## [Live Demo](http://meditations.ioddly.com)
 
 # Usage
 
     $ go build
     $ yarn
-    $ ./meditations --port [PORT] --database [PATH] --migrate 
-
-# SSL
-
-To use SSL, you'll need to set up nginx (or another webserver) as a proxy. 
+    $ ./meditations --port 8080 --database sample.sqlite3 --migrate 
 
 # Dependencies
 
 - Go libraries: See Godeps/Godeps.json
 - JS libraries: See package.json
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
-- Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. Please use an up to date version of a consumer browser.
+- Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. It is developed against the latest version of Chrome.
 
 # Development
 
-Note that webpack is required for development. Use `webpack -w`.
+Webpack is required for development. Use `webpack -w`.
 
 Although this is a Go package, it is intended to be run directly from the repo and not installed with `go get`.
 
-# Internals
+# Further information
 
-## Viewing internal documentation
-
-    $ yarn run typedoc
-    $ yarn run godoc
-
-## Directories and files of interest
-
-- `backend/` Go backend code
-- `backend/backend_test.go` Backend test suite
-- `src/` Frontend code
-- `main.go` Go command entry point
-- `tests` Frontend test suite
+See the manual at [docs/manual.html](docs/manual.html) or `yarn run manual-open` from command
+line to view your local copy.
 
 # Attribution
 

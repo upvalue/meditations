@@ -14,7 +14,7 @@ func checkErr(err error) {
 	}
 }
 
-// Log and return a 500 error via Macaron
+// serverError logs and returns a 500 error via Macaron
 func serverError(c *macaron.Context, format string, a ...interface{}) {
 	s := fmt.Sprintf(format, a...)
 	log.Printf("Server error: %s\n", s)

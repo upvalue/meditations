@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Meditations Manual</title>
+<!-- 2017-07-03 Mon 23:28 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Meditations Manual</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. meditations</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Browser support</a></li>
+<li><a href="#sec-1-2">1.2. Usage</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Tutorial</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Habits</a></li>
+<li><a href="#sec-1-2-3">1.2.3. Journal</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. Architecture</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. Internal documentation</a></li>
+<li><a href="#sec-1-3-2">1.3.2. Database</a></li>
+<li><a href="#sec-1-3-3">1.3.3. Code organization</a></li>
+<li><a href="#sec-1-3-4">1.3.4. SSL &amp; Encryption</a></li>
+<li><a href="#sec-1-3-5">1.3.5. About</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> meditations</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<a href="https://github.com/ioddly/meditations">Meditations on GitHub</a>
+</p>
+
+<p>
+meditations is an application for tracking life progress that builds on the principles of habit
+formation.
+</p>
+
+<p>
+Originally a Trello board, meditations simply keeps track of how often you complete tasks, and
+how much time you spend on them (optionally). It's fairly minimalist compared to more complex
+time management systems, and leave the structure of your day entirely up to you. The goal of
+meditations is to get an objective, long-term view of how you are doing.
+</p>
+
+<p>
+It's currently divided into two separate pieces of functionality: Habits (a todo list) and
+Journal (a journal, go figure).
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Browser support</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Meditations is currently developed against the latest version of Chrome, and does not include
+polyfills. Please let me know if this causes any issues.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Usage</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Tutorial</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+There is a built-in walkthrough that can be accessed through the application, which is the best
+way to learn the user interface.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Habits</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<p>
+Habits is a todo list based on habit formation through completion of repeated tasks.
+</p>
+
+<p>
+The view is divided into four different scopes, from left to right: daily, monthly, yearly and
+project-based tasks. This is intended to give you a quick overview of your goals in both the
+short and long term.
+</p>
+
+<p>
+Within a scope, each task is represented by a button. Clicking the button will cycle the task
+between unset, complete and incomplete status. These statuses are used to calculate long-term
+statistics.
+</p>
+
+<p>
+Task statistics are calculated based on shared task names across scopes.
+</p>
+
+<p>
+For example, say you have a New Years resolution of exercising four times a week. You would first
+add an "Exercise" task to the scope for this year; copy it to the current month using the
+clipboard button. Then you would copy it from the month on each day you want to exercise.
+</p>
+
+<p>
+When you begin marking these daily tasks as complete or incomplete, you will get a percentage of
+tasks completed for months and years. For example, if you set out to exercise 14 days in January
+and successfully did it 50% of the time, you would see "Exercise 7/14 (50%)" on both the monthly
+and yearly summary.
+</p>
+
+<p>
+You also get a streak indicator, so if you exercised successfully seven days in a row at the end
+of the month, you will see 7/7 meaning that your best streak and current streak are both seven
+days. Streaks only break when a task is incomplete, so if your goal is to exercise on
+non-consecutive days (say Monday/Wednesday/Friday).
+</p>
+
+<p>
+The goal, of course, is to get this completion as close to 100% as possible. The benefit of using
+meditations comes in triaging multiple goals by getting a quick visual overview of progress. For
+example, if you have five current goals and none of them are doing well, it may be time to focus
+on only two or three.
+</p>
+
+<p>
+It is also beneficial in tracking things that you are good at doing and simply trying to maintain
+and log. For example, say you are happy with how you generally eat, but you end up violating your
+rules when eating out with friends or coworkers. In a case like this, you might add a daily task
+like "Diet" representing whether or not you eat well, and only become concerned if completion
+drops below 80% (meaning you're going off-diet more than one out of every five days).
+</p>
+
+<p>
+Not every long-term task involves daily repetition, for which meditations has the concept of
+projects, which are displayed on the far right. Active projects should be "pinned"; pinned
+projects have a flame indicator next to them which indicates projects. The flame is calculated by
+how many tasks with the project's name have been completed in the last few weeks.
+</p>
+
+<p>
+So for example if you create a project "Refurbish bathroom", then daily tasks would be created
+with the name "Refurbish bathroom" each time you completed an hour or so of work towards the
+project.
+</p>
+
+<p>
+Projects can also contain tasks, which can be accessed like the time-based tasks by clicking on a
+project name. These do not count towards the flame indicator but can be used to track major
+milestones.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Journal</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+Journal is, well, just a journal. It's use should be fairly obvious: navigation is on the left,
+entries are added from the bar at the top.
+</p>
+
+<p>
+Entries can be named and tagged, and entries can be browsed chronologically, alphabetically, or
+by their tags. There are convenience buttons at the top to go back or forward by a month or a
+year in the chronological view.
+</p>
+
+<p>
+Named entries can be subdivided in the navigation by using colons in the name. For example
+"Notes: Physics" and "Notes: Chemistry" will result in a "Notes" list in the alphabetical
+navigation-list, of which Physics and Chemistry will be links leading to the relevant entries.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Architecture</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Meditations is written with Go, Macaron and GORM+sqlite3 on the backend, and TypeScript, React
+and Redux on the frontend.
+</p>
+</div>
+
+<div id="outline-container-sec-1-3-1" class="outline-4">
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> Internal documentation</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+Both the TypeScript and Go APIs are semi-documented. Use `yarn run typedoc`
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> Database</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<p>
+There are three tables relating to habits: tasks, comments (one-to-one relationship with tasks),
+and scopes.
+</p>
+
+<p>
+In the documentation and code comments, a "scope" is considered a time-based or project-based
+container of tasks. So July 3, 2017 could be a daily scope, July 2017 could be a monthly scope,
+there could be a project called "Bucket List" which is also referred to as a scope, and so on.
+</p>
+
+<p>
+The scope table contains three dummy rows for daily, monthly, and yearly tasks and an unlimited
+number of rows after that which are used to store project names.
+</p>
+
+<p>
+So a task's scope is, in actuality, a combination of its SCOPE and DATE columns. For example, a
+daily task created on July 3, 2017 would have a SCOPE of 1 and a DATE of 2017-07-03, and
+meditations would mount it under the daily task column by querying for all tasks with this date
+and scope.
+</p>
+
+<p>
+This is somewhat confusing and the database is organized this way mostly for historical reasons.
+</p>
+
+<p>
+The journal has three tables: entries, tags, and entrytags, whose meaning is self-evident.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3-3" class="outline-4">
+<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> Code organization</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<p>
+Backend code is located in backend/
+</p>
+
+<ul class="org-ul">
+<li>app.go contains the entry point and command line interface
+</li>
+<li>habits.go contains the bulk of the habits backend code, but
+</li>
+<li>habitsweb.go contains the web interface
+</li>
+<li>journal.go contains both the backend and web interface of the journal
+</li>
+<li>sync.go contains convenience method for establishing WebSockets
+</li>
+</ul>
+
+<p>
+Frontend code is located in src/
+</p>
+
+<ul class="org-ul">
+<li>common.tsx contains all methods used by both Habits and Journal
+</li>
+<li>habits.tsx contains all Habits frontend code
+</li>
+<li>linktree.tsx contains a component that is a tree of links. It's used to navigate journal named
+entries.
+</li>
+
+<li>journal-sidebar.tsx contains the Journal sidebar
+</li>
+</ul>
+
+<p>
+Meditations uses WebSockets to synchronize UI across multiple clients. GET requests result in
+JSON data being sent in response, and are used to do things like initialize the UI. POST requests
+result in new information being sent over the relevant WebSocket, if any needs to be sent in
+response to an action that has occurred. Contra REST, POST methods do not necessarily result in
+data being created or modified.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3-4" class="outline-4">
+<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> SSL &amp; Encryption</h4>
+<div class="outline-text-4" id="text-1-3-4">
+<p>
+Meditations is intended to be run on a local network; SSL can be achieved using nginx as a
+reverse proxy, but this is mainly useful for the demo instance. Meditations does not support
+encryption directly, but works fine with an sqlite database mounted on EncFS.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3-5" class="outline-4">
+<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> About</h4>
+<div class="outline-text-4" id="text-1-3-5">
+<p>
+Meditations is developed by <a href="https://upvalue.io">upvalue()</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2017-07-03 Mon 23:28</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.2.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

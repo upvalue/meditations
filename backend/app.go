@@ -16,7 +16,7 @@ import (
 	"gopkg.in/macaron.v1"
 )
 
-// Configuration variables
+// Configuration variables, initialized from command line arguments
 type Configuration struct {
 	// HTTP host
 	Host string
@@ -32,7 +32,7 @@ type Configuration struct {
 	Development bool
 	// If true, run a database migration before starting
 	Migrate bool
-	// Message to be displayed in navbar, used in the demo site
+	// Message to be displayed in navbar, used in the demo instance
 	Message string
 }
 
