@@ -692,7 +692,7 @@ const projectActivityIcon = (p: Project) => {
   const recentActivityString = 
     ['little activity', 'some activity', 'lots of activity', 'immense activity'][recentActivity];
   return <span className = {`octicon octicon-flame project-activity-${recentActivity}`}
-    title={``} />;
+    title={`${p.CompletedTasks} in the last 72 days`} />;
 };
 
 export interface ProjectScopeProps {
@@ -850,6 +850,7 @@ export class HabitsControlBar extends React.Component<HabitsState, undefined> {
   }
 
   renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
+    // TODO: Datepicker onClearable does not work unless a SELECTED value is also apssed
     return <DatePicker 
       className="form-control"
       onChange={date => this.filterByDate(end, date)}
@@ -878,7 +879,6 @@ export class HabitsControlBar extends React.Component<HabitsState, undefined> {
       </span>;
     }
 
-    // TODO: Datepicker onClearable9
     return <div id="controls" className="form-inline">
       <input type="text" placeholder="Filter by name" className="form-control"
         onChange={e => this.filterByName(e.target.value)} />
