@@ -12,7 +12,7 @@
 ** TODO Add search and/or filtering. This could also be used to select entries for export
 ** TODO Add a created-at date to bucket items (currently displays beginning of month)
 ** DONE Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
-** TODO Use a ScrollView of some kind instead of scrolling off the page
+** TODO Use overflow for daily tasks?
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO Add a named entry
@@ -42,3 +42,5 @@
 ** TODO Interactive timer
 ** TODO Built-in tutorial
 ** TODO Windows & linux build
+** TODO Electron part
+*** TODO window.prompt is unsupported

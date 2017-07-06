@@ -2,7 +2,7 @@
   "name": "meditations",
   "version": "1.0.0",
   "description": "meditations is an application for tracking life progress that builds on habit formation and long term thinking.",
-  "main": "main.js",
+  "main": "electron-main.js",
   "scripts": {
     "cloc": "cloc src/**/*.ts src/*.tsx backend/*.go",
     "postinstall": "webpack -p",
