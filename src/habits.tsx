@@ -406,6 +406,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
  * This is decorated immediately after using react-dnd methods;
  * for some reason using them directly as decorators fails.
  */
+
 export class CTaskImpl extends common.Editable<TaskProps> {
   cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP };
@@ -621,7 +622,7 @@ const createCTask = (key: number, task: Task) => {
 };
 
 export class TimeScope extends
-  React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope,
+  React.PureComponent<{currentProject: number, currentDate: moment.Moment, scope: Scope,
     filter: FilterState}, undefined> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
@@ -651,13 +652,18 @@ export class TimeScope extends
       });
     }
 
-    if (this.props.filter.begin && this.props.filter.end) {
-      const filterBegin = this.props.filter.begin;
-      const filterEnd = this.props.filter.end;
+    const filterBegin = this.props.filter.begin;
+    const filterEnd = this.props.filter.end;
 
-      filteredTasks = filteredTasks.filter((t, i) => {
-        return t.Date >= filterBegin && t.Date <= filterEnd;
-      });
+    if (filterBegin || filterEnd) {
+      if (filterBegin && filterEnd) {
+        filteredTasks = filteredTasks.filter((t, i) =>
+          t.Date >= filterBegin && t.Date <= filterEnd);
+      } else if (filterBegin) {
+        filteredTasks = filteredTasks.filter((t, i) => t.Date >= filterBegin);
+      } else if (filterEnd) {
+        filteredTasks = filteredTasks.filter((t, i) => t.Date <= filterEnd);
+      }
     }
 
     const tasks = filteredTasks.map((t, i) => {
@@ -700,7 +706,7 @@ export interface ProjectScopeProps {
   scope: Scope;
 }
 
-export class ProjectScope extends React.Component<ProjectScopeProps, undefined> {
+export class ProjectScope extends React.PureComponent<ProjectScopeProps, undefined> {
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);
@@ -749,7 +755,7 @@ export interface ProjectListProps {
   currentDate: moment.Moment;
 }
 
-export class ProjectList extends React.Component<ProjectListProps, undefined> {
+export class ProjectList extends React.PureComponent<ProjectListProps, undefined> {
   deleteProject(id: number) {
     if (window.confirm('Are you sure you want to delete this project?')) {
       common.post(typedDispatch, `/habits/projects/delete/${id}`);
@@ -812,7 +818,7 @@ export class ProjectList extends React.Component<ProjectListProps, undefined> {
 
 }
 
-export class HabitsControlBar extends React.Component<HabitsState, undefined> {
+export class HabitsControlBar extends React.PureComponent<HabitsState, undefined> {
   filterByName(name: string) {
     typedDispatch({ name, type: 'FILTER_BY_NAME' });
   }
@@ -892,7 +898,7 @@ export class HabitsControlBar extends React.Component<HabitsState, undefined> {
 
 // tslint:disable-next-line:variable-name
 export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
-common.connect()(class extends React.Component<HabitsState, undefined> {
+common.connect()(class extends React.PureComponent<HabitsState, undefined> {
   /** Render time-based scope (days, months, years) */
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {

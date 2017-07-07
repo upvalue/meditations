@@ -348,7 +348,8 @@ export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
 }
 
 /** An item that has an editable body. Used for task comments and journal entries */
-export class Editable<Props> extends React.Component<Props, {editor: MediumEditor.MediumEditor}> {
+export class Editable<Props> extends React.PureComponent<Props,
+  {editor: MediumEditor.MediumEditor}> {
   /** 
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
    * subclass's render method */

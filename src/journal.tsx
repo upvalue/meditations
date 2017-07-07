@@ -243,7 +243,7 @@ class CEntry extends common.Editable<CEntryProps> {
 }
 
 // TODO: SFC
-class BrowseMonth extends React.Component<{date: moment.Moment, entries: Entry[]}, undefined> {
+class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Entry[]}, undefined> {
   navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
     const date = (this.props.date.clone()[method])(1, unit);
     route(`view/${date.format(common.MONTH_FORMAT)}`);
@@ -297,7 +297,7 @@ const ViewEntry = (props: {entry: Entry | null}) => {
   return props.entry ? <CEntry context={false} entry={props.entry} /> : <p>Entry deleted</p>;
 };
 
-class BrowseTag extends React.Component<{tagName: string, entries: Entry[]}, undefined> {
+class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]}, undefined> {
   render() {
     const entries: React.ReactElement<undefined>[] = [];
     let key = 0;
@@ -316,7 +316,7 @@ class BrowseTag extends React.Component<{tagName: string, entries: Entry[]}, und
 
 // tslint:disable-next-line:variable-name
 const JournalNavigation = connect(state => state)
-(class extends React.Component<JournalState, undefined> {
+(class extends React.PureComponent<JournalState, undefined> {
   createEntry(date: moment.Moment | null) {
     if (date !== null) {
       common.post(typedDispatch, `/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
@@ -330,7 +330,7 @@ const JournalNavigation = connect(state => state)
 });
 
 // tslint:disable-next-line:variable-name
-const JournalRoot = common.connect()(class extends React.Component<JournalState, undefined> {
+const JournalRoot = common.connect()(class extends React.PureComponent<JournalState, undefined> {
   render() { 
     return <div>
       <common.CommonUI {...this.props} />
