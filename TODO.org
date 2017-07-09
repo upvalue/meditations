@@ -34,6 +34,7 @@
 ** DONE Nice loading indicators
 ** DONE Title updates
 ** TODO Client-side, server-side and behavioral tests
+** TODO Performance: avoid creating functions in render
 
 * 0.1 roadmap
 ** DONE Write manual

@@ -5,8 +5,15 @@ import (
 	"testing"
 )
 
-func TestHello(t *testing.T) {
+// TestSeed tests that DB has been seeded properly
+func TestSeed(t *testing.T) {
+	var task Task
 
+	DB.Where("name = 'Exercise'").First(&task)
+
+	if task.ID == 0 {
+		t.Fail()
+	}
 }
 
 func TestMain(m *testing.M) {
@@ -14,7 +21,7 @@ func TestMain(m *testing.M) {
 	Config.DBLog = true
 	DBOpen()
 	DBMigrate()
-	DBClose()
+	DBSeed("2017-06")
 	// DB Seed
 	os.Exit(m.Run())
 }

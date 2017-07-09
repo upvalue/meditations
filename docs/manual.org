@@ -160,6 +160,12 @@ result in new information being sent over the relevant WebSocket, if any needs t
 response to an action that has occurred. Contra REST, POST methods do not necessarily result in
 data being created or modified.
 
+*** Reading the source code
+
+To start understanding how meditations works "under the hood," the best place to start would be
+the end of habitsweb.go and journal.go, and the end of habits.tsx and journal.tsx, which is where
+the routing logic and initialization for the backend and frontend live.
+
 *** SSL & Encryption
 
 Meditations is intended to be run on a local network; SSL can be achieved using nginx as a

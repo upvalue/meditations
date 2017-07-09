@@ -4,6 +4,8 @@ package backend
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3" // load sqlite3 driver
@@ -54,10 +56,65 @@ func DBCreate() {
 	DB.FirstOrCreate(&settings)
 }
 
-// DBSeed seeds the database with example data, suitable for testing or the demo/tutorial
-// application
-func DBSeed() {
+func seedTask(name string, date time.Time, scope int, status int, comment string) *Task {
+	task := Task{
+		Name:   name,
+		Date:   date,
+		Scope:  scope,
+		Status: status,
+	}
+	if comment != "" {
+		task.Comment = Comment{
+			Body: comment,
+		}
+	}
+	return &task
+}
 
+// DBSeed seeds the database with example data, suitable for testing or the demo/tutorial
+// application. Accepts an optional date argument to start from (for reproducible tests), if empty
+// string is provided, seeds from the current day
+func DBSeed(seedFrom string) {
+	var day time.Time
+	if seedFrom == "" {
+		day = time.Now()
+	} else {
+		day, _ = time.Parse("2006-01", seedFrom)
+	}
+
+	// deterministic random values
+	rand.Seed(12345)
+
+	DB.LogMode(false)
+	tx := DB.Begin()
+	for i := 0; i < 365*2; i++ {
+		calories := rand.Intn(500) + 2350
+
+		status := TaskComplete
+		if calories > 2500 {
+			status = TaskIncomplete
+		}
+
+		tx.Save(seedTask("Diet", day, ScopeDay, status, fmt.Sprintf("%d calories\n", calories)))
+		tx.Save(seedTask("Exercise", day, ScopeDay, TaskComplete, ""))
+
+		if day.Day() == 1 {
+			// Add month tasks on first of day
+			tx.Save(seedTask("Diet", day, ScopeMonth, status, "Eat less than 2500 calories a day"))
+			tx.Save(seedTask("Exercise", day, ScopeMonth, TaskComplete, "Run every day"))
+		}
+
+		if day.AddDate(0, 0, -1).Year() != day.Year() {
+			tx.Save(seedTask("Diet", day, ScopeYear, status, "Eat less than 2500 calories a day"))
+			tx.Save(seedTask("Exercise", day, ScopeYear, TaskComplete, "Run every day"))
+		}
+
+		day = day.AddDate(0, 0, -1)
+	}
+
+	// TODO: Projects.
+
+	tx.Commit()
 }
 
 // repairScope repairs a specific scope

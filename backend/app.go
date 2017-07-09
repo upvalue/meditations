@@ -40,7 +40,7 @@ type Configuration struct {
 type Settings struct {
 	gorm.Model
 	Name string `gorm:"unique"`
-	// Schema version; for certain manual migrations
+	// Schema version; for certain manually-handled migrations
 	Schema int
 }
 
@@ -177,7 +177,7 @@ func Main() {
 		},
 		cli.BoolFlag{
 			Name:  "migrate",
-			Usage: "run database migration",
+			Usage: "run database migration before performing action",
 		},
 	}
 
@@ -193,6 +193,7 @@ func Main() {
 				DBRepair(true)
 			},
 		},
+
 		{
 			Name:  "check",
 			Usage: "check database for errors",
@@ -202,6 +203,23 @@ func Main() {
 				Config.DBLog = true
 				DBOpen()
 				DBRepair(false)
+				DBClose()
+			},
+		},
+
+		{
+			Name:  "seed",
+			Usage: "Seed database with example data; for tutorial/demo, will add lots of info to database!",
+			Flags: flags,
+			Action: func(c *cli.Context) {
+				loadConfig(c)
+				Config.DBLog = true
+				DBOpen()
+				if Config.Migrate == true {
+					DBMigrate()
+				}
+				DBSeed("2017-07")
+				DBClose()
 			},
 		},
 
@@ -218,6 +236,7 @@ func Main() {
 				DBClose()
 			},
 		},
+
 		{
 			Name:  "serve",
 			Usage: "start server",
