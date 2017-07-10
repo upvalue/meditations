@@ -362,7 +362,7 @@ func (project *Scope) CalculateProjectStats() {
 	}
 
 	var count struct{ Count int }
-	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ?",
+	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
 		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
 	project.CompletedTasks = count.Count
 }

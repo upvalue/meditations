@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
+	"runtime"
 	"time"
 
 	"github.com/go-macaron/pongo2"
@@ -34,6 +36,8 @@ type Configuration struct {
 	Migrate bool
 	// Message to be displayed in navbar, used in the demo instance
 	Message string
+	// Package path
+	PackagePath string
 }
 
 // Settings represents app settings saved in the database
@@ -54,6 +58,7 @@ var Config = Configuration{
 	Development: true,
 	Migrate:     false,
 	Message:     "",
+	PackagePath: "",
 }
 
 func loadConfig(c *cli.Context) {
@@ -67,9 +72,25 @@ func loadConfig(c *cli.Context) {
 
 // App configures returns a meditations web application
 func App() *macaron.Macaron {
-	_, err := os.Stat("./assets/webpack/bundle-habits.js")
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("No caller information")
+	}
+
+	packagePath := path.Dir(filename)
+	// Go up from /backend directory
+	packagePath = path.Dir(packagePath)
+
+	Config.PackagePath = packagePath
+
+	fmt.Printf("Using %s as path\n", packagePath)
+
+	webpackCheck := path.Join(Config.PackagePath, "assets/webpack/bundle-habits.js")
+
+	_, err := os.Stat(webpackCheck)
+
 	if os.IsNotExist(err) {
-		panic("./assets/webpack/bundle-habits.js not found; did you run webpack?")
+		panic(fmt.Sprintf("%s not found; have you run yarn and webpack?", webpackCheck))
 	}
 
 	m := macaron.Classic()

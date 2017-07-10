@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as common from '../src/common';
 
 describe('test suite', () => {
-  it("runs", () => {
+  it('runs', () => {
   });
 
   it('makes assertions', () => {

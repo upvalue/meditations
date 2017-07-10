@@ -608,7 +608,7 @@ const CTask = ReactDnd.DropTarget('TASK', taskTarget, (connect, monitor) => {
   };
 })(CTaskImplDraggable);
 
-const CTaskFactory = React.createFactory(CTask);
+export const CTaskFactory = React.createFactory(CTask);
 
 // Finally, this method is used to create instances of CTask in a type-checked way
 
@@ -617,7 +617,7 @@ const CTaskFactory = React.createFactory(CTask);
  * @param key indice of array loop
  * @param task task data
  */
-const createCTask = (key: number, task: Task) => {
+export const createCTask = (key: number, task: Task) => {
   return CTaskFactory({ key, task } as any);
 };
 

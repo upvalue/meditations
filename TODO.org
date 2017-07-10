@@ -35,6 +35,7 @@
 ** DONE Title updates
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Performance: avoid creating functions in render
+** TODO Handle WebSocket disconnects gracefully
 
 * 0.1 roadmap
 ** DONE Write manual

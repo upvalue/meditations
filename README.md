@@ -18,6 +18,15 @@ In addition, it has a journal that supports tagging and organizing entries by na
     $ yarn
     $ ./meditations --port 8080 --database sample.sqlite3 --migrate 
 
+# Running the development version
+
+    $ go get github.com/ioddly/meditations
+
+Go to the meditations directory in your Go workspace.
+
+    $ yarn
+    $ webpack -w
+
 # Dependencies
 
 - Go libraries: See Godeps/Godeps.json
@@ -25,7 +34,7 @@ In addition, it has a journal that supports tagging and organizing entries by na
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
 - Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. It is developed against the latest version of Chrome.
 
-# Development
+# Running the development 
 
 Webpack is required for development. Use `webpack -w`.
 
