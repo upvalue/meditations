@@ -929,25 +929,26 @@ common.connect()(class extends React.PureComponent<HabitsState, undefined> {
 
   render() {
     return <div id="habits-root-sub">
-      <common.CommonUI {...this.props} />
-      <HabitsControlBar {...this.props} />
-      {this.props.mounted && 
-        <div className="row">
-          <div id="habits-scope-daily" className="col-md-3">
-            {this.props.days ? 
-              this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
-              <common.Spinner /> }
-          </div>
-          <div className="col-md-3">
-            {this.renderTimeScope(this.props.month)}
-          </div>
-          <div className="col-md-3">
-            {this.renderTimeScope(this.props.year)}
-          </div>
-          <div className="col-md-3">
-            {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
-          </div>
-        </div>}
+      <common.CommonUI {...this.props}>
+        <HabitsControlBar {...this.props} />
+        {this.props.mounted && 
+          <div className="row">
+            <div id="habits-scope-daily" className="col-md-3">
+              {this.props.days ? 
+                this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
+                <common.Spinner /> }
+            </div>
+            <div className="col-md-3">
+              {this.renderTimeScope(this.props.month)}
+            </div>
+            <div className="col-md-3">
+              {this.renderTimeScope(this.props.year)}
+            </div>
+            <div className="col-md-3">
+              {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
+            </div>
+          </div>}
+      </common.CommonUI>
     </div>;
   }
 }));
@@ -1092,7 +1093,7 @@ export const main = () => {
     }
   };
 
-  common.makeSocket('habits/sync', (msg: HabitMessage) => {
+  common.makeSocket(typedDispatch, 'habits/sync', (msg: HabitMessage) => {
     console.log(`Received WebSocket message`, msg);
     switch (msg.Type) {
       case 'UPDATE_TASKS':

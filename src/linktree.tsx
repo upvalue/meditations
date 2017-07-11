@@ -1,4 +1,3 @@
-/** An expandable tree of links */
 
 import * as React from 'react';
 
@@ -17,6 +16,7 @@ export interface LinkTreeState {
   data: LinkTreeNode[];
 }
 
+/** An expandable tree of links */
 export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   constructor(props: LinkTreeProps) {
     super();

@@ -8,8 +8,9 @@
 ** TODO Reporting minute amounts over 60 should round down
 ** DONE Copying and pasting comments doesn't seem to work. Probably because it messes with focus in some way.
 ** TODO Using ctrl-up in medium-editor reduces font size
-** TODO Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
-** TODO Add search and/or filtering. This could also be used to select entries for export
+** DONE Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
+** DONE Add search and/or filtering. This could also be used to select entries for export
+** TODO Export in a nice, helpful way. Probably need to bring in some kind of modal. 
 ** TODO Add a created-at date to bucket items (currently displays beginning of month)
 ** DONE Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
 ** TODO Use overflow for daily tasks?
@@ -19,7 +20,6 @@
 ** TODO Add a named entry from LinkTree navigation
 ** TODO Sidebar should reflect entry state.
 ** DONE Fix synchronization
-** TODO Option to add a titled entry rather than by date
 * Overall
 ** TODO D3 visualization
 ** DONE Port to Bootstrap 4.6
@@ -36,6 +36,7 @@
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Performance: avoid creating functions in render
 ** TODO Handle WebSocket disconnects gracefully
+** TODO Use flexbox instead of bootstrap grid.
 
 * 0.1 roadmap
 ** DONE Write manual

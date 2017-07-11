@@ -87,7 +87,10 @@ func DBSeed(seedFrom string) {
 
 	DB.LogMode(false)
 	tx := DB.Begin()
+
+	// Generate 2 years of tasks with some random functions
 	for i := 0; i < 365*2; i++ {
+		// Diet will have some calories logged as a comment, and success based on that random number
 		calories := rand.Intn(500) + 2350
 
 		status := TaskComplete

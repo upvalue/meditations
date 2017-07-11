@@ -8,8 +8,9 @@
     "postinstall": "webpack -p",
     "doc-frontend": "typedoc --out docs",
     "doc-backend": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",
-    "test-backend": "go test -v ./backend",
+    "test-backend": "godep go test -v ./backend --cover",
     "test-frontend": "./node_modules/.bin/jest",
+    "test-frontend-coverage": "./node_modules/.bin/jest --coverage",
     "manual-build": "emacs docs/manual.org --batch -f org-html-export-to-html",
     "manual-open": "xdg-open docs/manual.html"
   },
@@ -22,7 +23,8 @@
     "transform": {
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$"
+    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$",
+    "collectCoverageFrom": ["src/**/*.{js,jsx,ts,tsx}", "!**/*.d.ts"]
   },
   "repository": {
     "type": "git",

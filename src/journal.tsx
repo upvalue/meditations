@@ -323,17 +323,31 @@ const JournalNavigation = connect(state => state)
     }
   }
 
+  search(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    // common.post(typedDispatch, `/journal/search?string=`)
+
+    console.log('searchy search');
+  }
+
   render() {
-    return <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
-      placeholderText="Click to add new entry" />;
+    return <div>
+      <form className="form-inline" style={{ display: 'inline' }}
+        onSubmit={e => this.search(e)}>
+          <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
+            placeholderText="Click to add new entry" />
+          <input type="text" className="form-control" placeholder="Text to search for" />
+          <button className="btn btn-sm btn-primary">Search for text</button>
+        </form>
+      </div>;
   }
 });
 
 // tslint:disable-next-line:variable-name
 const JournalRoot = common.connect()(class extends React.PureComponent<JournalState, undefined> {
   render() { 
-    return <div>
-      <common.CommonUI {...this.props} />
+    return <common.CommonUI {...this.props}>
       <div id="controls">
         <JournalNavigation />
       </div>
@@ -351,7 +365,7 @@ const JournalRoot = common.connect()(class extends React.PureComponent<JournalSt
               : this.props.entries[0]} /> : ''}
         </div>
       </div>
-    </div>;
+    </common.CommonUI>;
   }
 });
 
@@ -360,7 +374,7 @@ export const main = () => {
   // Install router. If no route was specifically given, start with #view/YYYY-MM
   common.installRouter('/journal#', `view/${moment().format(common.MONTH_FORMAT)}`, {
     no_action: () => route(`view/${moment().format(common.MONTH_FORMAT)}`),
-    journal: () => {}, // Dummy, called if journal is clicked from navbar
+    journal: () => null, // Dummy, called if journal is clicked from navbar
 
     view: (datestr: string, entryScrollId?: number) => {
       const date = moment(datestr, common.MONTH_FORMAT);
@@ -419,7 +433,7 @@ export const main = () => {
     Datum: SidebarState;
   };
 
-  const socket = common.makeSocket('journal/sync', (msg: JournalMessage) => {
+  const socket = common.makeSocket(typedDispatch, 'journal/sync', (msg: JournalMessage) => {
     if (msg.Type === 'UPDATE_ENTRY') {
       common.processModel(msg.Datum);
       typedDispatch({ type: 'UPDATE_ENTRY', entry: msg.Datum });

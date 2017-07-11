@@ -12,6 +12,13 @@ import * as ReactDOM from 'react-dom';
 import * as MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
 
+declare global {
+  /** Extend window with a meditations object for console interaction. */
+  interface Window {
+    meditations: any;
+  }
+}
+
 /** Fields common to all models */
 export interface Model {
   ID: number;
@@ -24,6 +31,7 @@ export interface Model {
 /** Converts JSON strings to moment dates when received from backend */
 export const processModel = (e: Model) => {
   // Convert from JSON
+  // Hey, this is a lot of fun, just like casting a bunch of stuff in C++!
   e.CreatedAt = moment((e.CreatedAt as any) as string);
   e.UpdatedAt = moment((e.UpdatedAt as any) as string);
   e.Date = moment.utc((e.Date as any) as string);
@@ -41,11 +49,16 @@ export type NotificationOpen = {
   notification: Notification;
 };
 
-export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' };
+export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } |
+  { type: 'SOCKET_OPENED', socket: WebSocket, socketReconnect: () => void } |
+  { type: 'SOCKET_CLOSED' };
 
 export type CommonState = {
+  socketClosed: boolean;
   dismissNotifications: () => void;
   notifications?: Notification[];
+  socket: WebSocket;
+  socketReconnect: () => void;
 };
 
 function reduceReducers<S>(...reducers: redux.Reducer<S>[]): redux.Reducer<S> {
@@ -64,6 +77,11 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
       } else {
         return { ...state, notifications: [action.notification] };
       }
+    case 'SOCKET_CLOSED':
+      return { ...state, socketClosed: true };
+    case 'SOCKET_OPENED':
+      return { ...state, socketClosed: false, socket: action.socket,
+        socketReconnect: action.socketReconnect };
     case 'NOTIFICATIONS_DISMISS':
       return { ...state, notifications: undefined };
   }
@@ -120,24 +138,51 @@ export const Spinner = (props: any) => {
  * Common UI elements (currently just a notification bar that appears at the top)
  */
 export class CommonUI extends React.Component<CommonState, undefined> {
-  render() {
-    if (this.props.notifications) {
-      return <div>
-        <button className="btn btn-outline-warning btn-sm octicon octicon-x"
-          onClick={() => this.props.dismissNotifications()}>Dismiss notifications</button>
-        <div className="notifications card-group">
-          {this.props.notifications.map((n, i) => {
-            return <div key={i} className={`card ${n.error ? 'card-outline-warning' : ''}`}>
-              <div className="card-block">
-                {n.message}
-              </div>
-            </div>;
-          })}
+  reconnect() {
+    this.props.socketReconnect();
+  }
+  
+  renderPopups() {
+    return <div id="notifications">
+      {this.props.socketClosed && <div>
+        <div className="card">
+          <div className="card-block" style={{ }}>
+            <p>WebSocket connection failed!</p>
+            <button className="btn btn-primary" onClick={() => this.reconnect()}>
+              Attempt reconnection
+            </button>
+          </div>
         </div>
-      </div>;
-    } else {
-      return <span />;
-    }
+      </div>}
+
+      {this.props.notifications && <div>
+        <button className="btn btn-warning btn-sm octicon octicon-x"
+          onClick={() => this.props.dismissNotifications()}>
+          Dismiss notifications
+        </button>
+
+        {this.props.notifications.map((n, i) => {
+          return <div key={i} className={`card ${n.error ? 'card-error' : ''}`}>
+            <div className="card-content" style={{ }}>
+              {n.message}
+            </div>
+          </div>;
+        })}
+      </div>}
+    </div>;
+  }
+
+  render() {
+    // When socket is not active, blur UI to indicate it is unusable.
+    // TODO: Figure out how to capture user interaction as well
+
+    const blurAll = this.props.socketClosed ? {
+      style: { filter: 'blur(1px)' } } : {};
+
+    return <div>
+      {this.renderPopups()}
+      <div {...blurAll}>{this.props.children}</div>
+    </div>;
   }
 }
 
@@ -236,14 +281,34 @@ export const HUMAN_DAY_FORMAT = 'MMMM Do, YYYY';
  * @param onmessage Callback when message is received
  * @returns {WebSocket}
  */
-export function makeSocket(location: string, onmessage: (s: any) => void,
-    onopen?: () => void) {
+export function makeSocket(
+    dispatch: (a: CommonAction) => void,
+    location: string, onmessage: (s: any) => void,
+    onopen?: () => void,
+    reconnect?: boolean) {
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const url = `${protocol}://${window.location.hostname}:${window.location.port}/${location}`;
   const socket = new WebSocket(url);
 
+  // console harness
+  window.meditations = {
+    socket,
+    notify: (msg: string) => {
+      dispatch({ type: 'NOTIFICATION_OPEN', notification: { error: false, message: msg } });
+    },
+  };
+
   socket.onopen = (m) => {
     console.log(`Common.makeSocket: Connected to ${url} WebSocket`);
+    if (reconnect) {
+      dispatch({ type: 'NOTIFICATION_OPEN', notification: { error: false,
+        message: 'Reconnection successful'}})
+
+    }
+    dispatch({ socket, type: 'SOCKET_OPENED', socketReconnect: () => {
+      console.log('Attempting to reopen socket');
+      makeSocket(dispatch, location, onmessage, onopen, true);
+    }});
     if (onopen) {
       onopen();
     }
@@ -251,6 +316,10 @@ export function makeSocket(location: string, onmessage: (s: any) => void,
 
   socket.onmessage = (m) => {
     onmessage(JSON.parse(m.data));
+  };
+
+  socket.onclose = (e) => {
+    dispatch({ type: 'SOCKET_CLOSED' });
   };
 
   return socket;

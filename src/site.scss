@@ -77,6 +77,24 @@ a, a:visited {
   margin-right: 5px;
 }
 
+#notifications {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 320px;
+  z-index: 1;
+}
+
+#notifications button {
+  margin-bottom: 5px;
+}
+
+#notifications .card {
+  border-color: #000;
+  margin-bottom: 5px;
+  color: #000;
+}
+
 //
 ///// MEDIUM EDITOR
 //
