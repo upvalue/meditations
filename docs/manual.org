@@ -146,7 +146,7 @@ Frontend code is located in src/
 + habits.tsx contains all Habits frontend code
 + linktree.tsx contains a component that is a tree of links. It's used to navigate journal named
   entries.
-+ journal-sidebar.tsx contains the Journal sidebar
++ journal-sidebar.tsx contains the Journal sidebar component.
 + journal.tsx contains the remainder of Journal code.
 + site.scss contains the stylesheets.
 

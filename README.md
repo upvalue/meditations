@@ -34,12 +34,6 @@ Go to the meditations directory in your Go workspace.
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
 - Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. It is developed against the latest version of Chrome.
 
-# Running the development 
-
-Webpack is required for development. Use `webpack -w`.
-
-Although this is a Go package, it is intended to be run directly from the repo and not installed with `go get`.
-
 # Further information
 
 See the manual at [docs/manual.org](docs/manual.org) or `yarn run manual-open` from command

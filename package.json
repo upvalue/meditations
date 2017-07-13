@@ -24,7 +24,10 @@
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "/__tests__/.*\\.(ts|tsx|js)$",
-    "collectCoverageFrom": ["src/**/*.{js,jsx,ts,tsx}", "!**/*.d.ts"]
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!**/*.d.ts"
+    ]
   },
   "repository": {
     "type": "git",
@@ -45,6 +48,7 @@
     "@types/react": "^15.0.25",
     "@types/react-datepicker": "^0.46.0",
     "@types/react-dom": "^15.5.0",
+    "@types/react-modal": "^1.6.7",
     "@types/react-redux": "^4.4.41",
     "@types/react-tabs": "^1.0.0",
     "@types/redux-logger": "^3.0.0",
@@ -66,6 +70,7 @@
     "react-dnd": "^2.4.0",
     "react-dnd-html5-backend": "^2.4.1",
     "react-dom": "^15.5.4",
+    "react-modal": "^2.2.2",
     "react-redux": "^5.0.5",
     "react-tabs": "^1.0.0",
     "redux": "^3.6.0",

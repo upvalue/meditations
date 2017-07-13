@@ -58,6 +58,12 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-modal@^1.6.7":
+  version "1.6.7"
+  resolved "https://registry.yarnpkg.com/@types/react-modal/-/react-modal-1.6.7.tgz#e65d26c0decd89e1d3f5c4185fd89a2346a90312"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-redux@^4.4.41":
   version "4.4.41"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-4.4.41.tgz#8613af4650b204682707747fe29d8aaad56c2f76"
@@ -1252,6 +1258,10 @@ execa@^0.5.0:
     p-finally "^1.0.0"
     signal-exit "^3.0.0"
     strip-eof "^1.0.0"
+
+exenv@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/exenv/-/exenv-1.2.0.tgz#3835f127abf075bfe082d0aed4484057c78e3c89"
 
 expand-brackets@^0.1.4:
   version "0.1.5"
@@ -3297,6 +3307,10 @@ react-dnd@^2.4.0:
     lodash "^4.2.0"
     prop-types "^15.5.8"
 
+react-dom-factories@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-dom-factories/-/react-dom-factories-1.0.0.tgz#f43c05e5051b304f33251618d5bc859b29e46b6d"
+
 react-dom@^15.5.4:
   version "15.5.4"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.5.4.tgz#ba0c28786fd52ed7e4f2135fe0288d462aef93da"
@@ -3305,6 +3319,14 @@ react-dom@^15.5.4:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
     prop-types "~15.5.7"
+
+react-modal@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/react-modal/-/react-modal-2.2.2.tgz#4bbf98bc506e61c446c9f57329c7a488ea7d504b"
+  dependencies:
+    exenv "1.2.0"
+    prop-types "^15.5.10"
+    react-dom-factories "^1.0.0"
 
 react-onclickoutside@^5.11.1:
   version "5.11.1"

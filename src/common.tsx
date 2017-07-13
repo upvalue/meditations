@@ -300,11 +300,13 @@ export function makeSocket(
 
   socket.onopen = (m) => {
     console.log(`Common.makeSocket: Connected to ${url} WebSocket`);
+
+    // Notify user of successfuly reconnetions
     if (reconnect) {
       dispatch({ type: 'NOTIFICATION_OPEN', notification: { error: false,
-        message: 'Reconnection successful'}})
-
+        message: 'Reconnection successful'}});
     }
+
     dispatch({ socket, type: 'SOCKET_OPENED', socketReconnect: () => {
       console.log('Attempting to reopen socket');
       makeSocket(dispatch, location, onmessage, onopen, true);
