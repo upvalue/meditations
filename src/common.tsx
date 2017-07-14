@@ -316,6 +316,16 @@ export function makeSocket(
     }
   };
 
+  socket.onerror = (e) => {
+    if (e.type === 'error') {
+      dispatch({
+        type: 'NOTIFICATION_OPEN', notification: {
+          error: true, message: 'Failed to reconnect',
+        },
+      });
+    }
+  };
+
   socket.onmessage = (m) => {
     onmessage(JSON.parse(m.data));
   };
