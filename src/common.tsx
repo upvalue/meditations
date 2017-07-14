@@ -32,11 +32,11 @@ export interface Model {
 export const processModel = (e: Model) => {
   // Convert from JSON
   // Hey, this is a lot of fun, just like casting a bunch of stuff in C++!
-  e.CreatedAt = moment((e.CreatedAt as any) as string);
-  e.UpdatedAt = moment((e.UpdatedAt as any) as string);
+  e.CreatedAt = moment.utc((e.CreatedAt as any) as string);
+  e.UpdatedAt = moment.utc((e.UpdatedAt as any) as string);
   e.Date = moment.utc((e.Date as any) as string);
   if (e.DeletedAt) {
-    e.DeletedAt = moment((e.DeletedAt as any) as string);
+    e.DeletedAt = moment.utc((e.DeletedAt as any) as string);
   }
 };
 

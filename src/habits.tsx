@@ -312,7 +312,9 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
           } else if (task.Scope === SCOPE_DAY) {
             // Update only the specific day using diff
             nstate.days = 
-              [...state.days.map(s => s.Date.diff(task.Date, 'days') === 0 ? updateScope(s) : s)];
+              [...state.days.map(s =>
+                s.Date.format(common.DAY_FORMAT) === task.Date.format(common.DAY_FORMAT) ?
+                  updateScope(s) : s)];
           } else {
             nstate.project = updateScope(nstate.project);
           }
