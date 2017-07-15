@@ -10,3 +10,4 @@
 /typings
 /docs/manual.html~
 /coverage
+*.sqlite

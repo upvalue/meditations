@@ -64,6 +64,7 @@
     "moment": "^2.18.1",
     "node-sass": "^4.5.3",
     "octicons": "^3.5.0",
+    "primer-css": "^9.0.0",
     "react": "^15.5.4",
     "react-datepicker": "^0.46.0",
     "react-dnd": "^2.4.0",

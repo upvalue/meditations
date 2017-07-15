@@ -3,10 +3,13 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 
+const sassExtract = new ExtractTextPlugin('bundle-style.css');
+const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
+
 module.exports = {
   entry: {
-    journal: ['./src/entry/journal.ts', './src/site.scss'],
-    habits: ['./src/entry/habits.ts', './src/site.scss'],
+    //journal: ['./src/entry/journal.ts', './src/site.scss'],
+    habits: ['./src/entry/habits.ts', './src/style/habits.scss'],
   },
 
   output: {
@@ -22,7 +25,7 @@ module.exports = {
 
   plugins: [
     new webpack.IgnorePlugin(/^\.\/locale$/),
-    new ExtractTextPlugin('bundle-style.css'),
+    sassExtract,
     new CheckerPlugin(), // async typescript error reporting
   ],
 
@@ -30,15 +33,28 @@ module.exports = {
     rules: [
       { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
       { test: /\.css$/,
-        use: ExtractTextPlugin.extract({
+        use: sassExtract.extract({
           fallback: 'style-loader',
-          use: 'css-loader',
+          use: [{
+            loader: 'css-loader',
+            options: {
+              modules: true,
+            },
+          }],
         }),
       },
-      { test: /\.scss$/,
-        loader: ExtractTextPlugin.extract({
+      { test: /\.s?css$/,
+        loader: sassExtract.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader'],
+          use: [
+            {
+              loader: 'css-loader',
+            }, {
+              loader: 'sass-loader',
+              options: {
+                includePaths: [nodeModulesDirectory], // necessary for primer-css to work
+              },
+            }],
         }),
       },
 
