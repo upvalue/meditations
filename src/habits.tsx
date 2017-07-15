@@ -700,7 +700,7 @@ const projectActivityIcon = (p: Project) => {
   const recentActivityString = 
     ['little activity', 'some activity', 'lots of activity', 'immense activity'][recentActivity];
   return <span className = {`octicon octicon-flame project-activity-${recentActivity}`}
-    title={`${p.CompletedTasks} in the last 72 days`} />;
+    title={`${recentActivityString} ${p.CompletedTasks} in the last 72 days`} />;
 };
 
 export interface ProjectScopeProps {
