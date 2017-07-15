@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 
-const sassExtract = new ExtractTextPlugin('bundle-style.css');
+const sassExtract = new ExtractTextPlugin('bundle-[name].css');
 const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
 module.exports = {

@@ -1,292 +1,61 @@
 /* NOTE: relative URLs will be compressed by webpack */
 @import "primer-css/index.scss";
 
+/*
 @import "~medium-editor/dist/css/medium-editor.min.css";
 @import "~medium-editor/dist/css/themes/bootstrap.min.css";
 @import "~medium-editor-tables/dist/css/medium-editor-tables.css";
 @import "~react-datepicker/dist/react-datepicker";
 @import "~react-tabs/style/react-tabs.css";
 
+*/
 @import "~octicons/octicons/octicons.css";
 
-@import "~@typopro/web-open-sans/TypoPRO-OpenSans.css";
-@import "~@typopro/web-inconsolata/TypoPRO-Inconsolata.css";
+@import "animations.scss";
 
 $linkColor: #09d;
 $bodyBg: #fff;
-$bodyFont: "TypoPRO Open Sans";
-$commentFont: "TypoPRO Inconsolata", monospace;
+$commentFont: $mono-font;
 
-//
-///// GLOBAL ELEMENT STYLING
-//
-
-body, button, input, optgroup, select, textarea {
-  font-family: $bodyFont, sans-serif;
+.masthead {
+  background-color: #f5f5f5;
 }
 
-h1, h2, h3, h4, h5, h6, .navbar {
-  font-family: $bodyFont, serif;
-  font-weight:bold;
+
+.masthead .tabnav span {
+  padding-right:5px;
 }
 
-a, a:visited {
-  color: $linkColor;
-}
-
-//
-///// NAVBAR
-//
-
-#navigation {
-  background-color: darken($bodyBg, 5%);
-  padding: 5px;
-  padding-left: 25px; /* align with first elements on page */
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 0px;
-}
-
-.navigation-link, .navigation-link:hover {
-  margin-bottom: -1px;
-  background-color: darken($bodyBg, 5%);
-}
-
-.navigation-link-active, .navigation-link-active:hover {
-  background-color: $bodyBg;
-  border-bottom: 1px solid $bodyBg;
-  margin-bottom: -1px;
+.tabnav .selected {
+  border-top: 2px solid #e36209;
   font-weight: bold;
 }
 
-#navigation-brand {
-  font-weight: bold;
-  padding-right: 5px;
-}
-
-#controls {
-  padding: 5px;
-  padding-left: 25px;
-  font-size: small;
-}
-
-#content {
-  padding-top:5px;
-}
-
-#controls button, input {
-  margin-right: 5px;
-}
-
-#notifications {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 320px;
+#mobile-menu {
+  display: none !important;
+  position: fixed;
+  right: 10px;
+  top: 50px;
   z-index: 1;
-}
-
-#notifications button {
-  margin-bottom: 5px;
-}
-
-#notifications .card {
-  border-color: #000;
-  margin-bottom: 5px;
-  color: #000;
-}
-
-//
-///// MEDIUM EDITOR
-//
-
-.medium-editor-toolbar li button {height: auto; min-width: 0; }
-
-//
-///// HABITS
-//
-
-#habits-root { 
-  margin:0;
-  padding:0;
-}
-
-.scope-title {
-  display: inline;
-}
-
-.scope-controls { display: inline; }
-
-.scope {
-  padding: 0 .25em .50em .25em;
-}
-
-.scope .task:first-of-type {
-  padding-top:0.2em;
-}
-
-.scope .task {
-  clear:both;
-}
-
-/* Text align doesn't work properly if we don't do this to pad them from the task controls */
-.task { font-size: 0.8em; }
-
-.task div:first-of-type { padding-top:2px;}
-
-/*#content input.form-control[type=text] { height:1.5em; }*/
-
-.comment {
-  font-family: $commentFont;
-}
-
-.comment p {
-  margin-bottom: 0;
-}
-
-.comment p:first-of-type { padding-top:.25em; }
-.comment p:last-of-type { padding-bottom:.25em; }
-
-.comment:empty { display: inline;}
-
-.btn-xs {
-  font-size: .75rem;
-  padding: .1rem .30rem;
-  border-radius:0.1rem;
-}
-
-.task-control { padding:2px;}
-
-.project-activity-0 {
-  color: #ccc;
-}
-
-.project-activity-1 {
-  color: #ffcd38;
-  font-size: 1.4em;
-}
-
-.project-activity-2 {
-  color: #ff6e26;
-  font-size: 1.8em;
-}
-.project-activity-3 {
-  color: #f00;
-  font-size: 2em;
-}
-
-//
-///// JOURNAL
-//
-
-.nav .nav-item { display:inline; }
-
-.nav-tabs { border: 0; } 
-
-.container-fluid h3:first-of-type { margin:0; }
-
-#entries-title { display: inline; }
-
-.entry-tag-form {display:inline; }
-
-.navigation-list { 
-  list-style: none;
-  margin-left: 2px;
-  padding-left:0;
-}
-
-.navigation-list ul {  list-style: none; padding-left: 1em; }
-
-#journal-nav ul.nav { display:inline; clear:none; list-style-type:none; margin:0;padding:0; }
-
-.journal-controls {
-  background-color: #eee;
-  padding-left:5px; padding-right: 5px; border-radius: 5px; font-size: 1rem; 
-  font-weight: bold;
 
 }
 
-hr { clear:both; }
-
-.journal-tags { font-size: 0.8em; clear:both; display:block; }
-
-.journal-tag { display:block; clear:both; }
-
-.journal-timestamp { display:block; clear:both; font-size:0.8em; }
-
-.journal-control { padding: 2px; }
-
-.react-tabs__tab { border:0; color: $linkColor; }
-.react-tabs__tab-list { border: 0; }
-.react-tabs__tab--selected { border: 0; font-weight:bold; }
-
-div#alphabetical li { font-size:0.8em; }
-
-/* Remove spurious spacing between entries */
-.entry-body p:last-of-type { margin-bottom:0; }
-
-div#content h1:first-of-type { margin-top:0; }
-
-// Linking tree
-
-.link-tree-node {
-  padding-left: 10px;
-  display:block; 
-}
-
-.link-tree-node-anchor {
-  color: $linkColor !important;
-}
-
-.link-tree-node-nochildren {
-  padding-left: 28px;
-}
-
-.link-tree-node-btn {
-  display: inline;
-}
-
-//
-///// LOADING SPINNER ANIMATION
-//
-
-.spinner {
-  margin: 100px auto 0;
-  width: 70px;
-  text-align: center;
-}
-
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: #333;
-
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-}
-
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% { 
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% { 
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
+@media (max-width: 768px) {
+  #mobile-menu {
+    display: flex !important;
   }
+}
+
+///// Notification bar
+#notifications {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+
+  position: fixed;
+  left: 20px;
+  top: 50px;
+  z-index: 1;
+  width: 320px;
 }

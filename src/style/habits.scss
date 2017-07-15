@@ -1,1 +1,109 @@
 @import "shared.scss";
+
+.scope {
+  border: 1px solid #e1e4e8;
+}
+
+.scope-column {
+  width: 25%;
+  /* TODO SCSS includes */
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+@media (max-width: 1024px) {
+  .scope-column {
+    width: 100%;
+  }
+}
+
+.scope-controls {
+  display:inline; 
+}
+
+.scope-controls .btn, .task-controls .btn, .entry-controls .btn {
+  background: transparent;
+  border:0;
+  color: #586069;
+}
+
+.task:hover {
+  background-color: #e5e5e5;
+}
+.task {
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
+.task:last-of-type {
+  border:0;
+}
+
+.scope-header h3 { display: inline;}
+
+.task-status {
+  /* Task buttons should be a bit smaller */
+  padding: 0px 4px 0px 4px;
+  font-weight: normal;
+}
+
+.task-status.task-complete {
+  background-color: #74c94f;
+  background-image: linear-gradient(#74c94f 0%, #6cc644 100%);
+  color: white;
+}
+
+.task-status.task-incomplete {
+  background-color: #b32a00;
+  background-image: linear-gradient(#b32a00 0%, #bd2c00 100%);
+  color: white;
+}
+
+.task-controls .btn {
+  padding:0;
+}
+
+.task-comment, .entry-body {
+  /* Comments have a white background */
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  background-color: #fcfcfc;
+  padding: 2px;
+  font-size: 12px;
+}
+
+.task-comment:hover {
+  transition: box-shadow 1s ease;
+  box-shadow:  0 0 4px#09d;
+}
+
+button.btn-octicon {
+  background: transparent;
+}
+
+button svg {
+  fill: #585069;
+}
+
+
+.btn-danger svg {
+  fill: #b33630;
+}
+
+.journal-sidebar {
+  width: 15%;
+}
+
+.journal-view {
+  width: 85%;
+}
+
+@media (max-width: 768px) {
+  .journal-sidebar, .journal-view { width: 100%; }
+
+}
+
+.journal-sidebar .tabnav {}
+
+.entry {
+  border: 1px solid #e1e4e8;
+}

@@ -143,32 +143,40 @@ export class CommonUI extends React.Component<CommonState, undefined> {
   }
   
   renderPopups() {
-    return <div id="notifications">
+    if (!this.props.notifications && !this.props.socketClosed) {
+      return <span />;
+    }
+
+    return <div id="notifications" className="bg-gray border border-gray-dark p-2">
+      <h3>Notifications
+        {this.props.notifications &&
+          <span className="float-right Label Label--gray-darker">
+            {this.props.notifications.length}
+          </span>
+        }
+      </h3>
+
+      {this.props.notifications &&
+        <button className="btn btn-block mb-2" onClick={this.props.dismissNotifications}>
+          Dismiss all notifications
+        </button>}
+
       {this.props.socketClosed && <div>
-        <div className="card">
-          <div className="card-block" style={{ }}>
-            <p>WebSocket connection failed!</p>
-            <button className="btn btn-primary" onClick={() => this.reconnect()}>
-              Attempt reconnection
-            </button>
-          </div>
+        <div className="notification flash flash-danger mb-2">
+          <p>WebSocket connection failed!</p>
+          <button className="btn btn-primary" onClick={() => this.reconnect()}>
+            Attempt reconnection
+          </button>
         </div>
       </div>}
 
-      {this.props.notifications && <div>
-        <button className="btn btn-warning btn-sm octicon octicon-x"
-          onClick={() => this.props.dismissNotifications()}>
-          Dismiss notifications
-        </button>
+      {this.props.notifications && this.props.notifications.map((n, i) => {
+        return <div key={i} className={`notification flash flash-with-icon mb-2
+          ${n.error ? 'flash-danger' : ''}`}>
+          {n.message}
 
-        {this.props.notifications.map((n, i) => {
-          return <div key={i} className={`card ${n.error ? 'card-error' : ''}`}>
-            <div className="card-content" style={{ }}>
-              {n.message}
-            </div>
-          </div>;
-        })}
-      </div>}
+        </div>;
+      })}
     </div>;
   }
 

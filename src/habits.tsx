@@ -623,6 +623,18 @@ export const createCTask = (key: number, task: Task) => {
   return CTaskFactory({ key, task } as any);
 };
 
+///// SCOPES
+
+const PresentScope: React.SFC<{
+  title: string,
+  addTask: () => void,
+}> = (props) => {
+
+  return <section className="scope bg-gray-2 mb-2">
+    <p>Hello world</p>
+  </section>;
+};
+
 export class TimeScope extends
   React.PureComponent<{currentProject: number, currentDate: moment.Moment, scope: Scope,
     filter: FilterState}, undefined> {
@@ -672,6 +684,11 @@ export class TimeScope extends
       return createCTask(i, t);
     });
 
+
+    const title =
+      this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
+    return <PresentScope title={title} addTask={() => this.addTask()} />;
+    /*
     return <section className="scope">
       {(this.props.scope.Scope === SCOPE_MONTH || this.props.scope.Scope === SCOPE_YEAR) &&
         <span>
@@ -689,6 +706,7 @@ export class TimeScope extends
       </h6>
       {...tasks}
     </section>;
+    */
   }
 }
 
@@ -933,23 +951,22 @@ common.connect()(class extends React.PureComponent<HabitsState, undefined> {
     return <div id="habits-root-sub">
       <common.CommonUI {...this.props}>
         <HabitsControlBar {...this.props} />
-        {this.props.mounted && 
-          <div className="row">
-            <div id="habits-scope-daily" className="col-md-3">
-              {this.props.days ? 
-                this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
-                <common.Spinner /> }
-            </div>
-            <div className="col-md-3">
-              {this.renderTimeScope(this.props.month)}
-            </div>
-            <div className="col-md-3">
-              {this.renderTimeScope(this.props.year)}
-            </div>
-            <div className="col-md-3">
-              {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
-            </div>
-          </div>}
+        <div className="d-flex flex-column flex-md-row">
+          <div id="habits-scope-daily" className="scope-column">
+            {this.props.days ? 
+              this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
+              <common.Spinner /> }
+          </div>
+          <div className="scope-column">
+            {this.renderTimeScope(this.props.month)}
+          </div>
+          <div className="scope-column">
+            {this.renderTimeScope(this.props.year)}
+          </div>
+          <div className="scope-column">
+            {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
+          </div>
+        </div>
       </common.CommonUI>
     </div>;
   }
@@ -1120,5 +1137,5 @@ export const main = () => {
   });
   
   ///// RENDER
-  common.render('habits-root', store, <HabitsRoot />);
+  common.render('root', store, <HabitsRoot />);
 };
