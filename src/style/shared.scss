@@ -1,4 +1,4 @@
-/* NOTE: relative URLs will be compressed by webpack */
+// TODO: Only use necessary CSS components
 @import "primer-css/index.scss";
 
 /*
@@ -9,7 +9,9 @@
 @import "~react-tabs/style/react-tabs.css";
 
 */
+/*
 @import "~octicons/octicons/octicons.css";
+*/
 
 @import "animations.scss";
 
@@ -37,7 +39,6 @@ $commentFont: $mono-font;
   right: 10px;
   top: 50px;
   z-index: 1;
-
 }
 
 @media (max-width: 768px) {

@@ -21,7 +21,7 @@ export type SidebarState = {
 
 /** Sidebar. Contains convenient navigation methods. */
 export const JournalSidebar = connect((state) => { return state.sidebar; })(
-  class extends React.Component<SidebarState, undefined> {
+  class extends React.Component<SidebarState, {}> {
     /** Render tag navigation links */
     renderTags() {
       if (this.props.TagLinks === null) {

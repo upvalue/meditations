@@ -8,7 +8,7 @@ const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
 module.exports = {
   entry: {
-    //journal: ['./src/entry/journal.ts', './src/site.scss'],
+    // journal: ['./src/entry/journal.ts', './src/site.scss'],
     habits: ['./src/entry/habits.ts', './src/style/habits.scss'],
   },
 
@@ -31,6 +31,17 @@ module.exports = {
 
   module: {
     rules: [
+      /*
+      { test: /\.jsx?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [['es2015'], ['react']],
+            ignore: ['node_modules'],
+          },
+        },
+      },
+      */
       { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
       { test: /\.css$/,
         use: sassExtract.extract({

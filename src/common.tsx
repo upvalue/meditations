@@ -137,7 +137,7 @@ export const Spinner = (props: any) => {
 /**
  * Common UI elements (currently just a notification bar that appears at the top)
  */
-export class CommonUI extends React.Component<CommonState, undefined> {
+export class CommonUI extends React.Component<CommonState, {}> {
   reconnect() {
     this.props.socketReconnect();
   }

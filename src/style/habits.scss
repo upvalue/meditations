@@ -84,6 +84,13 @@ button svg {
   fill: #585069;
 }
 
+.btn .octicons {
+  vertical-align:text-top;
+}
+
+.btn-danger {
+  color: #b33630 !important;
+}
 
 .btn-danger svg {
   fill: #b33630;

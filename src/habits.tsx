@@ -5,11 +5,13 @@ import * as redux from 'redux';
 import route from 'riot-route';
 import * as ReactDnd from 'react-dnd';
 import DatePicker from 'react-datepicker';
+import HTML5Backend from 'react-dnd-html5-backend';
+
+const { PlusIcon, TrashcanIcon, ClippyIcon, ClockIcon, CommentIcon } =
+  require('react-octicons-svg');
+
 
 import * as common from './common';
-
-const HTML5Backend = require('react-dnd-html5-backend');
-// TODO: Remove once react-dnd TS bindings are fixed
 
 ///// BACKEND INTERACTION
 
@@ -520,18 +522,20 @@ export class CTaskImpl extends common.Editable<TaskProps> {
     </span>;
   }
 
-  renderControl(title: string, icon: string, callback: () => void) {
+  renderControl(title: string, Icon: any, callback: () => void, danger?: boolean) {
     return <button 
-      className={`task-control btn-link btn btn-sm btn-default octicon octicon-${icon}`}
-      title={title}
-      onClick = {callback} />;
+      className={`tooltipped tooltipped-w btn btn-sm pr-2 ${danger && 'btn-danger'}`}
+      aria-label={title}
+      onClick = {callback}>
+      <Icon />
+    </button>;
   }
 
   renderComment() {
     if (this.props.task.Comment) {
       return <div
         className="comment"
-        ref={body => this.body = body} 
+        ref={(body) => { if (body) { this.body = body; } }} 
         onClick={e => this.editorOpen(e)}
         dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />;
     }
@@ -541,9 +545,10 @@ export class CTaskImpl extends common.Editable<TaskProps> {
     const { isDragging, connectDragSource, connectDragPreview, connectDropTarget,
       isOver, isOverCurrent } = this.props;
     // Create a draggable task button.
-    const klass = ['', 'btn-success', 'btn-danger'][this.props.task.Status];
+    const klass = ['task-unset', 'task-complete', 'task-incomplete'][this.props.task.Status];
     const taskButton_ =
-      <button className={`btn btn-xs btn-default ${klass}`} onClick={() => this.cycleStatus()}>
+      <button className={`task-status btn btn btn-sm ${klass}`}
+          onClick={() => this.cycleStatus()}>
         {this.props.task.Name}
         {this.hasStats() && this.renderStats()}
       </button>;
@@ -563,6 +568,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
       style['borderStyle'] = 'solid';
     }
 
+    /*
     const result =  <section className="task" style={style}>
       {taskButton}
       <span className="float-right">
@@ -576,14 +582,26 @@ export class CTaskImpl extends common.Editable<TaskProps> {
           <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
           </span>}
 
-        {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
-        {this.props.task.Scope === SCOPE_DAY && 
-          this.renderControl('Set time', 'clock', () => this.setTime())}
-        {this.hasCopy() &&
-          this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
-        {this.renderControl('Delete task', 'trashcan', () => this.destroy())}  
       </span>
       {this.props.task.Comment && this.renderComment()}
+    </section>;
+    */
+
+    const result = <section className="task" style={style}>
+      <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
+        {taskButton}
+
+        <div className="task-controls pr-1 ">
+          {this.renderControl('Add/edit comment', CommentIcon, () => this.editorOpen())}  
+          {this.props.task.Scope === SCOPE_DAY && 
+            this.renderControl('Set time', ClockIcon, () => this.setTime())}
+          {this.hasCopy() &&
+            this.renderControl('Copy to the left', ClippyIcon, () => this.copyLeft())}
+          {this.renderControl('Delete task', TrashcanIcon, () => this.destroy(), true)}  
+
+        </div>
+
+      </div>
     </section>;
 
     return connectDropTarget(result);
@@ -628,16 +646,28 @@ export const createCTask = (key: number, task: Task) => {
 const PresentScope: React.SFC<{
   title: string,
   addTask: () => void,
-}> = (props) => {
+}> = ({ title, addTask, children }) => {
 
-  return <section className="scope bg-gray-2 mb-2">
-    <p>Hello world</p>
+  return <section className="scope bg-gray mb-2">
+    <div className="scope-header border-bottom">
+      <h3 className="pl-2">{title}</h3>
+      <div className="scope-controls float-right">
+        <button className="btn btn-sm tooltipped tooltipped-w" aria-label="Add new task" 
+          onClick={addTask}>
+          <PlusIcon />
+        </button>
+      </div>
+    </div>
+
+    <div className="scope-tasks mt-1">
+      {children}
+    </div>
   </section>;
 };
 
 export class TimeScope extends
-  React.PureComponent<{currentProject: number, currentDate: moment.Moment, scope: Scope,
-    filter: FilterState}, undefined> {
+  React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope,
+    filter: FilterState}, {}> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -687,7 +717,9 @@ export class TimeScope extends
 
     const title =
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
-    return <PresentScope title={title} addTask={() => this.addTask()} />;
+    return <PresentScope title={title} addTask={() => this.addTask()}>
+      {...tasks}      
+      </PresentScope>;
     /*
     return <section className="scope">
       {(this.props.scope.Scope === SCOPE_MONTH || this.props.scope.Scope === SCOPE_YEAR) &&
@@ -726,7 +758,7 @@ export interface ProjectScopeProps {
   scope: Scope;
 }
 
-export class ProjectScope extends React.PureComponent<ProjectScopeProps, undefined> {
+export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);
@@ -775,7 +807,7 @@ export interface ProjectListProps {
   currentDate: moment.Moment;
 }
 
-export class ProjectList extends React.PureComponent<ProjectListProps, undefined> {
+export class ProjectList extends React.Component<ProjectListProps, {}> {
   deleteProject(id: number) {
     if (window.confirm('Are you sure you want to delete this project?')) {
       common.post(typedDispatch, `/habits/projects/delete/${id}`);
@@ -838,7 +870,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, undefined
 
 }
 
-export class HabitsControlBar extends React.PureComponent<HabitsState, undefined> {
+export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   filterByName(name: string) {
     typedDispatch({ name, type: 'FILTER_BY_NAME' });
   }
@@ -918,7 +950,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, undefined
 
 // tslint:disable-next-line:variable-name
 export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
-common.connect()(class extends React.PureComponent<HabitsState, undefined> {
+common.connect()(class extends React.PureComponent<HabitsState, {}> {
   /** Render time-based scope (days, months, years) */
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {
@@ -964,7 +996,8 @@ common.connect()(class extends React.PureComponent<HabitsState, undefined> {
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="scope-column">
-            {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
+            <common.Spinner />
+            {/*this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />*/}
           </div>
         </div>
       </common.CommonUI>
