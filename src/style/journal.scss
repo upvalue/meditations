@@ -1,0 +1,20 @@
+@import "shared.scss";
+
+
+.journal-sidebar {
+  width: 15%;
+}
+
+.journal-view {
+  width: 85%;
+}
+
+@media (max-width: $mobileWidth) {
+  .journal-sidebar, .journal-view { width: 100%; }
+}
+
+.journal-sidebar .tabnav {}
+
+.entry {
+  border: 1px solid #e1e4e8;
+}

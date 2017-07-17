@@ -156,19 +156,19 @@ export class CommonUI extends React.Component<CommonState, {}> {
         }
       </h3>
 
-      {this.props.notifications &&
-        <button className="btn btn-block mb-2" onClick={this.props.dismissNotifications}>
-          Dismiss all notifications
-        </button>}
-
       {this.props.socketClosed && <div>
-        <div className="notification flash flash-danger mb-2">
+        <div className="notification flash flash-error mb-2">
           <p>WebSocket connection failed!</p>
           <button className="btn btn-primary" onClick={() => this.reconnect()}>
             Attempt reconnection
           </button>
         </div>
       </div>}
+
+      {this.props.notifications &&
+        <button className="btn btn-block mb-2" onClick={this.props.dismissNotifications}>
+          Dismiss all notifications
+        </button>}
 
       {this.props.notifications && this.props.notifications.map((n, i) => {
         return <div key={i} className={`notification flash flash-with-icon mb-2
@@ -482,6 +482,8 @@ export class Editable<Props> extends React.PureComponent<Props,
       });
       this.setState({ editor });
     } 
+    // Empty comments will have the no-display class added
+    this.body.classList.remove('no-display');
     this.body.focus();
   }
 }

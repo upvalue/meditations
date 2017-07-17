@@ -9,20 +9,21 @@
 @import "~react-tabs/style/react-tabs.css";
 
 */
-/*
 @import "~octicons/octicons/octicons.css";
-*/
 
 @import "animations.scss";
 
 $linkColor: #09d;
-$bodyBg: #fff;
-$commentFont: $mono-font;
+$bodyBg: white;
+/* Slightly muted color of some UI actions e.g. task modifiers */
+$uiColorMuted: #586069;
+// Width at which to put the UI into mobile mode
+$mobileWidth: 1024px;
+
 
 .masthead {
   background-color: #f5f5f5;
 }
-
 
 .masthead .tabnav span {
   padding-right:5px;
@@ -41,7 +42,7 @@ $commentFont: $mono-font;
   z-index: 1;
 }
 
-@media (max-width: 768px) {
+@media (max-width: $mobileWidth) {
   #mobile-menu {
     display: flex !important;
   }
@@ -59,4 +60,12 @@ $commentFont: $mono-font;
   top: 50px;
   z-index: 1;
   width: 320px;
+}
+
+
+.no-display {
+  display:none !important;
+}
+.no-display {
+  display:none !important;
 }

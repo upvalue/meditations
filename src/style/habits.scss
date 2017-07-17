@@ -1,5 +1,8 @@
 @import "shared.scss";
 
+$taskBackground: $bg-gray;
+$commentBackground: #fcfcfc;
+
 .scope {
   border: 1px solid #e1e4e8;
 }
@@ -24,12 +27,25 @@
 .scope-controls .btn, .task-controls .btn, .entry-controls .btn {
   background: transparent;
   border:0;
-  color: #586069;
+  color: $uiColorMuted;
+  padding: 0;
 }
 
+/** Highlight hovered tasks */
 .task:hover {
-  background-color: #e5e5e5;
+  transition: background-color 0.5s ease; 
+  background-color: darken($taskBackground, 5%);
 }
+
+.task:hover .task-comment {
+  transition: background-color 0.5s ease;
+  background-color: darken($commentBackground, 5%);
+}
+
+.task-comment[data-medium-focused="true"] {
+  background-color: darken($commentBackground, 5%);
+}
+
 .task {
   padding-top: 1px;
   padding-bottom: 1px;
@@ -45,6 +61,13 @@
   /* Task buttons should be a bit smaller */
   padding: 0px 4px 0px 4px;
   font-weight: normal;
+  border:0;
+  border-radius:1px;
+}
+
+.task-status.task-unset {
+  background-color: #ddd;
+  background-image: none;
 }
 
 .task-status.task-complete {
@@ -59,17 +82,24 @@
   color: white;
 }
 
-.task-controls .btn {
-  padding:0;
+.task-controls {
+  vertical-align: text-top;
+  color: $uiColorMuted;
 }
 
 .task-comment, .entry-body {
-  /* Comments have a white background */
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  background-color: #fcfcfc;
+  font-family: $mono-font;
+  /* Comments have an off-white background */
+  background-color: $commentBackground;
   padding: 2px;
   font-size: 12px;
 }
+
+/* Do not add padding to bottom of comments */
+.task-comment p:last-of-type {
+  margin-bottom: 0;
+}
+
 
 .task-comment:hover {
   transition: box-shadow 1s ease;
@@ -80,37 +110,10 @@ button.btn-octicon {
   background: transparent;
 }
 
-button svg {
-  fill: #585069;
-}
-
-.btn .octicons {
-  vertical-align:text-top;
-}
-
-.btn-danger {
-  color: #b33630 !important;
+button.btn-octicon svg {
+  fill: #09d;
 }
 
 .btn-danger svg {
   fill: #b33630;
-}
-
-.journal-sidebar {
-  width: 15%;
-}
-
-.journal-view {
-  width: 85%;
-}
-
-@media (max-width: 768px) {
-  .journal-sidebar, .journal-view { width: 100%; }
-
-}
-
-.journal-sidebar .tabnav {}
-
-.entry {
-  border: 1px solid #e1e4e8;
 }

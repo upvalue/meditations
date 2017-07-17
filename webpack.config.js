@@ -31,17 +31,6 @@ module.exports = {
 
   module: {
     rules: [
-      /*
-      { test: /\.jsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [['es2015'], ['react']],
-            ignore: ['node_modules'],
-          },
-        },
-      },
-      */
       { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
       { test: /\.css$/,
         use: sassExtract.extract({

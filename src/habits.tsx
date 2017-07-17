@@ -7,10 +7,6 @@ import * as ReactDnd from 'react-dnd';
 import DatePicker from 'react-datepicker';
 import HTML5Backend from 'react-dnd-html5-backend';
 
-const { PlusIcon, TrashcanIcon, ClippyIcon, ClockIcon, CommentIcon } =
-  require('react-octicons-svg');
-
-
 import * as common from './common';
 
 ///// BACKEND INTERACTION
@@ -522,19 +518,26 @@ export class CTaskImpl extends common.Editable<TaskProps> {
     </span>;
   }
 
-  renderControl(title: string, Icon: any, callback: () => void, danger?: boolean) {
+  /** Render an octicon button tied to a specific task action */
+  renderControl(title: string, icon:string, callback: () => void, danger?: boolean) {
     return <button 
-      className={`tooltipped tooltipped-w btn btn-sm pr-2 ${danger && 'btn-danger'}`}
       aria-label={title}
+      className={`tooltipped tooltipped-w btn btn-octicon btn-sm pl-1
+      ${danger ? 'btn-danger' : ''}`}
       onClick = {callback}>
-      <Icon />
+      <span className={`octicon octicon-${icon}`} />
     </button>;
   }
 
   renderComment() {
     if (this.props.task.Comment) {
+      let commentClasses = '';
+
+      if (this.props.task.Comment.Body === '') {
+        commentClasses = 'no-display';
+      }
       return <div
-        className="comment"
+        className={`task-comment border-bottom border-gray mt-1 pl-1 pr-1 ${commentClasses}`}
         ref={(body) => { if (body) { this.body = body; } }} 
         onClick={e => this.editorOpen(e)}
         dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />;
@@ -568,40 +571,38 @@ export class CTaskImpl extends common.Editable<TaskProps> {
       style['borderStyle'] = 'solid';
     }
 
-    /*
-    const result =  <section className="task" style={style}>
-      {taskButton}
-      <span className="float-right">
-        {this.hasTime() && <span>
-          <span className="octicon octicon-clock"></span>{' '}
-          {this.props.task.Hours > 0 && `${this.props.task.Hours}h `}
-          {this.props.task.Minutes > 0 && `${this.props.task.Minutes}m`}
-        </span>}
-        {this.hasStreak() && <span className="streak">{' '}
-          <span className="octicon octicon-dashboard"></span>{' '}
-          <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
-          </span>}
-
-      </span>
-      {this.props.task.Comment && this.renderComment()}
-    </section>;
-    */
 
     const result = <section className="task" style={style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
-        {taskButton}
+        <div>
+          {taskButton}
+        </div>
 
-        <div className="task-controls pr-1 ">
-          {this.renderControl('Add/edit comment', CommentIcon, () => this.editorOpen())}  
+        <div className="task-controls d-flex">
+          {this.hasTime() && <span>
+            <span className="octicon octicon-clock"></span>{' '}
+            {this.props.task.Hours > 0 && `${this.props.task.Hours}h `}
+            {this.props.task.Minutes > 0 && `${this.props.task.Minutes}m`}
+          </span>}
+          {this.hasStreak() && <span className="streak pl-1">{' '}
+            <span className="octicon octicon-dashboard"></span>{' '}
+            <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
+            </span>}
+
+          {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
           {this.props.task.Scope === SCOPE_DAY && 
-            this.renderControl('Set time', ClockIcon, () => this.setTime())}
+            this.renderControl('Set time', 'clock', () => this.setTime())}
           {this.hasCopy() &&
-            this.renderControl('Copy to the left', ClippyIcon, () => this.copyLeft())}
-          {this.renderControl('Delete task', TrashcanIcon, () => this.destroy(), true)}  
+            this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
+          {this.renderControl('Delete task', 'trashcan', () => this.destroy(), true)}  
+
 
         </div>
 
       </div>
+
+
+      {this.props.task.Comment && this.renderComment()}
     </section>;
 
     return connectDropTarget(result);
@@ -651,10 +652,10 @@ const PresentScope: React.SFC<{
   return <section className="scope bg-gray mb-2">
     <div className="scope-header border-bottom">
       <h3 className="pl-2">{title}</h3>
-      <div className="scope-controls float-right">
+      <div className="scope-controls float-right pr-1 pt-1">
         <button className="btn btn-sm tooltipped tooltipped-w" aria-label="Add new task" 
           onClick={addTask}>
-          <PlusIcon />
+          <span className="octicon octicon-plus" />
         </button>
       </div>
     </div>
@@ -937,7 +938,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
       </span>;
     }
 
-    return <div id="controls" className="form-inline">
+    return <div id="controls" className="d-flex flex-row">
       <input type="text" placeholder="Filter by name" className="form-control"
         onChange={e => this.filterByName(e.target.value)} />
       {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
