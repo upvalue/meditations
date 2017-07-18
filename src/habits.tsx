@@ -519,14 +519,9 @@ export class CTaskImpl extends common.Editable<TaskProps> {
   }
 
   /** Render an octicon button tied to a specific task action */
-  renderControl(title: string, icon:string, callback: () => void, danger?: boolean) {
-    return <button 
-      aria-label={title}
-      className={`tooltipped tooltipped-w btn btn-octicon btn-sm pl-1
-      ${danger ? 'btn-danger' : ''}`}
-      onClick = {callback}>
-      <span className={`octicon octicon-${icon}`} />
-    </button>;
+  renderControl(tip: string, icon:string, callback: () => void, danger?: boolean) {
+    return <common.OcticonButton tooltip={tip} name={icon} onClick={callback} 
+      className="pl-1" />;
   }
 
   renderComment() {
@@ -579,13 +574,14 @@ export class CTaskImpl extends common.Editable<TaskProps> {
         </div>
 
         <div className="task-controls d-flex">
-          {this.hasTime() && <span>
-            <span className="octicon octicon-clock"></span>{' '}
+          {this.hasTime() && <span className="pr-1 tooltipped tooltipped-w"
+              aria-label="Average time">
+            <span className="octicon octicon-clock "></span>
             {this.props.task.Hours > 0 && `${this.props.task.Hours}h `}
             {this.props.task.Minutes > 0 && `${this.props.task.Minutes}m`}
           </span>}
-          {this.hasStreak() && <span className="streak pl-1">{' '}
-            <span className="octicon octicon-dashboard"></span>{' '}
+          {this.hasStreak() && <span className="streak pr-1 ">
+            <span className="octicon octicon-dashboard"></span>
             <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
             </span>}
 
@@ -653,10 +649,7 @@ const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title
     <div className="scope-header border-bottom">
       <h3 className="pl-2">{title}</h3>
       <div className="scope-controls float-right pr-1 pt-1">
-        <button className="btn btn-sm tooltipped tooltipped-w" aria-label="Add new task" 
-          onClick={addTask}>
-          <span className="octicon octicon-plus" />
-        </button>
+        <common.OcticonButton name="plus" onClick={addTask} tooltip="Add task" />
       </div>
     </div>
 
@@ -722,25 +715,6 @@ export class TimeScope extends
     return <PresentScope title={title} addTask={() => this.addTask()}>
       {...tasks}      
     </PresentScope>;
-    /*
-    return <section className="scope">
-      {(this.props.scope.Scope === SCOPE_MONTH || this.props.scope.Scope === SCOPE_YEAR) &&
-        <span>
-          <button
-            className="btn btn-link btn-sm btn-default octicon octicon-chevron-left"
-            title="Previous"
-            onClick={() => this.navigate('subtract')} />
-          <button className="btn btn-link btn-sm btn-default octicon octicon-chevron-right"
-            title="Next" onClick={() => this.navigate('add')} />
-        </span>}
-      <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="New task"
-        onClick={() => this.addTask()} />
-      <h6 className="scope-title">
-        {this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope])}
-      </h6>
-      {...tasks}
-    </section>;
-    */
   }
 }
 
@@ -809,7 +783,7 @@ export interface ProjectListProps {
   currentDate: moment.Moment;
 }
 
-export class ProjectList extends React.Component<ProjectListProps, {}> {
+export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   deleteProject(id: number) {
     if (window.confirm('Are you sure you want to delete this project?')) {
       common.post(typedDispatch, `/habits/projects/delete/${id}`);
@@ -832,22 +806,26 @@ export class ProjectList extends React.Component<ProjectListProps, {}> {
   }
 
   renderProjectLink(project: Project) {
-    return <div key={project.ID}>
-      {project.Pinned && projectActivityIcon(project)}
+    return <div key={project.ID} className="d-flex flex-row flex-justify-between">
+      <div>
 
-      <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
+        {project.Pinned && projectActivityIcon(project)}
 
-      <span className="float-right">
-        <span className="task"> {/* used for smaller font*/}
+        <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
+      </div>
+
+      <div className="project-controls">
+        <span className="task mr-1"> {/* used for smaller font*/}
           {project.CompletedTasks}
         </span>
-        <span className="task-control btn-link btn-sm btn-default octicon octicon-clippy"
-          title="Copy to left" onClick={() => this.copyLeft(project) } />
-        <span className="task-control btn-link btn-sm btn-default octicon octicon-pin"
-          title="Pin project" onClick={() => this.pinProject(project) } />
-        <span className="task-control btn-link btn-sm btn-default octicon octicon-trashcan" 
-          title="Delete project" onClick={() => this.deleteProject(project.ID)} />
-      </span>
+
+        <common.OcticonButton name="clippy" tooltip="Copy to left"
+          onClick={() => this.copyLeft(project)} />
+        <common.OcticonButton name="pin" tooltip={project.Pinned ? 'Unpin project' : 'Pin project'}
+          onClick={() => this.pinProject(project)} />
+        <common.OcticonButton name="trashcan" tooltip="Delete project"
+          onClick={() => this.deleteProject(project.ID)} />
+      </div>
     </div>;
   }
 
@@ -859,15 +837,20 @@ export class ProjectList extends React.Component<ProjectListProps, {}> {
   }
 
   render() {
-    return <div>
-      <button className="btn btn-link octicon octicon-plus" title="Add new project"
-        onClick={() => this.addProject()} />
-      <h6 className="scope-title">Projects</h6>
-      {this.props.pinnedProjects.map(p => this.renderProjectLink(p))}
-      <hr />
-      {this.props.unpinnedProjects.map(p => this.renderProjectLink(p))}
-
-    </div>;
+    return <section className="project-list border bg-gray ">
+      <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
+        <h3 className="scope-title">Projects</h3>
+        <common.OcticonButton name="plus" tooltip="Add new project"
+          onClick={() => this.addProject()} />
+      </div>
+      <div className="pl-1 pr-1 pt-1">
+        {this.props.pinnedProjects.map(p => this.renderProjectLink(p))}
+      </div>
+      <hr className="mt-1 mb-1" />
+      <div className="pl-1 pr-1">
+        {this.props.unpinnedProjects.map(p => this.renderProjectLink(p))}
+      </div>
+    </section>;
   }
 
 }
@@ -1022,8 +1005,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="scope-column">
-            <common.Spinner />
-            {/*this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />*/}
+            {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
           </div>
         </div>
       </common.CommonUI>

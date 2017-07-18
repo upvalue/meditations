@@ -565,3 +565,23 @@ export class Editable<Props> extends React.PureComponent<Props,
     this.body.focus();
   }
 }
+
+/** A muted Octicon button */
+export const OcticonButton: React.SFC<{ name: string, onClick: () => void, 
+  tooltip: string, tooltipDirection?: string, className?: string }> =
+
+  ({ name, onClick, tooltip, tooltipDirection, className }) => {
+    return <button className={`btn btn-octicon tooltipped tooltipped-${tooltipDirection}
+        ${className}`}
+        aria-label={tooltip}
+        onClick={onClick}>
+        <span className={`octicon octicon-${name}`} />
+      </button>;
+  };
+
+
+OcticonButton.defaultProps = {
+  tooltipDirection: 'w',
+  className: '',
+};
+

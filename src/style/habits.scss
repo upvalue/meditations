@@ -24,11 +24,7 @@ $commentBackground: #fcfcfc;
   display:inline; 
 }
 
-.scope-controls .btn, .task-controls .btn, .entry-controls .btn {
-  background: transparent;
-  border:0;
-  color: $uiColorMuted;
-  padding: 0;
+.scope-controls .btn, .task-controls .btn, .project-controls .btn, .entry-controls .btn {
 }
 
 /** Highlight hovered tasks */
@@ -106,8 +102,11 @@ $commentBackground: #fcfcfc;
   box-shadow:  0 0 4px#09d;
 }
 
-button.btn-octicon {
+.btn-octicon {
   background: transparent;
+  border:0;
+  color: $uiColorMuted;
+  padding: 0;
 }
 
 button.btn-octicon svg {
@@ -116,4 +115,22 @@ button.btn-octicon svg {
 
 .btn-danger svg {
   fill: #b33630;
+}
+
+.project-activity-0 {
+  color: #ccc;
+}
+
+.project-activity-1 {
+  color: #ffcd38;
+  font-size: 1.4em;
+}
+
+.project-activity-2 {
+  color: #ff6e26;
+  font-size: 1.8em;
+}
+.project-activity-3 {
+  color: #f00;
+  font-size: 2em;
 }
