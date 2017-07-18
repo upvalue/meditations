@@ -647,9 +647,8 @@ export const createCTask = (key: number, task: Task) => {
 /** 
  * Scope presentation element. Made because time-based and project-based scopes have some different
  * functionality */
-const PresentScope: React.SFC<{ title: string, addTask: () => void, }> = ({ title, addTask,
-children }) => {
-
+const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title, addTask,
+    children }) => {
   return <section className="scope bg-gray mb-2">
     <div className="scope-header border-bottom">
       <h3 className="pl-2">{title}</h3>
@@ -669,7 +668,7 @@ children }) => {
 
 export class TimeScope extends
   React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope,
-    filter: FilterState, modalPrompt: (a:string, b:string, c:(r:string) => void) => void}, {}> {
+    filter: FilterState, modalPrompt: common.ModalPromptDispatcher}, {}> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);

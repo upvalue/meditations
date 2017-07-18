@@ -25,7 +25,9 @@ In addition, it has a journal that supports tagging and organizing entries by na
 Go to the meditations directory in your Go workspace.
 
     $ yarn
+    $ go build
     $ webpack -w
+    $ ./meditations serve --migrate
 
 # Dependencies
 

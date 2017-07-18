@@ -60,6 +60,9 @@ export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } 
   { type: 'SOCKET_OPENED', socket: WebSocket, socketReconnect: () => void } |
   { type: 'SOCKET_CLOSED' } | { type: 'MODAL_DISMISS' };
 
+export type ModalPromptDispatcher =
+  (text:string, ok: string, onClose: (result: string) => void) => void;
+
 export type CommonState = {
   socketClosed: boolean;
   notifications?: Notification[];
@@ -71,7 +74,7 @@ export type CommonState = {
 
   dismissModal: () => void;
   dismissNotifications: () => void;
-  modalPrompt: (text: string, ok: string, onClose: (result: string) => void) => void;
+  modalPrompt: ModalPromptDispatcher;
   /** Method for attempting a socket reconnect */
   socketReconnect: () => void;
 };
@@ -217,19 +220,28 @@ export class CommonUI extends React.Component<CommonState, {}> {
     // TODO: Figure out how to capture user interaction as well
   
     let filterAll: any;
-
+    let clickCatch: any;
     if (this.props.modalOpen) {
       filterAll = { style: { filter: 'opacity(80%)' } };
+      clickCatch = {
+        onClick: (e: MouseEvent) => {
+          e.preventDefault();
+          this.props.dismissModal();
+        },
+      };
     }
 
     if (this.props.socketClosed) {
       filterAll = { style: { filter: 'blur(1px)' } };
+      clickCatch = {
+        onClick: (e: MouseEvent) => e.preventDefault(),
+      };
     }
 
     return <div>
       {this.props.modalOpen && this.renderModal()}
       {this.renderPopups()}
-      <div {...filterAll}>{this.props.children}</div>
+      <div {...clickCatch} {...filterAll}>{this.props.children}</div>
     </div>;
   }
 }
@@ -303,8 +315,10 @@ export function connect() {
 
         modalPrompt: (body: string, ok: string, cb: (result: string) => void) => {
           let ref: HTMLInputElement;
+
+          console.log('open prompt', cb);
           const submit = () => {
-            cb(ref.value)
+            cb(ref.value);
             dismiss();
           };
 
@@ -314,9 +328,8 @@ export function connect() {
               <span>{body}</span>
               <input ref={(e) => { if (e) { ref = e; e.focus(); } }}
                 className="form-control input-block mb-1" type="text" />
-              <button className="btn btn-primary btn-block mb-1">{ok}</button>
+              <button className="btn btn-primary btn-block mb-1" onClick={submit}>{ok}</button>
               <button className="btn btn-secondary btn-block" onClick={dismiss}
-              
               >Close</button>
             </form>,
             modalOnClose: () => {},
