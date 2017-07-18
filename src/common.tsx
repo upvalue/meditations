@@ -49,15 +49,30 @@ export type NotificationOpen = {
   notification: Notification;
 };
 
-export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } |
+/** Action that causes a modal prompt to be opened */
+export type ModalPrompt = {
+  type: 'MODAL_PROMPT';
+  modalBody: React.ReactNode;
+  modalOnClose: () => void;
+};
+
+export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } | ModalPrompt |
   { type: 'SOCKET_OPENED', socket: WebSocket, socketReconnect: () => void } |
-  { type: 'SOCKET_CLOSED' };
+  { type: 'SOCKET_CLOSED' } | { type: 'MODAL_DISMISS' };
 
 export type CommonState = {
   socketClosed: boolean;
-  dismissNotifications: () => void;
   notifications?: Notification[];
   socket: WebSocket;
+
+  modalBody: React.ReactNode;
+  modalOpen: boolean;
+  modalOnClose: () => void;
+
+  dismissModal: () => void;
+  dismissNotifications: () => void;
+  modalPrompt: (text: string, ok: string, onClose: (result: string) => void) => void;
+  /** Method for attempting a socket reconnect */
   socketReconnect: () => void;
 };
 
@@ -84,6 +99,11 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
         socketReconnect: action.socketReconnect };
     case 'NOTIFICATIONS_DISMISS':
       return { ...state, notifications: undefined };
+    case 'MODAL_DISMISS':
+      return { ...state, modalOpen: false };
+    case 'MODAL_PROMPT':
+      return { ...state, modalOpen: true, modalOnClose: action.modalOnClose,
+        modalBody: action.modalBody };
   }
   return state;
 }
@@ -180,16 +200,36 @@ export class CommonUI extends React.Component<CommonState, {}> {
     </div>;
   }
 
+  renderModal() {
+    return <div id="modal" className="bg-white border border-gray-dark p-2">
+      <div className="float-right">
+        <button className="btn btn-sm mb-2" onClick={() => this.props.dismissModal()}>
+          <span className="octicon octicon-x"
+            aria-label="Dismiss prompt" />
+        </button>
+      </div>
+      {this.props.modalBody}
+    </div>;
+  }
+
   render() {
     // When socket is not active, blur UI to indicate it is unusable.
     // TODO: Figure out how to capture user interaction as well
+  
+    let filterAll: any;
 
-    const blurAll = this.props.socketClosed ? {
-      style: { filter: 'blur(1px)' } } : {};
+    if (this.props.modalOpen) {
+      filterAll = { style: { filter: 'opacity(80%)' } };
+    }
+
+    if (this.props.socketClosed) {
+      filterAll = { style: { filter: 'blur(1px)' } };
+    }
 
     return <div>
+      {this.props.modalOpen && this.renderModal()}
       {this.renderPopups()}
-      <div {...blurAll}>{this.props.children}</div>
+      <div {...filterAll}>{this.props.children}</div>
     </div>;
   }
 }
@@ -255,8 +295,33 @@ export function connect() {
   return reactredux.connect(
     state => state,
     (dispatch: (a: CommonAction) => void) => {
+      const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
       return {
+        dismissModal: dismiss,
+
         dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' }),
+
+        modalPrompt: (body: string, ok: string, cb: (result: string) => void) => {
+          let ref: HTMLInputElement;
+          const submit = () => {
+            cb(ref.value)
+            dismiss();
+          };
+
+          dispatch({
+            type: 'MODAL_PROMPT',
+            modalBody: <form onSubmit={e => submit()}>
+              <span>{body}</span>
+              <input ref={(e) => { if (e) { ref = e; e.focus(); } }}
+                className="form-control input-block mb-1" type="text" />
+              <button className="btn btn-primary btn-block mb-1">{ok}</button>
+              <button className="btn btn-secondary btn-block" onClick={dismiss}
+              
+              >Close</button>
+            </form>,
+            modalOnClose: () => {},
+          });
+        },
       };
     },
   );

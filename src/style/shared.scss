@@ -62,10 +62,17 @@ $mobileWidth: 1024px;
   width: 320px;
 }
 
-
-.no-display {
-  display:none !important;
+///// MODAL PROMPT
+#modal {
+  position: fixed;
+  z-index: 1;
+  top: 20%;
+  left: 50%;
+  width: 350px;
+  margin-left: -175px;
 }
+
+
 .no-display {
   display:none !important;
 }

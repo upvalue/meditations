@@ -644,10 +644,11 @@ export const createCTask = (key: number, task: Task) => {
 
 ///// SCOPES
 
-const PresentScope: React.SFC<{
-  title: string,
-  addTask: () => void,
-}> = ({ title, addTask, children }) => {
+/** 
+ * Scope presentation element. Made because time-based and project-based scopes have some different
+ * functionality */
+const PresentScope: React.SFC<{ title: string, addTask: () => void, }> = ({ title, addTask,
+children }) => {
 
   return <section className="scope bg-gray mb-2">
     <div className="scope-header border-bottom">
@@ -668,7 +669,7 @@ const PresentScope: React.SFC<{
 
 export class TimeScope extends
   React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope,
-    filter: FilterState}, {}> {
+    filter: FilterState, modalPrompt: (a:string, b:string, c:(r:string) => void) => void}, {}> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -676,14 +677,15 @@ export class TimeScope extends
   }
 
   addTask() {
-    const name = window.prompt('Enter task name (leave empty to cancel): ');
-    if (name) {
-      common.post(typedDispatch, `/habits/new`, {
-        name,
-        date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
-        scope: this.props.scope.Scope,
-      });
-    }
+    this.props.modalPrompt('Enter the name of the new task', 'Add new task', (name: string) => {
+      if (name) {
+        common.post(typedDispatch, `/habits/new`, {
+          name,
+          date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
+          scope: this.props.scope.Scope,
+        });
+      }
+    });
   }
 
   render() {
@@ -720,7 +722,7 @@ export class TimeScope extends
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
     return <PresentScope title={title} addTask={() => this.addTask()}>
       {...tasks}      
-      </PresentScope>;
+    </PresentScope>;
     /*
     return <section className="scope">
       {(this.props.scope.Scope === SCOPE_MONTH || this.props.scope.Scope === SCOPE_YEAR) &&
@@ -872,6 +874,11 @@ export class ProjectList extends React.Component<ProjectListProps, {}> {
 }
 
 export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
+  navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
+    const ndate = this.props.currentDate.clone()[method](1, unit);
+    route(routeForView(ndate, this.props.currentProject));
+  }
+
   filterByName(name: string) {
     typedDispatch({ name, type: 'FILTER_BY_NAME' });
   }
@@ -911,7 +918,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
     // TODO: Datepicker onClearable does not work unless a SELECTED value is also apssed
     return <DatePicker 
-      className="form-control"
+      className="form-control ml-1"
       onChange={date => this.filterByDate(end, date)}
       isClearable={true}
       placeholderText={placeholder ? placeholder.format(common.DAY_FORMAT) : defaultPlaceholder}
@@ -931,23 +938,41 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     if (this.props.filter.name || this.props.filter.begin || this.props.filter.end) {
       // And if a name and/or a date RANGE have been entered, we'll allow export
       buttons = <span>
-        <button className="btn btn-sm btn-primary"
+        <button className="btn btn-secondary ml-1"
           onClick={() => this.clearFilter()}>Clear date filter</button>
-        <button className="btn btn-sm btn-secondary"
+        <button className="btn btn-primary ml-1"
           onClick={() => this.exportTasks()}>Export selected tasks</button>
       </span>;
     }
 
-    return <div id="controls" className="d-flex flex-row">
-      <input type="text" placeholder="Filter by name" className="form-control"
-        onChange={e => this.filterByName(e.target.value)} />
-      {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
-      {this.renderDatePicker(true, '...to', this.props.filter.end)}
-      {buttons}
+    // tslint:disable-next-line
+    return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-2 mr-2 mt-2 mb-2">
+      <div className="d-flex flex-justify-between">
+        <button className="btn mr-1" onClick={() => this.navigate('subtract', 'year')}>
+          <span className="octicon octicon-chevron-left" />
+        </button>
+        <button className="btn mr-1" onClick={() => this.navigate('subtract', 'month')}>
+          <span className="octicon octicon-arrow-left" />
+        </button>
+        <button className="btn mr-1" onClick={() => this.navigate('add', 'month')}>
+          <span className="octicon octicon-arrow-right" />
+        </button>
+        <button className="btn mr-1" onClick={() => this.navigate('add', 'year')}>
+          <span className="octicon octicon-chevron-right" />
+        </button>
+        <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
+      </div>
+
+      <div className="d-flex flex-column flex-md-row">
+        <input type="text" placeholder="Filter by name" className="form-control"
+          onChange={e => this.filterByName(e.target.value)} />
+        {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
+        {this.renderDatePicker(true, '...to', this.props.filter.end)}
+        {buttons}
+      </div>
     </div>;
   }
 }
-
 
 // tslint:disable-next-line:variable-name
 export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
@@ -958,6 +983,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
       // TODO: Filter by date?
       return <TimeScope currentProject={this.props.currentProject}
         key={i} currentDate={this.props.currentDate} scope={s}
+        modalPrompt={this.props.modalPrompt}
         filter={this.props.filter} />;
     } else {
       return <common.Spinner />;
