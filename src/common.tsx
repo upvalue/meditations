@@ -53,7 +53,6 @@ export type NotificationOpen = {
 export type ModalPrompt = {
   type: 'MODAL_PROMPT';
   modalBody: React.ReactNode;
-  modalOnClose: () => void;
 };
 
 export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } | ModalPrompt |
@@ -63,6 +62,8 @@ export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } 
 export type ModalPromptDispatcher =
   (text:string, ok: string, onClose: (result: string) => void) => void;
 
+export type CommonActionDispatcher = (a: CommonAction) => void;
+
 export type CommonState = {
   socketClosed: boolean;
   notifications?: Notification[];
@@ -70,11 +71,9 @@ export type CommonState = {
 
   modalBody: React.ReactNode;
   modalOpen: boolean;
-  modalOnClose: () => void;
 
   dismissModal: () => void;
   dismissNotifications: () => void;
-  modalPrompt: ModalPromptDispatcher;
   /** Method for attempting a socket reconnect */
   socketReconnect: () => void;
 };
@@ -105,7 +104,7 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
     case 'MODAL_DISMISS':
       return { ...state, modalOpen: false };
     case 'MODAL_PROMPT':
-      return { ...state, modalOpen: true, modalOnClose: action.modalOnClose,
+      return { ...state, modalOpen: true, 
         modalBody: action.modalBody };
   }
   return state;
@@ -145,6 +144,95 @@ export function createStore<State extends CommonState, Action extends redux.Acti
 
   return [store, typedDispatch, thunkDispatch];
 }
+
+///// ACTION CREATE-AND-DISPATCHERS
+
+/**
+ * Open a modal prompt with a text input
+ * @param dispatch Typed dispatcher
+ * @param body Text of the prompt
+ * @param ok Text of the prompt submission button
+ * @param cb Success callback
+ * @param defaultValue Default value of the input field
+ * @param checker Can return an error representing an input issue which will be displayed in the
+ *   modal
+ */
+export const modalPrompt = (dispatch: CommonActionDispatcher,
+    body: string, ok: string, cb: (result: string) => void,
+    defaultValue?: string, checker?: (chk: string) => string) => {
+
+  let ref: HTMLInputElement;
+  let err: HTMLElement;
+  let errmsg = '';
+
+  const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
+
+  const submit = (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    // Optionally, arguments can be checked for validity before submission.
+    if (checker) {
+      errmsg = checker(ref.value);
+      if (errmsg !== '') {
+        err.className = 'flash flash-error mt-1 mb-1';
+        err.innerText = errmsg;
+        return;
+      }
+    }
+
+    if (ref.value !== '') {
+      cb(ref.value);
+    }
+    dismiss();
+  };
+
+  dispatch({
+    type: 'MODAL_PROMPT',
+    modalBody: <form onSubmit={e => submit(e)}>
+      <span>{body}</span>
+      <div ref={(elt) => { if (elt) { err = elt; } }} />
+      <input defaultValue={defaultValue || ''} ref={(e) => { if (e) { ref = e; e.focus(); } }}
+        className="form-control input-block mb-1" type="text" />
+      <button className="btn btn-primary btn-block mb-1" onClick={() => submit()}>{ok}</button>
+      <button className="btn btn-secondary btn-block" onClick={dismiss}
+      >Close</button>
+    </form>,
+  });
+};
+
+/**
+ * Open a yes/no confirmation prompt
+ * @param dispatch typedDispatch
+ * @param bodyText Text of the body
+ * @param confirmText Text of the yes button
+ * @param cb Callback when yes button is clicked
+ */
+export const modalConfirm = (dispatch: CommonActionDispatcher,
+    bodyText: string, confirmText: string, cb: () => void) => {
+
+  const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
+
+  dispatch({
+    type: 'MODAL_PROMPT',
+    modalBody: <div>
+      <span>{bodyText}</span>
+      <button className="btn btn-danger btn-block mb-1" onClick={() => {dismiss(); cb(); }}>
+        {confirmText}
+      </button>
+      <button className="btn btn-secondary btn-block mb-1" onClick={dismiss}>
+        Cancel
+      </button>
+    </div>,
+  });
+};
+
+export const modalPromptChecked = (dispatch: CommonActionDispatcher,
+    body: string, ok: string, defaultValue: string, checker: (chk: string) => string,
+    callback: (result: string) => void) => {
+  modalPrompt(dispatch, body, ok, callback, defaultValue, checker);
+};
 
 ///// REACT COMMON
 
@@ -312,29 +400,6 @@ export function connect() {
         dismissModal: dismiss,
 
         dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' }),
-
-        modalPrompt: (body: string, ok: string, cb: (result: string) => void) => {
-          let ref: HTMLInputElement;
-
-          console.log('open prompt', cb);
-          const submit = () => {
-            cb(ref.value);
-            dismiss();
-          };
-
-          dispatch({
-            type: 'MODAL_PROMPT',
-            modalBody: <form onSubmit={e => submit()}>
-              <span>{body}</span>
-              <input ref={(e) => { if (e) { ref = e; e.focus(); } }}
-                className="form-control input-block mb-1" type="text" />
-              <button className="btn btn-primary btn-block mb-1" onClick={submit}>{ok}</button>
-              <button className="btn btn-secondary btn-block" onClick={dismiss}
-              >Close</button>
-            </form>,
-            modalOnClose: () => {},
-          });
-        },
       };
     },
   );
@@ -584,4 +649,3 @@ OcticonButton.defaultProps = {
   tooltipDirection: 'w',
   className: '',
 };
-

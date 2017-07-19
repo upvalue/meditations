@@ -38,6 +38,12 @@ $commentBackground: #fcfcfc;
   background-color: darken($commentBackground, 5%);
 }
 
+.task .task-comment {
+
+  font-size: 0.8em;
+  // Comments are padded slightly to indicate that they exist within tasks
+}
+
 .task-comment[data-medium-focused="true"] {
   background-color: darken($commentBackground, 5%);
 }

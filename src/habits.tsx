@@ -417,12 +417,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
     common.post(typedDispatch, `/habits/${path}`, this.props.task);
   }
 
-  setTime() {
-    const timestr = window.prompt('Log time (HH:MM or minutes, 0 to clear)');
-    if (!timestr) {
-      return;
-    }
-
+  parseTime(timestr: string) {
     // Parse something like "5" (5 minutes) or "5:03" (5 hours, 3 minutes)
     const time = timestr.split(':');
     let hours = NaN;
@@ -435,28 +430,34 @@ export class CTaskImpl extends common.Editable<TaskProps> {
       minutes = parseInt(time[1], 10);
     } 
 
-    console.log(hours, minutes);
+    return [hours, minutes];
+  }
 
-    if (isNaN(hours) || isNaN(minutes)) {
-      typedDispatch({
-        type: 'NOTIFICATION_OPEN',
-        notification: { 
-          error: true, message: `Invalid time string '${time}' (should be HH:MM or MM)`,
-        },
+  setTime() {
+    common.modalPromptChecked(typedDispatch, 'Log time (HH:MM or MM, 0 to reset)', 'Set time',
+      '0',
+      (timestr: string) => {
+        const [hours, minutes] = this.parseTime(timestr);
+
+        if (isNaN(hours) || isNaN(minutes)) {
+          return 'Invalid time string';
+        }
+
+        return '';
+      },
+      (timestr: string) => {
+        const [hours, minutes] = this.parseTime(timestr);
+
+        // Do not update comment
+        const task = { ...this.props.task, Hours: hours, Minutes: minutes };
+        delete task.Comment;
+        common.post(typedDispatch, `/habits/update`, task);
       });
-      return;
-    }
-
-    // Do not update comment
-    const task = { ...this.props.task, Hours: hours, Minutes: minutes };
-    delete task.Comment;
-    common.post(typedDispatch, `/habits/update`, task);
   }
 
   destroy() {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      common.post(typedDispatch, `/habits/delete`, this.props.task);
-    }
+    common.modalConfirm(typedDispatch, 'Are you sure you want to delete this task?',
+      'Delete this task!', () => common.post(typedDispatch, '/habits/delete', this.props.task));
   }
 
   copyLeft() {
@@ -531,11 +532,13 @@ export class CTaskImpl extends common.Editable<TaskProps> {
       if (this.props.task.Comment.Body === '') {
         commentClasses = 'no-display';
       }
-      return <div
-        className={`task-comment border-bottom border-gray mt-1 pl-1 pr-1 ${commentClasses}`}
-        ref={(body) => { if (body) { this.body = body; } }} 
-        onClick={e => this.editorOpen(e)}
-        dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />;
+      return <div className="ml-2 mr-2">
+        <div
+          className={`task-comment border border-gray mt-1 ${commentClasses}`}
+          ref={(body) => { if (body) { this.body = body; } }} 
+          onClick={e => this.editorOpen(e)}
+          dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />
+      </div>;
     }
   }
 
@@ -659,9 +662,15 @@ const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title
   </section>;
 };
 
+interface TimeScopeProps {
+  currentProject: number;
+  currentDate: moment.Moment;
+  scope: Scope;
+  filter: FilterState;
+}
+
 export class TimeScope extends
-  React.Component<{currentProject: number, currentDate: moment.Moment, scope: Scope,
-    filter: FilterState, modalPrompt: common.ModalPromptDispatcher}, {}> {
+  React.Component<TimeScopeProps, {}> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === SCOPE_MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -669,7 +678,7 @@ export class TimeScope extends
   }
 
   addTask() {
-    this.props.modalPrompt('Enter the name of the new task', 'Add new task', (name: string) => {
+    common.modalPrompt(typedDispatch, 'Enter name:', 'Add new task', (name: string) => {
       if (name) {
         common.post(typedDispatch, `/habits/new`, {
           name,
@@ -745,34 +754,33 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
   }
 
   addTask() {
-    const name = window.prompt('Enter task name (leave empty to cancel): ');
-    if (name) {
-      common.post(typedDispatch, `/habits/new`, {
-        name,
-        date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
-        scope: this.props.scope.Scope,
-      });
-    }
+    common.modalPrompt(typedDispatch, 'Enter task name', 'New task', (name) => {
+      if (name) {
+        common.post(typedDispatch, `/habits/new`, {
+          name,
+          date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
+          scope: this.props.scope.Scope,
+        });
+      }
+    });
   }
 
   render() {
     const tasks = this.props.scope.Tasks.map((t, i) => {
       return createCTask(i, t);
     });
-    return <section className="scope">
-      <div>
-        <h6 className="scope-title">
+
+    return <section className="scope bg-gray">
+      <div className="scope-header d-flex flex-row flex-justify-between p-1 ">
+        <h4 className="scope-title border-bottom ">
           <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
             Projects</a></span> 
-          <span> &gt; {this.props.scope.Name}</span></h6>
+          <span> &gt; {this.props.scope.Name}</span></h4>
+
+        <common.OcticonButton name="plus" tooltip="New task" onClick={() => this.addTask()} />
       </div>
 
-      <button className="btn btn-link btn-sm btn-default octicon octicon-plus" title="New task"
-        onClick={() => this.addTask()} />
-      <h6 className="scope-title">{this.props.scope.Name}</h6>
-
       {...tasks}
-
     </section>;
   }
 }
@@ -785,9 +793,11 @@ export interface ProjectListProps {
 
 export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   deleteProject(id: number) {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      common.post(typedDispatch, `/habits/projects/delete/${id}`);
-    }
+    common.modalConfirm(typedDispatch,
+      'Are you sure you want to delete this project?', 'Delete this project!',
+      () => {
+        common.post(typedDispatch, `/habits/projects/delete/${id}`);
+      });
   }
 
   pinProject(p: Project) {
@@ -830,10 +840,11 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   }
 
   addProject() {
-    const name = window.prompt('New project name (leave empty to cancel)');
-    if (name) {
-      common.post(typedDispatch, `/habits/projects/new/${name}`);
-    }
+    common.modalPrompt(typedDispatch, 'New project name', 'Add new project', (name) => {
+      if (name) {
+        common.post(typedDispatch, `/habits/projects/new/${name}`);
+      }
+    });
   }
 
   render() {
@@ -914,43 +925,53 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     const placeholderEnd = this.props.filter.end ?
       this.props.filter.end.format(common.HUMAN_DAY_FORMAT) : '...to';
 
-    let buttons = <span></span>;
+    const buttonsDisabled = { disabled: true };
 
     // If any filters have been entered, we'll render a clear button
     if (this.props.filter.name || this.props.filter.begin || this.props.filter.end) {
       // And if a name and/or a date RANGE have been entered, we'll allow export
-      buttons = <span>
-        <button className="btn btn-secondary ml-1"
-          onClick={() => this.clearFilter()}>Clear date filter</button>
-        <button className="btn btn-primary ml-1"
-          onClick={() => this.exportTasks()}>Export selected tasks</button>
-      </span>;
+      buttonsDisabled['disabled'] = false;
     }
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-2 mr-2 mt-2 mb-2">
       <div className="d-flex flex-justify-between">
-        <button className="btn mr-1" onClick={() => this.navigate('subtract', 'year')}>
+        <button className="btn mr-1 tooltipped tooltipped-e"
+          aria-label="Go back one year"
+          onClick={() => this.navigate('subtract', 'year')}>
           <span className="octicon octicon-chevron-left" />
         </button>
-        <button className="btn mr-1" onClick={() => this.navigate('subtract', 'month')}>
+        <button className="btn mr-1 tooltipped tooltipped-e"
+          aria-label="Go back one month"
+          onClick={() => this.navigate('subtract', 'month')}>
           <span className="octicon octicon-arrow-left" />
         </button>
-        <button className="btn mr-1" onClick={() => this.navigate('add', 'month')}>
+        <button className="btn mr-1 tooltipped tooltipped-e"
+          onClick={() => this.navigate('add', 'month')}
+          aria-label="Go forward one month">
           <span className="octicon octicon-arrow-right" />
         </button>
-        <button className="btn mr-1" onClick={() => this.navigate('add', 'year')}>
+        <button className="btn mr-1 tooltipped tooltipped-e"
+          aria-label="Go forward one year"
+          onClick={() => this.navigate('add', 'year')}>
           <span className="octicon octicon-chevron-right" />
         </button>
         <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
       </div>
 
+
       <div className="d-flex flex-column flex-md-row">
         <input type="text" placeholder="Filter by name" className="form-control"
           onChange={e => this.filterByName(e.target.value)} />
+
         {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
+
         {this.renderDatePicker(true, '...to', this.props.filter.end)}
-        {buttons}
+
+        <button className="btn btn-secondary btn-block ml-1" {...buttonsDisabled}
+          onClick={() => this.clearFilter()}>Clear date filter</button>
+        <button className="btn btn-primary btn-block ml-1" {...buttonsDisabled}
+          onClick={() => this.exportTasks()}>Export selected tasks</button>
       </div>
     </div>;
   }
@@ -965,7 +986,6 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
       // TODO: Filter by date?
       return <TimeScope currentProject={this.props.currentProject}
         key={i} currentDate={this.props.currentDate} scope={s}
-        modalPrompt={this.props.modalPrompt}
         filter={this.props.filter} />;
     } else {
       return <common.Spinner />;

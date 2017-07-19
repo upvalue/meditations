@@ -1,17 +1,17 @@
 // TODO: Only use necessary CSS components
 @import "primer-css/index.scss";
 
-/*
 @import "~medium-editor/dist/css/medium-editor.min.css";
 @import "~medium-editor/dist/css/themes/bootstrap.min.css";
 @import "~medium-editor-tables/dist/css/medium-editor-tables.css";
-@import "~react-datepicker/dist/react-datepicker";
+/*
 @import "~react-tabs/style/react-tabs.css";
 
 */
 @import "~octicons/octicons/octicons.css";
 
 @import "animations.scss";
+@import "datepicker.scss";
 
 $linkColor: #09d;
 $bodyBg: white;
