@@ -31,3 +31,13 @@
 .entry {
   border: 1px solid #e1e4e8;
 }
+
+.entry-body {
+  font-family: $mono-font;
+  background-color: #fcfcfc;
+  font-size: 12px;
+}
+
+.entry-body p:last-of-type {
+  margin-bottom: 0;
+}

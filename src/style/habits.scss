@@ -94,7 +94,7 @@ $commentBackground: #fcfcfc;
   color: $uiColorMuted;
 }
 
-.task-comment, .entry-body {
+.task-comment {
   font-family: $mono-font;
   /* Comments have an off-white background */
   padding: 2px;
@@ -110,21 +110,6 @@ $commentBackground: #fcfcfc;
 .task-comment:hover {
   transition: box-shadow 1s ease;
   box-shadow:  0 0 4px#09d;
-}
-
-.btn-octicon {
-  background: transparent;
-  border:0;
-  color: $uiColorMuted;
-  padding: 0;
-}
-
-button.btn-octicon svg {
-  fill: #09d;
-}
-
-.btn-danger svg {
-  fill: #b33630;
 }
 
 .project-activity-0 {

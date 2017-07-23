@@ -649,9 +649,9 @@ export const createCTask = (key: number, task: Task) => {
 const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title, addTask,
     children }) => {
   return <section className="scope bg-gray mb-2">
-    <div className="scope-header border-bottom">
+    <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
       <h3 className="pl-2">{title}</h3>
-      <div className="scope-controls float-right pr-1 pt-1">
+      <div className="scope-controls pr-1 pt-1">
         <common.OcticonButton name="plus" onClick={addTask} tooltip="Add task" />
       </div>
     </div>
@@ -850,7 +850,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   render() {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
-        <h3 className="scope-title">Projects</h3>
+        <h2 className="scope-title">Projects</h2>
         <common.OcticonButton name="plus" tooltip="Add new project"
           onClick={() => this.addProject()} />
       </div>
@@ -944,12 +944,12 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
         <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go back one month"
           onClick={() => this.navigate('subtract', 'month')}>
-          <span className="octicon octicon-arrow-left" />
+          <span className="octicon octicon-chevron-left" />
         </button>
         <button className="btn mr-1 tooltipped tooltipped-e"
           onClick={() => this.navigate('add', 'month')}
           aria-label="Go forward one month">
-          <span className="octicon octicon-arrow-right" />
+          <span className="octicon octicon-chevron-right" />
         </button>
         <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go forward one year"
