@@ -7,6 +7,7 @@
     <title>{% block title %}{% endblock %} | {{ Config.SiteTitle }}</title>
     {% block style %}{% endblock %}
     <link rel=stylesheet href="/assets/webpack/bundle-{{Page}}.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico" />
     <script type=text/javascript>window.MeditationsConfig = {{ ConfigJSON | safe}}</script>
   </head>
   <body>
