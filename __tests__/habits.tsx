@@ -1,6 +1,6 @@
 import * as renderer from 'react-test-renderer';
 
-import { Task, createCTask } from '../src/habits';
+import { Task, createCTask } from '../frontend/habits';
 
 const testTask = (name: string) => {
   return {

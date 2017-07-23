@@ -7,7 +7,7 @@
    Then just a checkmark at the top to show hidden tasks or not.
 ** TODO Reporting minute amounts over 60 should round down
 ** DONE Copying and pasting comments doesn't seem to work. Probably because it messes with focus in some way.
-** TODO Using ctrl-up in medium-editor reduces font size
+** DONE Using ctrl-up in medium-editor reduces font size
 ** DONE Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
 ** DONE Add search and/or filtering. This could also be used to select entries for export
 ** TODO Export in a nice, helpful way. Probably need to bring in some kind of modal. 
@@ -44,10 +44,10 @@
 
 * 0.1 roadmap
 ** DONE Write manual
-** TODO Visual redesign
+** DONE Visual redesign
 ** TODO Search
 ** TODO Interactive timer
 ** TODO Built-in tutorial
 ** TODO Windows & linux build
-** TODO Electron part
+** TODO Electron port
 *** DONE window.prompt is unsupported
