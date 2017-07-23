@@ -145,35 +145,40 @@ interface CEntryState {
 
 class CEntry extends common.Editable<CEntryProps> {
   changeName() {
-    const name = window.prompt('What would you like to name this entry? (leave empty to delete)',
-      this.props.entry.Name);
-    if (name !== this.props.entry.Name) {
-      common.post(typedDispatch, `/journal/name-entry/${this.props.entry.ID}/${name}`);
-    }
+    common.modalPrompt(typedDispatch,
+      'What would you like to name this entry? (leave empty to delete)', 'Name entry',
+    (name) => {
+      if (name !== this.props.entry.Name) {
+        common.post(typedDispatch, `/journal/name-entry/${this.props.entry.ID}/${name}`);
+      }
+
+    });
   }
 
   addTag() {
-    const tname = 
-      window.prompt('What tag would you like to add to this entry? (leave empty to cancel)');
+    common.modalPrompt(typedDispatch,
+      'What tag would you like to add to this entry? (leave empty to cancel)', 'Tag entry',
+    (tname) => {
     // If input was empty or tag already exists, don't do anything
-    if (tname === '' || tname === null || 
-      (this.props.entry.Tags && this.props.entry.Tags.some(t => t.Name === tname))) {
-      return;
-    }
-    
-    common.post(typedDispatch, `/journal/add-tag/${this.props.entry.ID}/${tname}`);
+      if (tname === '' || tname == null ||
+        (this.props.entry.Tags && this.props.entry.Tags.some(t => t.Name === tname))) {
+        return;
+      }
+
+      common.post(typedDispatch, `/journal/add-tag/${this.props.entry.ID}/${tname}`);
+    });
   }
 
   removeTag(t: Tag)  {
-    if (window.confirm(`Are you sure you want to remove the tag ${t.Name}`)) {
-      common.post(typedDispatch, `/journal/remove-tag/${this.props.entry.ID}/${t.Name}`);
-    }
+    common.modalConfirm(typedDispatch, `Are you sure you want to remove the tag ${t.Name}`,
+      'Yes, remove it',
+      () => common.post(typedDispatch, `/journal/remove-tag/${this.props.entry.ID}/${t.Name}`));
   }
 
   deleteEntry() {
-    if (window.confirm('Are you sure you want to remove this entry?')) {
-      common.post(typedDispatch, `/journal/delete-entry/${this.props.entry.ID}`);      
-    }
+    common.modalConfirm(typedDispatch, 'Are you sure you want to remove this entry?', 
+    'Yes, remove it',
+    () => common.post(typedDispatch, `/journal/delete-entry/${this.props.entry.ID}`));
   }
 
   editorUpdated() {
