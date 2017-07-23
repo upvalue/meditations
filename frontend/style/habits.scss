@@ -101,8 +101,12 @@ $commentBackground: #fcfcfc;
   font-size: 12px;
 }
 
+.task-comment p:first-of-type {
+  padding-top: .25em;
+}
+
 /* Do not add padding to bottom of comments */
-.task-comment p:last-of-type {
+.task-comment p{
   margin-bottom: 0;
 }
 

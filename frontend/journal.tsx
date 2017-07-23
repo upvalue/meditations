@@ -231,7 +231,7 @@ class CEntry extends common.Editable<CEntryProps> {
 
         </div>
       </div>
-      <div className="entry-body pl-1 pr-1 border-gray" id={`entry-body-${this.props.entry.ID}`} 
+      <div className="entry-body p-2 border-gray" id={`entry-body-${this.props.entry.ID}`} 
         ref={(body) => { if (body) this.body = body; }}
         dangerouslySetInnerHTML={{ __html: this.props.entry.Body }}
         onClick={e => this.editorOpen(e)} />

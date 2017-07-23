@@ -33,11 +33,16 @@
 }
 
 .entry-body {
-  font-family: $mono-font;
+  font-family: $body-font;
   background-color: #fcfcfc;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .entry-body p:last-of-type {
   margin-bottom: 0;
+}
+
+.link-tree-node-anchor {
+  cursor: pointer;
+
 }

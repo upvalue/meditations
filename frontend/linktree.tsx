@@ -32,7 +32,7 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
 
   renderNode(node: LinkTreeNode, i: number): React.ReactElement<undefined> {
     const classes = node.children ? 'menu mb-0' : '';
-    return <div className={`menu-item ${classes}`}
+    return <div className={`menu-item  pt-0 pb-0 ${classes}`}
         key={i}>
       {node.children && 
         <button
