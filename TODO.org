@@ -37,6 +37,7 @@
 ** TODO Performance: avoid creating functions in render
 ** TODO Handle WebSocket disconnects gracefully
 ** TODO Use flexbox instead of bootstrap grid.
+** TODO 
 
 * 0.1 roadmap
 ** DONE Write manual
@@ -46,4 +47,4 @@
 ** TODO Built-in tutorial
 ** TODO Windows & linux build
 ** TODO Electron part
-*** TODO window.prompt is unsupported
+*** DONE window.prompt is unsupported

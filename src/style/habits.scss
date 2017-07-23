@@ -5,6 +5,7 @@ $commentBackground: #fcfcfc;
 
 .scope {
   border: 1px solid #e1e4e8;
+  background-color: darken(#f6f8fa, 0%) !important;
 }
 
 .scope-column {
@@ -70,17 +71,21 @@ $commentBackground: #fcfcfc;
 .task-status.task-unset {
   background-color: #ddd;
   background-image: none;
+  background-color: #ddd;
+  border: 1px solid #ddd;
 }
 
 .task-status.task-complete {
-  background-color: #74c94f;
-  background-image: linear-gradient(#74c94f 0%, #6cc644 100%);
+  background-color: #449d44;
+  border: 1px solid #419641;
+  background-image: none; //linear-gradient(#74c94f 0%, #6cc644 100%);
   color: white;
 }
 
 .task-status.task-incomplete {
-  background-color: #b32a00;
-  background-image: linear-gradient(#b32a00 0%, #bd2c00 100%);
+  background-color: #d9534f; //#b32a00;
+  border: 1px solid #d9534f;
+  background-image: none; //linear-gradient(#b32a00 0%, #bd2c00 100%);
   color: white;
 }
 
@@ -92,7 +97,6 @@ $commentBackground: #fcfcfc;
 .task-comment, .entry-body {
   font-family: $mono-font;
   /* Comments have an off-white background */
-  background-color: $commentBackground;
   padding: 2px;
   font-size: 12px;
 }

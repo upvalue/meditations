@@ -31,7 +31,8 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   }
 
   renderNode(node: LinkTreeNode, i: number): React.ReactElement<undefined> {
-    return <div className={`link-tree-node ${node.children ? '' : 'link-tree-node-nochildren'}`}
+    const classes = node.children ? 'menu mb-0' : '';
+    return <div className={`menu-item ${classes}`}
         key={i}>
       {node.children && 
         <button
@@ -50,7 +51,7 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   }
 
   render() {
-    return <div>{this.state.data.map((node, i) => {
+    return <div className="menu">{this.state.data.map((node, i) => {
       return this.renderNode(node, i);
     })}</div>;
   }

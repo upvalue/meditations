@@ -48,8 +48,7 @@ interface ViewNamedEntry extends common.CommonState {
   sidebar: SidebarState;
 }
 
-type JournalState = ViewTag | ViewNamedEntry | ViewMonth;
-
+export type JournalState = ViewTag | ViewNamedEntry | ViewMonth;
 
 type JournalAction = {
   type: 'VIEW_MONTH';
@@ -327,12 +326,11 @@ const JournalNavigation = connect(state => state)
     e.preventDefault();
 
     // common.post(typedDispatch, `/journal/search?string=`)
-
-    console.log('searchy search');
   }
 
   render() {
-    return <div>
+    return <div className="d-flex flex-column flex-md-row flex-justify-between">
+      <h1>journal</h1>
       <form className="form-inline" style={{ display: 'inline' }}
         onSubmit={e => this.search(e)}>
           <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
@@ -348,14 +346,13 @@ const JournalNavigation = connect(state => state)
 const JournalRoot = common.connect()(class extends React.PureComponent<JournalState, {}> {
   render() { 
     return <common.CommonUI {...this.props}>
-      <div id="controls">
-        <JournalNavigation />
-      </div>
-      <div className="row">
-        <div className="col-md-2" id="journal-sidebar">
+      <div className="d-flex flex-column flex-md-row flex-justify-between">
+        <div id="journal-sidebar">
           <JournalSidebar />
         </div>
-        <div className="col-md-10">
+
+        <div id="journal-main">
+          <JournalNavigation />
           {this.props.route === 'VIEW_MONTH' ?
             <BrowseMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
           {this.props.route === 'VIEW_TAG' ?

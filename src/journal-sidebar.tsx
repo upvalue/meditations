@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { Spinner } from './common';
 import LinkTree, { LinkTreeNode } from './linktree';
 
+import { JournalState } from './journal';
+
 export type ChronoLink = {
   Date: string;
   Count: number;
@@ -17,24 +19,34 @@ export type SidebarState = {
   TagLinks: ReadonlyArray<{Name: string, Count: string}>;
   ChronoLinks: ReadonlyArray<ChronoLink>;
   NameLinks: ReadonlyArray<{Name: string}>;
+
+  // Navigations
+  tag?: string;
 };
 
 /** Sidebar. Contains convenient navigation methods. */
-export const JournalSidebar = connect((state) => { return state.sidebar; })(
-  class extends React.Component<SidebarState, {}> {
+export const JournalSidebar = connect((state) => { return state; })(
+  class extends React.Component<JournalState, {}> {
     /** Render tag navigation links */
     renderTags() {
-      if (this.props.TagLinks === null) {
+      if (this.props.sidebar.TagLinks === null) {
         return <p>No tag links yet; have you tagged any journal entries?</p>;
       }
 
-      return this.props.TagLinks.map((l, i) => 
-        <div key={i}><a href={`#tag/${l.Name}`}>#{l.Name} ({l.Count})</a></div>);
+      const selectedTag = this.props.route === 'VIEW_TAG' ? this.props.tag : '';
+
+      return <div className="menu">
+        {this.props.sidebar.TagLinks.map((l, i) => 
+          <div className={`${selectedTag === l.Name ? 'selected' : ''}  
+            menu-item pt-0 pb-0`} key={i}>
+            <a href={`#tag/${l.Name}`}>#{l.Name} <span className="counter">({l.Count})</span></a>
+          </div>)}
+      </div>;
     }
     
     /** Render alphabetical navigation links */
     renderAlphabetically() {
-      if (this.props.ChronoLinks === null) {
+      if (this.props.sidebar.ChronoLinks === null) {
         return <p>No alphabetical links yet; have you titled any journal entries?</p>;
       }
       // This code converts a list of strings like this
@@ -48,7 +60,7 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
       // type-annotated because I'm tired
 
       const table: any = {};
-      for (const link of this.props.NameLinks) {
+      for (const link of this.props.sidebar.NameLinks) {
         const elts = link.Name.split(':').map(x => x.trim());
         let tableRef: any = table;
         let last: any = null;
@@ -79,13 +91,13 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
     
     /** Render chronological navigation links */
     renderChronologically() {
-      if (this.props.ChronoLinks === null) {
+      if (this.props.sidebar.ChronoLinks === null) {
         return <p>No chronological links yet. Have you created any journal entries?</p>;
       }
 
       // Convert to LinkTree structure
       // TODO: No reason the Go code couldn't return this directly
-      const tree = this.props.ChronoLinks.map((y) => {
+      const tree = this.props.sidebar.ChronoLinks.map((y) => {
         const year: LinkTreeNode = { title: `${y.Date} (${y.Count})` };
         year.children = y.Sub.map((m) => {
           return { title: `${m.Date} (${m.Count})`, href: `#view/${m.Link}` };
@@ -97,8 +109,9 @@ export const JournalSidebar = connect((state) => { return state.sidebar; })(
     }
     
     render() {
-      if (this.props.mounted) {
-        return <Tabs>
+      if (this.props.sidebar && this.props.sidebar.mounted) {
+        const defaultTab = { VIEW_TAG: 2, VIEW_NAMED_ENTRY: 1, VIEW_MONTH: 0 }[this.props.route];
+        return <Tabs defaultIndex={defaultTab}>
             <TabList>
               <Tab><span className="octicon octicon-clock" />Time</Tab>
               <Tab><span className="octicon octicon-text-size" />Title</Tab>
