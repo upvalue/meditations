@@ -222,7 +222,8 @@ class CEntry extends common.Editable<CEntryProps> {
 
           <div className="entry-controls mr-1">
             <em><a href={ctxLink}>{
-              this.props.entry.CreatedAt.local().format(this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
+              this.props.entry.CreatedAt.local()
+                .format(this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
             }</a></em>
 
             <common.OcticonButton name="trashcan" onClick={() => this.deleteEntry()}

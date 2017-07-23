@@ -13,6 +13,7 @@
     ],
     "exclude": [
         "node_modules",
-        "node_modules/@types/react-dnd/index.d.ts"
+        "node_modules/@types/react-dnd/index.d.ts",
+        "frontend/tests"
     ]
 }
