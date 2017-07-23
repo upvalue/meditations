@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 
-import * as common from '../frontend/common';
+import * as common from '../common';
 
 describe('test suite', () => {
   it('runs', () => {

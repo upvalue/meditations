@@ -23,9 +23,9 @@
     "transform": {
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$",
+    "testRegex": "/frontend/tests/.*\\.(ts|tsx|js)$",
     "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}",
+      "frontend/**/*.{js,jsx,ts,tsx}",
       "!**/*.d.ts"
     ]
   },
