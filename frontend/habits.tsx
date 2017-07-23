@@ -435,7 +435,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
 
   setTime() {
     common.modalPromptChecked('Log time (HH:MM or MM, 0 to reset)', 'Set time',
-      '0',
+      '',
       (timestr: string) => {
         const [hours, minutes] = this.parseTime(timestr);
 

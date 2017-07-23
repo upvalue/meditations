@@ -216,7 +216,8 @@ export const modalConfirm = (bodyText: string, confirmText: string, cb: () => vo
     type: 'MODAL_PROMPT',
     modalBody: <div>
       <span>{bodyText}</span>
-      <button className="btn btn-danger btn-block mb-1" onClick={() => {dismiss(); cb(); }}>
+      <button className="btn btn-danger btn-block mb-1" onClick={() => {dismiss(); cb(); }}
+        ref={(e) => { if (e) { e.focus(); } }} >
         {confirmText}
       </button>
       <button className="btn btn-secondary btn-block mb-1" onClick={dismiss}>
