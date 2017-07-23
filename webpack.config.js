@@ -8,8 +8,8 @@ const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
 module.exports = {
   entry: {
-    journal: ['./src/entry/journal.ts', './src/style/journal.scss'],
-    habits: ['./src/entry/habits.ts', './src/style/habits.scss'],
+    journal: ['./frontend/entry/journal.ts', './frontend/style/journal.scss'],
+    habits: ['./frontend/entry/habits.ts', './frontend/style/habits.scss'],
   },
 
   output: {

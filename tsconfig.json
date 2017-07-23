@@ -9,7 +9,7 @@
         "strict": true
     },
     "include": [
-      "src/**/*"
+      "frontend/**/*"
     ],
     "exclude": [
         "node_modules",
