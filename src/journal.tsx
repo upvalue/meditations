@@ -276,20 +276,26 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
       res.push(<hr key={key} />);
     });
 
-    return <div>
-      <button className="btn btn-link btn-sm octicon octicon-triangle-left" title="Last year"
-        onClick={() => this.navigate('subtract', 'year')} />
+    return <div className="ml-md-2">
+      <div className="d-flex flex-column flex-items-start flex-row ml-1 mb-2">
+        <div className="d-flex mt-1">
+          <button className="btn octicon octicon-triangle-left mr-1" title="Last year"
+            onClick={() => this.navigate('subtract', 'year')} />
 
-      <button className="btn btn-link btn-sm octicon octicon-chevron-left" title="Previous month"
-        onClick={() => this.navigate('subtract', 'month')} />
-        
-      <h3 id="entries-title">{this.props.date.format('MMMM YYYY')}</h3>
+          <button className="btn octicon octicon-chevron-left mr-1" title="Previous month"
+            onClick={() => this.navigate('subtract', 'month')} />
+            
+          <button className="btn octicon octicon-chevron-right mr-1" title="Next month"
+            onClick={() => this.navigate('add', 'month')} />
 
-      <button className="btn btn-link btn-sm octicon octicon-chevron-right" title="Next month"
-        onClick={() => this.navigate('add', 'month')} />
+          <button className="btn octicon octicon-triangle-right mr-1" title="Next year"
+            onClick={() => this.navigate('add', 'year')} />
 
-      <button className="btn btn-link btn-sm octicon octicon-triangle-right" title="Next year"
-        onClick={() => this.navigate('add', 'year')} />
+          <h3 id="entries-title">
+            {this.props.date.format('MMMM YYYY')}
+          </h3>
+        </div>
+      </div>
 
       {res}
     </div>;
@@ -334,7 +340,6 @@ const JournalNavigation = connect(state => state)
 
   render() {
     return <div className="d-flex flex-column flex-md-row flex-justify-between">
-      <h1>journal</h1>
       <form className="form-inline" style={{ display: 'inline' }}
         onSubmit={e => this.search(e)}>
           <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
