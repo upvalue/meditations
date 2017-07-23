@@ -939,7 +939,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
         <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go back one year"
           onClick={() => this.navigate('subtract', 'year')}>
-          <span className="octicon octicon-chevron-left" />
+          <span className="octicon octicon-triangle-left" />
         </button>
         <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go back one month"
@@ -954,7 +954,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
         <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go forward one year"
           onClick={() => this.navigate('add', 'year')}>
-          <span className="octicon octicon-chevron-right" />
+          <span className="octicon octicon-triangle-right" />
         </button>
         <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
       </div>
