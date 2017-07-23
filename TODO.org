@@ -37,7 +37,10 @@
 ** TODO Performance: avoid creating functions in render
 ** TODO Handle WebSocket disconnects gracefully
 ** TODO Use flexbox instead of bootstrap grid.
-** TODO 
+** TODO Meditations currently uses local time only. How much of a problem is this for travel?
+    And OTOH, if you write a journal entry at 2:30 local time, you probably always want it to be
+    reported as that, because you want to know when you wrote it, not when you wrote it adjusted
+    for where you are now. 
 
 * 0.1 roadmap
 ** DONE Write manual

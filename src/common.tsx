@@ -110,18 +110,19 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
   return state;
 }
 
+export let dispatch: (action: CommonAction) => void;
+
 /**
  * This creates a store with thunk & logger middleware applied and a common reducer added. 
  * @param reducer 
  * @param initialState 
- * @returns a tuple containing the store, a dispatcher that type-checks synchronous actions,
- * and a dispatcher that calls redux-thunk actions with an appropriately typed dispatcher.
+ * @returns a tuple containing the store and a dispatcher that type-checks synchronous and 
+ * asynchronous actions
  */
 export function createStore<State extends CommonState, Action extends redux.Action>(
     reducer: (s: State,  a: Action) => State, initialState: State):
       [redux.Store<State>,
-       (action: Action) => void,
-       (dispatcher: (thunk: (action: Action) => void) => void) => void
+       (action: Action | ((thunk: (action: Action) => void) => void)) => void
        ] {
 
 
@@ -134,15 +135,14 @@ export function createStore<State extends CommonState, Action extends redux.Acti
 
   const store = redux.createStore<State>(combinedReducer, redux.applyMiddleware(thunk, logger));
 
-  const typedDispatch = (action: Action) => {
-    return store.dispatch(action);
+  type AsyncAction = ((thunk: (action: Action) => void) => void);
+  const typedDispatch = (action: Action | AsyncAction) => {
+    return store.dispatch(action as any);
   };
 
-  const thunkDispatch = (dispatcher: (thunk: (action: Action) => void) => void) => {
-    store.dispatch(dispatcher);
-  };
+  dispatch = typedDispatch as (action: CommonAction) => void;
 
-  return [store, typedDispatch, thunkDispatch];
+  return [store, typedDispatch];
 }
 
 ///// ACTION CREATE-AND-DISPATCHERS
@@ -157,8 +157,7 @@ export function createStore<State extends CommonState, Action extends redux.Acti
  * @param checker Can return an error representing an input issue which will be displayed in the
  *   modal
  */
-export const modalPrompt = (dispatch: CommonActionDispatcher,
-    body: string, ok: string, cb: (result: string) => void,
+export const modalPrompt = (body: string, ok: string, cb: (result: string) => void,
     defaultValue?: string, checker?: (chk: string) => string) => {
 
   let ref: HTMLInputElement;
@@ -209,8 +208,7 @@ export const modalPrompt = (dispatch: CommonActionDispatcher,
  * @param confirmText Text of the yes button
  * @param cb Callback when yes button is clicked
  */
-export const modalConfirm = (dispatch: CommonActionDispatcher,
-    bodyText: string, confirmText: string, cb: () => void) => {
+export const modalConfirm = (bodyText: string, confirmText: string, cb: () => void) => {
 
   const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
 
@@ -228,10 +226,10 @@ export const modalConfirm = (dispatch: CommonActionDispatcher,
   });
 };
 
-export const modalPromptChecked = (dispatch: CommonActionDispatcher,
-    body: string, ok: string, defaultValue: string, checker: (chk: string) => string,
+export const modalPromptChecked = (body: string, ok: string, defaultValue: string,
+    checker: (chk: string) => string,
     callback: (result: string) => void) => {
-  modalPrompt(dispatch, body, ok, callback, defaultValue, checker);
+  modalPrompt(body, ok, callback, defaultValue, checker);
 };
 
 ///// REACT COMMON
@@ -342,7 +340,7 @@ export class CommonUI extends React.Component<CommonState, {}> {
  * @param url URL of the request
  */
 export function request<ResponseType>(
-    method: string, body: any, dispatch: (a: CommonAction) => void, url: string,
+    method: string, body: any, url: string,
     then?: (res:ResponseType) => void) {
   const reqinit: any = { method };
   if (body !== undefined) {
@@ -378,17 +376,13 @@ export function request<ResponseType>(
   });
 }
 
-export function get<ResponseType>(
-  dispatch: (action: CommonAction) => void, url: string, then: (res: ResponseType) => void,
-) {
-  return request<ResponseType>('GET', undefined, dispatch, url, then);
+export function get<ResponseType>(url: string, then: (res: ResponseType) => void) {
+  return request<ResponseType>('GET', undefined, url, then);
 }
 
 
-export function post<ResponseType>(
-  dispatch: (action: CommonAction) => void, url: string, body?: any,
-) {
-  return request<ResponseType>('POST', body, dispatch, url);
+export function post<ResponseType>(url: string, body?: any,) {
+  return request<ResponseType>('POST', body, url);
 }
 
 export function connect() {
@@ -433,7 +427,6 @@ export const HUMAN_DAY_FORMAT = 'MMMM Do, YYYY';
  * @returns {WebSocket}
  */
 export function makeSocket(
-    dispatch: (a: CommonAction) => void,
     location: string, onmessage: (s: any) => void,
     onopen?: () => void,
     reconnect?: boolean) {
@@ -460,7 +453,7 @@ export function makeSocket(
 
     dispatch({ socket, type: 'SOCKET_OPENED', socketReconnect: () => {
       console.log('Attempting to reopen socket');
-      makeSocket(dispatch, location, onmessage, onopen, true);
+      makeSocket(location, onmessage, onopen, true);
     }});
     if (onopen) {
       onopen();

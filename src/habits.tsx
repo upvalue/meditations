@@ -340,7 +340,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
   return state;
 };
 
-const [store, typedDispatch, thunkDispatch] = common.createStore(reducer, initialState);
+const [store, dispatch] = common.createStore(reducer, initialState);
 
 ////// REACT
 
@@ -395,7 +395,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 
       if (taskSameScope(src, target)) {
         // Task dropped on task in same scope; trigger a re-order
-        common.post(typedDispatch, `/habits/reorder/${src.ID}/${target.ID}`);
+        common.post(`/habits/reorder/${src.ID}/${target.ID}`);
       }
     }
   },
@@ -410,11 +410,11 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 export class CTaskImpl extends common.Editable<TaskProps> {
   cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP };
-    common.post(typedDispatch, `/habits/update`, task);
+    common.post(`/habits/update`, task);
   }
 
   command(path: string) {
-    common.post(typedDispatch, `/habits/${path}`, this.props.task);
+    common.post(`/habits/${path}`, this.props.task);
   }
 
   parseTime(timestr: string) {
@@ -434,7 +434,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
   }
 
   setTime() {
-    common.modalPromptChecked(typedDispatch, 'Log time (HH:MM or MM, 0 to reset)', 'Set time',
+    common.modalPromptChecked('Log time (HH:MM or MM, 0 to reset)', 'Set time',
       '0',
       (timestr: string) => {
         const [hours, minutes] = this.parseTime(timestr);
@@ -451,13 +451,13 @@ export class CTaskImpl extends common.Editable<TaskProps> {
         // Do not update comment
         const task = { ...this.props.task, Hours: hours, Minutes: minutes };
         delete task.Comment;
-        common.post(typedDispatch, `/habits/update`, task);
+        common.post(`/habits/update`, task);
       });
   }
 
   destroy() {
-    common.modalConfirm(typedDispatch, 'Are you sure you want to delete this task?',
-      'Delete this task!', () => common.post(typedDispatch, '/habits/delete', this.props.task));
+    common.modalConfirm('Are you sure you want to delete this task?',
+      'Delete this task!', () => common.post('/habits/delete', this.props.task));
   }
 
   copyLeft() {
@@ -477,7 +477,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
       Date: date.format('YYYY-MM-DDTHH:mm:ssZ'),
     };
 
-    common.post(typedDispatch, '/habits/new', task);
+    common.post('/habits/new', task);
   }
 
   editorUpdated() {
@@ -485,7 +485,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
   }
 
   editorSave() {
-    common.post(typedDispatch, `/habits/comment-update`, {
+    common.post(`/habits/comment-update`, {
       ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
       Body: this.body.innerHTML,
       TaskID: this.props.task.ID,
@@ -678,9 +678,9 @@ export class TimeScope extends
   }
 
   addTask() {
-    common.modalPrompt(typedDispatch, 'Enter name:', 'Add new task', (name: string) => {
+    common.modalPrompt('Enter name:', 'Add new task', (name: string) => {
       if (name) {
-        common.post(typedDispatch, `/habits/new`, {
+        common.post(`/habits/new`, {
           name,
           date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
           scope: this.props.scope.Scope,
@@ -754,9 +754,9 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
   }
 
   addTask() {
-    common.modalPrompt(typedDispatch, 'Enter task name', 'New task', (name) => {
+    common.modalPrompt('Enter task name', 'New task', (name) => {
       if (name) {
-        common.post(typedDispatch, `/habits/new`, {
+        common.post(`/habits/new`, {
           name,
           date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
           scope: this.props.scope.Scope,
@@ -793,15 +793,15 @@ export interface ProjectListProps {
 
 export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   deleteProject(id: number) {
-    common.modalConfirm(typedDispatch,
+    common.modalConfirm(
       'Are you sure you want to delete this project?', 'Delete this project!',
       () => {
-        common.post(typedDispatch, `/habits/projects/delete/${id}`);
+        common.post(`/habits/projects/delete/${id}`);
       });
   }
 
   pinProject(p: Project) {
-    common.post(typedDispatch, `/habits/projects/toggle-pin/${p.ID}`);
+    common.post(`/habits/projects/toggle-pin/${p.ID}`);
   }
 
   copyLeft(p: Project) {
@@ -811,7 +811,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
       Date: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
     };
 
-    common.post(typedDispatch, '/habits/new', task);
+    common.post('/habits/new', task);
 
   }
 
@@ -840,9 +840,9 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   }
 
   addProject() {
-    common.modalPrompt(typedDispatch, 'New project name', 'Add new project', (name) => {
+    common.modalPrompt('New project name', 'Add new project', (name) => {
       if (name) {
-        common.post(typedDispatch, `/habits/projects/new/${name}`);
+        common.post(`/habits/projects/new/${name}`);
       }
     });
   }
@@ -873,17 +873,17 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   }
 
   filterByName(name: string) {
-    typedDispatch({ name, type: 'FILTER_BY_NAME' });
+    dispatch({ name, type: 'FILTER_BY_NAME' });
   }
 
   filterByDate(end: boolean, date: moment.Moment | null) {
     if (date) {
-      typedDispatch({ date, end, type: 'FILTER_BY_DATE' });
+      dispatch({ date, end, type: 'FILTER_BY_DATE' });
     }
   }
 
   clearFilter() {
-    typedDispatch({ type: 'FILTER_CLEAR' });
+    dispatch({ type: 'FILTER_CLEAR' });
   }
 
   exportTasks() {
@@ -905,7 +905,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
       body.End = this.props.filter.end.format(common.DAY_FORMAT);
     }
 
-    common.post(typedDispatch, '/habits/export', body);
+    common.post('/habits/export', body);
   }
 
   renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
@@ -1071,11 +1071,11 @@ export const main = () => {
       const projectChanged = prevProject !== project;
 
       common.setTitle('Habits', `${date.format('MMMM YYYY')}`);
-      typedDispatch({ date, type: 'CHANGE_ROUTE', currentProject: project });
+      dispatch({ date, type: 'CHANGE_ROUTE', currentProject: project });
 
       // Get day scopes
       if (timeChanged === 'CHANGE_YEAR' || timeChanged === 'CHANGE_MONTH') {
-        thunkDispatch((dispatch) => {
+        dispatch((dispatch) => {
           let limit = null;
           const today = moment();
           // If we are showing days for the current month,
@@ -1093,7 +1093,7 @@ export const main = () => {
           let qs = `/habits/in-month-and-days?date=${date.format(common.DAY_FORMAT)}`;
           qs += `${limit ? '&limit=' + limit : ''}`;
 
-          common.get(dispatch, qs,
+          common.get(qs,
             ((response: { Days: Day[], Month: Task[] }) => {
               response.Days.forEach((d) => {
                 d.Tasks.forEach(common.processModel);
@@ -1110,8 +1110,8 @@ export const main = () => {
       }
 
       if (timeChanged === 'CHANGE_YEAR') {
-        thunkDispatch((dispatch) => {
-          common.get(dispatch, `/habits/in-year?date=${date.format(common.DAY_FORMAT)}`,
+        dispatch((dispatch) => {
+          common.get(`/habits/in-year?date=${date.format(common.DAY_FORMAT)}`,
           ((tasks: Task[]) => {
             tasks.forEach(common.processModel);
             dispatch({ date, tasks, type: 'MOUNT_SCOPE', scope: SCOPE_YEAR } as HabitsAction);
@@ -1121,8 +1121,8 @@ export const main = () => {
 
       // Retrieve and mount project list
       if (!state.pinnedProjects) {
-        thunkDispatch((dispatch) => {
-          common.get(dispatch, `/habits/projects`, ((response:
+        dispatch((dispatch) => {
+          common.get(`/habits/projects`, ((response:
             { Pinned: Project[], Unpinned: Project[] }) => {
             dispatch({ type: 'PROJECT_LIST', pinnedProjects: response.Pinned,
               unpinnedProjects: response.Unpinned });
@@ -1132,8 +1132,8 @@ export const main = () => {
 
       // Retrieve and mount requested project
       if (projectChanged) {
-        thunkDispatch((dispatch) => {
-          common.get(dispatch, `/habits/in-project/${project}`,
+        dispatch((dispatch) => {
+          common.get(`/habits/in-project/${project}`,
             ((response: { scope: { Name: string, ID: number }, tasks: Task[] }) => {
               response.tasks.forEach(common.processModel);
               dispatch({
@@ -1173,25 +1173,25 @@ export const main = () => {
     }
   };
 
-  common.makeSocket(typedDispatch, 'habits/sync', (msg: HabitMessage) => {
+  common.makeSocket('habits/sync', (msg: HabitMessage) => {
     console.log(`Received WebSocket message`, msg);
     switch (msg.Type) {
       case 'UPDATE_TASKS':
         msg.Datum.Tasks.forEach(common.processModel);
         console.log(msg.Datum);
-        typedDispatch({type: 'UPDATE_TASKS',
+        dispatch({type: 'UPDATE_TASKS',
           tasks: msg.Datum.Tasks,
         });
         break;
 
       case 'UPDATE_SCOPE':
         msg.Datum.Tasks.forEach(common.processModel);
-        typedDispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
+        dispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
           scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name} as MountScope);
         break;
 
       case 'PROJECTS':
-        typedDispatch({ type: 'PROJECT_LIST', pinnedProjects: msg.Datum.Pinned,
+        dispatch({ type: 'PROJECT_LIST', pinnedProjects: msg.Datum.Pinned,
           unpinnedProjects: msg.Datum.Unpinned});
         break;
     }
