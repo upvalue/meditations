@@ -1,4 +1,4 @@
-
+// linktree.tsx - implementation of an expandable tree of links
 import * as React from 'react';
 
 export interface LinkTreeNode {
@@ -31,15 +31,16 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   }
 
   renderNode(node: LinkTreeNode, i: number): React.ReactElement<undefined> {
-    const classes = node.children ? 'menu mb-0' : '';
-    return <div className={`menu-item  pt-0 pb-0 ${classes}`}
+    const classes = node.children ? 'mb-0' : '';
+    return <div className={` pt-0 pb-0 ${classes} link-tree-node `}
         key={i}>
-      {node.children && 
-        <button
+      {node.children && <span className="link-tree-node-btn">{(node.expanded ? 'v' : '>')}</span>
+      /*
+        <button style={{ marginLeft: -15 }}
           className={`link-tree-node-btn btn btn-link btn-xs octicon
             octicon-chevron-${node.expanded ? 'down' : 'right'}`}
           onClick={e => this.toggleNode(e, node)} >
-        </button>
+        </button>*/
       }
       {node.href ? 
          <a href={node.href}>{node.title}</a>
@@ -51,7 +52,7 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   }
 
   render() {
-    return <div className="menu">{this.state.data.map((node, i) => {
+    return <div className="link-tree-top">{this.state.data.map((node, i) => {
       return this.renderNode(node, i);
     })}</div>;
   }

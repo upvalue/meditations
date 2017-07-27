@@ -16,7 +16,6 @@
   #journal-sidebar, #journal-main { width: 100%; }
 }
 
-#journal-sidebar .tabnav {}
 
 .react-tabs {
   border-bottom: 1px solid #d1d5da;
@@ -40,7 +39,11 @@
   margin-bottom: 0;
 }
 
+
+.link-tree-node .link-tree-node {
+  margin-left: 15px;
+}
+
 .link-tree-node-anchor {
   cursor: pointer;
-
 }

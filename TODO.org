@@ -19,6 +19,7 @@
 ** TODO Add a named entry
 ** TODO Add a named entry from LinkTree navigation
 ** TODO Sidebar should reflect entry state.
+** TODO LinkTree styling
 ** DONE Fix synchronization
 * Overall
 ** TODO D3 visualization
@@ -36,8 +37,9 @@
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Performance: avoid creating functions in render
 ** TODO Handle WebSocket disconnects gracefully
-** TODO Use flexbox instead of bootstrap grid.
-** TODO Meditations currently uses local time only. How much of a problem is this for travel?
+** DONE Use flexbox instead of bootstrap grid.
+
+** TODO Time handling
     And OTOH, if you write a journal entry at 2:30 local time, you probably always want it to be
     reported as that, because you want to know when you wrote it, not when you wrote it adjusted
     for where you are now. 
@@ -48,6 +50,7 @@
 ** TODO Search
 ** TODO Interactive timer
 ** TODO Built-in tutorial
+** TODO Responsive interface
 ** TODO Windows & linux build
 ** TODO Electron port
 *** DONE window.prompt is unsupported
