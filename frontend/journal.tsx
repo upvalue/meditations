@@ -210,7 +210,7 @@ class CEntry extends common.Editable<CEntryProps> {
     const ctxLink = 
       `#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}`;
 
-    return <section className="entry bg-gray mb-1" id={`entry-${this.props.entry.ID}`}>
+    return <section className="entry border bg-gray mb-1" id={`entry-${this.props.entry.ID}`}>
       <div className="entry-header border-bottom">
         <div className="d-flex flex-row flex-justify-between flex-items-end">
           <h4 className="ml-1">

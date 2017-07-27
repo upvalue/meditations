@@ -1,4 +1,3 @@
-// TODO: Only use necessary CSS components
 @import "primer-base/index.scss";
 @import "primer-box/index.scss";
 @import "primer-buttons/index.scss";
@@ -24,6 +23,7 @@ $bodyBg: white;
 $uiColorMuted: #586069;
 // Width at which to put the UI into mobile mode
 $mobileWidth: 1024px;
+$editableBg: #fcfcfc;
 
 .masthead {
   background-color: #f5f5f5;

@@ -1,6 +1,8 @@
-@import "shared.scss";
+// journal.scss - journal-specific styling
 
 @import "~react-tabs/style/react-tabs.css";
+
+@import "shared.scss";
 
 #journal-sidebar {
   width: 15%;
@@ -28,13 +30,9 @@
   border-top: 2px solid #e36209;
 }
 
-.entry {
-  border: 1px solid #e1e4e8;
-}
-
 .entry-body {
   font-family: $body-font;
-  background-color: #fcfcfc;
+  background-color: $editableBg;
   font-size: 14px;
 }
 

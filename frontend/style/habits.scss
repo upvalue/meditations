@@ -1,3 +1,5 @@
+// habits.scss - habits-specific styling
+
 @import "shared.scss";
 
 $taskBackground: $bg-gray;
@@ -35,18 +37,18 @@ $commentBackground: #fcfcfc;
 }
 
 .task:hover .task-comment {
-  transition: background-color 0.5s ease;
-  background-color: darken($commentBackground, 5%);
+  // transition: background-color 0.5s ease;
+  //background-color: darken($editableBg, 5%);
 }
 
 .task .task-comment {
-
+  background-color: $editableBg;
   font-size: 0.8em;
   // Comments are padded slightly to indicate that they exist within tasks
 }
 
 .task-comment[data-medium-focused="true"] {
-  background-color: darken($commentBackground, 5%);
+  // background-color: darken($editableBg, 5%);
 }
 
 .task {
