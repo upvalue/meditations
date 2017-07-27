@@ -12,14 +12,13 @@ $commentBackground: #fcfcfc;
 
 .scope-column {
   width: 25%;
-  /* TODO SCSS includes */
   margin-left: 5px;
   margin-right: 5px;
 }
 
 @media (max-width: 1024px) {
   .scope-column {
-    width: 100%;
+    width: 99%;
   }
 }
 

@@ -911,7 +911,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
     // TODO: Datepicker onClearable does not work unless a SELECTED value is also apssed
     return <DatePicker 
-      className="form-control ml-1"
+      className="form-control ml-1 mb-md-0 mb-1"
       onChange={date => this.filterByDate(end, date)}
       isClearable={true}
       placeholderText={placeholder ? placeholder.format(common.DAY_FORMAT) : defaultPlaceholder}
@@ -935,7 +935,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-2 mr-2 mt-2 mb-2">
-      <div className="d-flex flex-justify-between">
+      <div className="d-flex flex-justify-between mb-1">
         <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go back one year"
           onClick={() => this.navigate('subtract', 'year')}>
@@ -961,16 +961,16 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
 
 
       <div className="d-flex flex-column flex-md-row">
-        <input type="text" placeholder="Filter by name" className="form-control"
+        <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-1"
           onChange={e => this.filterByName(e.target.value)} />
 
         {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
 
         {this.renderDatePicker(true, '...to', this.props.filter.end)}
 
-        <button className="btn btn-secondary btn-block ml-1" {...buttonsDisabled}
+        <button className="btn btn-secondary btn-block ml-1 mb-md-0 mb-1" {...buttonsDisabled}
           onClick={() => this.clearFilter()}>Clear date filter</button>
-        <button className="btn btn-primary btn-block ml-1" {...buttonsDisabled}
+        <button className="btn btn-primary btn-block ml-1 mb-md-0 mb-1" {...buttonsDisabled}
           onClick={() => this.exportTasks()}>Export selected tasks</button>
       </div>
     </div>;
