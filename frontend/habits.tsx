@@ -961,7 +961,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
 
 
       <div className="d-flex flex-column flex-md-row">
-        <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-1"
+        <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-"
           onChange={e => this.filterByName(e.target.value)} />
 
         {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
