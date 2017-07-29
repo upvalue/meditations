@@ -603,10 +603,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
           {this.hasCopy() &&
             this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
           {this.renderControl('Delete task', 'trashcan', () => this.destroy(), true)}  
-
-
         </div>
-
       </div>
 
 

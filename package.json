@@ -5,6 +5,7 @@
   "private": true,
   "main": "electron-main.js",
   "scripts": {
+    "postinstall": "npm rebuild node-sass && webpack -p",
     "cloc": "cloc frontend/**/*.ts frontend/**.tsx src/**/*.scss backend/*.go *.js",
     "doc-frontend": "typedoc --out docs",
     "doc-backend": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",
