@@ -50,6 +50,14 @@ $commentBackground: #fcfcfc;
   // background-color: darken($editableBg, 5%);
 }
 
+.task-last-modified {
+  font-weight: bold;
+}
+
+.task-last-modified .task-status {
+  font-weight: bold !important;
+}
+
 .task {
   padding-top: 1px;
   padding-bottom: 1px;

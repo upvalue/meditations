@@ -47,10 +47,11 @@
 * 0.1 roadmap
 ** DONE Write manual
 ** DONE Visual redesign
-** TODO Search
+** TODO Journal search
 ** TODO Interactive timer
 ** TODO Built-in tutorial
 ** TODO Responsive interface
 ** TODO Windows & linux build
 ** TODO Electron port
+** TODO Refactor code
 *** DONE window.prompt is unsupported

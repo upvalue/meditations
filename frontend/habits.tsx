@@ -110,6 +110,11 @@ interface ViewMonth extends common.CommonState {
   year: Scope;
   days: Scope[];
   project: Scope;
+  /** 
+   * Name of the last modified task. Used to highlight monthly/yearly tasks after daily tasks are
+   * modified to reinforce rules
+   */
+  lastModifiedTask: string;
 
   // Filtering
   filter: FilterState;
@@ -282,6 +287,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
     case 'UPDATE_TASKS': {
       const nstate = { ...state };
       for (const task of action.tasks) {
+        nstate.lastModifiedTask = task.Name;
         // If task is not visible, no need to do anything
         if (taskVisible(state, task)) {
           const updateScope = (scope: Scope): Scope => {
@@ -366,6 +372,7 @@ export interface TaskProps {
   
   // Actual props
   task: Task;
+  lastModified: boolean;
 }
 
 // Drag and drop implementation details
@@ -406,7 +413,6 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
  * This is decorated immediately after using react-dnd methods;
  * for some reason using them directly as decorators fails.
  */
-
 export class CTaskImpl extends common.Editable<TaskProps> {
   cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % STATUS_WRAP };
@@ -532,7 +538,9 @@ export class CTaskImpl extends common.Editable<TaskProps> {
       if (this.props.task.Comment.Body === '') {
         commentClasses = 'no-display';
       }
-      return <div className="ml-2 mr-2">
+
+
+      return <div className={`ml-2 mr-2`}>
         <div
           className={`task-comment border border-gray mt-1 ${commentClasses}`}
           ref={(body) => { if (body) { this.body = body; } }} 
@@ -543,6 +551,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
   }
 
   render() {
+    const lastModified = this.props.lastModified ? 'task-last-modified' : '';
     const { isDragging, connectDragSource, connectDragPreview, connectDropTarget,
       isOver, isOverCurrent } = this.props;
     // Create a draggable task button.
@@ -570,7 +579,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
     }
 
 
-    const result = <section className="task" style={style}>
+    const result = <section className={`task ${lastModified}`} style={style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}
@@ -637,8 +646,8 @@ export const CTaskFactory = React.createFactory(CTask);
  * @param key indice of array loop
  * @param task task data
  */
-export const createCTask = (key: number, task: Task) => {
-  return CTaskFactory({ key, task } as any);
+export const createCTask = (key: number, task: Task, lastModifiedTask?: string) => {
+  return CTaskFactory({ key, task, lastModified: task.Name === lastModifiedTask } as any);
 };
 
 ///// SCOPES
@@ -667,6 +676,7 @@ interface TimeScopeProps {
   currentDate: moment.Moment;
   scope: Scope;
   filter: FilterState;
+  lastModifiedTask: string;
 }
 
 export class TimeScope extends
@@ -715,7 +725,7 @@ export class TimeScope extends
     }
 
     const tasks = filteredTasks.map((t, i) => {
-      return createCTask(i, t);
+      return createCTask(i, t, this.props.lastModifiedTask);
     });
 
 
@@ -936,7 +946,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-2 mr-2 mt-2 mb-2">
       <div className="d-flex flex-justify-between mb-1">
-        <button className="btn mr-1 tooltipped tooltipped-e"
+        <button className="btn mr-2 tooltipped tooltipped-e"
           aria-label="Go back one year"
           onClick={() => this.navigate('subtract', 'year')}>
           <span className="octicon octicon-triangle-left" />
@@ -986,7 +996,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
       // TODO: Filter by date?
       return <TimeScope currentProject={this.props.currentProject}
         key={i} currentDate={this.props.currentDate} scope={s}
-        filter={this.props.filter} />;
+        filter={this.props.filter} lastModifiedTask={this.props.lastModifiedTask} />;
     } else {
       return <common.Spinner />;
     }
