@@ -11,15 +11,19 @@
 ** DONE Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
 ** DONE Add search and/or filtering. This could also be used to select entries for export
 ** TODO Export in a nice, helpful way. Probably need to bring in some kind of modal. 
+  Exports should download to a text file or something like that.
 ** TODO Add a created-at date to bucket items (currently displays beginning of month)
 ** DONE Is the Bucket enough for long-term projects, or should there perhaps be some true kanban functionality?
 ** TODO Use overflow for daily tasks?
+** TODO Adding to project lists should cause the flame to grow bigger immediately
 * Journal
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO Add a named entry
 ** TODO Add a named entry from LinkTree navigation
 ** TODO Sidebar should reflect entry state.
 ** TODO LinkTree styling
+** TODO Fix lists in journal entries
+** TODO Fix poor formatting in some older entries
 ** DONE Fix synchronization
 * Overall
 ** TODO D3 visualization
@@ -53,5 +57,5 @@
 ** TODO Responsive interface
 ** TODO Windows & linux build
 ** TODO Electron port
-** TODO Refactor code
+** TODO Refactor frontend code to be more organized
 *** DONE window.prompt is unsupported

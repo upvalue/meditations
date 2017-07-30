@@ -943,7 +943,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-2 mr-2 mt-2 mb-2">
       <div className="d-flex flex-justify-between mb-1">
-        <button className="btn mr-2 tooltipped tooltipped-e"
+        <button className="btn mr-1 tooltipped tooltipped-e"
           aria-label="Go back one year"
           onClick={() => this.navigate('subtract', 'year')}>
           <span className="octicon octicon-triangle-left" />
