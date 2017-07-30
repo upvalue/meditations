@@ -1,3 +1,3 @@
-import * as journal from '../journal';
+import { main } from '../journal/main';
 
-document.addEventListener('DOMContentLoaded', journal.main);
+document.addEventListener('DOMContentLoaded', main);

@@ -1,5 +1,8 @@
+// main.tsx - Main habits file; routing & socket handling
+
 import * as React from 'react';
 import * as moment from 'moment';
+import route from 'riot-route';
 
 import * as common from '../common';
 

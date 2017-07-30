@@ -1,9 +1,8 @@
-// components.tsx -- habits display components
+// components.tsx -- habits components
 import * as moment from 'moment';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as redux from 'redux';
-import route from 'riot-route';
 import * as ReactDnd from 'react-dnd';
 import DatePicker from 'react-datepicker';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -22,10 +21,6 @@ import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
  */
 
 export const PROJECT_ACTIVITY_BENCHMARK = 24;
-
-
-////// REACT
-
 
 export interface TaskProps {
   // Drag and drop implementation props
@@ -606,7 +601,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   }
 
   renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
-    // TODO: Datepicker onClearable does not work unless a SELECTED value is also apssed
+    // TODO: Datepicker onClearable does not work unless a SELECTED value is also passed
     return <DatePicker 
       className="form-control ml-1 mb-md-0 mb-1"
       onChange={date => this.filterByDate(end, date)}

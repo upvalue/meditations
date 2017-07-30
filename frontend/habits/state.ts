@@ -18,19 +18,8 @@ export enum ScopeType {
   PROJECT = 4,
 }
 
-export const STATUS_UNSET = -1;
-export const STATUS_COMPLETE = 0;
-export const STATUS_INCOMPLETE = 2;
-export const STATUS_WRAP = 3;
-
-export const SCOPE_UNUSED = 0;
-export const SCOPE_DAY = 1;
-export const SCOPE_MONTH = 2;
-export const SCOPE_YEAR = 3;
-export const SCOPE_PROJECT = 4;
-
 export const scopeIsTimeBased = (scope: number) => {
-  return scope < SCOPE_PROJECT && scope > SCOPE_UNUSED;
+  return scope < ScopeType.PROJECT && scope > ScopeType.UNUSED;
 };
 
 export interface Comment extends common.Model {
@@ -179,11 +168,11 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
 
   // Check if a scope is visible by looking within the current month.
   // For daily and monthly tasks/scopes.
-  if (scope === SCOPE_MONTH || scope === SCOPE_DAY) {
+  if (scope === ScopeType.MONTH || scope === ScopeType.DAY) {
     return date1.year() === date2.year() && date1.month() === date2.month();
   }
 
-  if (scope === SCOPE_YEAR) {
+  if (scope === ScopeType.YEAR) {
     return date1.year() === date2.year();
   }
 
@@ -219,14 +208,14 @@ const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState 
   const scope = { Scope: action.scope, Date: action.date, Tasks: action.tasks } as Scope;
 
   switch (action.scope) {
-    case SCOPE_DAY: 
+    case ScopeType.DAY: 
       return {...state, 
         days: state.days.map((s, i) => {
           // TODO is diff okay here?
           return s.Date.diff(action.date, 'days') === 0 ? scope : s;
         })};
-    case SCOPE_MONTH: return { ...state, mounted: true, month: scope };
-    case SCOPE_YEAR: return { ...state, mounted: true, year: scope };
+    case ScopeType.MONTH: return { ...state, mounted: true, month: scope };
+    case ScopeType.YEAR: return { ...state, mounted: true, year: scope };
   }
   return state;
 };
@@ -247,8 +236,10 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
       const days = Array<Scope>();
       for (const day of action.days) {
         days.push({
-          Date: moment(day.Date, common.DAY_FORMAT), Scope: SCOPE_DAY, Tasks: day.Tasks} as Scope,
-        );
+          Date: moment(day.Date, common.DAY_FORMAT),
+          Scope: ScopeType.DAY,
+          Tasks: day.Tasks,
+        } as Scope);
       }
       return { ...state, days, mounted: true };
 
@@ -277,11 +268,11 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
             return { ...scope, Tasks: tasks };
           };
 
-          if (task.Scope === SCOPE_MONTH) {
+          if (task.Scope === ScopeType.MONTH) {
             nstate.month = updateScope(nstate.month);
-          } else if (task.Scope === SCOPE_YEAR) {
+          } else if (task.Scope === ScopeType.YEAR) {
             nstate.year = updateScope(nstate.year);
-          } else if (task.Scope === SCOPE_DAY) {
+          } else if (task.Scope === ScopeType.DAY) {
             // Update only the specific day using diff
             nstate.days = 
               [...state.days.map(s =>
