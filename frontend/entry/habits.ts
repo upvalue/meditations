@@ -1,3 +1,3 @@
-import * as habits from '../habits';
+import { main } from '../habits/main';
 
-document.addEventListener('DOMContentLoaded', habits.main);
+document.addEventListener('DOMContentLoaded', main);
