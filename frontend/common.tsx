@@ -148,7 +148,6 @@ export function createStore<State extends CommonState, Action extends redux.Acti
 
 /**
  * Open a modal prompt with a text input
- * @param dispatch Typed dispatcher
  * @param body Text of the prompt
  * @param ok Text of the prompt submission button
  * @param cb Success callback
@@ -157,7 +156,7 @@ export function createStore<State extends CommonState, Action extends redux.Acti
  *   modal
  */
 export const modalPrompt = (body: string, ok: string, cb: (result: string) => void,
-    defaultValue?: string, checker?: (chk: string) => string) => {
+    defaultValue?: string, checker?: (chk: string) => string, allowEmpty?: boolean) => {
 
   let ref: HTMLInputElement;
   let err: HTMLElement;
@@ -180,7 +179,7 @@ export const modalPrompt = (body: string, ok: string, cb: (result: string) => vo
       }
     }
 
-    if (ref.value !== '') {
+    if (allowEmpty || ref.value !== '') {
       cb(ref.value);
     }
     dismiss();
@@ -202,10 +201,10 @@ export const modalPrompt = (body: string, ok: string, cb: (result: string) => vo
 
 /**
  * Open a yes/no confirmation prompt
- * @param dispatch typedDispatch
  * @param bodyText Text of the body
  * @param confirmText Text of the yes button
  * @param cb Callback when yes button is clicked
+ * @param allowEmpty if true, callback will be called if an empty string is provided
  */
 export const modalConfirm = (bodyText: string, confirmText: string, cb: () => void) => {
 
@@ -224,6 +223,12 @@ export const modalConfirm = (bodyText: string, confirmText: string, cb: () => vo
       </button>
     </div>,
   });
+};
+
+export const modalPromptAllowEmpty = (body: string, ok: string, defaultValue: string,
+  callback: (result: string) => void) => {
+
+  modalPrompt(body, ok, callback, defaultValue, undefined, true);
 };
 
 export const modalPromptChecked = (body: string, ok: string, defaultValue: string,

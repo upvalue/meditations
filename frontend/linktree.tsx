@@ -24,6 +24,12 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
     this.state = { data: JSON.parse(JSON.stringify(props.data)) };
   }
 
+  componentWillReceiveProps(nextProps: LinkTreeProps) {
+    this.setState({
+      data: JSON.parse(JSON.stringify(nextProps.data)),
+    });
+  }
+
   toggleNode(e: React.MouseEvent<HTMLElement>, node: LinkTreeNode) {
     e.preventDefault();
     node.expanded = !node.expanded;

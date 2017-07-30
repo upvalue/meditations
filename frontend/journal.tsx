@@ -28,7 +28,6 @@ interface Entry extends common.Model {
 ///// REDUX
 
 interface ViewMonth extends common.CommonState {
-  common: common.CommonState;
   route: 'VIEW_MONTH';
   date: moment.Moment;
   entries: Entry[];
@@ -122,7 +121,9 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         entries: state.entries.slice().filter(v => v.ID !== action.ID),
       };
     case 'MOUNT_SIDEBAR': 
-      return { ...state, sidebar: { ...state.sidebar, ...action.sidebar, mounted: true } };
+      const nstate =  { ...state, sidebar: action.sidebar };
+      nstate.sidebar.mounted = true;
+      return nstate;
     case 'VIEW_NAMED_ENTRY':
       return { ...state, route: 'VIEW_NAMED_ENTRY', entries: [action.entry] };
   }
@@ -145,11 +146,15 @@ interface CEntryState {
 
 class CEntry extends common.Editable<CEntryProps> {
   changeName() {
-    common.modalPrompt('What would you like to name this entry? (leave empty to delete)',
-      'Name entry',
+    common.modalPromptAllowEmpty('What would you like to name this entry? (leave empty to delete)',
+      'Name entry', this.props.entry.Name,
     (name) => {
       if (name !== this.props.entry.Name) {
-        common.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
+        if (name === '') {
+          common.post(`/journal/name-entry/${this.props.entry.ID}`);
+        } else {
+          common.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
+        }
       }
 
     });
@@ -199,7 +204,7 @@ class CEntry extends common.Editable<CEntryProps> {
     let tags : ReadonlyArray<React.ReactElement<undefined>> = [];
     if (this.props.entry.Tags) {
       tags = this.props.entry.Tags.map((t, i) =>
-        <button className="mt-2 mt-md-0 ml-md-3 border " key={i} style={{ borderRadius: '1px' }} >
+        <button className="mt-4 mt-md-0 ml-md-3 border " key={i} style={{ borderRadius: '1px' }} >
           <a href={`#tag/${t.Name}`} style={{ color: 'black' }} >#{t.Name}</a>
           <span className="octicon octicon-x ml-1" onClick={() => this.removeTag(t)} />
         </button>,
@@ -377,12 +382,12 @@ const JournalNavigation = connect(state => state)
 });
 
 // tslint:disable-next-line:variable-name
-const JournalRoot = common.connect()(class extends React.PureComponent<JournalState, {}> {
+const JournalRoot = common.connect()(class extends React.Component<JournalState, {}> {
   render() { 
     return <common.CommonUI {...this.props}>
       <div className="d-flex flex-column flex-md-row flex-justify-between mr-1">
         <div id="journal-sidebar">
-          <JournalSidebar />
+          <JournalSidebar  />
         </div>
 
         <div id="journal-main" className="ml-1 ">

@@ -113,6 +113,7 @@ func journalNew(c *macaron.Context) {
 	c.JSON(200, entry)
 
 	journalSync.Send("CREATE_ENTRY", entry)
+	syncSidebarChrono()
 }
 
 func journalUpdate(c *macaron.Context, entryUpdate Entry) {
@@ -150,6 +151,7 @@ func journalAddTag(c *macaron.Context) {
 
 	c.JSON(200, entry)
 	syncEntry(entry)
+	syncSidebarTags()
 }
 
 func journalRemoveTag(c *macaron.Context) {
@@ -159,6 +161,7 @@ func journalRemoveTag(c *macaron.Context) {
 
 	c.JSON(200, entry)
 	syncEntry(entry)
+	syncSidebarTags()
 }
 
 func journalDeleteEntry(c *macaron.Context) {
@@ -174,6 +177,13 @@ func journalDeleteEntry(c *macaron.Context) {
 
 func journalRemoveEntryName(c *macaron.Context) {
 	DB.Table("entries").Where("id = ?", c.ParamsInt("id")).Update("name", gorm.Expr("NULL"))
+
+	var entry Entry
+	DB.Where("id = ?", c.ParamsInt("id")).Preload("Tags").First(&entry)
+
+	syncEntry(entry)
+	syncSidebarNamed()
+
 	c.PlainText(200, []byte("OK"))
 }
 
@@ -183,99 +193,11 @@ func journalNameEntry(c *macaron.Context) {
 
 	entry.Name = c.Params("name")
 	DB.Save(&entry)
-	c.PlainText(200, []byte("ok"))
+
 	syncEntry(entry)
-}
+	syncSidebarNamed()
 
-///// SIDEBAR MANAGEMENT
-
-// ChronoLink represents a link to view a month, or a year expandable to month links
-type ChronoLink struct {
-	Date  string
-	Count int
-	Sub   []ChronoLink
-	Link  string
-}
-
-// TagLink is a link to a tag, including how many entries are in it
-type TagLink struct {
-	Name  string
-	Count int
-}
-
-// NameLink is a link to a named journal entry
-type NameLink struct {
-	Name string
-	ID   string
-	Href string
-	Sub  []NameLink
-}
-
-// Sidebar represents all link information
-type Sidebar struct {
-	ChronoLinks []ChronoLink
-	TagLinks    []TagLink
-	NameLinks   []NameLink
-}
-
-// SidebarInfo represents navigation information that is displayed in the sidebar
-func journalSidebarInfo(c *macaron.Context) {
-	// TODO: Update incrementally when possible
-
-	// Display chronological navigation information
-	years := []ChronoLink{}
-
-	var yearsindb []struct{ Year string }
-	DB.Raw("SELECT DISTINCT strftime('%Y', date) as year FROM entries ORDER BY date desc").Scan(&yearsindb)
-
-	for _, row := range yearsindb {
-		datestr := row.Year
-
-		var count struct{ Count int }
-		sub := []ChronoLink{}
-
-		var monthsinyear []struct{ Datestr string }
-		DB.Raw("SELECT DISTINCT strftime('%Y-%m', date) as datestr from entries where strftime('%Y', date) = ? order by date desc", datestr).Scan(&monthsinyear)
-
-		for _, row := range monthsinyear {
-			monthstr := row.Datestr
-
-			d, _ := time.Parse("2006-01", monthstr)
-			DB.Raw("SELECT count(*) as count from entries where strftime('%Y-%m', date) = ?", monthstr).Scan(&count)
-			sub = append(sub, ChronoLink{Date: d.Format("January"), Link: d.Format("2006-01"), Count: count.Count})
-		}
-		DB.Raw("SELECT count(*) as count from entries where strftime('%Y', date) = ?", datestr).Scan(&count)
-
-		year := ChronoLink{Date: datestr, Count: count.Count, Sub: sub}
-		years = append(years, year)
-	}
-
-	// Return tagged entries
-	var tags []Tag
-	var tagLinks []TagLink
-
-	DB.Order("name").Find(&tags)
-	for _, tag := range tags {
-		var count int
-		row := DB.Raw("select count(*) from entry_tags where tag_id = ?", tag.ID).Row()
-		row.Scan(&count)
-		if count > 0 {
-			tagLinks = append(tagLinks, TagLink{Name: tag.Name, Count: count})
-		}
-	}
-
-	// Return named entries
-	var nameLinks []NameLink
-	var nameEntries []Entry
-	DB.Where("name is not null and deleted_at is null").Order("name").Find(&nameEntries)
-
-	for _, entry := range nameEntries {
-		nameLinks = append(nameLinks, NameLink{Name: entry.Name})
-	}
-
-	journalSync.Send("SIDEBAR", Sidebar{years, tagLinks, nameLinks})
-
-	c.PlainText(200, []byte("OK"))
+	c.PlainText(200, []byte("ok"))
 }
 
 func journalIndex(c *macaron.Context) {
