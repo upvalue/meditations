@@ -25,6 +25,10 @@ $uiColorMuted: #586069;
 $mobileWidth: 1024px;
 $editableBg: #fcfcfc;
 
+body {
+  font-family: "Roboto", $body-font !important;
+}
+
 .masthead {
   background-color: #f5f5f5;
 }
@@ -99,4 +103,8 @@ button.btn-octicon svg {
 // Repair UL
 li {
   margin-left: 20px;
+}
+
+a {
+  color: #09d;
 }

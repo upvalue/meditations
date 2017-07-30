@@ -941,28 +941,22 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     }
 
     // tslint:disable-next-line
-    return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-2 mr-2 mt-2 mb-2">
+    return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-3 mr-2 mt-2 mb-2">
       <div className="d-flex flex-justify-between mb-1">
-        <button className="btn mr-1 tooltipped tooltipped-e"
-          aria-label="Go back one year"
-          onClick={() => this.navigate('subtract', 'year')}>
-          <span className="octicon octicon-triangle-left" />
-        </button>
-        <button className="btn mr-1 tooltipped tooltipped-e"
-          aria-label="Go back one month"
-          onClick={() => this.navigate('subtract', 'month')}>
-          <span className="octicon octicon-chevron-left" />
-        </button>
-        <button className="btn mr-1 tooltipped tooltipped-e"
-          onClick={() => this.navigate('add', 'month')}
-          aria-label="Go forward one month">
-          <span className="octicon octicon-chevron-right" />
-        </button>
-        <button className="btn mr-1 tooltipped tooltipped-e"
-          aria-label="Go forward one year"
-          onClick={() => this.navigate('add', 'year')}>
-          <span className="octicon octicon-triangle-right" />
-        </button>
+        <common.OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-1"
+          onClick={() => this.navigate('subtract', 'year')} />
+
+        <common.OcticonButton name="chevron-left" tooltip="Go back one month"
+          octiconClass="mr-1"
+          onClick={() => this.navigate('subtract', 'month')} />
+
+        <common.OcticonButton name="chevron-right" tooltip="Go forward one month"
+          octiconClass="mr-1"
+          onClick={() => this.navigate('add', 'month')} />
+
+        <common.OcticonButton name="triangle-right" tooltip="Go forward one year"
+          octiconClass="mr-1"
+          onClick={() => this.navigate('add', 'year')} />
         <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
       </div>
 

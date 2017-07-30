@@ -170,7 +170,7 @@ class CEntry extends common.Editable<CEntryProps> {
   }
 
   removeTag(t: Tag)  {
-    common.modalConfirm(`Are you sure you want to remove the tag #${t.Name}`, 'Yes, remove it',
+    common.modalConfirm(`Are you sure you want to remove the tag #${t.Name}?`, 'Yes, remove it',
       () => common.post(`/journal/remove-tag/${this.props.entry.ID}/${t.Name}`));
   }
 
@@ -195,39 +195,67 @@ class CEntry extends common.Editable<CEntryProps> {
   }
 
   render() {
+    // Create an array of tag links
     let tags : ReadonlyArray<React.ReactElement<undefined>> = [];
     if (this.props.entry.Tags) {
       tags = this.props.entry.Tags.map((t, i) =>
-        <span className="ml-1" key={i}>
-          <em><a href={`#tag/${t.Name}`}>#{t.Name}</a></em>
-          <common.OcticonButton name="x" tooltip="Remove tag" tooltipDirection="n"
-            onClick={() => this.removeTag(t)} className="ml-1" />
-        </span>,
+        <button className="ml-2 border " key={i} style={{ borderRadius: '1px' }} >
+          <a href={`#tag/${t.Name}`} style={{color: 'black'}} >#{t.Name}</a>
+          <span className="octicon octicon-x ml-1" onClick={() => this.removeTag(t)} />
+        </button>,
       );
     }
 
-    // A link to the entry's monthly context; 
-    const ctxLink = 
-      `#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}`;
+    // A link to the month the entry was written, if viewing in a non time based context (e.g. by
+    // name or by tag)
+    const ctxLink = this.props.context ? 
+      `#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}` :
+      false;
+
+    // In order, render:
+    // A header with title and title-changing control, then tags
+    // Other controls and timestamp on the rightmost
 
     return <section className="entry border bg-gray mb-1" id={`entry-${this.props.entry.ID}`}>
       <div className="entry-header border-bottom">
-        <div className="d-flex flex-row flex-justify-between flex-items-end">
-          <h4 className="ml-1">
-          #{this.props.entry.ID} {this.props.entry.Name && <strong>{this.props.entry.Name}</strong>}
+        <div className="d-flex flex-row flex-justify-between flex-items-center">
+          <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
+            <common.OcticonButton name="text-size" onClick={() => this.changeName()}
+              tooltip="Change name" tooltipDirection="e" octiconClass="p-1 mr-2" />
 
-          <common.OcticonButton name="text-size" onClick={() => this.changeName()}
-            tooltip="Change name" tooltipDirection="e" />
-          </h4>
+            <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
 
-          <div className="entry-controls mr-1">
-            <em><a href={ctxLink}>{
-              this.props.entry.CreatedAt.local()
+              <span className="d-flex flex-column flex-md-row">
+              #{this.props.entry.ID}&nbsp;
+              <span>{this.props.entry.Name && <strong>{this.props.entry.Name}</strong>}</span>
+              </span>
+            </h3>
+
+            <div className="ml-2" style={{ display: 'inline' }}>
+              <common.OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
+                octiconClass="p-1 mr-2"
+                onClick={() => this.addTag()} />
+              {tags}        
+            </div>
+
+          </div>
+
+
+          <div className="entry-controls mr-2">
+            <strong>
+              {this.props.entry.CreatedAt.local()
                 .format(this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
-            }</a></em>
+            }</strong>
+
+            {ctxLink && 
+              <a className="tooltipped tooltipped-w" aria-label="Go to context" href={ctxLink}>
+                <button className="btn btn-octicon octicon octicon-link" 
+                style={{ color: 'black' }} />
+              </a>
+                  }
 
             <common.OcticonButton name="trashcan" onClick={() => this.deleteEntry()}
-              tooltip="Change name" className="btn-danger ml-1" />
+              tooltip="Delete this entry" className="btn-danger ml-1" />
           </div>
 
         </div>
@@ -237,11 +265,6 @@ class CEntry extends common.Editable<CEntryProps> {
         dangerouslySetInnerHTML={{ __html: this.props.entry.Body }}
         onClick={e => this.editorOpen(e)} />
       
-      <div className="pl-1 pr-1 border-top">
-        <common.OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
-          onClick={() => this.addTag()} />
-        {tags}        
-      </div>
     </section>;
   }
 }
@@ -268,7 +291,7 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
         key += 1;
         res.push(<h3 className="pb-1" key={key}>
           {lastDate.format('dddd')}, {' '}
-          <a href={`view/${lastDate.format(common.MONTH_FORMAT)}/${e.ID}`}>
+          <a href={`#view/${lastDate.format(common.MONTH_FORMAT)}/${e.ID}`}>
             {lastDate.format('MMMM')}
           </a>{' '}
           {lastDate.format('Do')}
@@ -341,13 +364,13 @@ const JournalNavigation = connect(state => state)
   }
 
   render() {
-    return <div className="d-flex flex-column flex-md-row flex-justify-between mb-1">
+    return <div className="d-flex flex-column flex-md-row flex-justify-between mb-1 ml-2">
       <form className="form-inline" style={{ display: 'inline' }}
         onSubmit={e => this.search(e)}>
           <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
             placeholderText="Click to add new entry" />
-          <input type="text" className="form-control" placeholder="Text to search for" />
-          <button className="btn btn-primary">Search for text</button>
+          <input type="text" className="form-control ml-md-2" placeholder="Text to search for" />
+          <button className="btn btn-primary ml-md-1">Search for text</button>
         </form>
       </div>;
   }

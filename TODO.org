@@ -17,6 +17,7 @@
 ** TODO Use overflow for daily tasks?
 ** TODO Adding to project lists should cause the flame to grow bigger immediately
 * Journal
+** TODO Month link is broken
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO Add a named entry
 ** TODO Add a named entry from LinkTree navigation
@@ -41,6 +42,7 @@
 ** TODO Client-side, server-side and behavioral tests
 ** TODO Performance: avoid creating functions in render
 ** TODO Handle WebSocket disconnects gracefully
+** TODO Octicon replacement. There's no need to include all the octicons when this app uses 10-15 of them.
 ** DONE Use flexbox instead of bootstrap grid.
 
 ** TODO Time handling
