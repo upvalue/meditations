@@ -1,5 +1,4 @@
-///<reference path="riot-route/index.d.ts" />
-///<reference path="medium-editor-tables/index.d.ts" />
+///<reference path="bindings.d.ts" />
 
 import * as moment from 'moment';
 import * as redux from 'redux';

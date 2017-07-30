@@ -4,6 +4,7 @@ package backend
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
@@ -25,6 +26,8 @@ func DBOpen() {
 // DBMigrate run database migration
 func DBMigrate() {
 	// habits.go
+	DB.LogMode(true)
+	log.Printf("Migrating database")
 	DB.Exec("pragma foreign_keys = on;")
 	DB.AutoMigrate(
 		// app.go
@@ -39,6 +42,8 @@ func DBMigrate() {
 	// By hand migrations
 	settings := Settings{Name: "settings"}
 	DB.First(&settings)
+
+	DB.LogMode(false)
 }
 
 // DBCreate initialize a new database; will not overwrite existing settings.
@@ -46,10 +51,10 @@ func DBCreate() {
 	day, month, year, bucket := Scope{Name: "Day"}, Scope{Name: "Month"}, Scope{Name: "Year"}, Scope{Name: "Bucket"}
 
 	// lazily create scopes
-	DB.FirstOrCreate(&day)
-	DB.FirstOrCreate(&month)
-	DB.FirstOrCreate(&year)
-	DB.FirstOrCreate(&bucket)
+	DB.Save(&day)
+	DB.Save(&month)
+	DB.Save(&year)
+	DB.Save(&bucket)
 
 	settings := Settings{Name: "settings", Schema: 1}
 

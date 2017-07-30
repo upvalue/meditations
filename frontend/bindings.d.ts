@@ -1,3 +1,5 @@
+// bindings.d.ts - Types for riot-route and medium-editor-tables
+
 // TypeScript bindings for riot-route
 
 // riot-route is a callable object with functions as properties
@@ -26,4 +28,13 @@ declare var route: RouteStatic;
 
 declare module "riot-route" {
   export default route;
+}
+
+// TypeScript definitions for medium-editor-tables
+
+declare var MediumEditorTable: any;
+
+declare module "medium-editor-tables" {
+  import * as MediumEditor from 'medium-editor';
+  export default MediumEditorTable;
 }

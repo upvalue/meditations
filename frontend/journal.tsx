@@ -199,8 +199,8 @@ class CEntry extends common.Editable<CEntryProps> {
     let tags : ReadonlyArray<React.ReactElement<undefined>> = [];
     if (this.props.entry.Tags) {
       tags = this.props.entry.Tags.map((t, i) =>
-        <button className="ml-2 border " key={i} style={{ borderRadius: '1px' }} >
-          <a href={`#tag/${t.Name}`} style={{color: 'black'}} >#{t.Name}</a>
+        <button className="mt-2 mt-md-0 ml-md-3 border " key={i} style={{ borderRadius: '1px' }} >
+          <a href={`#tag/${t.Name}`} style={{ color: 'black' }} >#{t.Name}</a>
           <span className="octicon octicon-x ml-1" onClick={() => this.removeTag(t)} />
         </button>,
       );
@@ -231,7 +231,7 @@ class CEntry extends common.Editable<CEntryProps> {
               </span>
             </h3>
 
-            <div className="ml-2" style={{ display: 'inline' }}>
+            <div className="ml-2 d-flex flex-md-row flex-column" style={{ display: 'inline' }}>
               <common.OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
                 octiconClass="p-1 mr-2"
                 onClick={() => this.addTag()} />
@@ -302,7 +302,7 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
     });
 
     return <div className="ml-md-2">
-      <div className="d-flex flex-column flex-items-start flex-row ml-1 mb-2">
+      <div className="d-flex flex-column flex-items-start flex-row mb-2">
         <div className="d-flex mt-1">
           <button className="btn octicon octicon-triangle-left mr-1" title="Last year"
             onClick={() => this.navigate('subtract', 'year')} />
@@ -316,7 +316,7 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
           <button className="btn octicon octicon-triangle-right mr-1" title="Next year"
             onClick={() => this.navigate('add', 'year')} />
 
-          <h2 id="entries-title">
+          <h2 id="entries-title" className="ml-md-1">
             {this.props.date.format('MMMM YYYY')}
           </h2>
         </div>

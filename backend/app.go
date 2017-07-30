@@ -230,7 +230,7 @@ func Main() {
 
 		{
 			Name:  "seed",
-			Usage: "Seed database with example data; for tutorial/demo, will add lots of info to database!",
+			Usage: "Seed database with example data beginning from July 2017; for tutorial/demo, will add lots of info to database!",
 			Flags: flags,
 			Action: func(c *cli.Context) {
 				loadConfig(c)

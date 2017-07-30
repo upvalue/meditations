@@ -4,6 +4,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const sassExtract = new ExtractTextPlugin('bundle-[name].css');
+
 const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
 module.exports = {
@@ -52,7 +53,8 @@ module.exports = {
             }, {
               loader: 'sass-loader',
               options: {
-                includePaths: [nodeModulesDirectory], // necessary for primer-css to work
+                // include style is necessary for primer-css to work
+                includePaths: [nodeModulesDirectory],
               },
             }],
         }),
