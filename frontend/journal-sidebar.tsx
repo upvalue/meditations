@@ -30,7 +30,7 @@ export const JournalSidebar = connect((state) => { return state; })(
     /** Render tag navigation links */
     renderTags() {
       if (this.props.sidebar.TagLinks === null) {
-        return <p>No tag links yet; have you tagged any journal entries?</p>;
+        return <p>No tagged entries found.</p>;
       }
 
       const selectedTag = this.props.route === 'VIEW_TAG' ? this.props.tag : '';
@@ -58,6 +58,10 @@ export const JournalSidebar = connect((state) => { return state; })(
 
       // Originally written in JS for simplicity's sake and not properly
       // type-annotated because I'm tired
+
+      if (!this.props.sidebar.NameLinks) {
+        return <p>No named entries found.</p>;
+      }
 
       const table: any = {};
       for (const link of this.props.sidebar.NameLinks) {
@@ -91,7 +95,7 @@ export const JournalSidebar = connect((state) => { return state; })(
     
     /** Render chronological navigation links */
     renderChronologically() {
-      if (this.props.sidebar.ChronoLinks === null) {
+      if (this.props.sidebar.ChronoLinks.length === 0) {
         return <p>No chronological links yet. Have you created any journal entries?</p>;
       }
 
