@@ -22,7 +22,7 @@ the manual: [HTML](https://rawgit.com/ioddly/meditations/master/docs/manual.html
 
     $ go get github.com/ioddly/meditations
     
-    Go to your workspace's source.
+Go to your workspace's source.
 
     $ go build
     $ yarn

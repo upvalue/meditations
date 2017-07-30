@@ -132,6 +132,11 @@ func App() *macaron.Macaron {
 		c.ServeFileContent("favicon.ico")
 	})
 
+	// Block robots from indexing the demo page
+	m.Get("/robots.txt", func(c *macaron.Context) {
+		c.PlainText(200, []byte("User-agent: *\nDisallow: /\n"))
+	})
+
 	m.Get("/", func(c *macaron.Context) {
 		c.Redirect("/habits")
 	})
