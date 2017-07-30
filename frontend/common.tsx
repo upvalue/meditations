@@ -12,7 +12,7 @@ import * as MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
 
 declare global {
-  /** Extend window with a meditations object for console interaction. */
+  /** Extend window with a meditations object for simple console interaction. */
   interface Window {
     meditations: any;
   }
@@ -113,6 +113,8 @@ export let dispatch: (action: CommonAction) => void;
 
 /**
  * This creates a store with thunk & logger middleware applied and a common reducer added. 
+ * The store is also saved off so that common UI items can dispatch actions to it without it needing
+ * to be passed as a parameter.
  * @param reducer 
  * @param initialState 
  * @returns a tuple containing the store and a dispatcher that type-checks synchronous and 
@@ -196,6 +198,17 @@ export const modalPrompt = (body: string, ok: string, cb: (result: string) => vo
       <button className="btn btn-secondary btn-block" onClick={dismiss}
       >Close</button>
     </form>,
+  });
+};
+
+/**
+ * Dispatch a custom modal, for complex input requirements
+ * @param body JSX body
+ */
+export const modalCustom = (body: React.ReactNode) => {
+  dispatch({
+    type: 'MODAL_PROMPT',
+    modalBody: body,
   });
 };
 
@@ -535,48 +548,6 @@ export function installRouter(base: string, first: string,
   } 
 }
 
-/**
- * Create a medium-editor instance on a given element
- *
- * @param elt
- * @param focus?
- * @param blur? Action on blur
- * @param opts Additional options to pass to medium editor
- * @returns {MediumEditor.MediumEditor}
- */
-export function makeEditor(elt: any, focus?: () => void, blur?: () => void,
-    opts?: MediumEditor.CoreOptions): MediumEditor.MediumEditor {
-  const options = {
-    autoLink: true,
-    placeholder: true, 
-
-    toolbar: {
-      buttons: ['bold', 'italic', 'underline',
-        'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table'],
-    },
-
-    keyboardCommands: false,
-
-    paste: { cleanPastedHTML: true, forcePlainText: false },
-    extensions: {
-      table: new MediumEditorTable(),
-    },
-    ...opts};
-
-  const editor = new MediumEditor(elt, options);
-
-  editor.subscribe('focus', () => {
-    if (focus) focus();
-  });
-
-  editor.subscribe('blur', () => {
-    if (blur) blur();
-  });
-  
-  return editor;
-}
-
 /** An item that has an editable body. Used for task comments and journal entries */
 export class Editable<Props> extends React.PureComponent<Props,
   {editor: MediumEditor.MediumEditor}> {
@@ -603,7 +574,26 @@ export class Editable<Props> extends React.PureComponent<Props,
   /** Lazily create an editor; if it already exists, focus on it */
   editorOpen(e?: React.MouseEvent<HTMLElement>) {
     if (!this.state.editor) {
-      const editor = makeEditor(this.body, undefined, () => {
+      const options = {
+        autoLink: true,
+        placeholder: true, 
+
+        toolbar: {
+          buttons: ['bold', 'italic', 'underline',
+            'anchor', 'image', 'quote', 'orderedlist', 'unorderedlist',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table'],
+        },
+
+        keyboardCommands: false,
+
+        paste: { cleanPastedHTML: true, forcePlainText: false },
+        extensions: {
+          table: new MediumEditorTable(),
+        }};
+
+      const editor = new MediumEditor(this.body, options);
+
+      editor.subscribe('blur', () => {
         // It is possible that blur may have been called because copy-paste causes MediumEditor to
         // create a 'pastebin' element, in which case we do not want to trigger a save.
         if (document.activeElement.id.startsWith('medium-editor-pastebin')) {
@@ -623,6 +613,7 @@ export class Editable<Props> extends React.PureComponent<Props,
       });
       this.setState({ editor });
     } 
+
     // Empty comments will have the no-display class added
     this.body.classList.remove('no-display');
     this.body.focus();

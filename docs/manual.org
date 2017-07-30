@@ -23,6 +23,12 @@ polyfills. Please let me know if this causes any issues.
 
 ** Usage
 
+*** Command line 
+
+There are several commands available at the command line, which ./meditations --help will detail,
+but the only one necessary for end users is ./meditations serve --migrate which starts the
+webserver and migrates the database, if necessary.
+
 *** Tutorial
 
 There is a built-in walkthrough that can be accessed through the application, which is the best
@@ -84,6 +90,14 @@ The point of all of this is to track these things with as little friction as pos
 my browser open meditations on startup, and I leave it open throughout the day. Generally I
 simply note things down as I complete them, and at the end of the day I copy from the monthly to
 the daily list to plan the next day. I re-assess my daily tasks and progress at the end of each month.
+
+**** Filter and task export
+
+Occasionally one wants to get an overview of how a certain task is going, in which case the
+"filter" feature at the top is a handy way to do so. Simply time in the name of the task, such as
+"Exercise" and only tasks matching that name will be displayed. You can also add a date range to
+this, which can then be combined with the export feature to download a markdown text file of your
+tasks and comments. You can use this to e.g. export an exercise log to show to other people.
 
 *** Journal
 
