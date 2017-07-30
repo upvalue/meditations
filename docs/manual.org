@@ -148,25 +148,24 @@ The journal has three tables: entries, tags, and entrytags, whose meaning is sel
 Backend code is located in backend/
 
 + app.go contains the entry point and command line interface
++ database.go contains database migration and repair
 + habits.go contains the bulk of the habits backend code, but
-+ habitsweb.go contains the web interface
++ habitsweb.go contains the web methods and routing for habits
 + journal.go contains both the backend and web interface of the journal
++ journal_sidebar.go contains the Journal sidebar synchronization code
 + sync.go contains convenience method for establishing WebSockets
 
 Frontend code is located in src/
 
-+ entry/ contains the entry points for habits and journal
++ bindings.d.ts - TypeScript type declarations for medium-editor-tables and riot-route
++ entry/ contains the webpack entry points. 
 + common.tsx contains all methods used by both Habits and Journal.
-+ habits.tsx contains all Habits frontend code
-+ linktree.tsx contains a component that is a tree of links. It's used to navigate journal named
-  entries.
-+ journal-sidebar.tsx contains the Journal sidebar component.
-+ journal.tsx contains the remainder of Journal code.
-+ site.scss contains the stylesheets.
 
-Meditations contains some ad-hoc TypeScript bindings for medium-editor-tables and riot-route,
-which don't have officially maintained bindings. It contains slightly modified bindings for
-react-dnd, whose bindings haven't been updated for TypeScript 2.4 as of this writing.
++ habits/ and journal/ contain the frontend code for Habits and Journal respectively.
+
+  Each of them have a 'state.ts' file containing backend type definitions and Redux state, a
+  'main.tsx' file containing WebSocket and routing handling, and a 'components.tsx' file
+  containing most components. In some cases components are further split up into their own files.
 
 Meditations uses WebSockets to synchronize UI across multiple clients. GET requests result in
 JSON data being sent in response, and are used to do things like initialize the UI. POST requests
@@ -177,8 +176,8 @@ data being created or modified.
 *** Reading the source code
 
 To start understanding how meditations works "under the hood," the best place to start would be
-the end of habitsweb.go and journal.go, and the end of habits.tsx and journal.tsx, which is where
-the routing logic and initialization for the backend and frontend live.
+the end of habitsweb.go and journal.go, and the main.tsx file for habits/ and journal/, which is
+where the routing logic and initialization for the backend and frontend live.
 
 *** SSL & Encryption
 

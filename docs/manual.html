@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Meditations Manual</title>
-<!-- 2017-07-03 Mon 23:40 -->
+<!-- 2017-07-30 Sun 17:42 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <style type="text/css">
@@ -147,9 +147,10 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-1">1.1. Browser support</a></li>
 <li><a href="#sec-1-2">1.2. Usage</a>
 <ul>
-<li><a href="#sec-1-2-1">1.2.1. Tutorial</a></li>
-<li><a href="#sec-1-2-2">1.2.2. Habits</a></li>
-<li><a href="#sec-1-2-3">1.2.3. Journal</a></li>
+<li><a href="#sec-1-2-1">1.2.1. Command line</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Tutorial</a></li>
+<li><a href="#sec-1-2-3">1.2.3. Habits</a></li>
+<li><a href="#sec-1-2-4">1.2.4. Journal</a></li>
 </ul>
 </li>
 <li><a href="#sec-1-3">1.3. Architecture</a>
@@ -157,8 +158,9 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-3-1">1.3.1. API documentation</a></li>
 <li><a href="#sec-1-3-2">1.3.2. Database</a></li>
 <li><a href="#sec-1-3-3">1.3.3. Code organization</a></li>
-<li><a href="#sec-1-3-4">1.3.4. SSL &amp; Encryption</a></li>
-<li><a href="#sec-1-3-5">1.3.5. About</a></li>
+<li><a href="#sec-1-3-4">1.3.4. Reading the source code</a></li>
+<li><a href="#sec-1-3-5">1.3.5. SSL &amp; Encryption</a></li>
+<li><a href="#sec-1-3-6">1.3.6. About</a></li>
 </ul>
 </li>
 </ul>
@@ -206,8 +208,19 @@ polyfills. Please let me know if this causes any issues.
 <h3 id="sec-1-2"><span class="section-number-3">1.2</span> Usage</h3>
 <div class="outline-text-3" id="text-1-2">
 </div><div id="outline-container-sec-1-2-1" class="outline-4">
-<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Tutorial</h4>
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Command line</h4>
 <div class="outline-text-4" id="text-1-2-1">
+<p>
+There are several commands available at the command line, which ./meditations &#x2013;help will detail,
+but the only one necessary for end users is ./meditations serve &#x2013;migrate which starts the
+webserver and migrates the database, if necessary.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Tutorial</h4>
+<div class="outline-text-4" id="text-1-2-2">
 <p>
 There is a built-in walkthrough that can be accessed through the application, which is the best
 way to learn the user interface.
@@ -215,9 +228,9 @@ way to learn the user interface.
 </div>
 </div>
 
-<div id="outline-container-sec-1-2-2" class="outline-4">
-<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Habits</h4>
-<div class="outline-text-4" id="text-1-2-2">
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Habits</h4>
+<div class="outline-text-4" id="text-1-2-3">
 <p>
 Habits is a todo list based on habit formation through completion of repeated tasks.
 </p>
@@ -291,12 +304,30 @@ Projects can also contain tasks, which can be accessed like the time-based tasks
 project name. These do not count towards the flame indicator but can be used to track major
 milestones.
 </p>
-</div>
+
+<p>
+The point of all of this is to track these things with as little friction as possible; I have
+my browser open meditations on startup, and I leave it open throughout the day. Generally I
+simply note things down as I complete them, and at the end of the day I copy from the monthly to
+the daily list to plan the next day. I re-assess my daily tasks and progress at the end of each month.
+</p>
 </div>
 
-<div id="outline-container-sec-1-2-3" class="outline-4">
-<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Journal</h4>
-<div class="outline-text-4" id="text-1-2-3">
+<ol class="org-ol"><li><a id="sec-1-2-3-1" name="sec-1-2-3-1"></a>Filter and task export<br  /><div class="outline-text-5" id="text-1-2-3-1">
+<p>
+Occasionally one wants to get an overview of how a certain task is going, in which case the
+"filter" feature at the top is a handy way to do so. Simply time in the name of the task, such as
+"Exercise" and only tasks matching that name will be displayed. You can also add a date range to
+this, which can then be combined with the export feature to download a markdown text file of your
+tasks and comments. You can use this to e.g. export an exercise log to show to other people.
+</p>
+</div>
+</li></ol>
+</div>
+
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> Journal</h4>
+<div class="outline-text-4" id="text-1-2-4">
 <p>
 Journal is, well, just a journal. It's use should be fairly obvious: navigation is on the left,
 entries are added from the bar at the top.
@@ -397,28 +428,22 @@ Frontend code is located in src/
 </p>
 
 <ul class="org-ul">
-<li>entry/ contains the entry points for habits and journal
+<li>bindings.d.ts - TypeScript type declarations for medium-editor-tables and riot-route
+</li>
+<li>entry/ contains the webpack entry points. 
 </li>
 <li>common.tsx contains all methods used by both Habits and Journal.
 </li>
-<li>habits.tsx contains all Habits frontend code
-</li>
-<li>linktree.tsx contains a component that is a tree of links. It's used to navigate journal named
-entries.
-</li>
-<li>journal-sidebar.tsx contains the Journal sidebar
-</li>
-<li>journal.tsx contains the remainder of Journal code.
-</li>
-<li>site.scss contains the stylesheets.
-</li>
-</ul>
+
+<li>habits/ and journal/ contain the frontend code for Habits and Journal respectively.
 
 <p>
-Meditations contains some ad-hoc TypeScript bindings for medium-editor-tables and riot-route,
-which don't have officially maintained bindings. It contains slightly modified bindings for
-react-dnd, whose bindings haven't been updated for TypeScript 2.4 as of this writing.
+Each of them have a 'state.ts' file containing backend code and Redux state, a 'main.tsx' file
+containing WebSocket and routing handling, and a 'components.tsx' file containing most components.
+In some cases components are further split up into their own files.
 </p>
+</li>
+</ul>
 
 <p>
 Meditations uses WebSockets to synchronize UI across multiple clients. GET requests result in
@@ -431,8 +456,19 @@ data being created or modified.
 </div>
 
 <div id="outline-container-sec-1-3-4" class="outline-4">
-<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> SSL &amp; Encryption</h4>
+<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> Reading the source code</h4>
 <div class="outline-text-4" id="text-1-3-4">
+<p>
+To start understanding how meditations works "under the hood," the best place to start would be
+the end of habitsweb.go and journal.go, and the end of habits.tsx and journal.tsx, which is where
+the routing logic and initialization for the backend and frontend live.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3-5" class="outline-4">
+<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> SSL &amp; Encryption</h4>
+<div class="outline-text-4" id="text-1-3-5">
 <p>
 Meditations is intended to be run on a local network; SSL can be achieved using nginx as a
 reverse proxy, but this is mainly useful for the demo instance. Meditations does not support
@@ -441,9 +477,9 @@ encryption directly, but works fine with an sqlite database mounted on EncFS.
 </div>
 </div>
 
-<div id="outline-container-sec-1-3-5" class="outline-4">
-<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> About</h4>
-<div class="outline-text-4" id="text-1-3-5">
+<div id="outline-container-sec-1-3-6" class="outline-4">
+<h4 id="sec-1-3-6"><span class="section-number-4">1.3.6</span> About</h4>
+<div class="outline-text-4" id="text-1-3-6">
 <p>
 Meditations is developed by <a href="https://upvalue.io">upvalue()</a>.</p>
 </div>
@@ -452,7 +488,7 @@ Meditations is developed by <a href="https://upvalue.io">upvalue()</a>.</p>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2017-07-03 Mon 23:40</p>
+<p class="date">Created: 2017-07-30 Sun 17:42</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.2.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
