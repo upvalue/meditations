@@ -1,4 +1,5 @@
 import * as React from 'react';
+import route from 'riot-route';
 
 import * as moment from 'moment';
 import * as common from '../common';
