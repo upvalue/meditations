@@ -6,6 +6,7 @@ import * as redux from 'redux';
 import * as ReactDnd from 'react-dnd';
 import DatePicker from 'react-datepicker';
 import HTML5Backend from 'react-dnd-html5-backend';
+import route from 'riot-route';
 
 import * as common from '../common';
 
