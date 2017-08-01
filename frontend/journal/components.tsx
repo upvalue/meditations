@@ -16,6 +16,7 @@ import { SidebarState, JournalSidebar } from './sidebar';
 ///// REACT COMPONENTS
 
 interface CEntryProps {
+  /** If true, a link to the month the entry was created in will be added to the controls. */
   context?: boolean;
   entry: Entry;
 }
@@ -94,7 +95,8 @@ class CEntry extends common.Editable<CEntryProps> {
     // A link to the month the entry was written, if viewing in a non time based context (e.g. by
     // name or by tag)
     const ctxLink = this.props.context ? 
-      `#view/${this.props.entry.CreatedAt.format(common.MONTH_FORMAT)}/${this.props.entry.ID}` :
+      // tslint:disable-next-line
+      `#view/${this.props.entry.CreatedAt.local().format(common.MONTH_FORMAT)}/${this.props.entry.ID}` :
       false;
 
     // In order, render:
@@ -107,7 +109,6 @@ class CEntry extends common.Editable<CEntryProps> {
           <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
             <common.OcticonButton name="text-size" onClick={() => this.changeName()}
               tooltip="Change name" tooltipDirection="e" octiconClass="p-1 mr-2" />
-
             <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
 
               <span className="d-flex flex-column flex-md-row">
@@ -183,7 +184,7 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
         </h3>);
       }
       key += 1;
-      res.push(<CEntry context={true} key={key} entry={e} />);
+      res.push(<CEntry context={false} key={key} entry={e} />);
     });
 
     return <div className="ml-md-2">
@@ -214,7 +215,7 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
 
 // tslint:disable-next-line:variable-name
 const ViewEntry = (props: {entry: Entry | null}) => {
-  return props.entry ? <CEntry context={false} entry={props.entry} /> : <p>Entry deleted</p>;
+  return props.entry ? <CEntry context={true} entry={props.entry} /> : <p>Entry deleted</p>;
 };
 
 class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]}, {}> {
@@ -222,7 +223,7 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
     const entries: React.ReactElement<undefined>[] = [];
     let key = 0;
     this.props.entries.forEach((e) => {
-      entries.push(<CEntry context={false} key={key} entry={e} />);
+      entries.push(<CEntry context={true} key={key} entry={e} />);
       key += 1;
       entries.push(<hr key={key} />);
       key += 1;
