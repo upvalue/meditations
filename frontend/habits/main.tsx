@@ -75,8 +75,9 @@ export const main = () => {
           // we won't render days that haven't happened yet in advance
           if (today.month() === date.month() && today.year() === date.year()) {
             limit = today.date() + 1;
+
             // But do mount the next day if it's within 4 hours before midnight so tasks can be
-            // added at nighttime
+            // added at nighttime. Unless the next day is in the next month.
             const next = today.clone().add(MOUNT_NEXT_DAY_TIME, 'hours');
             if (next.date() !== today.date() && next.month() === today.month()) {
               limit += 1;
