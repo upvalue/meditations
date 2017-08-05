@@ -9,7 +9,7 @@ import { Tab, Tabs, TabList, TabPanel } from'react-tabs';
 import DatePicker from 'react-datepicker';
 
 import * as common from '../common';
-import { TimeNavigator } from '../common/components';
+import { TimeNavigator, OcticonButton, Editable, CommonUI } from '../common/components';
 
 import { store, dispatch, JournalState, Entry, Tag } from './state';
 import { SidebarState, JournalSidebar } from './sidebar';
@@ -26,7 +26,7 @@ interface CEntryState {
   editor: MediumEditor.MediumEditor;
 }
 
-class CEntry extends common.Editable<CEntryProps> {
+class CEntry extends Editable<CEntryProps> {
   changeName() {
     common.modalPromptAllowEmpty('What would you like to name this entry? (leave empty to delete)',
       'Name entry', this.props.entry.Name,
@@ -108,7 +108,7 @@ class CEntry extends common.Editable<CEntryProps> {
       <div className="entry-header border-bottom">
         <div className="d-flex flex-row flex-justify-between flex-items-center">
           <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
-            <common.OcticonButton name="text-size" onClick={() => this.changeName()}
+            <OcticonButton name="text-size" onClick={() => this.changeName()}
               tooltip="Change name" tooltipDirection="e" octiconClass="p-1 mr-2" />
             <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
 
@@ -119,7 +119,7 @@ class CEntry extends common.Editable<CEntryProps> {
             </h3>
 
             <div className="ml-2 d-flex flex-md-row flex-column" style={{ display: 'inline' }}>
-              <common.OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
+              <OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
                 octiconClass="p-1 mr-2"
                 onClick={() => this.addTag()} />
               {tags}        
@@ -141,7 +141,7 @@ class CEntry extends common.Editable<CEntryProps> {
               </a>
                   }
 
-            <common.OcticonButton name="trashcan" onClick={() => this.deleteEntry()}
+            <OcticonButton name="trashcan" onClick={() => this.deleteEntry()}
               tooltip="Delete this entry" className="btn-danger ml-1" />
           </div>
 
@@ -199,7 +199,6 @@ class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
 
     return <div className="ml-md-2">
       <div className="d-flex flex-column flex-items-start flex-row mb-2">
-
         <TimeNavigator navigate={this.navigate} currentDate={this.props.date} />
       </div>
 
@@ -260,7 +259,7 @@ const JournalNavigation = connect(state => state)
 // tslint:disable-next-line:variable-name
 export const JournalRoot = common.connect()(class extends React.Component<JournalState, {}> {
   render() { 
-    return <common.CommonUI {...this.props}>
+    return <CommonUI {...this.props}>
       <div className="d-flex flex-column flex-md-row flex-justify-between mr-1">
         <div id="journal-sidebar">
           <JournalSidebar  />
@@ -277,6 +276,6 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
               : this.props.entries[0]} /> : ''}
         </div>
       </div>
-    </common.CommonUI>;
+    </CommonUI>;
   }
 });

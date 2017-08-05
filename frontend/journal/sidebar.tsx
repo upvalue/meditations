@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
 
-import { connect, Spinner } from '../common';
+import { connect } from '../common';
+import { Spinner } from '../common/components';
 import LinkTree, { LinkTreeNode } from './linktree';
 
 import { JournalState } from '../journal/state';

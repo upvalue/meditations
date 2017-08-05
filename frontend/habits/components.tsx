@@ -9,7 +9,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import route from 'riot-route';
 
 import * as common from '../common';
-import { TimeNavigator } from '../common/components';
+import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner } from '../common/components';
 
 import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
   MountScope }
@@ -98,7 +98,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
  * This is decorated immediately after using react-dnd methods;
  * for some reason using them directly as decorators fails.
  */
-export class CTaskImpl extends common.Editable<TaskProps> {
+export class CTaskImpl extends Editable<TaskProps> {
   cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % Status.WRAP };
     common.post(`/habits/update`, task);
@@ -212,7 +212,7 @@ export class CTaskImpl extends common.Editable<TaskProps> {
 
   /** Render an octicon button tied to a specific task action */
   renderControl(tip: string, icon:string, callback: () => void, danger?: boolean) {
-    return <common.OcticonButton tooltip={tip} name={icon} onClick={callback} 
+    return <OcticonButton tooltip={tip} name={icon} onClick={callback} 
       className="pl-1" />;
   }
 
@@ -343,7 +343,7 @@ const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title
     <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
       <h3 className="pl-2">{title}</h3>
       <div className="scope-controls pr-1 pt-1">
-        <common.OcticonButton name="plus" onClick={addTask} tooltip="Add task" />
+        <OcticonButton name="plus" onClick={addTask} tooltip="Add task" />
       </div>
     </div>
 
@@ -466,7 +466,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
             Projects</a></span> 
           <span> &gt; {this.props.scope.Name}</span></h4>
 
-        <common.OcticonButton name="plus" tooltip="New task" onClick={() => this.addTask()} />
+        <OcticonButton name="plus" tooltip="New task" onClick={() => this.addTask()} />
       </div>
 
       {...tasks}
@@ -518,11 +518,11 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
           {project.CompletedTasks}
         </span>
 
-        <common.OcticonButton name="clippy" tooltip="Copy to left"
+        <OcticonButton name="clippy" tooltip="Copy to left"
           onClick={() => this.copyLeft(project)} />
-        <common.OcticonButton name="pin" tooltip={project.Pinned ? 'Unpin project' : 'Pin project'}
+        <OcticonButton name="pin" tooltip={project.Pinned ? 'Unpin project' : 'Pin project'}
           onClick={() => this.pinProject(project)} />
-        <common.OcticonButton name="trashcan" tooltip="Delete project"
+        <OcticonButton name="trashcan" tooltip="Delete project"
           onClick={() => this.deleteProject(project.ID)} />
       </div>
     </div>;
@@ -540,7 +540,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
         <h2 className="scope-title">Projects</h2>
-        <common.OcticonButton name="plus" tooltip="Add new project"
+        <OcticonButton name="plus" tooltip="Add new project"
           onClick={() => this.addProject()} />
       </div>
       <div className="pl-1 pr-1 pt-1">
@@ -673,7 +673,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
         key={i} currentDate={this.props.currentDate} scope={s}
         filter={this.props.filter} lastModifiedTask={this.props.lastModifiedTask} />;
     } else {
-      return <common.Spinner />;
+      return <Spinner />;
     }
   }
 
@@ -688,20 +688,20 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
         return <ProjectScope  currentDate={this.props.currentDate} scope={this.props.project} />;
       } else {
         // In case the route has changed, but the project data has not been loaded yet.
-        return <common.Spinner />;
+        return <Spinner />;
       }
     }
   }
 
   render() {
     return <div id="habits-root-sub">
-      <common.CommonUI {...this.props}>
+      <CommonUI {...this.props}>
         <HabitsControlBar {...this.props} />
         <div className="d-flex flex-column flex-md-row">
           <div id="habits-scope-daily" className="scope-column mr-md-1">
             {this.props.days ? 
               this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
-              <common.Spinner /> }
+              <Spinner /> }
           </div>
           <div className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.month)}
@@ -710,10 +710,10 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="scope-column">
-            {this.props.pinnedProjects ? this.renderProjects() : <common.Spinner />}
+            {this.props.pinnedProjects ? this.renderProjects() : <Spinner />}
           </div>
         </div>
-      </common.CommonUI>
+      </CommonUI>
     </div>;
   }
 }));
