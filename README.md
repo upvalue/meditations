@@ -35,7 +35,6 @@ Go to your workspace's source.
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
 - Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. It is developed against the latest version of Chrome.
 
-
 ## Attribution
 
 The favicon.ico was used under public domain from [Tango](http://tango.freedesktop.org)

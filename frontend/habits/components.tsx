@@ -585,20 +585,35 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     const end = this.props.filter.end && this.props.filter.end.format(common.DAY_FORMAT);
 
     const body: any = { day: true };
+    // Build up a descriptive filename along with the POST body
+    let filename = '';
 
     if (this.props.filter.name) {
       body.Name = this.props.filter.name;
+      filename += `-${this.props.filter.name}`;
     }
 
     if (this.props.filter.begin) {
       body.Begin = this.props.filter.begin.format(common.DAY_FORMAT);
+      filename += `-from-${this.props.filter.begin.format(common.DAY_FORMAT)}`;
     }
 
     if (this.props.filter.end) {
       body.End = this.props.filter.end.format(common.DAY_FORMAT);
+      filename += `-to-${this.props.filter.end.format(common.DAY_FORMAT)}`;
     }
 
-    common.post('/habits/export', body);
+    common.post('/habits/export', body, (res: any) => {
+
+
+      const elt = document.createElement('a');
+      elt.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(res.body)}`);
+      elt.setAttribute('download', `meditations-export${filename}.txt`);
+      elt.style.display = 'none';
+      document.body.appendChild(elt);
+      elt.click();
+      document.body.removeChild(elt);
+    });
   }
 
   renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {

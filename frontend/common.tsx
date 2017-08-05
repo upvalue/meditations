@@ -378,10 +378,7 @@ export function request<ResponseType>(
       return;
     }
 
-    // Only GET requests will return JSON to be processed;
-    // POST requests will result in a WebSocket message if anything
-    // as they must be pushed to all clients
-    if (method === 'GET') {
+    if (then) {
       return response.json().then(then);
     }
   }).catch((reason) => {
@@ -399,8 +396,8 @@ export function get<ResponseType>(url: string, then: (res: ResponseType) => void
 }
 
 
-export function post<ResponseType>(url: string, body?: any,) {
-  return request<ResponseType>('POST', body, url);
+export function post<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
+  return request<ResponseType>('POST', body, url, then);
 }
 
 export function connect() {

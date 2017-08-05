@@ -436,12 +436,13 @@ func export(c *macaron.Context) {
 	err = process.Run()
 	if err != nil {
 		// If pandoc failed, just output HTML
-		habitSync.Send("EXPORT", buffer.Bytes())
-		// c.PlainText(200, buffer.Bytes())
+		c.JSON(http.StatusOK, map[string]interface{}{
+			"body": string(buffer.Bytes()),
+		})
 	} else {
-		bytes := out.Bytes()
-		habitSync.Send("EXPORT", string(bytes))
-		//c.PlainText(200, bytes)
+		c.JSON(http.StatusOK, map[string]interface{}{
+			"body": string(out.Bytes()),
+		})
 	}
 }
 

@@ -162,10 +162,7 @@ export const main = () => {
       Pinned: Project[];
       Unpinned: Project[];
     }
-  } | {
-    Type: 'EXPORT';
-    Datum: string;
-  };
+  }
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
     console.log(`Received WebSocket message`, msg);
@@ -187,19 +184,6 @@ export const main = () => {
       case 'PROJECTS':
         dispatch({ type: 'PROJECT_LIST', pinnedProjects: msg.Datum.Pinned,
           unpinnedProjects: msg.Datum.Unpinned});
-        break;
-
-      case 'EXPORT':
-        // Special case: download exported tasks as text file
-        const elt = document.createElement('a');
-        elt.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(msg.Datum)}`);
-        elt.setAttribute('download', 'export.txt');
-        elt.style.display = 'none';
-        document.body.appendChild(elt);
-        elt.click();
-        document.body.removeChild(elt);
-
-        console.log(msg);
         break;
     }
   });

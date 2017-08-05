@@ -50,6 +50,7 @@
 ** TODO React performance optimization
 ** DONE Handle WebSocket disconnects gracefully
 ** TODO Octicon replacement. There's no need to include all the octicons when this app uses 10-15 of them. Medium-editor-tables will have to be modified.
+** TODO Switching from habits to journal or back causes a "WebSocket connection failed" message to pop up on Firefox.
 ** DONE Use flexbox instead of bootstrap grid.
 
 ** TODO Time handling
