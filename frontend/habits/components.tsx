@@ -21,8 +21,6 @@ import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
  * active, 18 somewhat active, and so on. Should be divisible by 4.
  */
 
-export const PROJECT_ACTIVITY_BENCHMARK = 24;
-
 export interface TaskProps {
   // Drag and drop implementation props
   connectDropTarget: ReactDnd.ConnectDropTarget;
@@ -422,13 +420,9 @@ export class TimeScope extends
 
 /** Returns project activity indicator */
 const projectActivityIcon = (p: Project) => { 
-  const fraction = PROJECT_ACTIVITY_BENCHMARK / 4;
-  const recentActivity = (Math.min(p.CompletedTasks, PROJECT_ACTIVITY_BENCHMARK) -
-    (p.CompletedTasks % fraction)) / 6;
-  const recentActivityString = 
-    ['little activity', 'some activity', 'lots of activity', 'immense activity'][recentActivity];
-  return <span className = {`octicon octicon-flame project-activity-${recentActivity}`}
-    title={`${recentActivityString} ${p.CompletedTasks} in the last 72 days`} />;
+  const projectActivityClass = Math.min(p.CompletedTasks, 23);
+  return <span className={`octicon octicon-flame project-activity-${projectActivityClass}`}
+    title={`${p.CompletedTasks} in the last 72 days`} />;
 };
 
 export interface ProjectScopeProps {
@@ -604,8 +598,6 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     }
 
     common.post('/habits/export', body, (res: any) => {
-
-
       const elt = document.createElement('a');
       elt.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(res.body)}`);
       elt.setAttribute('download', `meditations-export${filename}.txt`);

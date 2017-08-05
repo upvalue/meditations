@@ -125,20 +125,27 @@ $commentBackground: #fcfcfc;
   box-shadow:  0 0 4px#09d;
 }
 
+// This one is a little tricky - we want a flame to go from grey, to yellow, to orange, to red,
+// getting progressively larger.
+$pa-percentages: (
+  90%, 75%, 60%, 45%, 30%, 15%
+);
+
+$pa-colors: (
+  #ccc, #ffcd38, #ff9900, #ff6e26, #f00
+);
+
 .project-activity-0 {
   color: #ccc;
+  font-size: 1em;
 }
 
-.project-activity-1 {
-  color: #ffcd38;
-  font-size: 1.4em;
-}
-
-.project-activity-2 {
-  color: #ff6e26;
-  font-size: 1.8em;
-}
-.project-activity-3 {
-  color: #f00;
-  font-size: 2em;
+@for $j from 0 to 4 {
+  @for $i from 1 to 6 {
+    $pan: ($j * 6) + $i;
+    .project-activity-#{$pan} {
+      color: mix(nth($pa-colors, $j + 1), nth($pa-colors, $j + 2), nth($pa-percentages, $i + 1));
+      font-size: 1em + ($pan / 24);
+    }
+  }
 }
