@@ -1,3 +1,4 @@
+// Import only what is necessary
 @import "primer-base/index";
 @import "primer-box/index";
 @import "primer-buttons/index";
@@ -110,7 +111,7 @@ button.btn-octicon svg {
   fill: #b33630;
 }
 
-// Repair UL
+// Primer resets LI margin for some reason; it may change in a future version
 li {
   margin-left: 20px;
 }

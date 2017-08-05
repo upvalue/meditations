@@ -9,6 +9,7 @@ import { Tab, Tabs, TabList, TabPanel } from'react-tabs';
 import DatePicker from 'react-datepicker';
 
 import * as common from '../common';
+import { TimeNavigator } from '../common/components';
 
 import { store, dispatch, JournalState, Entry, Tag } from './state';
 import { SidebarState, JournalSidebar } from './sidebar';
@@ -156,7 +157,16 @@ class CEntry extends common.Editable<CEntryProps> {
 }
 
 // TODO: SFC
-class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Entry[]}, {}> {
+interface BrowseMonthProps {
+  date: moment.Moment;
+  entries: Entry[];
+}
+class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
+  constructor(props: BrowseMonthProps) {
+    super(props);
+    this.navigate = this.navigate.bind(this);
+  }
+
   navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
     const date = (this.props.date.clone()[method])(1, unit);
     route(`view/${date.format(common.MONTH_FORMAT)}`);
@@ -189,23 +199,8 @@ class BrowseMonth extends React.PureComponent<{date: moment.Moment, entries: Ent
 
     return <div className="ml-md-2">
       <div className="d-flex flex-column flex-items-start flex-row mb-2">
-        <div className="d-flex mt-1">
-          <button className="btn octicon octicon-triangle-left mr-1" title="Last year"
-            onClick={() => this.navigate('subtract', 'year')} />
 
-          <button className="btn octicon octicon-chevron-left mr-1" title="Previous month"
-            onClick={() => this.navigate('subtract', 'month')} />
-            
-          <button className="btn octicon octicon-chevron-right mr-1" title="Next month"
-            onClick={() => this.navigate('add', 'month')} />
-
-          <button className="btn octicon octicon-triangle-right mr-1" title="Next year"
-            onClick={() => this.navigate('add', 'year')} />
-
-          <h2 id="entries-title" className="ml-md-1">
-            {this.props.date.format('MMMM YYYY')}
-          </h2>
-        </div>
+        <TimeNavigator navigate={this.navigate} currentDate={this.props.date} />
       </div>
 
       {res}

@@ -9,6 +9,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import route from 'riot-route';
 
 import * as common from '../common';
+import { TimeNavigator } from '../common/components';
 
 import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
   MountScope }
@@ -555,6 +556,11 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
 }
 
 export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
+  constructor(props: HabitsState) {
+    super(props);
+    this.navigate = this.navigate.bind(this);
+  }
+
   navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
     const ndate = this.props.currentDate.clone()[method](1, unit);
     route(routeForView(ndate, this.props.currentProject));
@@ -636,26 +642,8 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-3 mr-2 mt-2 mb-2">
-      <div className="d-flex flex-justify-between mb-1">
-        <common.OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-1"
-          onClick={() => this.navigate('subtract', 'year')} tooltipDirection="e" />
-
-        <common.OcticonButton name="chevron-left" tooltip="Go back one month"
-          octiconClass="mr-1" tooltipDirection="e"
-          onClick={() => this.navigate('subtract', 'month')} />
-
-        <common.OcticonButton name="chevron-right" tooltip="Go forward one month"
-          tooltipDirection="e"
-          octiconClass="mr-1"
-          onClick={() => this.navigate('add', 'month')} />
-
-        <common.OcticonButton name="triangle-right" tooltip="Go forward one year"
-          tooltipDirection="e"
-          octiconClass="mr-1"
-          onClick={() => this.navigate('add', 'year')} />
-        <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
-      </div>
-
+      <TimeNavigator currentDate={this.props.currentDate}
+        navigate={this.navigate} />
 
       <div className="d-flex flex-column flex-md-row">
         <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-"
