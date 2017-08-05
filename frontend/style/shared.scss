@@ -8,14 +8,12 @@
 @import "primer-support/index";
 @import "primer-utilities/index";
 
-@import "~medium-editor/dist/css/medium-editor.min.css";
-@import "~medium-editor/dist/css/themes/bootstrap.min.css";
-@import "~medium-editor-tables/dist/css/medium-editor-tables.css";
 
 @import "~octicons/octicons/octicons.css";
 
 @import "animations.scss";
 @import "datepicker.scss";
+@import "medium-editor.scss";
 
 $linkColor: #09d;
 $bodyBg: white;
@@ -119,4 +117,14 @@ li {
 
 a {
   color: #09d;
+}
+
+blockquote {
+  margin-left: 10px;
+  border: 1px dotted black;
+  background-color: #eee;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  padding: 4px;
 }

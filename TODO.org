@@ -35,6 +35,7 @@
 * Overall
 ** TODO D3 visualization
 ** TODO Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.
+** TODO Replace the navbar with the date navigation element; generalize the date navigation element
 ** DONE Port to Bootstrap 4.6
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
 ** DONE Simplify sync code by moving messaging stuff to sync.go

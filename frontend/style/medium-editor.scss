@@ -1,0 +1,9 @@
+@import "~medium-editor/dist/css/medium-editor.min.css";
+@import "~medium-editor/dist/css/themes/mani.min.css";
+@import "~medium-editor-tables/dist/css/medium-editor-tables.css";
+
+// Make this a lot smaller and less unwieldy
+.medium-editor-toolbar li button {
+  height: 48px;
+  min-width: 0;
+}
