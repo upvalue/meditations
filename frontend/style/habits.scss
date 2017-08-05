@@ -12,13 +12,11 @@ $commentBackground: #fcfcfc;
 
 .scope-column {
   width: 25%;
-  margin-left: 5px;
-  margin-right: 5px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: $mobileWidth) {
   .scope-column {
-    width: 99%;
+    width: 100%;
   }
 }
 

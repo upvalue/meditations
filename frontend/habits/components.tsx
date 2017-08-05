@@ -421,6 +421,7 @@ export class TimeScope extends
 /** Returns project activity indicator */
 const projectActivityIcon = (p: Project) => { 
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
+
   return <span className={`octicon octicon-flame project-activity-${projectActivityClass}`}
     title={`${p.CompletedTasks} in the last 72 days`} />;
 };
@@ -709,15 +710,15 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
       <common.CommonUI {...this.props}>
         <HabitsControlBar {...this.props} />
         <div className="d-flex flex-column flex-md-row">
-          <div id="habits-scope-daily" className="scope-column">
+          <div id="habits-scope-daily" className="scope-column mr-md-1">
             {this.props.days ? 
               this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
               <common.Spinner /> }
           </div>
-          <div className="scope-column">
+          <div className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.month)}
           </div>
-          <div className="scope-column">
+          <div className="scope-column mr-md-2">
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="scope-column">
