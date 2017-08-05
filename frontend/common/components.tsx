@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as moment from 'moment';
+import route from 'riot-route';
 
 import { CommonState } from '../common';
 
@@ -78,17 +79,32 @@ export class Editable<Props> extends React.PureComponent<Props,
 }
 
 /** A muted Octicon button */
-export const OcticonButton: React.SFC<{ name: string, onClick: () => void, 
-  tooltip: string, tooltipDirection?: string, className?: string
-  octiconClass?: string }> =
+interface OcticonButtonProps {
+  name: string;
+  onClick: () => void;
+  tooltip: string;
+  tooltipDirection?: string;
+  /** Additional classes */
+  className?: string;
+  /** Octicon class defaulting to btn-octicon, can be overriden */
+  octiconClass?: string;
+  /** Href for a link, if given */
+  href?: string;
+}
 
-  ({ name, onClick, tooltip, octiconClass, tooltipDirection, className }) => {
-    return <button className={`btn ${octiconClass} tooltipped tooltipped-${tooltipDirection}
+export const OcticonButton: React.SFC<OcticonButtonProps> =
+  ({ name, onClick, href, tooltip, octiconClass, tooltipDirection, className }) => {
+    const clickWrap = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      onClick();
+    };
+
+    return <a href={href} className={`btn ${octiconClass} tooltipped tooltipped-${tooltipDirection}
         ${className}`}
         aria-label={tooltip}
-        onClick={onClick}>
+        onClick={clickWrap} >
         <span className={`octicon octicon-${name}`} />
-      </button>;
+      </a>;
   };
 
 
@@ -99,30 +115,52 @@ OcticonButton.defaultProps = {
 };
 
 interface TimeNavigatorProps {
-  navigate: (operation:'subtract' | 'add', unit:'year' | 'month') => void;
+  /** Returns a page-appropriate route string for navigation */
+  getRoute: (operation: 'subtract' | 'add' | 'reset', unit?: 'month' | 'year') =>
+    string | undefined;
+
+  /** Date to work off of */
   currentDate: moment.Moment;
 }
 
 /** Navigate by months or years */
 export class TimeNavigator extends React.PureComponent<TimeNavigatorProps, {}> {
+  navigate(operation: 'subtract' | 'add' | 'reset', unit?: 'year' | 'month') {
+    const routestr = this.props.getRoute(operation, unit);
+    if (routestr) {
+      route(routestr);
+    }
+  }
+
   render() {
     return <div className="d-flex flex-justify-between mb-1">
       <OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-1"
-        onClick={() => this.props.navigate('subtract', 'year')} tooltipDirection="e" />
+        href={`#${this.props.getRoute('subtract', 'year')}`}
+        onClick={() => this.navigate('subtract', 'year')}
+        tooltipDirection="e" />
 
       <OcticonButton name="chevron-left" tooltip="Go back one month"
         octiconClass="mr-1" tooltipDirection="e"
-        onClick={() => this.props.navigate('subtract', 'month')} />
+        href={`#${this.props.getRoute('subtract', 'month')}`}
+        onClick={() => this.navigate('subtract', 'month')} />
+
+      <OcticonButton name="calendar" tooltip="Go to current date" tooltipDirection="e"
+        octiconClass="mr-1"
+        href={`#${this.props.getRoute('reset')}`}
+        onClick={() => this.navigate('reset')} />
 
       <OcticonButton name="chevron-right" tooltip="Go forward one month"
         tooltipDirection="e"
         octiconClass="mr-1"
-        onClick={() => this.props.navigate('add', 'month')} />
+        href={`#${this.props.getRoute('add', 'month')}`}
+        onClick={() => this.navigate('add', 'month')} />
 
       <OcticonButton name="triangle-right" tooltip="Go forward one year"
         tooltipDirection="e"
+        href={`#${this.props.getRoute('add', 'year')}`}
         octiconClass="mr-1"
-        onClick={() => this.props.navigate('add', 'year')} />
+        onClick={() => this.navigate('add', 'year')} />
+
       <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
     </div>;
   }

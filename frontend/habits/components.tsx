@@ -559,6 +559,17 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   constructor(props: HabitsState) {
     super(props);
     this.navigate = this.navigate.bind(this);
+    this.navigatorRoute = this.navigatorRoute.bind(this);
+  }
+
+  /** Callback that gives page-appropriate routes to TimeNavigator */
+  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year') {
+    if (method === 'reset') {
+      return routeForView(moment(), this.props.currentProject);
+    } else if (unit) {
+      const ndate = this.props.currentDate.clone()[method](1, unit);
+      return routeForView(ndate, this.props.currentProject);
+    }
   }
 
   navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
@@ -642,8 +653,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-3 mr-2 mt-2 mb-2">
-      <TimeNavigator currentDate={this.props.currentDate}
-        navigate={this.navigate} />
+      <TimeNavigator getRoute={this.navigatorRoute} currentDate={this.props.currentDate}  />
 
       <div className="d-flex flex-column flex-md-row">
         <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-"

@@ -164,12 +164,16 @@ interface BrowseMonthProps {
 class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
   constructor(props: BrowseMonthProps) {
     super(props);
-    this.navigate = this.navigate.bind(this);
+    this.navigatorRoute = this.navigatorRoute.bind(this);
   }
 
-  navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
-    const date = (this.props.date.clone()[method])(1, unit);
-    route(`view/${date.format(common.MONTH_FORMAT)}`);
+  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year') {
+    if (method === 'reset') {
+      return `view/${moment().format(common.MONTH_FORMAT)}`;
+    } else if (unit) {
+      const ndate = this.props.date.clone()[method](1, unit);
+      return `view/${ndate.format(common.MONTH_FORMAT)}`;
+    }
   }
 
   render() {
@@ -198,10 +202,9 @@ class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
     });
 
     return <div className="ml-md-2">
-      <div className="d-flex flex-column flex-items-start flex-row mb-2">
-        <TimeNavigator navigate={this.navigate} currentDate={this.props.date} />
+      <div className="d-flex flex-items-start flex-row mb-2">
+        <TimeNavigator getRoute={this.navigatorRoute} currentDate={this.props.date} />
       </div>
-
       {res}
     </div>;
   }
