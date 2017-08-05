@@ -42,6 +42,18 @@ body {
   font-weight: bold;
 }
 
+.credits {
+  position: relative;
+}
+
+@media (min-width: $mobileWidth) {
+  .credits-body {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+
 #mobile-menu {
   display: none !important;
   position: fixed;

@@ -66,6 +66,7 @@
 ** TODO Built-in tutorial
 ** TODO Responsive interface
 ** TODO Windows & linux build
+** TODO Redesign navbar (again)
 ** TODO Electron port
 ** DONE Refactor frontend code to be more organized
 *** DONE window.prompt is unsupported

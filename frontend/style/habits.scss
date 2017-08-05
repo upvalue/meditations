@@ -126,7 +126,11 @@ $commentBackground: #fcfcfc;
 }
 
 // This one is a little tricky - we want a flame to go from grey, to yellow, to orange, to red,
-// getting progressively larger.
+// getting progressively larger. This is achieved by looping from 1 to 6 within a 0 to 4 loop; the
+// actual class name is determined by multiplying the current index of both loops, the index of the
+// 0-4 loop is used to get the color and the index of the 0-6 is used to get a percentage which is
+// then passed to the mix function.
+
 $pa-percentages: (
   90%, 75%, 60%, 45%, 30%, 15%
 );

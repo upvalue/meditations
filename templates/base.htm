@@ -14,12 +14,6 @@
     <header class="masthead ">
       <div class="tabnav pl-2 pt-2">
         <div class="float-right pr-3 d-flex">
-          <a class="tabnav-extra " href="https://cdn.rawgit.com/ioddly/meditations/42ea1461/docs/manual.html">
-              Manual
-            </a>
-          <a class="tabnav-extra " href="https://upvalue.io">
-            <img src="/assets/upvalue.svg" className="vertical-align:middle;" />
-            </a>
         </div>
         <nav class="tabnav-tabs">
           <span style="font-weight:bold">meditations</span>
@@ -41,6 +35,17 @@
       </noscript>
 
       {% block content %}{% endblock %}
+    </div>
+    <div class="position-relative">
+      <div class="credits-body d-flex flex-justify-center">
+        <a href="https://cdn.rawgit.com/ioddly/meditations/42ea1461/docs/manual.html">
+          Manual
+        </a>
+        &nbsp;
+        <a href="https://upvalue.io">
+          <img src="/assets/upvalue.svg" className="vertical-align:middle;" />
+        </a>
+      </div>
     </div>
 
     {% block script %}{% endblock %}
