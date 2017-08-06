@@ -21,6 +21,7 @@
   textinput.
 ** TODO As before, navigation buttons should also be valid links so they can be opened in new tabs.
 ** TODO Export causes downloads on multiple tabs. Export does not work when served through nginx
+** TODO Drag and drop on comment
 * Journal
 ** DONE Month link is broken
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately

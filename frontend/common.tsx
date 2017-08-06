@@ -8,8 +8,6 @@ import route from 'riot-route';
 import * as React from 'react';
 import * as reactredux from 'react-redux';
 import * as ReactDOM from 'react-dom';
-import * as MediumEditor from 'medium-editor';
-import MediumEditorTable from 'medium-editor-tables';
 
 declare global {
   /** Extend window with a meditations object for simple console interaction. */

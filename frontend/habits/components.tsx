@@ -213,7 +213,7 @@ export class CTaskImpl extends Editable<TaskProps> {
   /** Render an octicon button tied to a specific task action */
   renderControl(tip: string, icon:string, callback: () => void, danger?: boolean) {
     return <OcticonButton tooltip={tip} name={icon} onClick={callback} 
-      className="pl-1" />;
+      className="pl-1 flex-self-end" />;
   }
 
   renderComment() {
@@ -223,7 +223,6 @@ export class CTaskImpl extends Editable<TaskProps> {
       if (this.props.task.Comment.Body === '') {
         commentClasses = 'no-display';
       }
-
 
       return <div className={`ml-2 mr-2`}>
         <div
@@ -262,7 +261,6 @@ export class CTaskImpl extends Editable<TaskProps> {
       style['borderColor'] = 'black';
       style['borderStyle'] = 'solid';
     }
-
 
     const result = <section className={`task ${lastModified}`} style={style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
@@ -716,7 +714,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
           <div className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.month)}
           </div>
-          <div className="scope-column mr-md-2">
+          <div className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.year)}
           </div>
           <div className="scope-column">

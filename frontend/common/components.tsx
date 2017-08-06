@@ -3,6 +3,8 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import route from 'riot-route';
+import * as MediumEditor from 'medium-editor';
+import MediumEditorTable from 'medium-editor-tables';
 
 import { CommonState } from '../common';
 
