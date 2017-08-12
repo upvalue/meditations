@@ -7,7 +7,9 @@
     "rules": {
       "align": [false],
       "import-name": false,
-      "variable-name": false
+      "variable-name": false,
+      "indent": false,
+      "ter-indent": false
     },
     "rulesDirectory": []
 }

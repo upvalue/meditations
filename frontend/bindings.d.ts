@@ -26,7 +26,7 @@ interface RouteStatic {
 
 declare var route: RouteStatic;
 
-declare module "riot-route" {
+declare module 'riot-route' {
   export default route;
 }
 
@@ -34,7 +34,7 @@ declare module "riot-route" {
 
 declare var MediumEditorTable: any;
 
-declare module "medium-editor-tables" {
+declare module 'medium-editor-tables' {
   import * as MediumEditor from 'medium-editor';
   export default MediumEditorTable;
 }

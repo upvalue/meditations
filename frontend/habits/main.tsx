@@ -162,7 +162,7 @@ export const main = () => {
       Pinned: Project[];
       Unpinned: Project[];
     }
-  }
+  };
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
     console.log(`Received WebSocket message`, msg);

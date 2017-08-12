@@ -1,5 +1,6 @@
-// journal_sidebar.go - Journal sidebar implementation
 package backend
+
+// journal_sidebar.go - Journal sidebar implementation
 
 import (
 	"time"
