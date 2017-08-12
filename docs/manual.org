@@ -75,7 +75,7 @@ drops below 80% (meaning you're going off-diet more than one out of every five d
 
 Not every long-term task involves daily repetition, for which meditations has the concept of
 projects, which are displayed on the far right. Active projects should be "pinned"; pinned
-projects have a flame indicator next to them which indicates projects. The flame is calculated by
+projects have a flame indicator next to them which indicates momentum. The flame is calculated by
 how many tasks with the project's name have been completed in the last few weeks.
 
 So for example if you create a project "Refurbish bathroom", then daily tasks would be created
