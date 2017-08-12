@@ -79,9 +79,8 @@ const (
 // or greater
 type Scope struct {
 	gorm.Model
-	Name     string `gorm:"not null;unique"`
-	Selected bool   `gorm:"-"`
-	Pinned   bool   `gorm:"not null;default:'0'"`
+	Name   string `gorm:"not null;unique"`
+	Pinned bool   `gorm:"not null;default:'0'"`
 	// Derived statistics
 	CompletedTasks int `gorm:"-"`
 }

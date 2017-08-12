@@ -18,10 +18,8 @@ func TestSeed(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	Config.DBPath = ":memory:"
-	Config.DBLog = true
 	DBOpen()
-	DBMigrate()
-	DBSeed("2017-06")
+	DBSeed("2017-07")
 	// DB Seed
 	os.Exit(m.Run())
 }

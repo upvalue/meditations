@@ -178,16 +178,19 @@ func Main() {
 	app := cli.NewApp()
 	app.Name = "meditations"
 
-	flags := []cli.Flag{
+	commonflags := []cli.Flag{
 		cli.BoolFlag{
 			Name:  "db-log",
-			Usage: "log SQL queries",
+			Usage: "log SQL queries (note some commands will verbosely log SQL anyway)",
 		},
 		cli.StringFlag{
 			Name:  "database",
 			Usage: "database path",
 			Value: "development.sqlite3",
 		},
+	}
+
+	serverflags := append(commonflags, []cli.Flag{
 		cli.StringFlag{
 			Name:  "message",
 			Usage: "A message that will be displayed at the top, used for demo deployment",
@@ -205,13 +208,13 @@ func Main() {
 			Name:  "migrate",
 			Usage: "run database migration before performing action",
 		},
-	}
+	}...)
 
 	app.Commands = []cli.Command{
 		{
 			Name:  "repair",
 			Usage: "repair database errors where possible",
-			Flags: flags,
+			Flags: commonflags,
 			Action: func(c *cli.Context) {
 				loadConfig(c)
 				Config.DBLog = true
@@ -223,7 +226,7 @@ func Main() {
 		{
 			Name:  "check",
 			Usage: "check database for errors",
-			Flags: flags,
+			Flags: commonflags,
 			Action: func(c *cli.Context) {
 				loadConfig(c)
 				Config.DBLog = true
@@ -235,8 +238,11 @@ func Main() {
 
 		{
 			Name:  "seed",
-			Usage: "Seed database with example data beginning from July 2017; for tutorial/demo, will add lots of info to database!",
-			Flags: flags,
+			Usage: "WILL ERASE DATABASE! Seed database with example data beginning from July 2017; for tutorial/demo",
+			Flags: append(commonflags, cli.StringFlag{
+				Name:  "date",
+				Usage: "MMMM-YY date to seed from",
+			}),
 			Action: func(c *cli.Context) {
 				loadConfig(c)
 				Config.DBLog = true
@@ -244,7 +250,8 @@ func Main() {
 				if Config.Migrate == true {
 					DBMigrate()
 				}
-				DBSeed("2017-07")
+
+				DBSeed(c.String("date"))
 				DBClose()
 			},
 		},
@@ -252,7 +259,7 @@ func Main() {
 		{
 			Name:  "migrate",
 			Usage: "migrate database",
-			Flags: flags,
+			Flags: commonflags,
 			Action: func(c *cli.Context) {
 				loadConfig(c)
 				Config.DBLog = true
@@ -266,7 +273,7 @@ func Main() {
 		{
 			Name:  "serve",
 			Usage: "start server",
-			Flags: flags,
+			Flags: serverflags,
 			Action: func(c *cli.Context) {
 				loadConfig(c)
 				log.Printf("running with configuration %+v\n", Config)

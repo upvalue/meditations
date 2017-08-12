@@ -26,7 +26,6 @@ func DBOpen() {
 // DBMigrate run database migration
 func DBMigrate() {
 	// habits.go
-	DB.LogMode(true)
 	log.Printf("Migrating database")
 	DB.Exec("pragma foreign_keys = on;")
 	DB.AutoMigrate(
@@ -61,12 +60,13 @@ func DBCreate() {
 	DB.FirstOrCreate(&settings)
 }
 
-func seedTask(name string, date time.Time, scope int, status int, comment string) *Task {
+func seedTask(name string, date time.Time, scope int, status int, comment string, minutes int) *Task {
 	task := Task{
-		Name:   name,
-		Date:   date,
-		Scope:  scope,
-		Status: status,
+		Name:    name,
+		Date:    date,
+		Scope:   scope,
+		Status:  status,
+		Minutes: minutes,
 	}
 	if comment != "" {
 		task.Comment = Comment{
@@ -80,12 +80,17 @@ func seedTask(name string, date time.Time, scope int, status int, comment string
 // application. Accepts an optional date argument to start from (for reproducible tests), if empty
 // string is provided, seeds from the current day
 func DBSeed(seedFrom string) {
-	var day time.Time
 	if seedFrom == "" {
-		day = time.Now()
-	} else {
-		day, _ = time.Parse("2006-01", seedFrom)
+		seedFrom = "2017-07"
 	}
+
+	day, err := time.Parse("2006-01", seedFrom)
+	if err != nil {
+		log.Fatalf("Expected date of format 2006-01 but got %s: %v", seedFrom, err)
+	}
+
+	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Comment{})
+	DBMigrate()
 
 	// deterministic random values
 	rand.Seed(12345)
@@ -97,30 +102,39 @@ func DBSeed(seedFrom string) {
 	for i := 0; i < 365*2; i++ {
 		// Diet will have some calories logged as a comment, and success based on that random number
 		calories := rand.Intn(500) + 2350
+		minutes := rand.Intn(20) + 20
 
 		status := TaskComplete
 		if calories > 2500 {
 			status = TaskIncomplete
 		}
 
-		tx.Save(seedTask("Diet", day, ScopeDay, status, fmt.Sprintf("%d calories\n", calories)))
-		tx.Save(seedTask("Exercise", day, ScopeDay, TaskComplete, ""))
+		tx.Save(seedTask("Diet", day, ScopeDay, status, fmt.Sprintf("%d calories\n", calories), 0))
+		tx.Save(seedTask("Exercise", day, ScopeDay, TaskComplete, fmt.Sprintf("ran %d minutes\n", minutes), minutes))
+
+		// Project tasks
+		if day.Format("Monday") == "Monday" {
+			tx.Save(seedTask("Drawing practice", day, ScopeDay, TaskComplete, "Monday drawing practice", 60))
+		}
 
 		if day.Day() == 1 {
 			// Add month tasks on first of day
-			tx.Save(seedTask("Diet", day, ScopeMonth, status, "Eat less than 2500 calories a day"))
-			tx.Save(seedTask("Exercise", day, ScopeMonth, TaskComplete, "Run every day"))
+			tx.Save(seedTask("Diet", day, ScopeMonth, status, "Eat less than 2500 calories a day", 0))
+			tx.Save(seedTask("Exercise", day, ScopeMonth, TaskComplete, "Run every day", 0))
 		}
 
 		if day.AddDate(0, 0, -1).Year() != day.Year() {
-			tx.Save(seedTask("Diet", day, ScopeYear, status, "Eat less than 2500 calories a day"))
-			tx.Save(seedTask("Exercise", day, ScopeYear, TaskComplete, "Run every day"))
+			tx.Save(seedTask("Diet", day, ScopeYear, status, "Eat less than 2500 calories a day", 0))
+			tx.Save(seedTask("Exercise", day, ScopeYear, TaskComplete, "Run every day", 0))
 		}
 
 		day = day.AddDate(0, 0, -1)
 	}
 
-	// TODO: Projects.
+	tx.Save(&Scope{
+		Name:   "Drawing practice",
+		Pinned: true,
+	})
 
 	tx.Commit()
 }
