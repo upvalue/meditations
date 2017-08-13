@@ -93,11 +93,12 @@ the daily list to plan the next day. I re-assess my daily tasks and progress at 
 
 **** Filter and task export
 
-Occasionally one wants to get an overview of how a certain task is going, in which case the
-"filter" feature at the top is a handy way to do so. Simply time in the name of the task, such as
-"Exercise" and only tasks matching that name will be displayed. You can also add a date range to
-this, which can then be combined with the export feature to download a markdown text file of your
-tasks and comments. You can use this to e.g. export an exercise log to show to other people.
+Occasionally one wants to get an overview of what you've been doing towards a particular goal, in
+which case the "filter" feature at the top is a handy way to do so. Simply time in the name of
+the task, such as "Exercise" and only tasks matching that name will be displayed. You can also
+add a date range to this, which can then be combined with the export feature to download a
+markdown text file of your tasks and comments. You can use this to e.g. export an exercise log to
+show to other people.
 
 *** Journal
 

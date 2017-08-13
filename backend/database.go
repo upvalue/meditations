@@ -84,12 +84,15 @@ func DBSeed(seedFrom string) {
 		seedFrom = "2017-07"
 	}
 
+	log.Printf("Seeding database from %s\n", seedFrom)
+
 	day, err := time.Parse("2006-01", seedFrom)
 	if err != nil {
 		log.Fatalf("Expected date of format 2006-01 but got %s: %v", seedFrom, err)
 	}
 
-	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Comment{})
+	day = day.AddDate(0, 1, -1)
+	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Comment{}, &Tag{})
 	DBMigrate()
 
 	// deterministic random values
@@ -99,6 +102,7 @@ func DBSeed(seedFrom string) {
 	tx := DB.Begin()
 
 	// Generate 2 years of tasks with some random functions
+	dayi := day
 	for i := 0; i < 365*2; i++ {
 		// Diet will have some calories logged as a comment, and success based on that random number
 		calories := rand.Intn(500) + 2350
@@ -109,31 +113,57 @@ func DBSeed(seedFrom string) {
 			status = TaskIncomplete
 		}
 
-		tx.Save(seedTask("Diet", day, ScopeDay, status, fmt.Sprintf("%d calories\n", calories), 0))
-		tx.Save(seedTask("Exercise", day, ScopeDay, TaskComplete, fmt.Sprintf("ran %d minutes\n", minutes), minutes))
+		tx.Save(seedTask("Diet", dayi, ScopeDay, status, fmt.Sprintf("%d calories\n", calories), 0))
+		tx.Save(seedTask("Exercise", dayi, ScopeDay, TaskComplete, fmt.Sprintf("ran %d minutes\n", minutes), minutes))
 
 		// Project tasks
-		if day.Format("Monday") == "Monday" {
-			tx.Save(seedTask("Drawing practice", day, ScopeDay, TaskComplete, "Monday drawing practice", 60))
+		if dayi.Format("Monday") == "Monday" {
+			tx.Save(seedTask("Drawing practice", dayi, ScopeDay, TaskComplete, "Monday drawing practice", 60))
 		}
 
-		if day.Day() == 1 {
+		if dayi.Day() == 1 {
 			// Add month tasks on first of day
-			tx.Save(seedTask("Diet", day, ScopeMonth, status, "Eat less than 2500 calories a day", 0))
-			tx.Save(seedTask("Exercise", day, ScopeMonth, TaskComplete, "Run every day", 0))
+			tx.Save(seedTask("Diet", dayi, ScopeMonth, status, "Eat less than 2500 calories a day", 0))
+			tx.Save(seedTask("Exercise", dayi, ScopeMonth, TaskComplete, "Run every day", 0))
 		}
 
-		if day.AddDate(0, 0, -1).Year() != day.Year() {
-			tx.Save(seedTask("Diet", day, ScopeYear, status, "Eat less than 2500 calories a day", 0))
-			tx.Save(seedTask("Exercise", day, ScopeYear, TaskComplete, "Run every day", 0))
+		if dayi.AddDate(0, 0, -1).Year() != dayi.Year() {
+			tx.Save(seedTask("Diet", dayi, ScopeYear, status, "Eat less than 2500 calories a day", 0))
+			tx.Save(seedTask("Exercise", dayi, ScopeYear, TaskComplete, "Run every day", 0))
 		}
 
-		day = day.AddDate(0, 0, -1)
+		dayi = dayi.AddDate(0, 0, -1)
 	}
 
+	// Generate example project
 	tx.Save(&Scope{
 		Name:   "Drawing practice",
 		Pinned: true,
+	})
+
+	// Generate example entries from built-in strings
+	tag := &Tag{
+		Name: "enchiridion",
+	}
+
+	tx.Save(tag)
+
+	dayi = day
+	for i, text := range dbseedentries {
+		tx.Save(&Entry{
+			Name:     fmt.Sprintf("Enchiridion: Paragraph %d", len(dbseedentries)+1-i),
+			Date:     dayi,
+			Body:     text.Text,
+			LastBody: "",
+			Tags:     []Tag{*tag},
+		})
+		dayi = dayi.AddDate(0, 0, -1)
+	}
+
+	tx.Save(&Entry{
+		Name: "Welcome to the Meditations Journal",
+		Date: day,
+		Body: `<p>This is an example instance of meditations, seeded with text from the Enchiridion.</p>`,
 	})
 
 	tx.Commit()

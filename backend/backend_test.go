@@ -16,6 +16,10 @@ func TestSeed(t *testing.T) {
 	}
 }
 
+func TestStatistics(t *testing.T) {
+
+}
+
 func TestMain(m *testing.M) {
 	Config.DBPath = ":memory:"
 	DBOpen()

@@ -34,6 +34,7 @@ type Configuration struct {
 	Development bool
 	// If true, run a database migration before starting
 	Migrate bool
+	Demo    bool
 	// Message to be displayed in navbar, used in the demo instance
 	Message string
 	// Package path
@@ -57,6 +58,7 @@ var Config = Configuration{
 	SiteTitle:   "meditations",
 	Development: true,
 	Migrate:     false,
+	Demo:        false,
 	Message:     "",
 	PackagePath: "",
 }
@@ -68,6 +70,7 @@ func loadConfig(c *cli.Context) {
 	Config.Port = c.Int("port")
 	Config.Migrate = c.Bool("migrate")
 	Config.Message = c.String("message")
+	Config.Demo = c.Bool("demo")
 }
 
 // App configures returns a meditations web application
@@ -191,6 +194,10 @@ func Main() {
 	}
 
 	serverflags := append(commonflags, []cli.Flag{
+		cli.BoolFlag{
+			Name:  "demo",
+			Usage: "If true, will reset the database every hour",
+		},
 		cli.StringFlag{
 			Name:  "message",
 			Usage: "A message that will be displayed at the top, used for demo deployment",
@@ -247,6 +254,7 @@ func Main() {
 				loadConfig(c)
 				Config.DBLog = true
 				DBOpen()
+
 				if Config.Migrate == true {
 					DBMigrate()
 				}
@@ -276,6 +284,26 @@ func Main() {
 			Flags: serverflags,
 			Action: func(c *cli.Context) {
 				loadConfig(c)
+
+				DBOpen()
+
+				if Config.Demo {
+					ticker := time.NewTicker(time.Second * 10)
+					// ticker := time.NewTicker(time.Hour)
+					today := time.Now()
+
+					DBSeed(today.Format("2006-01"))
+
+					go func() {
+						for t := range ticker.C {
+							fmt.Printf("Seeding database at %v!\n", t)
+							DBSeed(today.Format("2006-01"))
+						}
+					}()
+
+				}
+
+				// DBSeed
 				log.Printf("running with configuration %+v\n", Config)
 				log.Printf("starting server")
 				server := Server()
