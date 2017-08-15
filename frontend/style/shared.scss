@@ -9,7 +9,6 @@
 @import "primer-support/index";
 @import "primer-utilities/index";
 
-
 @import "~octicons/octicons/octicons.css";
 
 @import "animations.scss";
@@ -25,7 +24,7 @@ $mobileWidth: 1024px;
 $editableBg: #fcfcfc;
 
 body {
-  font-family: "Roboto", $body-font !important;
+  font-family: "Roboto", $body-font;
 }
 
 .masthead {
@@ -122,10 +121,12 @@ a {
 
 blockquote {
   margin-left: 10px;
-  border: 1px dotted black;
-  background-color: #eee;
+  border: 3px solid #09d;
+  background-color: #fafafa;
   border-top: 0;
   border-right: 0;
   border-bottom: 0;
-  padding: 4px;
+  padding-left: 1em;
+  padding-top: .5em;
+  padding-bottom: .5em;
 }
