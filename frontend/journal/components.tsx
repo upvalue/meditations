@@ -248,11 +248,13 @@ const JournalNavigation = connect(state => state)
 
   render() {
     return <div className="d-flex flex-column flex-md-row flex-justify-between mb-1 ml-2">
-      <form className="form-inline" style={{ display: 'inline' }}
+      <form className="form-inline d-flex flex-column flex-md-row" style={{ display: 'inline' }}
         onSubmit={e => this.search(e)}>
-          <DatePicker className="form-control" onChange={date => this.createEntry(date)} 
+          <DatePicker className="form-control mb-1 mb-md-0"
+            onChange={date => this.createEntry(date)} 
             placeholderText="Click to add new entry" />
-          <input type="text" className="form-control ml-md-2" placeholder="Text to search for" />
+          <input type="text" className="form-control mb-1 mb-md-0 ml-md-2"
+            placeholder="Text to search for" />
           <button className="btn btn-primary ml-md-1">Search for text</button>
         </form>
       </div>;
@@ -264,7 +266,7 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
   render() { 
     return <CommonUI {...this.props}>
       <div className="d-flex flex-column flex-md-row flex-justify-between mr-1">
-        <div id="journal-sidebar">
+        <div id="journal-sidebar" className="mb-1">
           <JournalSidebar  />
         </div>
 

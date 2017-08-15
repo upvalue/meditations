@@ -7,6 +7,7 @@ import * as ReactDnd from 'react-dnd';
 import DatePicker from 'react-datepicker';
 import HTML5Backend from 'react-dnd-html5-backend';
 import route from 'riot-route';
+import * as Scroll from 'react-scroll';
 
 import * as common from '../common';
 import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner } from '../common/components';
@@ -459,10 +460,10 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
 
     return <section className="scope bg-gray">
       <div className="scope-header d-flex flex-row flex-justify-between p-1 ">
-        <h4 className="scope-title border-bottom ">
+        <h3 className="scope-title border-bottom ">
           <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
             Projects</a></span> 
-          <span> &gt; {this.props.scope.Name}</span></h4>
+          <span> &gt; {this.props.scope.Name}</span></h3>
 
         <OcticonButton name="plus" tooltip="New task" onClick={() => this.addTask()} />
       </div>
@@ -538,8 +539,10 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
         <h2 className="scope-title">Projects</h2>
-        <OcticonButton name="plus" tooltip="Add new project"
-          onClick={() => this.addProject()} />
+        <div className="scope-controls pr-1 pt-1">
+          <OcticonButton name="plus" tooltip="Add new project"
+            onClick={() => this.addProject()} />
+        </div>
       </div>
       <div className="pl-1 pr-1 pt-1">
         {this.props.pinnedProjects.map(p => this.renderProjectLink(p))}
@@ -670,6 +673,47 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   }
 }
 
+/**
+ * A menu for easy navigation between scopes on mobile devices
+ */
+class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
+  constructor(props) {
+    super(props);
+    this.state = { opened: false };
+  }
+
+  toggle() {
+    this.setState({ opened: !this.state.opened });
+  }
+
+  renderLink(name:string, text: string) {
+    // NOTE: activeClass doesn't work here when there are not many tasks as 
+    // the month/year/projects scope may fit into the screen without going past the day tasks
+    return <Scroll.Link to={name} smooth={true} duration={500} spy={true}
+      onClick={() => this.toggle()}
+      className="menu-item" >
+      {text}
+    </Scroll.Link>;
+  }
+
+  render() {
+    return <div id="mobile-menu" className="d-flex flex-column">
+      <OcticonButton name="three-bars" tooltip="Toggle mobile menu"  octiconClass=""
+        className="flex-self-end mb-1"
+        onClick={() => this.toggle()} />
+      {this.state.opened && 
+        <nav className="menu" id="mobile-menu-nav">
+          {this.renderLink('scope-days', 'Day')}
+          {this.renderLink('scope-month', 'Month')}
+          {this.renderLink('scope-year', 'Year')}
+          {this.renderLink('scope-projects', 'Projects')}
+        </nav>
+      }
+    </div>;
+  }
+
+}
+
 // tslint:disable-next-line:variable-name
 export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
 common.connect()(class extends React.PureComponent<HabitsState, {}> {
@@ -705,19 +749,20 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
     return <div id="habits-root-sub">
       <CommonUI {...this.props}>
         <HabitsControlBar {...this.props} />
+        <HabitsMobileMenu />
         <div className="d-flex flex-column flex-md-row">
-          <div id="habits-scope-daily" className="scope-column mr-md-1">
-            {this.props.days ? 
+          <div className="element" id="scope-days" className="scope-column mr-md-1">
+            {this.props.days ?  
               this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
               <Spinner /> }
           </div>
-          <div className="scope-column mr-md-1">
+          <div id="scope-month" className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.month)}
           </div>
-          <div className="scope-column mr-md-1">
+          <div id="scope-year" className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.year)}
           </div>
-          <div className="scope-column">
+          <div id="scope-projects" className="scope-column">
             {this.props.pinnedProjects ? this.renderProjects() : <Spinner />}
           </div>
         </div>

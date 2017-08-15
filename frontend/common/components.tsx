@@ -80,13 +80,14 @@ export class Editable<Props> extends React.PureComponent<Props,
   }
 }
 
-/** A muted Octicon button */
 interface OcticonButtonProps {
   name: string;
   onClick: () => void;
+  /** Tooltip text */
   tooltip: string;
+  /** Tooltip direction, default w */
   tooltipDirection?: string;
-  /** Additional classes */
+  /** Additional classes to apply */
   className?: string;
   /** Octicon class defaulting to btn-octicon, can be overriden */
   octiconClass?: string;
@@ -94,6 +95,7 @@ interface OcticonButtonProps {
   href?: string;
 }
 
+/** A muted Octicon button */
 export const OcticonButton: React.SFC<OcticonButtonProps> =
   ({ name, onClick, href, tooltip, octiconClass, tooltipDirection, className }) => {
     const clickWrap = (e: React.MouseEvent<HTMLAnchorElement>) => {

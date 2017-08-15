@@ -163,7 +163,8 @@ func DBSeed(seedFrom string) {
 	tx.Save(&Entry{
 		Name: "Welcome to the Meditations Journal",
 		Date: day,
-		Body: `<p>This is an example instance of meditations, seeded with text from the Enchiridion.</p>`,
+		Body: `<p>This is an example instance of meditations, seeded with text from the Enchiridion.
+			Try selecting some text to use the medium-editor functionality.</p>`,
 	})
 
 	tx.Commit()

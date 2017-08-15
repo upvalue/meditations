@@ -77,6 +77,12 @@
     "@types/react" "*"
     redux "^3.6.0"
 
+"@types/react-scroll@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@types/react-scroll/-/react-scroll-1.5.1.tgz#03b11e5452548669a5ee1349de8add03d77f1457"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-tabs@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/react-tabs/-/react-tabs-1.0.1.tgz#3675b7edbd6e4d257d31c55675fd7510d416e513"
@@ -3970,6 +3976,13 @@ react-redux@^5.0.5:
     lodash-es "^4.2.0"
     loose-envify "^1.1.0"
     prop-types "^15.5.10"
+
+react-scroll@^1.5.4:
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/react-scroll/-/react-scroll-1.5.4.tgz#8c5c4ced659553be1fa39959776c85055fceb137"
+  dependencies:
+    object-assign "^4.1.1"
+    prop-types "^15.5.8"
 
 react-tabs@^1.0.0:
   version "1.1.0"

@@ -5,6 +5,21 @@
 $taskBackground: $bg-gray;
 $commentBackground: #fcfcfc;
 
+// Mobile menu
+#mobile-menu {
+  display: none;
+  position: fixed;
+  right: 10px;
+  top: 50px;
+  z-index: 1;
+}
+
+@media (max-width: $mobileWidth) {
+  #mobile-menu {
+    display: flex;
+  }
+}
+
 .scope {
   border: 1px solid #e1e4e8;
   background-color: darken(#f6f8fa, 0%) !important;
