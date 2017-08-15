@@ -26,6 +26,7 @@ interface CEntryState {
   editor: MediumEditor.MediumEditor;
 }
 
+/** A journal entry. */
 class CEntry extends Editable<CEntryProps> {
   changeName() {
     common.modalPromptAllowEmpty('What would you like to name this entry? (leave empty to delete)',

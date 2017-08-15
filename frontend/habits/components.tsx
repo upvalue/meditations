@@ -677,7 +677,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
  * A menu for easy navigation between scopes on mobile devices
  */
 class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
-  constructor(props) {
+  constructor(props: {}) {
     super(props);
     this.state = { opened: false };
   }
@@ -751,7 +751,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
         <HabitsControlBar {...this.props} />
         <HabitsMobileMenu />
         <div className="d-flex flex-column flex-md-row">
-          <div className="element" id="scope-days" className="scope-column mr-md-1">
+          <div id="scope-days" className="scope-column mr-md-1">
             {this.props.days ?  
               this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
               <Spinner /> }

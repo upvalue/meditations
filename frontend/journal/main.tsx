@@ -1,5 +1,7 @@
 import * as React from 'react';
 import route from 'riot-route';
+import * as Scroll from 'react-scroll';
+
 
 import * as moment from 'moment';
 import * as common from '../common';
@@ -15,8 +17,15 @@ export const main = () => {
     no_action: () => route(`view/${moment().format(common.MONTH_FORMAT)}`),
     journal: () => null, // Dummy, called if journal is clicked from navbar
 
-    view: (datestr: string, entryScrollId?: number) => {
+    view: (datestr: string, entryScrollId?: string) => {
       const date = moment(datestr, common.MONTH_FORMAT);
+
+      if (entryScrollId && !isNaN(parseInt(entryScrollId, 10))) {
+        Scroll.scroller.scrollTo(`entry-${entryScrollId}`, {
+          smooth: true,
+          duration: 500,
+        });
+      }
 
       common.setTitle('Journal', `${date.format('MMMM YYYY')}`);
 
