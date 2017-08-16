@@ -288,8 +288,8 @@ func Main() {
 				DBOpen()
 
 				if Config.Demo {
-					ticker := time.NewTicker(time.Second * 10)
-					// ticker := time.NewTicker(time.Hour)
+					// ticker := time.NewTicker(time.Second * 10)
+					ticker := time.NewTicker(time.Hour)
 					today := time.Now()
 
 					DBSeed(today.Format("2006-01"))
