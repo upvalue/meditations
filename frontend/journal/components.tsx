@@ -105,7 +105,7 @@ class CEntry extends Editable<CEntryProps> {
     // A header with title and title-changing control, then tags
     // Other controls and timestamp on the rightmost
 
-    return <section className="entry border bg-gray mb-1" id={`entry-${this.props.entry.ID}`}>
+    return <section className="entry border bg-gray " id={`entry-${this.props.entry.ID}`}>
       <div className="entry-header border-bottom">
         <div className="d-flex flex-row flex-justify-between flex-items-center">
           <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
@@ -132,7 +132,7 @@ class CEntry extends Editable<CEntryProps> {
           <div className="entry-controls mr-2">
             <strong>
               {this.props.entry.CreatedAt.local()
-                .format(this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
+                .format(!this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
             }</strong>
 
             {ctxLink && 
@@ -148,7 +148,7 @@ class CEntry extends Editable<CEntryProps> {
 
         </div>
       </div>
-      <div className="entry-body p-2 border-gray" id={`entry-body-${this.props.entry.ID}`} 
+      <div className="entry-body p-2 " id={`entry-body-${this.props.entry.ID}`} 
         ref={(body) => { if (body) this.body = body; }}
         dangerouslySetInnerHTML={{ __html: this.props.entry.Body }}
         onClick={e => this.editorOpen(e)} />
