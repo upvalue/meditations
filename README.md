@@ -26,7 +26,7 @@ Go to your workspace's source.
 
     $ go build
     $ yarn
-    $ ./meditations --port 8080 --database sample.sqlite3 --migrate 
+    $ ./meditations serve --port 8080 --database sample.sqlite3 --migrate 
 
 ## Dependencies
 

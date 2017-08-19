@@ -33,10 +33,12 @@
 ** TODO Fix poor formatting in some older entries
 ** DONE Fix synchronization
 ** TODO Add tags from navigation bar
+** TODO Design tweak: Should there be a space between entries on the same day?
 * Overall
 ** TODO D3 visualization
 ** TODO Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.
-** TODO Replace the navbar with the date navigation element; generalize the date navigation element
+** DONE Replace the navbar with the date navigation element; generalize the date navigation element
+** TODO Replace navbar entirely?
 ** DONE Port to Bootstrap 4.6
 ** DONE Port from CoffeeScript to ES2015 or TypeScript
 ** DONE Simplify sync code by moving messaging stuff to sync.go
@@ -53,6 +55,7 @@
 ** DONE Handle WebSocket disconnects gracefully
 ** TODO Octicon replacement. There's no need to include all the octicons when this app uses 10-15 of them. Medium-editor-tables will have to be modified.
 ** TODO Switching from habits to journal or back causes a "WebSocket connection failed" message to pop up on Firefox.
+** TODO ESC button should exit modals.
 ** DONE Use flexbox instead of bootstrap grid.
 
 ** TODO Time handling
