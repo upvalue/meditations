@@ -10,7 +10,7 @@ In addition, it has a journal that supports tagging and organizing entries by na
 
 ![sample usage video](http://i.imgur.com/gmFSRK4.gif)
 
-## [Live Demo](http://meditations.ioddly.com)
+## [> Live Demo <](https://meditations.upvalue.io)
 
 # Manual
 

@@ -132,7 +132,7 @@ class CEntry extends Editable<CEntryProps> {
           <div className="entry-controls mr-2">
             <strong>
               {this.props.entry.CreatedAt.local()
-                .format(!this.props.context ? 'h:mm A'  : 'M-D-YY h:mm A')
+                .format(this.props.context ? 'M-D-YY h:mm A' : 'h:mm A')
             }</strong>
 
             {ctxLink && 
@@ -178,7 +178,10 @@ class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
   }
 
   render() {
-    const res = Array<React.ReactElement<{key: number}> | CEntry>();
+
+    // This could be simplified with some kind of reduce comparison
+    const res = Array<React.ReactElement<{key: number}>>();
+
     let lastDate : moment.Moment | null = null;
     let key = 0;
     this.props.entries.forEach((e) => {
@@ -186,6 +189,7 @@ class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
         lastDate = e.Date;
         // Add a nicely formatted and linky date header for each day with entries
         if (key !== 0) {
+          // Append HR after date headers
           key += 1;
           res.push(<hr key={key} />);
         }

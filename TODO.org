@@ -33,7 +33,8 @@
 ** TODO Fix poor formatting in some older entries
 ** DONE Fix synchronization
 ** TODO Add tags from navigation bar
-** TODO Design tweak: Should there be a space between entries on the same day?
+** DONE Design tweak: Should there be a space between entries on the same day?
+** TODO Idea: Some kind of word analysis e.g looking at the frequency of various words ("stress" "anxiety" etc)
 * Overall
 ** TODO D3 visualization
 ** TODO Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.

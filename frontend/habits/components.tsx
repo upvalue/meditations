@@ -17,12 +17,6 @@ import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, 
   from './state';
 import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
 
-/** 
- * Used to measure recent project activity, combined with ProjectDays on the backend such that e.g.
- * 24 out of the last 72 days having a project-related task in them would be considered extremely
- * active, 18 somewhat active, and so on. Should be divisible by 4.
- */
-
 export interface TaskProps {
   // Drag and drop implementation props
   connectDropTarget: ReactDnd.ConnectDropTarget;
