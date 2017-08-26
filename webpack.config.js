@@ -7,10 +7,13 @@ const sassExtract = new ExtractTextPlugin('bundle-[name].css');
 
 const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
+const getEntryList = name =>
+  [`./frontend/entry/${name}.ts`, `./frontend/style/${name}.scss`];
+
 module.exports = {
   entry: {
-    journal: ['./frontend/entry/journal.ts', './frontend/style/journal.scss'],
-    habits: ['./frontend/entry/habits.ts', './frontend/style/habits.scss'],
+    journal: getEntryList('journal'),
+    habits: getEntryList('habits'),
   },
 
   output: {

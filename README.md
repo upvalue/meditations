@@ -1,6 +1,7 @@
 ![CircleCI Badge](https://circleci.com/gh/ioddly/meditations.png?circle-token=:circle-token&style=shield)
 
-meditations is an application for tracking life progress that builds on habit formation and long term thinking.
+meditations is an application for tracking progress towards goals that builds on habit formation and long term
+thinking.
 
 Originally a Trello board, meditations simply keeps track of how often you complete tasks, and how much time you spend
 on them (optionally). It's fairly minimalist compared to more complex time management systems, and leave the structure

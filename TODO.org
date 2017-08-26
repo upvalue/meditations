@@ -22,6 +22,8 @@
 ** TODO As before, navigation buttons should also be valid links so they can be opened in new tabs.
 ** TODO Export causes downloads on multiple tabs. Export does not work when served through nginx
 ** TODO Drag and drop on comment
+** TODO Projects, rather than having a built-in range (e.g. 72 days) could have a user-settable range including years &etc
+  and could calculate time usage for such
 * Journal
 ** DONE Month link is broken
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately

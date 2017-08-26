@@ -75,10 +75,7 @@ export type CommonState = {
   socketReconnect: () => void;
 };
 
-function reduceReducers<S>(...reducers: redux.Reducer<S>[]): redux.Reducer<S> {
-  return (previous:any, current: any) =>
-    reducers.reduce((p: any, r: any) => r(p, current), previous);
-}
+export let dispatch: (action: CommonAction) => void;
 
 export function commonReducer(state: CommonState, action: CommonAction): CommonState  {
   switch (action.type) {
@@ -88,9 +85,8 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
         return {...state,
           notifications: [...state.notifications, action.notification],
         };
-      } else {
-        return { ...state, notifications: [action.notification] };
-      }
+      } 
+      return { ...state, notifications: [action.notification] };
     case 'SOCKET_CLOSED':
       return { ...state, socketClosed: true };
     case 'SOCKET_OPENED':
@@ -107,8 +103,6 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
   return state;
 }
 
-export let dispatch: (action: CommonAction) => void;
-
 /**
  * This creates a store with thunk & logger middleware applied and a common reducer added. 
  * The store is also saved off so that common UI items can dispatch actions to it without it needing
@@ -123,7 +117,6 @@ export function createStore<State extends CommonState, Action extends redux.Acti
       [redux.Store<State>,
        (action: Action | ((thunk: (action: Action) => void) => void)) => void
        ] {
-
 
   // Apply common reducer to all actions
   const combinedReducer = (pstate: State = initialState, action: redux.Action): State => {
