@@ -335,7 +335,7 @@ const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title
   return <section className="scope bg-gray mb-2">
     <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
       <h3 className="pl-2">{title}</h3>
-      <div className="scope-controls pr-1 pt-1">
+      <div className="scope-controls pr-1 pt-1 flex-self-center">
         <OcticonButton name="plus" onClick={addTask} tooltip="Add task" />
       </div>
     </div>
@@ -459,7 +459,8 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
             Projects</a></span> 
           <span> &gt; {this.props.scope.Name}</span></h3>
 
-        <OcticonButton name="plus" tooltip="New task" onClick={() => this.addTask()} />
+        <OcticonButton className="flex-self-center" name="plus"
+          tooltip="New task" onClick={() => this.addTask()} />
       </div>
 
       {...tasks}
@@ -533,8 +534,8 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
         <h2 className="scope-title">Projects</h2>
-        <div className="scope-controls pr-1 pt-1">
-          <OcticonButton name="plus" tooltip="Add new project"
+        <div className="scope-controls pr-1 pt-1 flex-self-center">
+          <OcticonButton name="plus" tooltip="Add new project" 
             onClick={() => this.addProject()} />
         </div>
       </div>
