@@ -38,8 +38,9 @@
 ** DONE Design tweak: Should there be a space between entries on the same day?
 ** TODO Idea: Some kind of word analysis e.g looking at the frequency of various words ("stress" "anxiety" etc)
 * Overall
+** TODO React 0.6 port
 ** TODO D3 visualization
-** TODO Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.
+** DONE Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.
 ** DONE Replace the navbar with the date navigation element; generalize the date navigation element
 ** TODO Replace navbar entirely?
 ** DONE Port to Bootstrap 4.6
@@ -74,7 +75,7 @@
 ** TODO Built-in tutorial
 ** TODO Responsive interface
 ** TODO Windows & linux build
-** TODO Redesign navbar (again)
+** DONE Redesign navbar (again)
 ** TODO Electron port
 ** DONE Refactor frontend code to be more organized
 *** DONE window.prompt is unsupported
