@@ -34,6 +34,11 @@ webserver and migrates the database, if necessary.
 There is a built-in walkthrough that can be accessed through the application, which is the best
 way to learn the user interface.
 
+*** Editing 
+
+Rich text editing is provided by medium-editor, see https://yabwe.github.io/medium-editor/ for
+further documentation.
+
 *** Habits
 
 Habits is a todo list based on habit formation through completion of repeated tasks.
