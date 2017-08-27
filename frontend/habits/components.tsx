@@ -13,7 +13,7 @@ import * as common from '../common';
 import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner } from '../common/components';
 
 import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
-  MountScope }
+  MountScope, dispatchProjectListUpdate }
   from './state';
 import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
 
@@ -335,8 +335,9 @@ const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title
   return <section className="scope bg-gray mb-2">
     <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
       <h3 className="pl-2">{title}</h3>
-      <div className="scope-controls pr-1 pt-1 flex-self-center">
-        <OcticonButton name="plus" onClick={addTask} tooltip="Add task" />
+      <div className="scope-controls pr-1 pt-1 ">
+        <OcticonButton className="" name="plus" onClick={addTask}
+          tooltip="Add task" />
       </div>
     </div>
 
@@ -413,16 +414,17 @@ export class TimeScope extends
 }
 
 /** Returns project activity indicator */
-const projectActivityIcon = (p: Project) => { 
+const projectActivityIcon = (p: Project, days: number) => { 
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
   return <span className={`octicon octicon-flame project-activity-${projectActivityClass}`}
-    title={`${p.CompletedTasks} in the last 72 days`} />;
+    title={`${p.CompletedTasks} in the last ${days} days`} />;
 };
 
 export interface ProjectScopeProps {
   currentDate: moment.Moment;
   scope: Scope;
+  projectStatsDays: number;
 }
 
 export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
@@ -472,9 +474,12 @@ export interface ProjectListProps {
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
   currentDate: moment.Moment;
+  projectStatsDays: number;
 }
 
 export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
+  projectStatsDaysInput: HTMLInputElement;
+
   deleteProject(id: number) {
     common.modalConfirm(
       'Are you sure you want to delete this project?', 'Delete this project!',
@@ -499,18 +504,29 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   }
 
   renderProjectLink(project: Project) {
+    const hours = Math.floor(project.Minutes / 60);
+    const minutes = project.Minutes % 60;
     return <div key={project.ID} className="d-flex flex-row flex-justify-between">
       <div>
 
-        {project.Pinned && projectActivityIcon(project)}
+        {project.Pinned && projectActivityIcon(project, this.props.projectStatsDays)}
 
         <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
       </div>
 
       <div className="project-controls">
-        <span className="task mr-1"> {/* used for smaller font*/}
-          {project.CompletedTasks}
-        </span>
+        {(project.CompletedTasks > 0) && 
+          <span className="mr-1 tooltipped tooltipped-w" aria-label="Completed tasks"> 
+            <span className="octicon octicon-check" />
+            {project.CompletedTasks}
+          </span>}
+
+        {(hours > 0 || minutes > 0) &&
+          <span className="mr-1 tooltipped tooltipped-w" aria-label="Time">
+            <span className="octicon octicon-clock" />
+            {hours > 0 && `${hours}h`}
+            {minutes > 0 && `${minutes}m`}
+          </span>}
 
         <OcticonButton name="clippy" tooltip="Copy to left"
           onClick={() => this.copyLeft(project)} />
@@ -530,6 +546,23 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
     });
   }
 
+  /** Calculate stats from the beginning of the year */
+  statsFromStartOfYear() {
+    const days = moment().diff(moment().startOf('year'), 'days');
+    dispatchProjectListUpdate(days);
+  }
+
+  statsFromForever() {
+    dispatchProjectListUpdate(365 * 30);
+  }
+
+  statsFromInput() {
+    const n = parseInt(this.projectStatsDaysInput.value, 10);
+    if (!isNaN(n)) {
+      dispatchProjectListUpdate(n);
+    }
+  }
+
   render() {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
@@ -546,9 +579,31 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
       <div className="pl-1 pr-1">
         {this.props.unpinnedProjects.map(p => this.renderProjectLink(p))}
       </div>
+      <hr className="mt-1 mb-1" />
+      <div className="pl-1 pr-1 pt-1 pb-1">
+        <div className="d-flex flex-row flex-justify-between">
+          <div>
+            Showing stats for last <button className="btn btn-sm ">
+              {this.props.projectStatsDays}
+            </button> days
+          </div>
+          <div>
+            <input ref={(ref) => { if (ref) this.projectStatsDaysInput = ref; }}
+              type="text" size={2} placeholder="72" className="mr-1 form-control"
+              onBlur={() => this.statsFromInput()} />
+            <button className="btn btn-sm btn-secondary mr-1"
+              onClick={() => this.statsFromStartOfYear()}>
+              Start of year
+            </button>
+            <button className="btn btn-sm btn-secondary"
+              onClick={() => this.statsFromForever()}>
+              Forever
+            </button>
+          </div>
+        </div>
+      </div>
     </section>;
   }
-
 }
 
 export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
@@ -729,10 +784,12 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
     if (this.props.currentProject === 0) {
       return <ProjectList currentDate={this.props.currentDate}
         pinnedProjects={this.props.pinnedProjects}
-        unpinnedProjects ={this.props.unpinnedProjects} />;
+        unpinnedProjects ={this.props.unpinnedProjects}
+        projectStatsDays={this.props.projectStatsDays} />;
     } else {
       if (this.props.project && this.props.currentProject === this.props.project.Scope) {
-        return <ProjectScope  currentDate={this.props.currentDate} scope={this.props.project} />;
+        return <ProjectScope  currentDate={this.props.currentDate} scope={this.props.project}
+          projectStatsDays={this.props.projectStatsDays} />;
       } else {
         // In case the route has changed, but the project data has not been loaded yet.
         return <Spinner />;

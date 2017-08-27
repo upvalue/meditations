@@ -44,6 +44,9 @@ export interface Task extends common.Model {
   TotalTasksWithTime: number;
 }
 
+/** Default amount of days to track project activity for */
+export const PROJECT_STATS_DAYS_DEFAULT = 72;
+
 /** Note that this does not track the structure of the backend
  * Scope table but is used for rendering */
 export interface Scope {
@@ -58,6 +61,7 @@ export type Project = {
   Name: string;
   Pinned: boolean;
   CompletedTasks: number;
+  Minutes: number;
 };
 
 /** A list of tasks and a date; used to mount a bunch of days at once. */
@@ -72,6 +76,11 @@ export interface FilterState {
   name?: string;
   begin?: moment.Moment | null;
   /** Filter ending date */
+  end?: moment.Moment | null;
+}
+
+export interface ProjectStatsState {
+  begin?: moment.Moment | null;
   end?: moment.Moment | null;
 }
 
@@ -92,14 +101,18 @@ export interface HabitsState extends common.CommonState {
   year: Scope;
   days: Scope[];
   project: Scope;
+
   /** 
    * Name of the last modified task. Used to highlight monthly/yearly tasks after daily tasks are
    * modified to reinforce rules
    */
   lastModifiedTask: string;
 
-  // Filtering
+  /** Filter date-scoped tasks */
   filter: FilterState;
+  
+  /** Days to track project activity for */
+  projectStatsDays: number;
 }
 
 interface ChangeRoute {
@@ -112,6 +125,7 @@ interface AddProjectList {
   type: 'PROJECT_LIST';
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
+  days: number;
 }
 
 interface MountDays {
@@ -133,6 +147,12 @@ interface UpdateTasks {
   tasks: Task[];
 }
 
+/** Update a single project with new information */
+interface UpdateProject {
+  type: 'UPDATE_PROJECT';
+  project: Project;
+}
+
 /** Update state to filter tasks by name */
 interface FilterByName {
   type: 'FILTER_BY_NAME';
@@ -151,13 +171,15 @@ interface FilterClear {
 }
 
 type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | 
-  ChangeRoute | AddProjectList | FilterByName | FilterByDate | FilterClear;
+  ChangeRoute | AddProjectList | FilterByName | FilterByDate | FilterClear | UpdateTasks |
+  UpdateProject; 
 
 const initialState = {
   currentDate: moment(),
   mounted: false,
   type: 'VIEW_MONTH',
   filter: {},
+  projectStatsDays: PROJECT_STATS_DAYS_DEFAULT,
 } as HabitsState;
 
 /** Check whether a particular scope+date combo is
@@ -224,7 +246,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
   switch (action.type) {
     case 'PROJECT_LIST':
       return { ...state, pinnedProjects: action.pinnedProjects,
-        unpinnedProjects: action.unpinnedProjects };
+        unpinnedProjects: action.unpinnedProjects, projectStatsDays: action.days };
 
     case 'CHANGE_ROUTE':
       return { ...state, currentDate: action.date, currentProject: action.currentProject };
@@ -288,6 +310,24 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
       }
       return nstate;
     }
+
+    case 'UPDATE_PROJECT': {
+      const upd = (array: Project[]) => {
+        return array.map((p) => {
+          if (p.Name === action.project.Name) {
+            return action.project;
+          } 
+          return p;
+        });
+      };
+
+      return { ...state, 
+        pinnedProjects: action.project.Pinned ? upd(state.pinnedProjects) : state.pinnedProjects,
+        unpinnedProjects: action.project.Pinned ? state.unpinnedProjects :
+          upd(state.unpinnedProjects),
+      };
+    }
+
     case 'FILTER_BY_NAME': {
       return { ...state, filter: { ...state.filter, name: action.name } };
     }
@@ -306,3 +346,16 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
 };
 
 export const [store, dispatch] = common.createStore(reducer, initialState);
+
+export const dispatchProjectListUpdate = (days: number) => {
+  dispatch((dispatch) => {
+    common.get(`/habits/projects/${days}`, ((response:
+      { Pinned: Project[], Unpinned: Project[] }) => {
+      dispatch({
+        days,
+        type: 'PROJECT_LIST', pinnedProjects: response.Pinned,
+        unpinnedProjects: response.Unpinned,
+      });
+    }));
+  });
+};

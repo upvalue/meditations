@@ -38,7 +38,7 @@
 ** DONE Design tweak: Should there be a space between entries on the same day?
 ** TODO Idea: Some kind of word analysis e.g looking at the frequency of various words ("stress" "anxiety" etc)
 * Overall
-** TODO React 0.6 port
+** TODO React 0.16 port
 ** TODO D3 visualization
 ** DONE Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.
 ** DONE Replace the navbar with the date navigation element; generalize the date navigation element
@@ -60,6 +60,7 @@
 ** TODO Octicon replacement. There's no need to include all the octicons when this app uses 10-15 of them. Medium-editor-tables will have to be modified.
 ** TODO Switching from habits to journal or back causes a "WebSocket connection failed" message to pop up on Firefox.
 ** TODO ESC button should exit modals.
+** TODO WebSocket bug: seems websockets cannot send multiple messages from a single go method. Unsure as to cause.
 ** DONE Use flexbox instead of bootstrap grid.
 
 ** TODO Time handling

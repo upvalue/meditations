@@ -83,6 +83,7 @@ type Scope struct {
 	Pinned bool   `gorm:"not null;default:'0'"`
 	// Derived statistics
 	CompletedTasks int `gorm:"-"`
+	Minutes        int `gorm:"-"`
 }
 
 // Comment represents a task comment.
@@ -198,7 +199,8 @@ func (task *Task) CalculateStats() {
 //
 
 type habitSyncMsg struct {
-	Tasks []Task
+	Tasks     []Task
+	ProjectID uint
 }
 
 // There are several types of UI task updates
@@ -212,7 +214,7 @@ func (task *Task) SyncOnlyTask() {
 	var tasks []Task
 	tasks = append(tasks, *task)
 
-	habitSync.Send("UPDATE_TASKS", habitSyncMsg{
+	habitSync.Send("UPDATE_TASKS_AND_PROJECT", habitSyncMsg{
 		Tasks: tasks,
 	})
 
@@ -227,6 +229,7 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 	DB.Where("task_id = ?", task.ID).First(&task.Comment)
 
 	var tasks []Task
+	var project Scope
 
 	if task.Scope == ScopeDay {
 		var year Task
@@ -244,7 +247,12 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 			month.CalculateStats()
 			tasks = append(tasks, month)
 		}
+
+		// Sync projects
+		DB.Where("name = ?", task.Name).Preload("Project").First(&project)
+
 	} else if task.Scope == ScopeYear || task.Scope == ScopeMonth {
+
 		task.CalculateStats()
 	}
 
@@ -255,8 +263,9 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 	if len(tasks) != 0 {
 		// It is possible for this to result in zero tasks to send, if a task has been deleted and
 		// no stat recalculations are necessary
-		habitSync.Send("UPDATE_TASKS", habitSyncMsg{
-			Tasks: tasks,
+		habitSync.Send("UPDATE_TASKS_AND_PROJECT", habitSyncMsg{
+			Tasks:     tasks,
+			ProjectID: project.ID,
 		})
 	}
 
@@ -352,18 +361,27 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 }
 
 // CalculateProjectStats calculates project statistics
-func (project *Scope) CalculateProjectStats() {
+func (project *Scope) CalculateProjectStats(days int) {
 	var past time.Time
 	if project.Pinned == true {
-		past = time.Now().AddDate(0, 0, -ProjectDays)
+		past = time.Now().AddDate(0, 0, -days)
 	} else {
+		// For non-pinned projects, calculate total time always
 		past = time.Now().AddDate(-30, 0, 0)
 	}
 
 	var count struct{ Count int }
 	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
 		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
+
+	var minutes struct{ Minutes int }
+	DB.Table("tasks").Select("(sum(hours) * 60) + sum(minutes) as minutes").
+		Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
+			ScopeDay, project.Name, past, TaskComplete).
+		Scan(&minutes)
+
 	project.CompletedTasks = count.Count
+	project.Minutes = minutes.Minutes
 }
 
 // ProjectListMsg is sent both as a result of GETting /habits/projects and syncing project list
@@ -374,7 +392,7 @@ type ProjectListMsg struct {
 }
 
 // getProjectList returns struct with slices of pinned and unpinned projects
-func getProjectList() ProjectListMsg {
+func getProjectList(days int) ProjectListMsg {
 	var pinnedProjects []Scope
 	var unpinnedProjects []Scope
 
@@ -382,11 +400,11 @@ func getProjectList() ProjectListMsg {
 	DB.Where("id >= ? and pinned = 0", ScopeProject).Order("name").Find(&unpinnedProjects)
 
 	for i := range pinnedProjects {
-		pinnedProjects[i].CalculateProjectStats()
+		pinnedProjects[i].CalculateProjectStats(days)
 	}
 
 	for i := range unpinnedProjects {
-		unpinnedProjects[i].CalculateProjectStats()
+		unpinnedProjects[i].CalculateProjectStats(days)
 	}
 
 	return ProjectListMsg{pinnedProjects, unpinnedProjects}
@@ -394,5 +412,5 @@ func getProjectList() ProjectListMsg {
 
 // syncProjectList sends an updated list of projects over the socket
 func syncProjectList() {
-	habitSync.Send("PROJECTS", getProjectList())
+	habitSync.Send("GET_PROJECT_LIST", nil)
 }

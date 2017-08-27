@@ -7,7 +7,7 @@ import route from 'riot-route';
 import * as common from '../common';
 
 import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
-  MountScope } from './state';
+  MountScope, PROJECT_STATS_DAYS_DEFAULT, dispatchProjectListUpdate } from './state';
 import { HabitsRoot } from './components';
 
 /**
@@ -24,6 +24,18 @@ export const routeForView = (date: moment.Moment, project?: number) => {
 export const urlForView = (date: moment.Moment, project?: number) => {
   return `#${routeForView(date, project)}`;
 };
+
+export const dispatchProjectUpdate = (id: number, days: number) => {
+  dispatch((dispatch) => {
+    common.get(`/habits/project/${id}/${days}`, ((response: Project) => {
+      dispatch({
+        type: 'UPDATE_PROJECT',
+        project: response,
+      });
+    }));
+  });
+};
+
 
 /** Habits entry point. Sets up router, socket, and renders root. */
 export const main = () => {
@@ -117,13 +129,16 @@ export const main = () => {
 
       // Retrieve and mount project list
       if (!state.pinnedProjects) {
+        dispatchProjectListUpdate(state.projectStatsDays)
+        /*
         dispatch((dispatch) => {
-          common.get(`/habits/projects`, ((response:
+          common.get(`/habits/projects/${state.projectActivityDays}`, ((response:
             { Pinned: Project[], Unpinned: Project[] }) => {
             dispatch({ type: 'PROJECT_LIST', pinnedProjects: response.Pinned,
               unpinnedProjects: response.Unpinned });
           }));
         });
+        */
       }
 
       // Retrieve and mount requested project
@@ -144,9 +159,10 @@ export const main = () => {
 
   ///// INSTALL WEBSOCKET
   type HabitMessage = {
-    Type: 'UPDATE_TASKS';
+    Type: 'UPDATE_TASKS_AND_PROJECT';
     Datum: {
       Tasks: Task[],
+      ProjectID?: number,
     }
   } | {
     Type: 'UPDATE_SCOPE';
@@ -157,22 +173,29 @@ export const main = () => {
       Name: string;
     }
   } | {
-    Type: 'PROJECTS';
+    Type: 'GET_PROJECT_LIST';
     Datum: {
       Pinned: Project[];
       Unpinned: Project[];
     }
+  } | {
+    Type: 'GET_PROJECT';
+    Datum: Project;
   };
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
     console.log(`Received WebSocket message`, msg);
     switch (msg.Type) {
-      case 'UPDATE_TASKS':
+      case 'UPDATE_TASKS_AND_PROJECT':
         msg.Datum.Tasks.forEach(common.processModel);
-        console.log(msg.Datum);
+
         dispatch({type: 'UPDATE_TASKS',
           tasks: msg.Datum.Tasks,
         });
+
+        if (msg.Datum.ProjectID) {
+          dispatchProjectUpdate(msg.Datum.ProjectID, store.getState().projectStatsDays);
+        }
         break;
 
       case 'UPDATE_SCOPE':
@@ -181,9 +204,12 @@ export const main = () => {
           scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name});
         break;
 
-      case 'PROJECTS':
-        dispatch({ type: 'PROJECT_LIST', pinnedProjects: msg.Datum.Pinned,
-          unpinnedProjects: msg.Datum.Unpinned});
+      case 'GET_PROJECT':
+        dispatchProjectUpdate(msg.Datum.ID, store.getState().projectStatsDays);
+        break;
+
+      case 'GET_PROJECT_LIST':
+        dispatchProjectListUpdate(store.getState().projectStatsDays);
         break;
     }
   });

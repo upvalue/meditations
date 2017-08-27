@@ -290,8 +290,22 @@ func commentUpdate(c *macaron.Context, comment Comment) {
 	c.PlainText(200, []byte("OK"))
 }
 
+// getProject retrieves information about a particular project;
+// called when time or completion information changes
+func getProject(c *macaron.Context) {
+	id := c.ParamsInt("id")
+	days := c.ParamsInt("days")
+	var project Scope
+	DB.Where("id = ?", id).First(&project)
+
+	project.CalculateProjectStats(days)
+
+	c.JSON(200, project)
+}
+
 func getProjects(c *macaron.Context) {
-	c.JSON(200, getProjectList())
+	days := c.ParamsInt("days")
+	c.JSON(200, getProjectList(days))
 }
 
 // projectPost parses a project ID and fetches it from the DB, returning an error if it can't be
@@ -461,7 +475,8 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-month-and-days", tasksInMonthAndDays)
 
 	m.Get("/in-project/:id:int", tasksInProject)
-	m.Get("/projects", getProjects)
+	m.Get("/project/:id:int/:days:int", getProject)
+	m.Get("/projects/:days:int", getProjects)
 
 	m.Post("/projects/delete/:id:int", projectDelete)
 	m.Post("/projects/new/:name", projectNew)
