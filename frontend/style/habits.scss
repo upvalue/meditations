@@ -21,6 +21,7 @@ $commentBackground: #fcfcfc;
 }
 
 .scope {
+  border-radius: 2px;
   border: 1px solid #e1e4e8;
   background-color: darken(#f6f8fa, 0%) !important;
 }
@@ -53,15 +54,6 @@ $commentBackground: #fcfcfc;
   //background-color: darken($editableBg, 5%);
 }
 
-.task .task-comment {
-  background-color: $editableBg;
-  font-size: 0.8em;
-  // Comments are padded slightly to indicate that they exist within tasks
-}
-
-.task-comment[data-medium-focused="true"] {
-  // background-color: darken($editableBg, 5%);
-}
 
 .task-last-modified {
   font-weight: bold;
@@ -116,19 +108,23 @@ $commentBackground: #fcfcfc;
   color: $uiColorMuted;
 }
 
+
+// .task-comment[data-medium-focused="true"] {
+  // background-color: darken($editableBg, 5%);
+
 .task-comment {
+  background-color: $editableBg;
+  font-size: 0.8em;
   font-family: $mono-font;
-  /* Comments have an off-white background */
-  padding: 2px;
-  font-size: 12px;
+  padding: 4px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
-.task-comment p:first-of-type {
-  padding-top: .25em;
-}
+// .task-comment p:first-of-type { }
 
 /* Do not add padding to bottom of comments */
-.task-comment p{
+.task-comment p {
   margin-bottom: 0;
 }
 

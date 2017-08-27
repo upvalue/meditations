@@ -533,7 +533,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   render() {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
-        <h2 className="scope-title">Projects</h2>
+        <h3 className="scope-title">Projects</h3>
         <div className="scope-controls pr-1 pt-1 flex-self-center">
           <OcticonButton name="plus" tooltip="Add new project" 
             onClick={() => this.addProject()} />
