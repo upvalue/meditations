@@ -288,16 +288,16 @@ func Main() {
 				DBOpen()
 
 				if Config.Demo {
-					// ticker := time.NewTicker(time.Second * 10)
-					ticker := time.NewTicker(time.Hour)
+					ticker := time.NewTicker(time.Second * 10)
+					// ticker := time.NewTicker(time.Hour)
 					today := time.Now()
 
-					DBSeed(today.Format("2006-01"))
+					DBSeed(today.AddDate(0, 1, 0).Format("2006-01-02"))
 
 					go func() {
 						for t := range ticker.C {
 							fmt.Printf("Seeding database at %v!\n", t)
-							DBSeed(today.Format("2006-01"))
+							DBSeed(today.Format("2006-01-02"))
 						}
 					}()
 

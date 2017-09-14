@@ -86,12 +86,17 @@ func DBSeed(seedFrom string) {
 
 	log.Printf("Seeding database from %s\n", seedFrom)
 
-	day, err := time.Parse("2006-01", seedFrom)
+	day, err := time.Parse("2006-01-02", seedFrom)
+
 	if err != nil {
-		log.Fatalf("Expected date of format 2006-01 but got %s: %v", seedFrom, err)
+		day, err = time.Parse("2006-01", seedFrom)
+		if err != nil {
+			log.Fatalf("Expected date of format 2006-01 or 2006-01-02 but got %s: %v", seedFrom, err)
+
+		}
+		day = day.AddDate(0, 1, -1)
 	}
 
-	day = day.AddDate(0, 1, -1)
 	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Comment{}, &Tag{})
 	DBMigrate()
 

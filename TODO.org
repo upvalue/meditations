@@ -1,5 +1,6 @@
 * Habits
 ** DONE CalculateStats should switch intelligently on monthly and yearly tasks
+** TODO Negative streaks in red
 ** TODO Remove comments table, collapse to tasks
 ** TODO Collapsing
    Or some other way of reducing visual clutter with tasks that are frequently logged but otherwise uninteresting.
@@ -22,8 +23,10 @@
 ** TODO As before, navigation buttons should also be valid links so they can be opened in new tabs.
 ** TODO Export causes downloads on multiple tabs. Export does not work when served through nginx
 ** TODO Drag and drop on comment
-** TODO Projects, rather than having a built-in range (e.g. 72 days) could have a user-settable range including years &etc
+** DONE Projects, rather than having a built-in range (e.g. 72 days) could have a user-settable range including years &etc
   and could calculate time usage for such
+** TODO Project activity icon should reflect percentage of days in time
+** TODO Stats number should not be a button, just some bold text
 * Journal
 ** DONE Month link is broken
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
@@ -37,6 +40,7 @@
 ** TODO Add tags from navigation bar
 ** DONE Design tweak: Should there be a space between entries on the same day?
 ** TODO Idea: Some kind of word analysis e.g looking at the frequency of various words ("stress" "anxiety" etc)
+** TODO Tag completions
 * Overall
 ** TODO React 0.16 port
 ** TODO D3 visualization

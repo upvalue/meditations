@@ -129,7 +129,7 @@ export const main = () => {
 
       // Retrieve and mount project list
       if (!state.pinnedProjects) {
-        dispatchProjectListUpdate(state.projectStatsDays)
+        dispatchProjectListUpdate(state.projectStatsDays);
         /*
         dispatch((dispatch) => {
           common.get(`/habits/projects/${state.projectActivityDays}`, ((response:
