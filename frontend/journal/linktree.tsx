@@ -49,7 +49,9 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
         </button>
       }
       {node.href ? 
-         <a href={node.href}>{node.title}</a>
+          <a href={node.href}
+            style={{ textDecoration: node.children ? 'underline' : 'none' }}          
+            >{node.title}</a>
          : <a className="link-tree-node-anchor"
               onClick={e => this.toggleNode(e, node)}>{node.title}</a>}
       </div>
