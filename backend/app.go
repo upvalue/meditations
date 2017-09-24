@@ -296,8 +296,9 @@ func Main() {
 
 					go func() {
 						for t := range ticker.C {
+							day := time.Now()
 							fmt.Printf("Seeding database at %v!\n", t)
-							DBSeed(today.Format("2006-01-02"))
+							DBSeed(day.Format("2006-01-02"))
 						}
 					}()
 
