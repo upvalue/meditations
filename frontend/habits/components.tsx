@@ -68,22 +68,30 @@ const taskSameScope = (left: Task, right: Task) => {
 
 const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
   drop(props, monitor, component) {
-    // Possible cases:
 
     if (component && monitor) {
       const src = (monitor.getItem() as any).task;
+      console.log('WIZARD FIGHT');
       console.log(monitor.getItemType());
       const target = props.task;
-      
+
       // Do not allow dropping on self
       if (src.ID === target.ID) {
         return;
       }
 
+
+      // Task dropped on task in same scope; trigger a re-order
       if (taskSameScope(src, target)) {
-        // Task dropped on task in same scope; trigger a re-order
         common.post(`/habits/reorder/${src.ID}/${target.ID}`);
+        return;
       }
+
+      // Task dropped on task in different scope: move the task
+      common.post(`/habits/reorder/${src.ID}/${target.ID}`);
+
+      // TODO: Possibly, this should copy rather than reorder if task scopes are different.
+      return;
     }
   },
 };
@@ -329,7 +337,8 @@ export const createCTask = (key: number, task: Task, lastModifiedTask?: string) 
 
 /** 
  * Scope presentation element. Made because time-based and project-based scopes have some different
- * functionality */
+ * functionality
+ */
 const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title, addTask,
     children }) => {
   return <section className="scope bg-gray mb-2">
@@ -651,11 +660,13 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     // Build up a descriptive filename along with the POST body
     let filename = '';
 
+    // Add task name, if available
     if (this.props.filter.name) {
       body.Name = this.props.filter.name;
       filename += `-${this.props.filter.name}`;
     }
 
+    // Add description of date, if available
     if (this.props.filter.begin) {
       body.Begin = this.props.filter.begin.format(common.DAY_FORMAT);
       filename += `-from-${this.props.filter.begin.format(common.DAY_FORMAT)}`;

@@ -278,10 +278,12 @@ type scopeSyncMsg struct {
 	Name  string
 }
 
-// SyncScope re-sends a task's entire scope. Necessary when order is changed or a task is deleted
-func (task *Task) SyncScope() {
+// syncScopeImpl re-sends an entire scope given scope and date as an int; it's used when tasks are
+// moved, deleted or added and thus the entire scope needs to be updated
+func syncScopeImpl(scope int, date time.Time) {
 	var tasks []Task
-	task.Near(&tasks)
+
+	tasksInScope(&tasks, scope, date)
 
 	for i := range tasks {
 		tasks[i].CalculateStats()
@@ -290,16 +292,16 @@ func (task *Task) SyncScope() {
 	var scopeName string
 
 	// If this is a project, we also need to include the name
-	if task.Scope >= ScopeProject {
+	if scope >= ScopeProject {
 		var scope Scope
-		DB.Where("ID = ?", task.Scope).First(&scope)
+		DB.Where("ID = ?", scope).First(&scope)
 
 		scopeName = scope.Name
 	}
 
 	message := scopeSyncMsg{
-		Date:  task.Date.Format(DateFormat),
-		Scope: task.Scope,
+		Date:  date.Format(DateFormat),
+		Scope: scope,
 		Tasks: tasks,
 		Name:  scopeName,
 	}
@@ -307,10 +309,15 @@ func (task *Task) SyncScope() {
 	habitSync.Send("UPDATE_SCOPE", message)
 }
 
+// TaskSyncScope re-sends a task's entire scope. Necessary when order is changed or a task is deleted
+func (task *Task) TaskSyncScope() {
+	syncScopeImpl(task.Scope, task.Date)
+}
+
 // Sync sends updates to the UI as necessary after a task changes
 func (task *Task) Sync(updateScope bool, recalculate bool, includeMainTask bool) {
 	if updateScope {
-		task.SyncScope()
+		task.TaskSyncScope()
 	}
 
 	if recalculate {

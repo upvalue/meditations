@@ -204,9 +204,14 @@ func taskDelete(c *macaron.Context, task Task) {
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
-// taskSwapOrdering places a task (the src) after a given task (the target), and reorders the entire
+// taskReorder places a task (the src) after a given task (the target), and reorders the entire
 // scope as appropriate
 func taskReorder(c *macaron.Context) {
+	// This is a bit of a mess
+	// Because it has to support several cases of varying complexity
+	// Moving a task within a scope
+	// Moving a task through scopes
+
 	var src, target Task
 
 	DB.LogMode(true)
@@ -214,6 +219,9 @@ func taskReorder(c *macaron.Context) {
 	DB.Where("id = ?", c.ParamsInt("target")).Find(&target)
 	DB.LogMode(false)
 
+	withinScope := src.Date == target.Date
+
+	fmt.Printf("Re-ordering tasks within scope %v\n", withinScope)
 	srcOrder := src.Order
 	fmt.Printf("SRC ORDER %v TARGET ORDER %v\n", srcOrder, target.Order)
 
@@ -223,36 +231,75 @@ func taskReorder(c *macaron.Context) {
 		return
 	}
 
-	var scopeTasks []Task
-	tasksInScope(&scopeTasks, target.Scope, target.Date)
+	srcScope := src.Scope
+	srcDate := src.Date
+
+	targetScope := target.Scope
+	targetDate := target.Date
+
+	var srcTasks []Task
+	var targetTasks []Task
+	tasksInScope(&srcTasks, src.Scope, src.Date)
+
+	if !withinScope {
+		tasksInScope(&targetTasks, target.Scope, target.Date)
+	}
 
 	// Remove src from scope
-	for i, t := range scopeTasks {
+	for i, t := range srcTasks {
 		if t.ID == src.ID {
-			scopeTasks = append(scopeTasks[:i], scopeTasks[i+1:]...)
+			srcTasks = append(srcTasks[:i], srcTasks[i+1:]...)
 		}
 	}
 
 	// Reinsert after target
-	for i, t := range scopeTasks {
-		if t.ID == target.ID {
-			scopeTasks = append(scopeTasks[:i+1], append([]Task{src}, scopeTasks[i+1:]...)...)
-			break
+	if withinScope {
+		for i, t := range srcTasks {
+			if t.ID == target.ID {
+				srcTasks = append(srcTasks[:i+1], append([]Task{src}, srcTasks[i+1:]...)...)
+				break
+			}
+		}
+	} else {
+		src.Date = target.Date
+		src.Scope = target.Scope
+		for i, t := range targetTasks {
+			if t.ID == target.ID {
+				targetTasks = append(targetTasks[:i+1], append([]Task{src}, targetTasks[i+1:]...)...)
+				break
+			}
 		}
 	}
 
 	// Recreate order list
-	for i := range scopeTasks {
-		scopeTasks[i].Order = i
+	for i := range srcTasks {
+		srcTasks[i].Order = i
+	}
+
+	if !withinScope {
+		for i := range targetTasks {
+			targetTasks[i].Order = i
+		}
 	}
 
 	fmt.Printf("Re-ordered tasks\n")
-	for _, t := range scopeTasks {
+
+	if !withinScope {
+		fmt.Printf("out of scope: re-ordering target scope\n")
+		for _, t := range targetTasks {
+			fmt.Printf("%d %s\n", t.Order, t.Name)
+			DB.Save(&t)
+		}
+		syncScopeImpl(targetScope, targetDate)
+	}
+
+	for _, t := range srcTasks {
 		fmt.Printf("%d %s\n", t.Order, t.Name)
 		DB.Save(&t)
 	}
 
-	src.SyncScope()
+	syncScopeImpl(srcScope, srcDate)
+
 	c.PlainText(200, []byte("OK"))
 }
 
