@@ -219,8 +219,9 @@ func taskReorder(c *macaron.Context) {
 	DB.Where("id = ?", c.ParamsInt("target")).Find(&target)
 	DB.LogMode(false)
 
-	withinScope := src.Date == target.Date
+	withinScope := src.Date.Equal(target.Date) && src.Scope == target.Scope
 
+	fmt.Printf("%v %v\n", src.Date, target.Date)
 	fmt.Printf("Re-ordering tasks within scope %v\n", withinScope)
 	srcOrder := src.Order
 	fmt.Printf("SRC ORDER %v TARGET ORDER %v\n", srcOrder, target.Order)

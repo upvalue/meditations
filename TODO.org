@@ -1,5 +1,6 @@
 * Habits
 ** DONE CalculateStats should switch intelligently on monthly and yearly tasks
+** TODO Fix reordering upwards
 ** TODO Negative streaks in red
 ** TODO Remove comments table, collapse to tasks
 ** TODO Collapsing
@@ -8,6 +9,7 @@
    Then just a checkmark at the top to show hidden tasks or not.
 ** TODO Reporting minute amounts over 60 should round down
 ** TODO Calculate and display average time
+** TODO Project progress indicators should be more visually aggressive (e.g. the flame should grow or shrink on pageload)
 ** DONE Copying and pasting comments doesn't seem to work. Probably because it messes with focus in some way.
 ** DONE Using ctrl-up in medium-editor reduces font size
 ** DONE Properly ignore tags for deleted entries. Deleting entries should also delete associated entry_tags.
@@ -42,7 +44,7 @@
 ** TODO Idea: Some kind of word analysis e.g looking at the frequency of various words ("stress" "anxiety" etc)
 ** TODO Tag completions
 * Overall
-** TODO React 0.16 port
+** DONE React 0.16 port
 ** TODO D3 visualization
 ** DONE Medium-editor: make it smaller, and add an HR option or something to more clearly visually separate things.
 ** DONE Replace the navbar with the date navigation element; generalize the date navigation element
