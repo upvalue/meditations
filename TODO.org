@@ -31,6 +31,9 @@
 ** TODO Stats number should not be a button, just some bold text
 * Journal
 ** DONE Month link is broken
+** TODO A named journal entry with sub-entries should display a listing below
+      it (e.g. Essays > Physics) clicking on Essays, if it's an actual entry should display a listing below the entries.
+** TODO LinkTree state should persist across clicks.
 ** TODO Adding a new journal entry and navigating to it should change the URL appropriately
 ** TODO Add a named entry
 ** TODO Add a named entry from LinkTree navigation

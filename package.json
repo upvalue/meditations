@@ -70,7 +70,7 @@
     "moment": "^2.18.1",
     "node-sass": "^4.5.3",
     "octicons": "^3.5.0",
-    "primer-css": "^9.3.0",
+    "primer-css": "9.5.0",
     "react": "16",
     "react-datepicker": "^0.46.0",
     "react-dnd": "^2.4.0",
