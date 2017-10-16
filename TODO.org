@@ -1,4 +1,5 @@
 * Habits
+** TODO Only store minutes instead of hours; convert at display.
 ** DONE CalculateStats should switch intelligently on monthly and yearly tasks
 ** TODO Fix reordering upwards
 ** TODO Negative streaks in red
@@ -31,6 +32,7 @@
 ** TODO Stats number should not be a button, just some bold text
 * Journal
 ** DONE Month link is broken
+** TODO Journal => Notes
 ** TODO A named journal entry with sub-entries should display a listing below
       it (e.g. Essays > Physics) clicking on Essays, if it's an actual entry should display a listing below the entries.
 ** TODO LinkTree state should persist across clicks.

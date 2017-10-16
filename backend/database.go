@@ -3,13 +3,19 @@ package backend
 // database.go - Database open, close, migration, and repair
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3" // load sqlite3 driver
+)
+
+const (
+	SchemaVersion = 2
 )
 
 // DB global database handle
@@ -42,6 +48,41 @@ func DBMigrate() {
 	settings := Settings{Name: "settings"}
 	DB.First(&settings)
 
+	if settings.Schema == SchemaVersion {
+		DB.LogMode(false)
+		return
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Printf("Out-of-date database: migration required. Backup your database before continuing!!!\n")
+	fmt.Print("Enter Y to continue: ")
+
+	text, _ := reader.ReadString('\n')
+
+	if text != "Y\n" {
+
+		fmt.Printf("Got %s instead of Y, exiting", text)
+		os.Exit(1)
+	}
+
+	if settings.Schema == 1 {
+
+		log.Printf("!!! Upgrading from Schema 1 to 2")
+
+		DB.Exec("CREATE TABLE tasks_altered(id, created_at, updated_at, deleted_at, name, date, status, scope, `order`, minutes);")
+		DB.Exec("INSERT INTO tasks_altered SELECT id, created_at, updated_at, deleted_at, name, date, status, scope, `order`, (hours * 60) + minutes as minutes FROM tasks")
+		DB.Exec("DROP TABLE tasks;")
+		//DB.Exec("CREATE TABLE tasks(id, created_at, updated_at, deleted_at, name, date, status, scope, `order`, minutes);")
+		DB.CreateTable(&Task{})
+		DB.Exec("INSERT INTO tasks SELECT id, created_at, updated_at, deleted_at, name, date, status, scope, `order`, minutes FROM tasks_altered")
+		DB.Exec("DROP TABLE tasks_altered")
+
+		// DB.Model(&Task{}).DropColumn("hours")
+
+		settings.Schema = 2
+		DB.Save(&settings)
+	}
+
 	DB.LogMode(false)
 }
 
@@ -55,7 +96,7 @@ func DBCreate() {
 	DB.Save(&year)
 	DB.Save(&bucket)
 
-	settings := Settings{Name: "settings", Schema: 1}
+	settings := Settings{Name: "settings", Schema: 2}
 
 	DB.FirstOrCreate(&settings)
 }

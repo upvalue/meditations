@@ -143,7 +143,7 @@ export class CTaskImpl extends Editable<TaskProps> {
         const [hours, minutes] = this.parseTime(timestr);
 
         // Do not update comment
-        const task = { ...this.props.task, Hours: hours, Minutes: minutes };
+        const task = { ...this.props.task, Minutes: minutes + (hours * 60) };
         delete task.Comment;
         common.post(`/habits/update`, task);
       });
@@ -191,7 +191,23 @@ export class CTaskImpl extends Editable<TaskProps> {
   }
   
   hasTime() {
-    return this.props.task.Hours > 0 || this.props.task.Minutes > 0;
+    return this.props.task.Minutes > 0;
+  }
+
+  renderTime() {
+    let minutes = this.props.task.Minutes;
+    const hours = Math.floor(minutes / 60);
+    minutes = minutes % 60;
+
+    let string = '';
+    if (hours > 0) {
+      string += `${hours}h `;
+    } 
+    if (minutes > 0) {
+      string += `${minutes}m`;
+    }
+
+    return string.trim();
   }
 
   hasStreak() {
@@ -275,8 +291,7 @@ export class CTaskImpl extends Editable<TaskProps> {
           {this.hasTime() && <span className="pr-1 tooltipped tooltipped-w"
               aria-label="Average time">
             <span className="octicon octicon-clock "></span>
-            {this.props.task.Hours > 0 && `${this.props.task.Hours}h `}
-            {this.props.task.Minutes > 0 && `${this.props.task.Minutes}m`}
+            {this.renderTime()}
           </span>}
           {this.hasStreak() && <span className="streak pr-1 ">
             <span className="octicon octicon-dashboard"></span>
@@ -533,7 +548,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
         {(hours > 0 || minutes > 0) &&
           <span className="mr-1 tooltipped tooltipped-w" aria-label="Time">
             <span className="octicon octicon-clock" />
-            {hours > 0 && `${hours}h`}
+            {hours > 0 && `${hours}h${minutes > 0 ? ' ' : ''}`}
             {minutes > 0 && `${minutes}m`}
           </span>}
 

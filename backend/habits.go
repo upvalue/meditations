@@ -57,7 +57,6 @@ type Task struct {
 	Comment Comment
 	// Time stats (in day-scoped tasks, these are set directly by the user; in monthly/yearly scopes,
 	// they are calculated from daily tasks)
-	Hours   int
 	Minutes int
 	// These statistics are derived at runtime, and not represented in SQL
 	CompletionRate     float64 `gorm:"-"`
@@ -136,23 +135,23 @@ func (task *Task) CalculateStreak() {
 func (task *Task) CalculateTimeAndCompletion() {
 	var tasks []Task
 	var completed, total, totalWithTime, rate float64
-	var hours, minutes int
+	var minutes int
 
 	from, to := between(task.Date, task.Scope)
 
 	// Complex queries: we sum the hours and minutes of all tasks, count all tasks, and finally count all completed tasks
-	rows, err := DB.Table("tasks").Select("count(*), sum(hours), sum(minutes)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
+	rows, err := DB.Table("tasks").Select("count(*), sum(minutes)").Where("date between ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Rows()
 
 	DB.Model(&task).Where("date between ? and ? and scope = ? and name = ? and status = ? and deleted_at is null", from, to, ScopeDay, task.Name, TaskComplete).Find(&tasks).Count(&completed)
 
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
-			rows.Scan(&total, &hours, &minutes)
+			rows.Scan(&total, &minutes)
 		}
 	}
 
-	rows, err = DB.Table("tasks").Select("count(*)").Where("date between ? and ? and scope = ? and name = ? and (hours is not null or minutes is not null) and deleted_at is null",
+	rows, err = DB.Table("tasks").Select("count(*)").Where("date between ? and ? and scope = ? and name = ? and (minutes is not null) and deleted_at is null",
 		from, to, ScopeDay, task.Name).Rows()
 
 	if err == nil {
@@ -161,10 +160,6 @@ func (task *Task) CalculateTimeAndCompletion() {
 			rows.Scan(&totalWithTime)
 		}
 	}
-
-	// Calculate time by converting minutes to hours and accounting for overflow
-	hours += (minutes / 60)
-	minutes = minutes % 60
 
 	// Calculate completion rate
 	if total == 0.0 {
@@ -175,7 +170,7 @@ func (task *Task) CalculateTimeAndCompletion() {
 		rate = math.Floor((completed * 100.0) / total)
 	}
 
-	task.Hours, task.Minutes, task.CompletedTasks, task.TotalTasks, task.TotalTasksWithTime, task.CompletionRate = hours, minutes,
+	task.Minutes, task.CompletedTasks, task.TotalTasks, task.TotalTasksWithTime, task.CompletionRate = minutes,
 		int(completed), int(total), int(totalWithTime), rate
 }
 
@@ -382,7 +377,7 @@ func (project *Scope) CalculateProjectStats(days int) {
 		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
 
 	var minutes struct{ Minutes int }
-	DB.Table("tasks").Select("(sum(hours) * 60) + sum(minutes) as minutes").
+	DB.Table("tasks").Select("sum(minutes) as minutes").
 		Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
 			ScopeDay, project.Name, past, TaskComplete).
 		Scan(&minutes)

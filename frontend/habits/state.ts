@@ -28,7 +28,6 @@ export interface Comment extends common.Model {
 
 export interface Task extends common.Model {
   ID: number;
-  Hours: number;
   Minutes: number;
   Order: number;
   Status: number;
