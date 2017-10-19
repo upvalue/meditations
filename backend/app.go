@@ -109,8 +109,10 @@ func App() *macaron.Macaron {
 		macaron.Env = "production"
 	}
 
+	fmt.Printf("%s\n", path.Join(packagePath, "templates"))
+
 	m.Use(pongo2.Pongoer(pongo2.Options{
-		Directory:  "templates",
+		Directory:  path.Join(packagePath, "templates"),
 		Extensions: []string{".htm"},
 	}))
 

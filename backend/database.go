@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	// SchemaVersion is the current version of the meditations DB schema
 	SchemaVersion = 2
 )
 
@@ -96,7 +97,7 @@ func DBCreate() {
 	DB.Save(&year)
 	DB.Save(&bucket)
 
-	settings := Settings{Name: "settings", Schema: 2}
+	settings := Settings{Name: "settings", Schema: SchemaVersion}
 
 	DB.FirstOrCreate(&settings)
 }
