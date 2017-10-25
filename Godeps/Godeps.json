@@ -26,6 +26,10 @@
 			"Rev": "28e8bf81cad72bee3aa5fef3d2fd7210b9b97b3f"
 		},
 		{
+			"ImportPath": "github.com/golang/groupcache/lru",
+			"Rev": "b710c8433bd175204919eb38776e944233235d03"
+		},
+		{
 			"ImportPath": "github.com/gorilla/websocket",
 			"Comment": "v1.2.0-12-g71fa72d",
 			"Rev": "71fa72d4842364bc5f74185f4161e0099ea3624a"
