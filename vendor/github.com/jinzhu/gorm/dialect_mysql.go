@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -27,8 +28,8 @@ func (mysql) Quote(key string) string {
 }
 
 // Get Data Type for MySQL Dialect
-func (mysql) DataTypeOf(field *StructField) string {
-	var dataValue, sqlType, size, additionalType = ParseFieldStructForDialect(field)
+func (s *mysql) DataTypeOf(field *StructField) string {
+	var dataValue, sqlType, size, additionalType = ParseFieldStructForDialect(field, s)
 
 	// MySQL allows only one auto increment column per table, and it must
 	// be a KEY column.
@@ -42,14 +43,28 @@ func (mysql) DataTypeOf(field *StructField) string {
 		switch dataValue.Kind() {
 		case reflect.Bool:
 			sqlType = "boolean"
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
+		case reflect.Int8:
+			if _, ok := field.TagSettings["AUTO_INCREMENT"]; ok || field.IsPrimaryKey {
+				field.TagSettings["AUTO_INCREMENT"] = "AUTO_INCREMENT"
+				sqlType = "tinyint AUTO_INCREMENT"
+			} else {
+				sqlType = "tinyint"
+			}
+		case reflect.Int, reflect.Int16, reflect.Int32:
 			if _, ok := field.TagSettings["AUTO_INCREMENT"]; ok || field.IsPrimaryKey {
 				field.TagSettings["AUTO_INCREMENT"] = "AUTO_INCREMENT"
 				sqlType = "int AUTO_INCREMENT"
 			} else {
 				sqlType = "int"
 			}
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uintptr:
+		case reflect.Uint8:
+			if _, ok := field.TagSettings["AUTO_INCREMENT"]; ok || field.IsPrimaryKey {
+				field.TagSettings["AUTO_INCREMENT"] = "AUTO_INCREMENT"
+				sqlType = "tinyint unsigned AUTO_INCREMENT"
+			} else {
+				sqlType = "tinyint unsigned"
+			}
+		case reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uintptr:
 			if _, ok := field.TagSettings["AUTO_INCREMENT"]; ok || field.IsPrimaryKey {
 				field.TagSettings["AUTO_INCREMENT"] = "AUTO_INCREMENT"
 				sqlType = "int unsigned AUTO_INCREMENT"
@@ -87,7 +102,7 @@ func (mysql) DataTypeOf(field *StructField) string {
 				}
 			}
 		default:
-			if _, ok := dataValue.Interface().([]byte); ok {
+			if IsByteArrayOrSlice(dataValue) {
 				if size > 0 && size < 65532 {
 					sqlType = fmt.Sprintf("varbinary(%d)", size)
 				} else {
@@ -110,6 +125,21 @@ func (mysql) DataTypeOf(field *StructField) string {
 func (s mysql) RemoveIndex(tableName string, indexName string) error {
 	_, err := s.db.Exec(fmt.Sprintf("DROP INDEX %v ON %v", indexName, s.Quote(tableName)))
 	return err
+}
+
+func (s mysql) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
+	if limit != nil {
+		if parsedLimit, err := strconv.ParseInt(fmt.Sprint(limit), 0, 0); err == nil && parsedLimit >= 0 {
+			sql += fmt.Sprintf(" LIMIT %d", parsedLimit)
+
+			if offset != nil {
+				if parsedOffset, err := strconv.ParseInt(fmt.Sprint(offset), 0, 0); err == nil && parsedOffset >= 0 {
+					sql += fmt.Sprintf(" OFFSET %d", parsedOffset)
+				}
+			}
+		}
+	}
+	return
 }
 
 func (s mysql) HasForeignKey(tableName string, foreignKeyName string) bool {

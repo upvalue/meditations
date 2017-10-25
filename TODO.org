@@ -74,6 +74,8 @@
 ** TODO ESC button should exit modals.
 ** TODO WebSocket bug: seems websockets cannot send multiple messages from a single go method. Unsure as to cause.
 ** DONE Use flexbox instead of bootstrap grid.
+** TODO Add a JavaScript version-check to remind users to hard refresh when updating
+    (Manual? Maybe something based on git-commit hash?)
 
 ** TODO Time handling
     And OTOH, if you write a journal entry at 2:30 local time, you probably always want it to be

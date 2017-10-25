@@ -1,21 +1,21 @@
 {
 	"ImportPath": "github.com/ioddly/meditations",
-	"GoVersion": "go1.8",
+	"GoVersion": "go1.9",
 	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Unknwon/com",
-			"Comment": "v1",
-			"Rev": "28b053d5a2923b87ce8c5a08f3af779894a72758"
+			"Comment": "v1-13-g7677a1d",
+			"Rev": "7677a1d7c1137cd3dd5ba7a076d0c898a1ef4520"
 		},
 		{
 			"ImportPath": "github.com/flosch/pongo2",
-			"Comment": "v1.0-rc1-211-g22499f9",
-			"Rev": "22499f94d3d56c7238591344a6902715d0b8fbbf"
+			"Comment": "v1.0-rc1-230-g1f4be1e",
+			"Rev": "1f4be1efe3b3529b7e58861f75d70120a9567dc4"
 		},
 		{
 			"ImportPath": "github.com/go-macaron/binding",
-			"Rev": "48920167fa152d02f228cfbece7e0f1e452d200a"
+			"Rev": "ac54ee249c27dca7e76fad851a4a04b73bd1b183"
 		},
 		{
 			"ImportPath": "github.com/go-macaron/inject",
@@ -27,13 +27,13 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Comment": "v1.1.0-6-gadf16b3",
-			"Rev": "adf16b31781325cbd41085c5be901d95b4d1f33d"
+			"Comment": "v1.2.0-12-g71fa72d",
+			"Rev": "71fa72d4842364bc5f74185f4161e0099ea3624a"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/gorm",
-			"Comment": "v1.0-108-g1aa2d4c",
-			"Rev": "1aa2d4ca89885c0e519ca82420f3a245b78835c2"
+			"Comment": "v1.0-176-g0a51f6c",
+			"Rev": "0a51f6cdc55d1650d9ed3b4c13026cfa9133b01e"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/inflection",
@@ -41,22 +41,30 @@
 		},
 		{
 			"ImportPath": "github.com/jinzhu/now",
-			"Rev": "95f61531f9021a162633b50777cc1263d3064641"
+			"Rev": "d939ba741945c047cac69c329c5fb0d6b4a06520"
+		},
+		{
+			"ImportPath": "github.com/juju/errors",
+			"Rev": "c7d06af17c68cd34c835053720b21f6549d9b0ee"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-sqlite3",
-			"Comment": "v1.2.0-13-gefea85c",
-			"Rev": "efea85cb9a06f1d4f661649f6beb5fd04597a366"
+			"Comment": "v1.3.0-2-g615c193",
+			"Rev": "615c193e01d8d462eef7ee390171506f531a1c9a"
 		},
 		{
 			"ImportPath": "github.com/tylerb/graceful",
-			"Comment": "v1.2.13-4-gd37e108",
-			"Rev": "d37e108c89765a8e307f15b8fb2ecd10575da6bb"
+			"Comment": "v1.2.15-3-gd72b015",
+			"Rev": "d72b0151351a13d0421b763b88f791469c4f5dc7"
 		},
 		{
 			"ImportPath": "github.com/urfave/cli",
-			"Comment": "v1.19.1-52-gb892ba3",
-			"Rev": "b892ba3809cd07fcf2b064e166b0c2e16e0147bd"
+			"Comment": "v1.20.0-28-g7bc6a0a",
+			"Rev": "7bc6a0acffa589f415f88aca16cc1de5ffd66f9c"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/pbkdf2",
+			"Rev": "2509b142fb2b797aa7587dad548f113b2c0f20ce"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
@@ -64,13 +72,13 @@
 		},
 		{
 			"ImportPath": "gopkg.in/ini.v1",
-			"Comment": "v1.23.0",
-			"Rev": "6f66b0e091edb3c7b380f7c4f0f884274d550b67"
+			"Comment": "v1.30.0",
+			"Rev": "5b3e00af70a9484542169a976dcab8d03e601a17"
 		},
 		{
 			"ImportPath": "gopkg.in/macaron.v1",
-			"Comment": "v1.1.11",
-			"Rev": "ddb19a9f3e8cedd44696b9dd5854dc8a43f3dd6c"
+			"Comment": "v1.2.3",
+			"Rev": "534b5803c7c0bfb3a59632359a94bc761d393d4c"
 		}
 	]
 }

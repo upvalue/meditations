@@ -3,14 +3,19 @@ package backend
 // habits.go - habits todo list functionality
 
 import (
+	"fmt"
 	"math"
 	"time"
 
+	"github.com/golang/groupcache/lru"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/now"
 )
 
 var habitSync = MakeSyncPage("habits")
+
+// Simple LRU cache is used to avoid expensive statistical calculations
+var habitStatGroup = lru.New(128)
 
 // DateFormat is the Time.Format format used in the database
 const (
@@ -174,18 +179,58 @@ func (task *Task) CalculateTimeAndCompletion() {
 		int(completed), int(total), int(totalWithTime), rate
 }
 
+type habitStatCache struct {
+	Minutes            int
+	CompletedTasks     int
+	TotalTasks         int
+	TotalTasksWithTime int
+	CompletionRate     float64
+	Streak             int
+	BestStreak         int
+}
+
 // CalculateStats calculates all statistics for monthly and yearly tasks
 func (task *Task) CalculateStats() {
-	// TODO: Rather than calling this ad-hoc, it should be done when a task is retrieved from the database.
-
-	// TODO: This is quite inefficient to do e.g. every time it needs to be rendered
-	// It could be cached in the database, but perhaps it would be simpler to do it in
-	// a data structure in memory of some kind
 	if task.Scope == ScopeMonth || task.Scope == ScopeYear {
+		var cacheKey string
+		if task.Scope == ScopeMonth {
+			cacheKey = fmt.Sprintf("%s-%s", task.Date.Format("2006-01"), task.Name)
+		} else if task.Scope == ScopeYear {
+			cacheKey = fmt.Sprintf("%s-%s", task.Date.Format("2006"), task.Name)
+		}
+
+		cacheEntryI, ok := habitStatGroup.Get(cacheKey)
+
+		if ok {
+			cacheEntry := cacheEntryI.(habitStatCache)
+			task.Minutes = cacheEntry.Minutes
+			task.CompletedTasks = cacheEntry.CompletedTasks
+			task.TotalTasks = cacheEntry.TotalTasks
+			task.TotalTasksWithTime = cacheEntry.TotalTasksWithTime
+			task.CompletionRate = cacheEntry.CompletionRate
+			task.Streak = cacheEntry.Streak
+			task.BestStreak = cacheEntry.BestStreak
+
+			// log.Printf("Found cached calculation for key %s out of %d cached item", cacheKey, habitStatGroup.Len())
+			return
+		}
+
 		task.CalculateTimeAndCompletion()
 		if task.Scope == ScopeYear {
 			task.CalculateStreak()
 		}
+
+		cacheEntry := habitStatCache{
+			Minutes:            task.Minutes,
+			CompletedTasks:     task.CompletedTasks,
+			TotalTasks:         task.TotalTasks,
+			TotalTasksWithTime: task.TotalTasksWithTime,
+			CompletionRate:     task.CompletionRate,
+			Streak:             task.Streak,
+			BestStreak:         task.BestStreak,
+		}
+
+		habitStatGroup.Add(cacheKey, cacheEntry)
 	}
 }
 

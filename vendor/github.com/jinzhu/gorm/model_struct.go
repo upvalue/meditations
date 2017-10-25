@@ -50,6 +50,19 @@ type ModelStruct struct {
 
 // TableName get model's table name
 func (s *ModelStruct) TableName(db *DB) string {
+	if s.defaultTableName == "" && db != nil && s.ModelType != nil {
+		// Set default table name
+		if tabler, ok := reflect.New(s.ModelType).Interface().(tabler); ok {
+			s.defaultTableName = tabler.TableName()
+		} else {
+			tableName := ToDBName(s.ModelType.Name())
+			if db == nil || !db.parent.singularTable {
+				tableName = inflection.Plural(tableName)
+			}
+			s.defaultTableName = tableName
+		}
+	}
+
 	return DefaultTableNameHandler(db, s.defaultTableName)
 }
 
@@ -84,7 +97,11 @@ func (structField *StructField) clone() *StructField {
 		TagSettings:     map[string]string{},
 		Struct:          structField.Struct,
 		IsForeignKey:    structField.IsForeignKey,
-		Relationship:    structField.Relationship,
+	}
+
+	if structField.Relationship != nil {
+		relationship := *structField.Relationship
+		clone.Relationship = &relationship
 	}
 
 	for key, value := range structField.TagSettings {
@@ -141,17 +158,6 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 
 	modelStruct.ModelType = reflectType
 
-	// Set default table name
-	if tabler, ok := reflect.New(reflectType).Interface().(tabler); ok {
-		modelStruct.defaultTableName = tabler.TableName()
-	} else {
-		tableName := ToDBName(reflectType.Name())
-		if scope.db == nil || !scope.db.parent.singularTable {
-			tableName = inflection.Plural(tableName)
-		}
-		modelStruct.defaultTableName = tableName
-	}
-
 	// Get all fields
 	for i := 0; i < reflectType.NumField(); i++ {
 		if fieldStruct := reflectType.Field(i); ast.IsExported(fieldStruct.Name) {
@@ -192,7 +198,9 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 					if indirectType.Kind() == reflect.Struct {
 						for i := 0; i < indirectType.NumField(); i++ {
 							for key, value := range parseTagSetting(indirectType.Field(i).Tag) {
-								field.TagSettings[key] = value
+								if _, ok := field.TagSettings[key]; !ok {
+									field.TagSettings[key] = value
+								}
 							}
 						}
 					}
@@ -215,6 +223,15 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 								subField.IsPrimaryKey = false
 							}
 						}
+
+						if subField.Relationship != nil && subField.Relationship.JoinTableHandler != nil {
+							if joinTableHandler, ok := subField.Relationship.JoinTableHandler.(*JoinTableHandler); ok {
+								newJoinTableHandler := &JoinTableHandler{}
+								newJoinTableHandler.Setup(subField.Relationship, joinTableHandler.TableName, reflectType, joinTableHandler.Destination.ModelType)
+								subField.Relationship.JoinTableHandler = newJoinTableHandler
+							}
+						}
+
 						modelStruct.StructFields = append(modelStruct.StructFields, subField)
 					}
 					continue

@@ -66,8 +66,9 @@ type Dialer struct {
 	// HandshakeTimeout specifies the duration for the handshake to complete.
 	HandshakeTimeout time.Duration
 
-	// Input and output buffer sizes. If the buffer size is zero, then a
-	// default value of 4096 is used.
+	// ReadBufferSize and WriteBufferSize specify I/O buffer sizes. If a buffer
+	// size is zero, then a useful default size is used. The I/O buffer sizes
+	// do not limit the size of the messages that can be sent or received.
 	ReadBufferSize, WriteBufferSize int
 
 	// Subprotocols specifies the client's requested subprotocols.
@@ -86,50 +87,6 @@ type Dialer struct {
 }
 
 var errMalformedURL = errors.New("malformed ws or wss URL")
-
-// parseURL parses the URL.
-//
-// This function is a replacement for the standard library url.Parse function.
-// In Go 1.4 and earlier, url.Parse loses information from the path.
-func parseURL(s string) (*url.URL, error) {
-	// From the RFC:
-	//
-	// ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
-	// wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
-	var u url.URL
-	switch {
-	case strings.HasPrefix(s, "ws://"):
-		u.Scheme = "ws"
-		s = s[len("ws://"):]
-	case strings.HasPrefix(s, "wss://"):
-		u.Scheme = "wss"
-		s = s[len("wss://"):]
-	default:
-		return nil, errMalformedURL
-	}
-
-	if i := strings.Index(s, "?"); i >= 0 {
-		u.RawQuery = s[i+1:]
-		s = s[:i]
-	}
-
-	if i := strings.Index(s, "/"); i >= 0 {
-		u.Opaque = s[i:]
-		s = s[:i]
-	} else {
-		u.Opaque = "/"
-	}
-
-	u.Host = s
-
-	if strings.Contains(u.Host, "@") {
-		// Don't bother parsing user information because user information is
-		// not allowed in websocket URIs.
-		return nil, errMalformedURL
-	}
-
-	return &u, nil
-}
 
 func hostPortNoPort(u *url.URL) (hostPort, hostNoPort string) {
 	hostPort = u.Host
@@ -176,7 +133,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 		return nil, nil, err
 	}
 
-	u, err := parseURL(urlStr)
+	u, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -368,7 +325,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 		return nil, resp, ErrBadHandshake
 	}
 
-	for _, ext := range parseExtensions(req.Header) {
+	for _, ext := range parseExtensions(resp.Header) {
 		if ext[""] != "permessage-deflate" {
 			continue
 		}
@@ -388,33 +345,4 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 	netConn.SetDeadline(time.Time{})
 	netConn = nil // to avoid close in defer.
 	return conn, resp, nil
-}
-
-// cloneTLSConfig clones all public fields except the fields
-// SessionTicketsDisabled and SessionTicketKey. This avoids copying the
-// sync.Mutex in the sync.Once and makes it safe to call cloneTLSConfig on a
-// config in active use.
-func cloneTLSConfig(cfg *tls.Config) *tls.Config {
-	if cfg == nil {
-		return &tls.Config{}
-	}
-	return &tls.Config{
-		Rand:                     cfg.Rand,
-		Time:                     cfg.Time,
-		Certificates:             cfg.Certificates,
-		NameToCertificate:        cfg.NameToCertificate,
-		GetCertificate:           cfg.GetCertificate,
-		RootCAs:                  cfg.RootCAs,
-		NextProtos:               cfg.NextProtos,
-		ServerName:               cfg.ServerName,
-		ClientAuth:               cfg.ClientAuth,
-		ClientCAs:                cfg.ClientCAs,
-		InsecureSkipVerify:       cfg.InsecureSkipVerify,
-		CipherSuites:             cfg.CipherSuites,
-		PreferServerCipherSuites: cfg.PreferServerCipherSuites,
-		ClientSessionCache:       cfg.ClientSessionCache,
-		MinVersion:               cfg.MinVersion,
-		MaxVersion:               cfg.MaxVersion,
-		CurvePreferences:         cfg.CurvePreferences,
-	}
 }

@@ -150,6 +150,12 @@ func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
 
+	// Dirty cache entries if necessary
+	if task.Scope == ScopeDay {
+		habitStatGroup.Remove(fmt.Sprintf("%s-%s", task.Date.Format("2006-01"), task.Name))
+		habitStatGroup.Remove(fmt.Sprintf("%s-%s", task.Date.Format("2006"), task.Name))
+	}
+
 	task.Sync(false, true, true)
 	c.PlainText(200, []byte("OK"))
 }
