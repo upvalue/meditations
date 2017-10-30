@@ -184,6 +184,7 @@ func taskDelete(c *macaron.Context, task Task) {
 
 	DB.Where("id = ?", c.Params("id")).First(&task)
 
+	task.ClearCache()
 	task.Near(&tasks)
 
 	log.Printf("%+v", task)
