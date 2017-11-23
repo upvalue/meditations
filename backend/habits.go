@@ -189,7 +189,7 @@ type habitStatCache struct {
 	BestStreak         int
 }
 
-func (task *Task) ClearCache() {
+func (task *Task) clearCache() {
 	// Dirty cache entries if necessary
 	if task.Scope == ScopeDay {
 		habitStatGroup.Remove(fmt.Sprintf("%s-%s", task.Date.Format("2006-01"), task.Name))

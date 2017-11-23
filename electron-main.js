@@ -3,7 +3,7 @@ const electron = require('electron');
 
 const SERVER_PORT = '47353';
 
-const { app, Tray, Menu } = electron;
+const { app, Tray, Menu, dialog } = electron;
 const BrowserWindow = electron.BrowserWindow;
 
 const { spawn } = require('child_process');
@@ -118,7 +118,14 @@ app.on('quit', () => {
 
 app.on('ready', () => {
   createWindow();
-  createServer();
+  console.log('ok');
+  dialog.showSaveDialog({
+    title: 'Select database',
+    properties: { openFile: true },
+  }, (paths) => {
+      console.log(paths);
+  });
+  //createServer();
   createTray();
 });
 

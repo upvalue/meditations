@@ -150,7 +150,7 @@ func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.Params("id")).First(&task)
 	DB.Save(&task)
 
-	task.ClearCache()
+	task.clearCache()
 	task.Sync(false, true, true)
 	c.PlainText(200, []byte("OK"))
 }
@@ -171,7 +171,7 @@ func taskNew(c *macaron.Context, task Task) {
 	}
 
 	// If this new task should have stats attached
-	task.ClearCache()
+	task.clearCache()
 	task.CalculateStats()
 
 	task.Sync(false, true, true)
@@ -184,7 +184,7 @@ func taskDelete(c *macaron.Context, task Task) {
 
 	DB.Where("id = ?", c.Params("id")).First(&task)
 
-	task.ClearCache()
+	task.clearCache()
 	task.Near(&tasks)
 
 	log.Printf("%+v", task)
@@ -222,7 +222,9 @@ func taskReorder(c *macaron.Context) {
 	DB.Where("id = ?", c.ParamsInt("target")).Find(&target)
 	DB.LogMode(false)
 
-	withinScope := src.Date.Equal(target.Date) && src.Scope == target.Scope
+	// We have to compare dates formatted, as dates not be exactly equal (tasks that are copied from
+	// other scopes have slightly different times in the date column than those added by the user)
+	withinScope := src.Date.Format("2006-02-01") == target.Date.Format("2006-02-01") && src.Scope == target.Scope
 
 	fmt.Printf("%v %v\n", src.Date, target.Date)
 	fmt.Printf("Re-ordering tasks within scope %v\n", withinScope)

@@ -233,6 +233,15 @@ func Main() {
 		},
 
 		{
+			Name:  "electron",
+			Usage: "To be invoked from Electron; allows Electron instances to configure DB path and other things before starting the server",
+			Flags: commonflags,
+			Action: func(c *cli.Context) {
+
+			},
+		},
+
+		{
 			Name:  "check",
 			Usage: "check database for errors",
 			Flags: commonflags,

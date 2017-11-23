@@ -27,7 +27,7 @@ export const main = () => {
         });
       }
 
-      common.setTitle('Journal', `${date.format('MMMM YYYY')}`);
+      common.setTitle('Notes', `${date.format('MMMM YYYY')}`);
 
       // TODO: Update habits link to reflect current date
       dispatch((dispatch) => {
@@ -46,7 +46,7 @@ export const main = () => {
     },
 
     tag: (tagname: string) => {
-      common.setTitle('Journal', `Tag #${tagname}`);
+      common.setTitle('Notes', `Tag #${tagname}`);
       dispatch((dispatch) => {
         common.get(`/journal/entries/tag/${tagname}`, ((entries: Entry[]) => {
           entries.forEach(common.processModel);
@@ -56,7 +56,7 @@ export const main = () => {
     },
     
     name: (name: string) => {
-      common.setTitle('Journal', `${name}`);
+      common.setTitle('Notes', `${name}`);
       dispatch((dispatch) => {
         common.get(`/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);
