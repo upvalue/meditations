@@ -58,13 +58,7 @@
   dependencies:
     "@types/react-dnd" "*"
 
-"@types/react-dnd@*":
-  version "2.0.33"
-  resolved "https://registry.yarnpkg.com/@types/react-dnd/-/react-dnd-2.0.33.tgz#b7ce466ef3dfba48c3e11d7151f21b02e0472f58"
-  dependencies:
-    "@types/react" "*"
-
-"@types/react-dnd@^2.0.34":
+"@types/react-dnd@*", "@types/react-dnd@^2.0.34":
   version "2.0.34"
   resolved "https://registry.yarnpkg.com/@types/react-dnd/-/react-dnd-2.0.34.tgz#2aaf475ac70767059c6e2f9edfcea9f03200e3c5"
   dependencies:
@@ -101,9 +95,9 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@15.0.38":
-  version "15.0.38"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.38.tgz#6afea31a9fe66304af474106ba372ddaba449995"
+"@types/react@*", "@types/react@16":
+  version "16.0.25"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.0.25.tgz#bf696b83fe480c5e0eff4335ee39ebc95884a1ed"
 
 "@types/redux-logger@^3.0.0":
   version "3.0.0"
@@ -4030,13 +4024,13 @@ react-datepicker@0.61.0:
     react-onclickoutside "^6.6.3"
     react-popper "^0.7.4"
 
-react-dnd-html5-backend@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-2.4.1.tgz#439d2bcaf8bd8b87a51386beb51c128826182ddd"
+react-dnd-html5-backend@2.5.4:
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-2.5.4.tgz#974ad083f67b12d56977a5b171f5ffeb29d78352"
   dependencies:
     lodash "^4.2.0"
 
-react-dnd@^2.4.0:
+react-dnd@^2.5.4:
   version "2.5.4"
   resolved "https://registry.yarnpkg.com/react-dnd/-/react-dnd-2.5.4.tgz#0b6dc5e9d0dfc2909f4f4fe736e5534f3afd1bd9"
   dependencies:

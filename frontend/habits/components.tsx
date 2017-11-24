@@ -33,7 +33,7 @@ export interface TaskProps {
 
 // Drag and drop implementation details
 const taskSource: ReactDnd.DragSourceSpec<TaskProps> = {
-  beginDrag: (props, monitor, component) => {
+  beginDrag: (props: TaskProps) => {
     // Make the task data available when this task is dropped
     return {
       task: props.task,

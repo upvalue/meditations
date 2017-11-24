@@ -19,7 +19,7 @@ export interface LinkTreeState {
 /** An expandable tree of links */
 export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   constructor(props: LinkTreeProps) {
-    super();
+    super(props);
     // Deep copy of data
     this.state = { data: JSON.parse(JSON.stringify(props.data)) };
   }
