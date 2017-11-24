@@ -11,3 +11,4 @@
 /coverage
 *.sqlite
 /docs/book
+/_book
