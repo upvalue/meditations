@@ -7,7 +7,7 @@ Originally a Trello board, meditations simply keeps track of how often you compl
 on them (optionally). It's fairly minimalist compared to more complex time management systems, and leave the structure
 of your day entirely up to you. The goal of meditations is to get an objective, long-term view of how you are doing.
 
-In addition, it has a journal that supports tagging and organizing entries by named categories.
+In addition, it has a note-taking application that supports tagging and organizing entries by named categories.
 
 ![sample usage video](http://i.imgur.com/gmFSRK4.gif)
 
@@ -16,8 +16,8 @@ In addition, it has a journal that supports tagging and organizing entries by na
 # Manual
 
 For information on how to use Meditations as well as some documentation of its architecture, see
-the manual: [HTML](https://rawgit.com/ioddly/meditations/master/docs/manual.html) |
-[org](docs/manual.org) | `yarn run manual-open` from the command line to view your local copy.
+[the documentation](https://ioddly.github.io/meditations). Also available in your local install
+under the `docs` directory.
 
 ## Running from command line
 

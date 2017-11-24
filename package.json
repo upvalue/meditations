@@ -15,9 +15,7 @@
     "test-backend": "godep go test -v ./backend --cover",
     "test-frontend": "./node_modules/.bin/jest",
     "test": "yarn run test-frontend && yarn run test-backend",
-    "test-frontend-coverage": "./node_modules/.bin/jest --coverage",
-    "manual-build": "emacs docs/manual.org --batch -f org-html-export-to-html",
-    "manual-open": "xdg-open docs/manual.html"
+    "test-frontend-coverage": "./node_modules/.bin/jest --coverage"
   },
   "jest": {
     "moduleFileExtensions": [

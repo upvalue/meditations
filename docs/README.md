@@ -1,7 +1,8 @@
 # meditations
 
-[Meditations on GitHub](https://github.com/ioddly/meditations)
-[Live Demo](https://meditations.upvalue.io)
+## [Meditations on GitHub](https://github.com/ioddly/meditations)
+## [Live Demo](https://meditations.upvalue.io)
+## [Built by upvalue()](https://upvalue.io)
 
 meditations is an application for tracking life progress that builds on the principles of habit
 formation.
@@ -12,7 +13,7 @@ time management systems, and leave the structure of your day entirely up to you.
 meditations is to get an objective, long-term view of how you are doing.
 
 It's currently divided into two separate pieces of functionality: Habits (a todo list) and
-Journal (a journal, go figure).
+Notes (for note taking, go figure).
 
 ## Browser support
 
