@@ -189,9 +189,11 @@ func taskDelete(c *macaron.Context, task Task) {
 
 	log.Printf("%+v", task)
 
-	DB.Delete(&task)
+	tx := DB.Begin()
+
+	tx.Delete(&task)
 	if task.Comment.ID > 0 {
-		DB.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
+		tx.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
 	}
 
 	// Reorder tasks after this one
@@ -199,8 +201,10 @@ func taskDelete(c *macaron.Context, task Task) {
 		if t.Order > task.Order {
 			t.Order = t.Order - 1
 		}
-		DB.Save(&t)
+		tx.Save(&t)
 	}
+
+	tx.Commit()
 
 	task.Sync(true, true, false)
 
