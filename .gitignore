@@ -8,6 +8,6 @@
 *.map
 /meditations
 /typings
-/docs/manual.html~
 /coverage
 *.sqlite
+/docs/book
