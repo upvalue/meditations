@@ -1,3 +1,8 @@
+general:
+  branches:
+    ignore:
+      - gh-pages
+
 # this mess is required because circleci checks out the git repo directly into home rather than
 # into the go workspace
 machine:
