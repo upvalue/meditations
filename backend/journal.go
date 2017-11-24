@@ -200,6 +200,10 @@ func journalNameEntry(c *macaron.Context) {
 	c.PlainText(200, []byte("ok"))
 }
 
+func journalSearch(c *macaron.Context) {
+	journalSync.Send("SEARCH", "hello")
+}
+
 func journalIndex(c *macaron.Context) {
 	c.Data["Page"] = "journal"
 	c.HTML(200, "journal")
@@ -219,6 +223,8 @@ func journalInit(m *macaron.Macaron) {
 	m.Post("/delete-entry/:id", journalDeleteEntry)
 	m.Post("/name-entry/:id/:name", journalNameEntry)
 	m.Post("/name-entry/:id/", journalRemoveEntryName)
+
+	m.Post("/search/:string", journalSearch)
 
 	m.Get("/sync", journalSync.Handler())
 }

@@ -703,13 +703,14 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
     });
   }
 
-  renderDatePicker(end: boolean, defaultPlaceholder: string,  placeholder?: moment.Moment | null) {
+  renderDatePicker(end: boolean, defaultPlaceholder: string,  value?: moment.Moment | null) {
     // TODO: Datepicker onClearable does not work unless a SELECTED value is also passed
     return <DatePicker 
       className="form-control ml-1 mb-md-0 mb-1"
       onChange={date => this.filterByDate(end, date)}
       isClearable={true}
-      placeholderText={placeholder ? placeholder.format(common.DAY_FORMAT) : defaultPlaceholder}
+      placeholderText={defaultPlaceholder}
+      value={value ? value.format(common.DAY_FORMAT) : ''}
       openToDate={this.props.currentDate} />;
   }
 

@@ -237,9 +237,13 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
   }
 }
 
+
 // tslint:disable-next-line:variable-name
 const JournalNavigation = connect(state => state)
 (class extends React.PureComponent<JournalState, {}> {
+
+  searchText: HTMLInputElement;
+
   createEntry(date: moment.Moment | null) {
     if (date !== null) {
       common.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
@@ -248,6 +252,7 @@ const JournalNavigation = connect(state => state)
 
   search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    console.log(this.searchText.value);
 
   }
 
@@ -259,7 +264,8 @@ const JournalNavigation = connect(state => state)
             onChange={date => this.createEntry(date)} 
             placeholderText="Click to add new entry" />
           <input type="text" className="form-control mb-1 mb-md-0 ml-md-2"
-            placeholder="Text to search for" />
+            placeholder="Text to search for"
+          ref={(searchText) => { if (searchText) this.searchText = searchText; }} />
           <button className="btn btn-primary ml-md-1">Search for text</button>
         </form>
       </div>;
@@ -277,13 +283,16 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
 
         <div id="journal-main" className="ml-1 ">
           <JournalNavigation />
-          {this.props.route === 'VIEW_MONTH' ?
-            <BrowseMonth date={this.props.date} entries={this.props.entries} /> : <span></span>}
-          {this.props.route === 'VIEW_TAG' ?
-            <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> : <span></span>}
-          {this.props.route === 'VIEW_NAMED_ENTRY' ?
+          {this.props.route === 'VIEW_MONTH' &&
+            <BrowseMonth date={this.props.date} entries={this.props.entries} />}
+          {this.props.route === 'VIEW_TAG' &&
+            <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> }
+          {this.props.route === 'VIEW_NAMED_ENTRY' &&
             <ViewEntry entry={this.props.entries.length === 0 ? null
-              : this.props.entries[0]} /> : ''}
+              : this.props.entries[0]} /> }
+          { this.props.route === 'VIEW_SEARCH' &&
+            <span>Search not implemented yet</span>
+            }
         </div>
       </div>
     </CommonUI>;

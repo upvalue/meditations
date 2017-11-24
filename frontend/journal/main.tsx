@@ -45,6 +45,10 @@ export const main = () => {
       });
     },
 
+    search: (string: string) => {
+
+    },
+
     tag: (tagname: string) => {
       common.setTitle('Notes', `Tag #${tagname}`);
       dispatch((dispatch) => {
@@ -79,22 +83,34 @@ export const main = () => {
   } | {
     Type: 'SIDEBAR';
     Datum: SidebarState;
+  } | {
+    Type: 'SEARCH';
+    Datum: string;
   };
 
   const socket = common.makeSocket('journal/sync', (msg: JournalMessage) => {
-    if (msg.Type === 'UPDATE_ENTRY') {
-      common.processModel(msg.Datum);
-      dispatch({ type: 'UPDATE_ENTRY', entry: msg.Datum });
-    } else if (msg.Type === 'DELETE_ENTRY') {
-      dispatch({ type: 'DELETE_ENTRY', ID: msg.Datum });
-    } else if (msg.Type === 'CREATE_ENTRY') {
-      common.processModel(msg.Datum);
-      // TODO: View change?
-      // TODO: Dispatch view change
-      dispatch({ type: 'CREATE_ENTRY', entry: msg.Datum });
-    } else if (msg.Type === 'SIDEBAR') {
-      dispatch({ type: 'MOUNT_SIDEBAR', sidebar: msg.Datum });
-    } 
+    switch (msg.Type) {
+      case 'UPDATE_ENTRY':
+        common.processModel(msg.Datum);
+        dispatch({ type: 'UPDATE_ENTRY', entry: msg.Datum });
+        break;
+      case 'DELETE_ENTRY':
+        dispatch({ type: 'DELETE_ENTRY', ID: msg.Datum });
+        break;
+      case 'CREATE_ENTRY':
+        common.processModel(msg.Datum);
+        // TODO: View change?
+        // TODO: Dispatch view change
+        dispatch({ type: 'CREATE_ENTRY', entry: msg.Datum });
+        break;
+      case 'SIDEBAR':
+        dispatch({ type: 'MOUNT_SIDEBAR', sidebar: msg.Datum });
+        break;
+      case 'SEARCH':
+        dispatch({ type: 'SEARCH', searchString: msg.Datum });
+        break;
+
+    }
   }, () => {
     ///// RENDER 
     // After socket connects

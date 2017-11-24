@@ -113,7 +113,11 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
   
   render() {
     if (this.props.sidebar && this.props.sidebar.mounted) {
-      const defaultTab = { VIEW_TAG: 2, VIEW_NAMED_ENTRY: 1, VIEW_MONTH: 0 }[this.props.route];
+      // Select tabs according to what page is currently being viewed (e.g. view tabs tag if the
+      // user is viewing a tab and so on)
+      const defaultTab = {
+        VIEW_SEARCH: 0, VIEW_TAG: 2, VIEW_NAMED_ENTRY: 1, VIEW_MONTH: 0,
+     }[this.props.route];
 
       return <Tabs defaultIndex={defaultTab}>
           <TabList>

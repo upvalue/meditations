@@ -20,27 +20,31 @@ export interface Entry extends common.Model {
 
 ///// REDUX
 
-export interface ViewMonth extends common.CommonState {
+export interface JournalCommonState extends common.CommonState {
+  entries: Entry[];
+  sidebar: SidebarState;
+}
+
+export interface ViewSearch extends JournalCommonState {
+  route: 'VIEW_SEARCH';
+  searchString: string;
+}
+
+export interface ViewMonth extends JournalCommonState {
   route: 'VIEW_MONTH';
   date: moment.Moment;
-  entries: Entry[];
-  sidebar: SidebarState;
 }
 
-export interface ViewTag extends common.CommonState {
+export interface ViewTag extends JournalCommonState {
   route: 'VIEW_TAG';
   tag: string;
-  entries: Entry[];
-  sidebar: SidebarState;
 }
 
-export interface ViewNamedEntry extends common.CommonState {
+export interface ViewNamedEntry extends JournalCommonState {
   route: 'VIEW_NAMED_ENTRY';
-  entries: Entry[];
-  sidebar: SidebarState;
 }
 
-export type JournalState = ViewTag | ViewNamedEntry | ViewMonth;
+export type JournalState = ViewTag | ViewNamedEntry | ViewMonth | ViewSearch;
 
 export type JournalAction = {
   type: 'VIEW_MONTH';
@@ -65,6 +69,9 @@ export type JournalAction = {
 } | {
   type: 'MOUNT_SIDEBAR';
   sidebar: SidebarState;
+} | { 
+  type: 'SEARCH';
+  searchString: string;
 } | {
   type: 'VIEW_NAMED_ENTRY';
   entry: Entry;
@@ -113,12 +120,15 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
       return {...state,
         entries: state.entries.slice().filter(v => v.ID !== action.ID),
       };
+    case 'SEARCH': {
+      return { ...state };
+    }
     case 'MOUNT_SIDEBAR': 
       const nstate =  { ...state, sidebar: action.sidebar };
       nstate.sidebar.mounted = true;
       return nstate;
     case 'VIEW_NAMED_ENTRY':
-      return { ...state, route: 'VIEW_NAMED_ENTRY', entries: [action.entry] };
+      return { ...state, route: 'VIEW_NAMED_ENTRY', entries: [action.entry] } as ViewNamedEntry;
   }
   return state;
 };
