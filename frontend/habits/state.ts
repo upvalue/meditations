@@ -61,6 +61,7 @@ export type Project = {
   Pinned: boolean;
   CompletedTasks: number;
   Minutes: number;
+  ProgressDirection: number;
 };
 
 /** A list of tasks and a date; used to mount a bunch of days at once. */

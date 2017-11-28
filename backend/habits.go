@@ -88,6 +88,9 @@ type Scope struct {
 	// Derived statistics
 	CompletedTasks int `gorm:"-"`
 	Minutes        int `gorm:"-"`
+	// ProgressDirection indicates whether a user has been doing more or less on a project recently;
+	// it's used to grow or shrink the flame indicator
+	ProgressDirection int `gorm:"-"`
 }
 
 // Comment represents a task comment.
@@ -417,17 +420,31 @@ func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 
 // CalculateProjectStats calculates project statistics
 func (project *Scope) CalculateProjectStats(days int) {
-	var past time.Time
+	var past, comparePastBegin, comparePastEnd time.Time
+	// Compare the previous 10% of this time slice to get an idea of whether the user
+	// has been doing more or less to progress on a particular project
+	compareDiff := (int(math.Ceil(float64(days) / 10)))
+
 	if project.Pinned == true {
 		past = time.Now().AddDate(0, 0, -days)
+
+		comparePastBegin = time.Now().AddDate(0, 0, -(days + compareDiff))
+		comparePastEnd = time.Now().AddDate(0, 0, -compareDiff)
+		fmt.Printf("Comparing how many completed tasks are in the range %v to %v (%v days) compared to %v to present\n", comparePastBegin, comparePastEnd, compareDiff, past)
 	} else {
 		// For non-pinned projects, calculate total time always
 		past = time.Now().AddDate(-30, 0, 0)
 	}
 
-	var count struct{ Count int }
+	var count, compareCount struct{ Count int }
 	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
 		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
+
+	if project.Pinned == true {
+		DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and date < ? and status = ? and deleted_at is null",
+			ScopeDay, project.Name, comparePastBegin, comparePastEnd, TaskComplete).Scan(&compareCount)
+		project.ProgressDirection = count.Count - compareCount.Count
+	}
 
 	var minutes struct{ Minutes int }
 	DB.Table("tasks").Select("sum(minutes) as minutes").

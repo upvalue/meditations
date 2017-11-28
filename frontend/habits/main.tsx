@@ -16,12 +16,13 @@ import { HabitsRoot } from './components';
 export const MOUNT_NEXT_DAY_TIME = 4;
 
 /** Convenience method; returns route argument for a given date and project. */
-export const routeForView = (date: moment.Moment, project?: number) => {
-  return `view/${date.format(common.MONTH_FORMAT)}/${project ? project : 0}`;
+export const routeForView = (date: moment.Moment | 'current', project?: number) => {
+  // tslint:disable-next-line
+  return `view/${date === 'current' ? date : date.format(common.MONTH_FORMAT)}/${project ? project : 0}`;
 };
 
 /** Returns URL to link to a given date and project */
-export const urlForView = (date: moment.Moment, project?: number) => {
+export const urlForView = (date: moment.Moment | 'current', project?: number) => {
   return `#${routeForView(date, project)}`;
 };
 
@@ -46,15 +47,24 @@ export const main = () => {
     },
     habits: () => {},
     view: (datestr: string, scopestr: string) => {
-      const date = moment(datestr, common.MONTH_FORMAT);
+      const state = store.getState() as HabitsState;
       const project = parseInt(scopestr, 10);
+
+      // Special case URL: if date is "current", we'll use state.currentDate in the URL. This allows
+      // some components to avoid being re-rendered when the date changes.
+
+      if (datestr === 'current') {
+        route(routeForView(state.currentDate, project), '?', true);
+      }
+
+      if (state === undefined) return;
+      const date = datestr === 'current' ? state.currentDate : moment(datestr, common.MONTH_FORMAT);
 
       // There are three possible UI changes that can result from this route
       // 1) Month and days need to be remounted (date changed by a month)
       // 2) Months, days and year needs to be remounted (date changed by a year)
       // 3) Project needs to be remounted (currentProject changed)
 
-      const state = store.getState() as HabitsState;
       if (state === undefined) return;
       const prevDate = state.currentDate;
       const prevProject = state.currentProject;
@@ -130,15 +140,6 @@ export const main = () => {
       // Retrieve and mount project list
       if (!state.pinnedProjects) {
         dispatchProjectListUpdate(state.projectStatsDays);
-        /*
-        dispatch((dispatch) => {
-          common.get(`/habits/projects/${state.projectActivityDays}`, ((response:
-            { Pinned: Project[], Unpinned: Project[] }) => {
-            dispatch({ type: 'PROJECT_LIST', pinnedProjects: response.Pinned,
-              unpinnedProjects: response.Unpinned });
-          }));
-        });
-        */
       }
 
       // Retrieve and mount requested project

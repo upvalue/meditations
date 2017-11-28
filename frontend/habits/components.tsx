@@ -71,8 +71,6 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 
     if (component && monitor) {
       const src = (monitor.getItem() as any).task;
-      console.log('WIZARD FIGHT');
-      console.log(monitor.getItemType());
       const target = props.task;
 
       // Do not allow dropping on self
@@ -459,6 +457,8 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
     if (isNaN(projectID)) return;
 
     route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
+
+    this.addTask = this.addTask.bind(this);
   }
 
   addTask() {
@@ -486,7 +486,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
           <span> &gt; {this.props.scope.Name}</span></h3>
 
         <OcticonButton className="flex-self-center" name="plus"
-          tooltip="New task" onClick={() => this.addTask()} />
+          tooltip="New task" onClick={this.addTask} />
       </div>
 
       {...tasks}
@@ -497,7 +497,6 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
 export interface ProjectListProps {
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
-  currentDate: moment.Moment;
   projectStatsDays: number;
 }
 
@@ -524,7 +523,6 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
     };
 
     common.post('/habits/new', task);
-
   }
 
   renderProjectLink(project: Project) {
@@ -535,7 +533,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
 
         {project.Pinned && projectActivityIcon(project, this.props.projectStatsDays)}
 
-        <a href={urlForView(this.props.currentDate, project.ID)}>{project.Name}</a>
+        <a href={urlForView('current', project.ID)}>{project.Name}</a>
       </div>
 
       <div className="project-controls">
@@ -809,7 +807,7 @@ common.connect()(class extends React.PureComponent<HabitsState, {}> {
   /** Render either a list of projects or the currently open project */
   renderProjects() {
     if (this.props.currentProject === 0) {
-      return <ProjectList currentDate={this.props.currentDate}
+      return <ProjectList 
         pinnedProjects={this.props.pinnedProjects}
         unpinnedProjects ={this.props.unpinnedProjects}
         projectStatsDays={this.props.projectStatsDays} />;
