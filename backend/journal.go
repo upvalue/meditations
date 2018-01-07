@@ -97,6 +97,12 @@ func journalEntriesByTag(c *macaron.Context) {
 	c.JSON(200, entries)
 }
 
+// journalTagAutoComplete suggests autocompletes for tags
+func journalTagAutocomplete(c *macaron.Context) {
+	DB.Where("name like ")
+
+}
+
 func journalNew(c *macaron.Context) {
 	date, err := time.Parse("2006-01-02", c.Query("date"))
 	if err != nil {

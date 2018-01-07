@@ -1,5 +1,6 @@
 * Habits
-** TODO Dragging and dropping on a comment doesn't work
+** TODO Dragging and dropping on a comment doesn't work 
+  This is because we create a medium-editor on the fly. Not sure how to apply dragSource to it.
 ** DONE Only store minutes instead of hours; convert at display.
 ** DONE CalculateStats should switch intelligently on monthly and yearly tasks
 ** DONE Fix reordering upwards
