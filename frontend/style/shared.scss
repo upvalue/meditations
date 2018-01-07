@@ -19,9 +19,11 @@ $linkColor: #09d;
 $bodyBg: white;
 /* Slightly muted color of some UI actions e.g. task modifiers */
 $uiColorMuted: #586069;
+$bgSlightlyMuted: #c8cfd6;
 // Width at which to put the UI into mobile mode
 $mobileWidth: 1024px;
 $editableBg: #fcfcfc;
+
 
 body {
   font-family: "Roboto", $body-font;

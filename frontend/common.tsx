@@ -139,6 +139,11 @@ export function createStore<State extends CommonState, Action extends redux.Acti
 
 ///// ACTION CREATE-AND-DISPATCHERS
 
+interface ModalPromptOptions {
+  allowEmpty?: boolean;
+  checker?: (chk: string) => string;
+}
+
 /**
  * Open a modal prompt with a text input
  * @param body Text of the prompt
@@ -147,9 +152,13 @@ export function createStore<State extends CommonState, Action extends redux.Acti
  * @param defaultValue Default value of the input field
  * @param checker Can return an error representing an input issue which will be displayed in the
  *   modal
+ * @param allowEmpty If true, allow submission of empty string
  */
 export const modalPrompt = (body: string, ok: string, cb: (result: string) => void,
-    defaultValue?: string, checker?: (chk: string) => string, allowEmpty?: boolean) => {
+    defaultValue?: string, options?: ModalPromptOptions) => {
+
+  const allowEmpty = options && options.allowEmpty;
+  const checker = options && options.checker;
 
   let ref: HTMLInputElement;
   let err: HTMLElement;
@@ -193,17 +202,6 @@ export const modalPrompt = (body: string, ok: string, cb: (result: string) => vo
 };
 
 /**
- * Dispatch a custom modal, for complex input requirements
- * @param body JSX body
- */
-export const modalCustom = (body: React.ReactNode) => {
-  dispatch({
-    type: 'MODAL_PROMPT',
-    modalBody: body,
-  });
-};
-
-/**
  * Open a yes/no confirmation prompt
  * @param bodyText Text of the body
  * @param confirmText Text of the yes button
@@ -232,13 +230,13 @@ export const modalConfirm = (bodyText: string, confirmText: string, cb: () => vo
 export const modalPromptAllowEmpty = (body: string, ok: string, defaultValue: string,
   callback: (result: string) => void) => {
 
-  modalPrompt(body, ok, callback, defaultValue, undefined, true);
+  modalPrompt(body, ok, callback, defaultValue, { allowEmpty: true });
 };
 
 export const modalPromptChecked = (body: string, ok: string, defaultValue: string,
     checker: (chk: string) => string,
     callback: (result: string) => void) => {
-  modalPrompt(body, ok, callback, defaultValue, checker);
+  modalPrompt(body, ok, callback, defaultValue, { checker });
 };
 
 /**

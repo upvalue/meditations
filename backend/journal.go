@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"fmt"
 	"log"
 	"sort"
 	"time"
@@ -99,8 +100,11 @@ func journalEntriesByTag(c *macaron.Context) {
 
 // journalTagAutoComplete suggests autocompletes for tags
 func journalTagAutocomplete(c *macaron.Context) {
-	DB.Where("name like ")
+	var tags Tag
 
+	DB.Where("name like ?", fmt.Sprintf("%s%%", c.Params("name"))).Find(&tags)
+
+	c.JSON(200, tags)
 }
 
 func journalNew(c *macaron.Context) {
@@ -220,6 +224,7 @@ func journalInit(m *macaron.Macaron) {
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
 	m.Get("/entries/name/:name", journalNamedEntry)
+	m.Get("/tags/autocomplete", journalTagAutocomplete)
 
 	m.Post("/sidebar", journalSidebarInfo)
 	m.Post("/new", journalNew)

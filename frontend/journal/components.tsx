@@ -7,6 +7,7 @@ import { render }from 'react-dom';
 import route from 'riot-route';
 import { Tab, Tabs, TabList, TabPanel } from'react-tabs';
 import DatePicker from 'react-datepicker';
+import * as Autosuggest from 'react-autosuggest';
 
 import * as common from '../common';
 import { TimeNavigator, OcticonButton, Editable, CommonUI } from '../common/components';
@@ -87,8 +88,8 @@ class CEntry extends Editable<CEntryProps> {
     let tags : ReadonlyArray<React.ReactElement<undefined>> = [];
     if (this.props.entry.Tags) {
       tags = this.props.entry.Tags.map((t, i) =>
-        <button className="mt-4 mt-md-0 ml-md-3 border " key={i} style={{ borderRadius: '1px' }} >
-          <a href={`#tag/${t.Name}`} style={{ color: 'black' }} >#{t.Name}</a>
+        <button className="mt-4 mt-md-0 ml-md-3  tag " key={i} style={{ borderRadius: '1px' }} >
+          <a href={`#tag/${t.Name}`}  >#{t.Name}</a>
           <span className="octicon octicon-x ml-1" onClick={() => this.removeTag(t)} />
         </button>,
       );
