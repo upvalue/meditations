@@ -45,6 +45,17 @@ export const main = () => {
       });
     },
 
+    viewdays: (datestr: string) => {
+      const date = moment(datestr, common.DAY_FORMAT);
+
+      dispatch((dispatch) => {
+        common.get(`/journal/entries/by-day?date=${datestr}`, ((entries: Entry[]) => {
+          entries.forEach(common.processModel);
+          dispatch({ date, entries, type: 'VIEW_DAYS' });
+        }));
+      });
+    },
+
     search: (string: string) => {
 
     },

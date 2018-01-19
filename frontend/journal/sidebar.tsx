@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
 
-import { connect } from '../common';
+import { connect, DAY_FORMAT } from '../common';
 import { Spinner } from '../common/components';
 import LinkTree, { LinkTreeNode } from './linktree';
+import * as moment from 'moment';
+import DatePicker from 'react-datepicker';
+import route from 'riot-route';
 
-import { JournalState } from '../journal/state';
+import { JournalState, dispatch } from '../journal/state';
 
 export type ChronoLink = {
   Date: string;
@@ -25,7 +28,7 @@ export type SidebarState = {
 };
 
 /** Sidebar. Contains convenient navigation methods. */
-export const JournalSidebar = connect()(class extends React.Component<JournalState, {}> {
+export const JournalSidebar = connect()(class extends React.Component<JournalState> {
   /** Render tag navigation links */
   renderTags() {
     if (this.props.sidebar.TagLinks === null) {
@@ -110,16 +113,33 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
 
     return <LinkTree data={tree} />;
   }
+
+  viewDays(date: moment.Moment | null) {
+    if (date) {
+      route(`viewdays/${date.format(DAY_FORMAT)}`);
+    }
+  }
   
   render() {
     if (this.props.sidebar && this.props.sidebar.mounted) {
       // Select tabs according to what page is currently being viewed (e.g. view tabs tag if the
       // user is viewing a tab and so on)
       const defaultTab = {
-        VIEW_SEARCH: 0, VIEW_TAG: 2, VIEW_NAMED_ENTRY: 1, VIEW_MONTH: 0,
+        VIEW_SEARCH: 0, VIEW_TAG: 2, VIEW_NAMED_ENTRY: 1, VIEW_MONTH: 0, VIEW_DAYS: 0,
      }[this.props.route];
 
-      return <Tabs defaultIndex={defaultTab}>
+      return <div>
+        <DatePicker 
+          className="form-control mb-1"
+          onChange={date => this.viewDays(date)}
+          isClearable={true}
+          placeholderText={'View all posts from day'}
+          openToDate={(this.props.route === 'VIEW_DAYS' || this.props.route === 'VIEW_MONTH') ? 
+            this.props.date :  moment()}
+          />
+
+        <Tabs defaultIndex={defaultTab}>
+
           <TabList>
             <Tab><span className="octicon octicon-clock" />Time</Tab>
             <Tab><span className="octicon octicon-text-size" />Title</Tab>
@@ -135,7 +155,8 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
           <TabPanel>
             {this.renderTags()}
           </TabPanel>
-        </Tabs>;
+        </Tabs>
+        </div>;
     } else {
       return <Spinner />;
     }

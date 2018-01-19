@@ -66,6 +66,9 @@ export type CommonState = {
   notifications?: Notification[];
   socket: WebSocket;
 
+  // Using a React.ReactNode created with a callback is not good style, but is a lot simpler than
+  // dealing with the myriad types of modals we need to create.
+
   modalBody: React.ReactNode;
   modalOpen: boolean;
 

@@ -40,16 +40,25 @@ export interface ViewTag extends JournalCommonState {
   tag: string;
 }
 
+export interface ViewDays extends JournalCommonState {
+  route: 'VIEW_DAYS';
+  date: moment.Moment;
+}
+
 export interface ViewNamedEntry extends JournalCommonState {
   route: 'VIEW_NAMED_ENTRY';
 }
 
-export type JournalState = ViewTag | ViewNamedEntry | ViewMonth | ViewSearch;
+export type JournalState = ViewTag | ViewNamedEntry | ViewMonth | ViewSearch | ViewDays;
 
 export type JournalAction = {
   type: 'VIEW_MONTH';
   date: moment.Moment;
   entries: Entry[];  
+} | {
+  type: 'VIEW_DAYS';
+  date: moment.Moment;
+  entries: Entry[];
 } | {
   type: 'MOUNT_ENTRIES';
   entries: Entry[];
@@ -92,6 +101,12 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         date: action.date,
         entries: action.entries,
       } as ViewMonth;
+    case 'VIEW_DAYS':
+      return {...state,
+        route: 'VIEW_DAYS',
+        date: action.date,
+        entries: action.entries,
+      } as ViewDays;
     case 'VIEW_TAG':
       return { ...state, route: 'VIEW_TAG', tag: action.tag, entries: action.entries } as ViewTag;
     case 'MOUNT_ENTRIES':

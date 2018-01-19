@@ -46,6 +46,19 @@ func journalEntries(c *macaron.Context) {
 	c.JSON(200, entries)
 }
 
+// journalEntriesByDay returns all entries written on a particular day, for getting
+// a long-term view of mood and progress
+func journalEntriesByDay(c *macaron.Context) {
+	date, err := time.Parse(DateFormat, c.Query("date"))
+	if err != nil {
+		serverError(c, "error parsing date %s", c.Query("date"))
+		return
+	}
+	var entries []Entry
+	DB.Where("strftime('%m-%d', date) = ?", date.Format("01-02")).Order("date desc").Find(&entries)
+	c.JSON(200, entries)
+}
+
 func journalNamedEntry(c *macaron.Context) {
 	var entry Entry
 	DB.Where("name = ?", c.Params("name")).Preload("Tags").First(&entry)
@@ -222,6 +235,7 @@ func journalIndex(c *macaron.Context) {
 func journalInit(m *macaron.Macaron) {
 	m.Get("/", journalIndex)
 	m.Get("/entries/date", journalEntries)
+	m.Get("/entries/by-day", journalEntriesByDay)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
 	m.Get("/entries/name/:name", journalNamedEntry)
 	m.Get("/tags/autocomplete", journalTagAutocomplete)

@@ -378,7 +378,7 @@ interface TimeScopeProps {
 }
 
 export class TimeScope extends
-  React.Component<TimeScopeProps, {}> {
+  React.Component<TimeScopeProps> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === ScopeType.MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -449,7 +449,7 @@ export interface ProjectScopeProps {
   projectStatsDays: number;
 }
 
-export class ProjectScope extends React.PureComponent<ProjectScopeProps, {}> {
+export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);
@@ -500,7 +500,7 @@ export interface ProjectListProps {
   projectStatsDays: number;
 }
 
-export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
+export class ProjectList extends React.PureComponent<ProjectListProps> {
   projectStatsDaysInput: HTMLInputElement;
 
   deleteProject(id: number) {
@@ -628,7 +628,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, {}> {
   }
 }
 
-export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
+export class HabitsControlBar extends React.PureComponent<HabitsState> {
   constructor(props: HabitsState) {
     super(props);
     this.navigate = this.navigate.bind(this);
@@ -636,7 +636,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
   }
 
   /** Callback that gives page-appropriate routes to TimeNavigator */
-  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year') {
+  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') {
     if (method === 'reset') {
       return routeForView(moment(), this.props.currentProject);
     } else if (unit) {
@@ -729,7 +729,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState, {}> {
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-3 mr-2 mt-2 mb-2">
-      <TimeNavigator getRoute={this.navigatorRoute} currentDate={this.props.currentDate}  />
+      <TimeNavigator daysOnly={false} getRoute={this.navigatorRoute} currentDate={this.props.currentDate}  />
 
       <div className="d-flex flex-column flex-md-row">
         <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-"
@@ -791,7 +791,7 @@ class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
 
 // tslint:disable-next-line:variable-name
 export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
-common.connect()(class extends React.PureComponent<HabitsState, {}> {
+common.connect()(class extends React.PureComponent<HabitsState> {
   /** Render time-based scope (days, months, years) */
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {

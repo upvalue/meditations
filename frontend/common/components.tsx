@@ -120,50 +120,59 @@ OcticonButton.defaultProps = {
 
 interface TimeNavigatorProps {
   /** Returns a page-appropriate route string for navigation */
-  getRoute: (operation: 'subtract' | 'add' | 'reset', unit?: 'month' | 'year') =>
+  getRoute: (operation: 'subtract' | 'add' | 'reset', unit?: 'month' | 'year' | 'day') =>
     string | undefined;
 
   /** Date to work off of */
   currentDate: moment.Moment;
+
+  /** If true, only one set of arrows is available and it navigates days rather than 
+   * months and years.
+   */
+  daysOnly: boolean;
 }
 
 /** Navigate by months or years */
-export class TimeNavigator extends React.PureComponent<TimeNavigatorProps, {}> {
-  navigate(operation: 'subtract' | 'add' | 'reset', unit?: 'year' | 'month') {
+export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
+  navigate(operation: 'subtract' | 'add' | 'reset', unit?: 'year' | 'month' | 'day') {
     const routestr = this.props.getRoute(operation, unit);
     if (routestr) {
       route(routestr);
     }
   }
 
-  render() {
-    return <div className="d-flex flex-justify-between mb-1">
-      <OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-1"
-        href={`#${this.props.getRoute('subtract', 'year')}`}
-        onClick={() => this.navigate('subtract', 'year')}
-        tooltipDirection="e" />
 
-      <OcticonButton name="chevron-left" tooltip="Go back one month"
+  render() {
+    const smallunit = this.props.daysOnly ? 'day' : 'month';
+    return <div className="d-flex flex-justify-between mb-1">
+      {!this.props.daysOnly &&
+        <OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-1"
+          href={`#${this.props.getRoute('subtract', 'year')}`}
+          onClick={() => this.navigate('subtract', 'year')}
+          tooltipDirection="e" />}
+
+      <OcticonButton name="chevron-left" tooltip={`Go back one ${smallunit}`}
         octiconClass="mr-1" tooltipDirection="e"
-        href={`#${this.props.getRoute('subtract', 'month')}`}
-        onClick={() => this.navigate('subtract', 'month')} />
+        href={`#${this.props.getRoute('subtract', smallunit)}`}
+        onClick={() => this.navigate('subtract', smallunit)} />
 
       <OcticonButton name="calendar" tooltip="Go to current date" tooltipDirection="e"
         octiconClass="mr-1"
         href={`#${this.props.getRoute('reset')}`}
         onClick={() => this.navigate('reset')} />
 
-      <OcticonButton name="chevron-right" tooltip="Go forward one month"
+      <OcticonButton name="chevron-right" tooltip={`Go forward one ${smallunit}`}
         tooltipDirection="e"
         octiconClass="mr-1"
-        href={`#${this.props.getRoute('add', 'month')}`}
-        onClick={() => this.navigate('add', 'month')} />
+        href={`#${this.props.getRoute('add', smallunit)}`}
+        onClick={() => this.navigate('add', smallunit)} />
 
-      <OcticonButton name="triangle-right" tooltip="Go forward one year"
-        tooltipDirection="e"
-        href={`#${this.props.getRoute('add', 'year')}`}
-        octiconClass="mr-1"
-        onClick={() => this.navigate('add', 'year')} />
+      {!this.props.daysOnly &&
+        <OcticonButton name="triangle-right" tooltip="Go forward one year"
+          tooltipDirection="e"
+          href={`#${this.props.getRoute('add', 'year')}`}
+          octiconClass="mr-1"
+          onClick={() => this.navigate('add', 'year')} />}
 
       <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
     </div>;

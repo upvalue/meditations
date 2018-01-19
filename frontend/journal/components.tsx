@@ -40,7 +40,6 @@ class CEntry extends Editable<CEntryProps> {
           common.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
         }
       }
-
     });
   }
 
@@ -159,27 +158,30 @@ class CEntry extends Editable<CEntryProps> {
 }
 
 // TODO: SFC
-interface BrowseMonthProps {
+interface BrowseChronoProps {
   date: moment.Moment;
   entries: Entry[];
+  daysView: boolean;
 }
-class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
-  constructor(props: BrowseMonthProps) {
+
+class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
+  constructor(props: BrowseChronoProps) {
     super(props);
     this.navigatorRoute = this.navigatorRoute.bind(this);
   }
 
-  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year') {
+  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') {
     if (method === 'reset') {
       return `view/${moment().format(common.MONTH_FORMAT)}`;
     } else if (unit) {
       const ndate = this.props.date.clone()[method](1, unit);
-      return `view/${ndate.format(common.MONTH_FORMAT)}`;
+      const fmt = unit === 'day' ? common.DAY_FORMAT : common.MONTH_FORMAT;
+      const route = this.props.daysView ? 'viewdays' : 'view';
+      return `${route}/${ndate.format(fmt)}`;
     }
   }
 
   render() {
-
     // This could be simplified with some kind of reduce comparison
     const res = Array<React.ReactElement<{key: number}>>();
 
@@ -201,6 +203,8 @@ class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
             {lastDate.format('MMMM')}
           </a>{' '}
           {lastDate.format('Do')}
+          {' '}
+          {this.props.daysView && lastDate.format('YYYY')}
         </h3>);
       }
       key += 1;
@@ -209,7 +213,10 @@ class BrowseMonth extends React.PureComponent<BrowseMonthProps, {}> {
 
     return <div className="ml-md-2">
       <div className="d-flex flex-items-start flex-row mb-2">
-        <TimeNavigator getRoute={this.navigatorRoute} currentDate={this.props.date} />
+        <TimeNavigator
+          daysOnly={this.props.daysView}
+          getRoute={this.navigatorRoute}
+          currentDate={this.props.date} />
       </div>
       {res}
     </div>;
@@ -263,7 +270,8 @@ const JournalNavigation = connect(state => state)
         onSubmit={e => this.search(e)}>
           <DatePicker className="form-control mb-1 mb-md-0"
             onChange={date => this.createEntry(date)} 
-            placeholderText="Click to add new entry" />
+            placeholderText="Click to add new entry"
+            />
           <input type="text" className="form-control mb-1 mb-md-0 ml-md-2"
             placeholder="Text to search for"
           ref={(searchText) => { if (searchText) this.searchText = searchText; }} />
@@ -284,8 +292,9 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
 
         <div id="journal-main" className="ml-1 ">
           <JournalNavigation />
-          {this.props.route === 'VIEW_MONTH' &&
-            <BrowseMonth date={this.props.date} entries={this.props.entries} />}
+          {(this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') &&
+            <BrowseChrono daysView={this.props.route === 'VIEW_DAYS'}
+              date={this.props.date} entries={this.props.entries} />}
           {this.props.route === 'VIEW_TAG' &&
             <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> }
           {this.props.route === 'VIEW_NAMED_ENTRY' &&
