@@ -56,10 +56,6 @@ export const main = () => {
       });
     },
 
-    search: (string: string) => {
-
-    },
-
     tag: (tagname: string) => {
       common.setTitle('Notes', `Tag #${tagname}`);
       dispatch((dispatch) => {
@@ -96,7 +92,10 @@ export const main = () => {
     Datum: SidebarState;
   } | {
     Type: 'SEARCH';
-    Datum: string;
+    Datum: {
+      String: string;
+      Entries: Entry[];
+    }
   };
 
   const socket = common.makeSocket('journal/sync', (msg: JournalMessage) => {
@@ -118,7 +117,12 @@ export const main = () => {
         dispatch({ type: 'MOUNT_SIDEBAR', sidebar: msg.Datum });
         break;
       case 'SEARCH':
-        dispatch({ type: 'SEARCH', searchString: msg.Datum });
+        msg.Datum.Entries.forEach(common.processModel);
+        dispatch({
+          type: 'SEARCH', 
+          string: msg.Datum.String,
+          entries: msg.Datum.Entries,
+        });
         break;
 
     }

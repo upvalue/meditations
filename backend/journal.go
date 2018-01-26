@@ -21,7 +21,7 @@ type Entry struct {
 	Tags     []Tag `gorm:"many2many:entry_tags"`
 }
 
-// Tag represents a journal tag; many-to-many relationship with entries
+// Tag represents a journal tag; many-to-many relationship with ntries
 type Tag struct {
 	gorm.Model
 	Name string
@@ -223,8 +223,23 @@ func journalNameEntry(c *macaron.Context) {
 	c.PlainText(200, []byte("ok"))
 }
 
+type searchResult struct {
+	Entries []Entry
+	String  string
+}
+
 func journalSearch(c *macaron.Context) {
-	journalSync.Send("SEARCH", "hello")
+	//journalSync.Send("SEARCH", "hello")
+
+	var entries []Entry
+	DB.LogMode(true)
+	DB.Where("body like ?", fmt.Sprintf("%%%s%%", c.Query("string"))).Preload("Tags").Find(&entries)
+	DB.LogMode(false)
+	journalSync.Send("SEARCH", searchResult{
+		String:  c.Query("string"),
+		Entries: entries,
+	})
+	c.PlainText(200, []byte("ok"))
 }
 
 func journalIndex(c *macaron.Context) {
@@ -249,7 +264,7 @@ func journalInit(m *macaron.Macaron) {
 	m.Post("/name-entry/:id/:name", journalNameEntry)
 	m.Post("/name-entry/:id/", journalRemoveEntryName)
 
-	m.Post("/search/:string", journalSearch)
+	m.Post("/search", journalSearch)
 
 	m.Get("/sync", journalSync.Handler())
 }

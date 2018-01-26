@@ -21,6 +21,8 @@ interface CEntryProps {
   /** If true, a link to the month the entry was created in will be added to the controls. */
   context?: boolean;
   entry: Entry;
+  /** A search string to highlight */
+  searchString?: string;
 }
 
 interface CEntryState {
@@ -104,6 +106,17 @@ class CEntry extends Editable<CEntryProps> {
     // In order, render:
     // A header with title and title-changing control, then tags
     // Other controls and timestamp on the rightmost
+    
+    let body = this.props.entry.Body;
+
+    if (this.props.searchString) {
+      const esc = this.props.searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const reg = new RegExp(esc, 'ig');
+      body = body.replace(reg, 
+        `<span class="entry-highlight">${this.props.searchString}</span>`);
+    }
+
+
 
     return <section className="entry border bg-gray " id={`entry-${this.props.entry.ID}`}>
       <div className="entry-header border-bottom">
@@ -125,9 +138,7 @@ class CEntry extends Editable<CEntryProps> {
                 onClick={() => this.addTag()} />
               {tags}        
             </div>
-
           </div>
-
 
           <div className="entry-controls mr-2">
             <strong>
@@ -150,7 +161,7 @@ class CEntry extends Editable<CEntryProps> {
       </div>
       <div className="entry-body p-2 " id={`entry-body-${this.props.entry.ID}`} 
         ref={(body) => { if (body) this.body = body; }}
-        dangerouslySetInnerHTML={{ __html: this.props.entry.Body }}
+        dangerouslySetInnerHTML={{ __html: body }}
         onClick={e => this.editorOpen(e)} />
       
     </section>;
@@ -162,6 +173,7 @@ interface BrowseChronoProps {
   date: moment.Moment;
   entries: Entry[];
   daysView: boolean;
+  searchString?: string;
 }
 
 class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
@@ -208,7 +220,9 @@ class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
         </h3>);
       }
       key += 1;
-      res.push(<CEntry context={false} key={key} entry={e} />);
+      res.push(<CEntry
+        searchString={this.props.searchString} context={false} key={key} entry={e} />,
+      );
     });
 
     return <div className="ml-md-2">
@@ -248,9 +262,14 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
 
 // tslint:disable-next-line:variable-name
 const JournalNavigation = connect(state => state)
-(class extends React.PureComponent<JournalState, {}> {
+(class extends React.PureComponent<JournalState> {
 
   searchText: HTMLInputElement;
+
+  constructor(props: any) {
+    super(props);
+    this.clearSearch = this.clearSearch.bind(this);
+  }
 
   createEntry(date: moment.Moment | null) {
     if (date !== null) {
@@ -258,14 +277,19 @@ const JournalNavigation = connect(state => state)
     }
   }
 
-  search(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    console.log(this.searchText.value);
+  clearSearch() {
+    console.log('ultimate power');
 
   }
 
+  search(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    console.log(this.searchText.value);
+    common.post(`/journal/search?string=${this.searchText.value}`);
+  }
+
   render() {
-    return <div className="d-flex flex-column flex-md-row flex-justify-between mb-1 ml-2">
+    return <div className="d-flex flex-column flex-md-row mb-1 ml-2">
       <form className="form-inline d-flex flex-column flex-md-row" style={{ display: 'inline' }}
         onSubmit={e => this.search(e)}>
           <DatePicker className="form-control mb-1 mb-md-0"
@@ -277,6 +301,13 @@ const JournalNavigation = connect(state => state)
           ref={(searchText) => { if (searchText) this.searchText = searchText; }} />
           <button className="btn btn-primary ml-md-1">Search for text</button>
         </form>
+        <div className="ml-1 flex-self-center">
+          {this.props.searchResults &&
+            <button className="tag" onClick={this.clearSearch}>
+              Displaying <strong>{this.props.searchResults}</strong> results
+              <span className="octicon octicon-x ml-1" />
+            </button>}
+        </div>
       </div>;
   }
 });
@@ -293,7 +324,9 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
         <div id="journal-main" className="ml-1 ">
           <JournalNavigation />
           {(this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') &&
-            <BrowseChrono daysView={this.props.route === 'VIEW_DAYS'}
+            <BrowseChrono 
+              searchString={this.props.searchString}
+              daysView={this.props.route === 'VIEW_DAYS'}
               date={this.props.date} entries={this.props.entries} />}
           {this.props.route === 'VIEW_TAG' &&
             <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> }

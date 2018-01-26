@@ -23,6 +23,9 @@ export interface Entry extends common.Model {
 export interface JournalCommonState extends common.CommonState {
   entries: Entry[];
   sidebar: SidebarState;
+
+  searchResults?: number;
+  searchString?: string;
 }
 
 export interface ViewSearch extends JournalCommonState {
@@ -80,7 +83,8 @@ export type JournalAction = {
   sidebar: SidebarState;
 } | { 
   type: 'SEARCH';
-  searchString: string;
+  entries: Entry[];
+  string: string;
 } | {
   type: 'VIEW_NAMED_ENTRY';
   entry: Entry;
@@ -100,15 +104,25 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         route: 'VIEW_MONTH',
         date: action.date,
         entries: action.entries,
+        searchResults: undefined,
+        searchString: undefined,
       } as ViewMonth;
     case 'VIEW_DAYS':
       return {...state,
         route: 'VIEW_DAYS',
         date: action.date,
         entries: action.entries,
+        searchResults: undefined,
+        searchString: undefined,
       } as ViewDays;
     case 'VIEW_TAG':
-      return { ...state, route: 'VIEW_TAG', tag: action.tag, entries: action.entries } as ViewTag;
+      return { ...state,
+        route: 'VIEW_TAG',
+        tag: action.tag,
+        entries: action.entries,
+        searchResults: undefined,
+        searchString: undefined,
+      } as ViewTag;
     case 'MOUNT_ENTRIES':
       return {...state,
         entries: action.entries,
@@ -136,7 +150,11 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         entries: state.entries.slice().filter(v => v.ID !== action.ID),
       };
     case 'SEARCH': {
-      return { ...state };
+      return { ...state,
+        entries: action.entries,
+        searchString: action.string,
+        searchResults: action.entries.length,
+      };
     }
     case 'MOUNT_SIDEBAR': 
       const nstate =  { ...state, sidebar: action.sidebar };

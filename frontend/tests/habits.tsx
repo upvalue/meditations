@@ -2,10 +2,16 @@ import * as renderer from 'react-test-renderer';
 
 import { Task } from '../habits/state';
 import { createCTask } from '../habits/components';
+import * as moment from 'moment';
 
 const testTask = (name: string) => {
   return {
-    Name:name,
+    ID: 0,
+    Name: name,
+    CreatedAt: moment(),
+    UpdatedAt: moment(),
+    DeletedAt: null,
+    Date: moment(),
     Hours: 0,
     Minutes: 0,
     Order: 0,
