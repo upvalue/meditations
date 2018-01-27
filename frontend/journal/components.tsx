@@ -292,9 +292,10 @@ const JournalNavigation = connect(state => state)
 
   search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(this.searchText.value);
-    this.setState({ searching: true });
-    route(`search/${this.searchText.value}`);
+    if (this.searchText.value.length > 0) {
+      this.setState({ searching: true });
+      route(`search/${this.searchText.value}`);
+    }
   }
 
   render() {
@@ -310,15 +311,20 @@ const JournalNavigation = connect(state => state)
           ref={(searchText) => { if (searchText) this.searchText = searchText; }} />
           <button className="btn btn-primary ml-md-1">Search for text</button>
         </form>
-      {this.state && this.state.searching &&
+
+        {this.state && this.state.searching &&
           <span className="ml-1 flex-self-center">Searching...</span>}
+
         <div className="ml-1 flex-self-center">
-          {this.props.searchResults &&
+          {(this.props.searchResults === 0) &&
+            <span className="flash flash-warn p-1">No search results :(</span> 
+          }
+          {(this.props.searchResults && this.props.searchResults > 0) ?
             <button className="tooltipped tooltipped-s tag" onClick={this.clearSearch}
               aria-label="Clear search results">
               Displaying <strong>{this.props.searchResults}</strong> results
               <span className="octicon octicon-x ml-1" />
-            </button>}
+            </button> : ''}
         </div>
       </div>;
   }
@@ -335,11 +341,16 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
 
         <div id="journal-main" className="ml-1 ">
           <JournalNavigation />
-          {(this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') &&
+          {((this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') ||
+            this.props.searchResults) &&
             <BrowseChrono 
               searchString={this.props.searchString}
               daysView={this.props.route === 'VIEW_DAYS'}
-              date={this.props.date} entries={this.props.entries} />}
+              date={
+                (this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') ?
+                  this.props.date : moment()
+              }
+              entries={this.props.entries} />}
           {this.props.route === 'VIEW_TAG' &&
             <BrowseTag tagName={this.props.tag} entries={this.props.entries} /> }
           {this.props.route === 'VIEW_NAMED_ENTRY' &&
