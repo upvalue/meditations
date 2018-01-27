@@ -107,12 +107,13 @@ class CEntry extends Editable<CEntryProps> {
     // A header with title and title-changing control, then tags
     // Other controls and timestamp on the rightmost
     
-    let body = this.props.entry.Body;
+    let body = this.props.entry.Body.slice(0);
 
-    if (this.props.searchString) {
+    if (!this.state.editorOpen && this.props.searchString) {
       // TODO: This highlight needs to be undone during actual editing, otherwise medium-editor
       // just saves the HTML.
-      const esc = this.props.searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const searchString = this.props.searchString.slice(0);
+      const esc = searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const reg = new RegExp(esc, 'ig');
       body = body.replace(reg, 
         `<span class="entry-highlight">${this.props.searchString}</span>`);

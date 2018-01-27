@@ -8,16 +8,20 @@ import MediumEditorTable from 'medium-editor-tables';
 
 import { CommonState } from '../common';
 
+interface EditableState {
+  editor: MediumEditor.MediumEditor;
+  editorOpen: boolean;
+}
+
 /** An item that has an editable body. Used for task comments and journal entries */
-export class Editable<Props> extends React.PureComponent<Props,
-  {editor: MediumEditor.MediumEditor}> {
+export class Editable<Props> extends React.Component<Props, EditableState> {
   /** 
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
    * subclass's render method */
   body: HTMLElement;
 
   componentWillMount() {
-    this.setState({});
+    this.setState({ editorOpen: false });
   }
 
   /** Abstract method; should compare body against model to determine if an update is warranted */
@@ -33,6 +37,7 @@ export class Editable<Props> extends React.PureComponent<Props,
 
   /** Lazily create an editor; if it already exists, focus on it */
   editorOpen(e?: React.MouseEvent<HTMLElement>) {
+    console.log('!!! editorOpen Called');
     if (!this.state.editor) {
       const options = {
         autoLink: true,
@@ -68,11 +73,15 @@ export class Editable<Props> extends React.PureComponent<Props,
         if (!this.editorUpdated()) {
           return;
         }
-        
+
         this.editorSave();
+        this.setState({ editorOpen: false });
       });
-      this.setState({ editor });
-    } 
+
+      this.setState({ editor, editorOpen: true });
+    } else {
+      this.setState({ editorOpen: true });
+    }
 
     // Empty comments will have the no-display class added
     this.body.classList.remove('no-display');
