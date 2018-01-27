@@ -110,13 +110,13 @@ class CEntry extends Editable<CEntryProps> {
     let body = this.props.entry.Body;
 
     if (this.props.searchString) {
+      // TODO: This highlight needs to be undone during actual editing, otherwise medium-editor
+      // just saves the HTML.
       const esc = this.props.searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const reg = new RegExp(esc, 'ig');
       body = body.replace(reg, 
         `<span class="entry-highlight">${this.props.searchString}</span>`);
     }
-
-
 
     return <section className="entry border bg-gray " id={`entry-${this.props.entry.ID}`}>
       <div className="entry-header border-bottom">
