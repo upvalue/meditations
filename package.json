@@ -92,9 +92,9 @@
   },
   "devDependencies": {
     "@types/jest": "^20.0.2",
-    "@types/react-test-renderer": "^15.5.2",
+    "@types/react-test-renderer": "^16.0.0",
     "jest": "^20.0.4",
-    "react-test-renderer": "^15.6.1",
+    "react-test-renderer": "^16.2.0",
     "ts-jest": "^20.0.6",
     "tslint": "^5.6.0",
     "tslint-config-airbnb": "5.2.1"

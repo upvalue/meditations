@@ -17,6 +17,8 @@ import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, 
   from './state';
 import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
 
+// TODO: Create a higher-level drag/drop component which contains task, for the sake of testing
+
 export interface TaskProps {
   // Drag and drop implementation props
   connectDropTarget: ReactDnd.ConnectDropTarget;

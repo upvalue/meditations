@@ -1,7 +1,7 @@
 import * as renderer from 'react-test-renderer';
 
 import { Task } from '../habits/state';
-import { createCTask } from '../habits/components';
+import { CTaskImpl } from '../habits/components';
 import * as moment from 'moment';
 
 const testTask = (name: string) => {
@@ -27,9 +27,18 @@ const testTask = (name: string) => {
 };
 
 test('task renders', () => {
-  const task1 = createCTask(1, testTask('Diet'));
+  /*
+  const task1 = renderer.create(
+    <CTaskImpl 
+      task={testTask('diet')} 
+    />;
+  );
+  */
+  // const task1 = createCTask(1, testTask('Diet'));
 
   // renderer.create(task1);
+
+  // const identity = el => el;
 
   // const component = renderer.create(task1);
 });
