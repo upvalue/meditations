@@ -233,7 +233,7 @@ func journalSearch(c *macaron.Context) {
 
 	var entries []Entry
 	DB.LogMode(true)
-	DB.Where("body like ?", fmt.Sprintf("%%%s%%", c.Query("string"))).Preload("Tags").Find(&entries)
+	DB.Where("body like ?", fmt.Sprintf("%%%s%%", c.Query("string"))).Preload("Tags").Order("date desc").Find(&entries)
 	DB.LogMode(false)
 	journalSync.Send("SEARCH", searchResult{
 		String:  c.Query("string"),
