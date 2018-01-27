@@ -337,6 +337,15 @@ export function makeSocket(
     location: string, onmessage: (s: any) => void,
     onopen?: () => void,
     reconnect?: boolean) {
+
+  let disconnecting = false;
+
+  // Disconnect the websocket before page unloads
+  // To prevent the connection lost modal from popping up on page changes
+  window.onbeforeunload = () => {
+    disconnecting = true;
+  };
+
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const url = `${protocol}://${window.location.hostname}:${window.location.port}/${location}`;
   const socket = new WebSocket(url);
@@ -382,7 +391,9 @@ export function makeSocket(
   };
 
   socket.onclose = (e) => {
-    dispatch({ type: 'SOCKET_CLOSED' });
+    if (!disconnecting) {
+      dispatch({ type: 'SOCKET_CLOSED' });
+    }
   };
 
   return socket;
@@ -408,6 +419,7 @@ export function setTitle(page: string, title: string) {
  */
 export function installRouter(base: string, first: string,
     routes: { [key: string] : (...a: any[]) => void }) {
+
   console.log('Common.installRouter called');
   route.base(base);
   route(function (this: any) {
