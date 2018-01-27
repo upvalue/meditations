@@ -29,5 +29,7 @@ const testTask = (name: string) => {
 test('task renders', () => {
   const task1 = createCTask(1, testTask('Diet'));
 
+  // renderer.create(task1);
+
   // const component = renderer.create(task1);
 });

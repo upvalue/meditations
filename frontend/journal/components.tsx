@@ -262,7 +262,7 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
 
 // tslint:disable-next-line:variable-name
 const JournalNavigation = connect(state => state)
-(class extends React.PureComponent<JournalState> {
+(class extends React.Component<JournalState, { searching: boolean }> {
 
   searchText: HTMLInputElement;
 
@@ -277,15 +277,24 @@ const JournalNavigation = connect(state => state)
     }
   }
 
-  clearSearch() {
-    console.log('ultimate power');
+  componentWillUpdate() {
+  }
 
+  componentWillReceiveProps() {
+    this.setState({ searching: false });
+
+  }
+
+  clearSearch() {
+    // TODO: Clear to previous URL.
+    route(`view/${moment().format(common.MONTH_FORMAT)}`);
   }
 
   search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     console.log(this.searchText.value);
-    common.post(`/journal/search?string=${this.searchText.value}`);
+    this.setState({ searching: true });
+    route(`search/${this.searchText.value}`);
   }
 
   render() {
@@ -301,9 +310,12 @@ const JournalNavigation = connect(state => state)
           ref={(searchText) => { if (searchText) this.searchText = searchText; }} />
           <button className="btn btn-primary ml-md-1">Search for text</button>
         </form>
+      {this.state && this.state.searching &&
+          <span className="ml-1 flex-self-center">Searching...</span>}
         <div className="ml-1 flex-self-center">
           {this.props.searchResults &&
-            <button className="tag" onClick={this.clearSearch}>
+            <button className="tooltipped tooltipped-s tag" onClick={this.clearSearch}
+              aria-label="Clear search results">
               Displaying <strong>{this.props.searchResults}</strong> results
               <span className="octicon octicon-x ml-1" />
             </button>}
