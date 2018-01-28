@@ -332,9 +332,8 @@ export const CTaskFactory = React.createFactory(CTask);
 
 /**
  * Creates an instance of CTask suitable for rendering in an array
- * @param key indice of array loop
  * @param task task data
  */
-export const createCTask = (key: number, task: Task, lastModifiedTask?: string) => {
-  return CTaskFactory({ key, task, lastModified: task.Name === lastModifiedTask } as any);
+export const createCTask = (task: Task, lastModifiedTask?: string) => {
+  return CTaskFactory({ task, key: task.ID, lastModified: task.Name === lastModifiedTask } as any);
 };

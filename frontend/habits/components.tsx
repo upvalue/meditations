@@ -96,7 +96,7 @@ export class TimeScope extends
     }
 
     const tasks = filteredTasks.map((t, i) => {
-      return createCTask(i, t, this.props.lastModifiedTask);
+      return createCTask(t, this.props.lastModifiedTask);
     });
 
 
@@ -148,7 +148,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
 
   render() {
     const tasks = this.props.scope.Tasks.map((t, i) => {
-      return createCTask(i, t);
+      return createCTask(t);
     });
 
     return <section className="scope bg-gray">
