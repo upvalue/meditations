@@ -1,7 +1,8 @@
+import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 
 import { Task } from '../habits/state';
-import { CTaskImpl } from '../habits/components';
+import { CTaskImpl } from '../habits/task';
 import * as moment from 'moment';
 
 const testTask = (name: string) => {
@@ -26,19 +27,25 @@ const testTask = (name: string) => {
   } as Task;
 };
 
-test('task renders', () => {
-  /*
-  const task1 = renderer.create(
+const renderTask = (task: Task) => {
+  return renderer.create(
     <CTaskImpl 
-      task={testTask('diet')} 
-    />;
+      task={task} 
+      lastModified={false}
+      connectDragSource={el => el}
+      connectDragPreview={el => el}
+      connectDropTarget={el => el}
+      isDragging={false}
+      isOver={false}
+      isOverCurrent={false}
+    />,
   );
-  */
-  // const task1 = createCTask(1, testTask('Diet'));
+};
 
-  // renderer.create(task1);
+test('task renders', () => {
+  const task = renderTask(testTask('Diet'));
 
-  // const identity = el => el;
 
-  // const component = renderer.create(task1);
+  expect(task.root.findAllByType('button')[0].children).toEqual(['Diet']);
+
 });

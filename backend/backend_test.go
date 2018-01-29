@@ -17,7 +17,19 @@ func TestSeed(t *testing.T) {
 }
 
 func TestStatistics(t *testing.T) {
+	var task Task
 
+	DB.Where("name = 'Exercise' and scope = 3 and strftime('%Y', date) = '2017'").First(&task)
+
+	task.CalculateStats()
+
+	if task.BestStreak != 212 {
+		t.Fail()
+	}
+
+	if task.Streak != 212 {
+		t.Fail()
+	}
 }
 
 func TestMain(m *testing.M) {
