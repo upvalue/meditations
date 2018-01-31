@@ -70,12 +70,10 @@ class CEntry extends Editable<CEntryProps> {
   }
 
   editorUpdated() {
-    if (!this.body) return false;
     return this.props.entry.Body !== this.body.innerHTML;
   }
 
   editorSave() {
-    if (!this.body) return;
     common.post('/journal/update', {
       ID: this.props.entry.ID,
       Body: this.body.innerHTML,
@@ -267,7 +265,7 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
 const JournalNavigation = connect(state => state)
 (class extends React.Component<JournalState, { searching: boolean }> {
 
-  searchText?: HTMLInputElement;
+  searchText!: HTMLInputElement;
 
   constructor(props: any) {
     super(props);
@@ -295,7 +293,6 @@ const JournalNavigation = connect(state => state)
 
   search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!this.searchText) return;
     if (this.searchText.value.length > 0) {
       this.setState({ searching: true });
       route(`search/${this.searchText.value}`);

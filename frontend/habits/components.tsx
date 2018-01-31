@@ -174,7 +174,7 @@ export interface ProjectListProps {
 }
 
 export class ProjectList extends React.PureComponent<ProjectListProps> {
-  projectStatsDaysInput?: HTMLInputElement;
+  projectStatsDaysInput!: HTMLInputElement;
 
   deleteProject(id: number) {
     common.modalConfirm(
@@ -252,10 +252,6 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
   }
 
   statsFromInput() {
-    if (!this.projectStatsDaysInput) {
-      return;
-    }
-
     const n = parseInt(this.projectStatsDaysInput.value, 10);
     if (!isNaN(n)) {
       dispatchProjectListUpdate(n);
