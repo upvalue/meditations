@@ -18,14 +18,14 @@ export class Editable<Props> extends React.Component<Props, EditableState> {
   /** 
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
    * subclass's render method */
-  body: HTMLElement;
+  body?: HTMLElement;
 
   componentWillMount() {
     this.setState({ editorOpen: false });
   }
 
   /** Abstract method; should compare body against model to determine if an update is warranted */
-  editorUpdated() {
+  editorUpdated(): boolean {
     console.warn('editorUpdated not implemented');
     return false;
   }
@@ -56,9 +56,11 @@ export class Editable<Props> extends React.Component<Props, EditableState> {
           table: new MediumEditorTable(),
         }};
 
+      if (!this.body) return;
       const editor = new MediumEditor(this.body, options);
 
       editor.subscribe('blur', () => {
+        if (!this.body) return;
         // It is possible that blur may have been called because copy-paste causes MediumEditor to
         // create a 'pastebin' element, in which case we do not want to trigger a save.
         if (document.activeElement.id.startsWith('medium-editor-pastebin')) {
@@ -84,6 +86,7 @@ export class Editable<Props> extends React.Component<Props, EditableState> {
     }
 
     // Empty comments will have the no-display class added
+    if (!this.body) return;
     this.body.classList.remove('no-display');
     this.body.focus();
   }

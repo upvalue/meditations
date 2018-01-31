@@ -166,10 +166,12 @@ export class CTaskImpl extends Editable<TaskProps> {
   }
 
   editorUpdated() {
+    if (!this.body) return false;
     return !this.props.task.Comment || this.body.innerHTML !== this.props.task.Comment.Body;
   }
 
   editorSave() {
+    if (!this.body) return;
     common.post(`/habits/comment-update`, {
       ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
       Body: this.body.innerHTML,
