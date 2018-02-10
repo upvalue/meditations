@@ -344,10 +344,10 @@ func syncScopeImpl(scope int, date time.Time) {
 
 	// If this is a project, we also need to include the name
 	if scope >= ScopeProject {
-		var scope Scope
-		DB.Where("ID = ?", scope).First(&scope)
+		var scoperec Scope
+		DB.Where("ID = ?", scope).First(&scoperec)
 
-		scopeName = scope.Name
+		scopeName = scoperec.Name
 	}
 
 	message := scopeSyncMsg{
