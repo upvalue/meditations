@@ -123,6 +123,11 @@ export interface ProjectScopeProps {
 }
 
 export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
+  constructor(props: ProjectScopeProps) {
+    super(props);
+    this.addTask = this.addTask.bind(this);
+  }
+
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);
@@ -130,8 +135,6 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
     if (isNaN(projectID)) return;
 
     route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
-
-    this.addTask = this.addTask.bind(this);
   }
 
   addTask() {
