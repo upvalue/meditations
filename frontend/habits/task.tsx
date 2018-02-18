@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
+import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
 
 import * as common from '../common';
@@ -272,7 +273,11 @@ export class CTaskImpl extends Editable<TaskProps> {
       style['borderStyle'] = 'solid';
     }
 
-    const result = <section className={`task ${lastModified}`} style={style}>
+    const result = <section className={`task ${lastModified}`} style={style} ref = {(elt) => {
+      if (elt) {
+          console.log(elt.clientHeight);
+        }
+      }}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}

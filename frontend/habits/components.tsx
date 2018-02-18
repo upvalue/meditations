@@ -287,7 +287,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
           </div>
           <div>
             <input ref={(ref) => { if (ref) this.projectStatsDaysInput = ref; }}
-              type="text" size={2} placeholder="72" className="mr-1 form-control"
+              type="text" size={2} placeholder="72" className="mr-1 form-control input-sm"
               onBlur={() => this.statsFromInput()} />
             <button className="btn btn-sm btn-secondary mr-1"
               onClick={() => this.statsFromStartOfYear()}>
