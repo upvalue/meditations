@@ -8,13 +8,14 @@ import MediumEditorTable from 'medium-editor-tables';
 
 import { CommonState } from '../common';
 
-interface EditableState {
+export interface EditableState {
   editor: MediumEditor.MediumEditor;
   editorOpen: boolean;
 }
 
 /** An item that has an editable body. Used for task comments and journal entries */
-export class Editable<Props> extends React.Component<Props, EditableState> {
+export class Editable<Props,
+    State extends EditableState = EditableState> extends React.Component<Props, State> {
   /** 
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
    * subclass's render method */

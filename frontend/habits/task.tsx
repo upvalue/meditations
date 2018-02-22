@@ -1,4 +1,4 @@
-// task.tsx - Task components
+// task.tsx - Task components, drag & drop support for tasks
 
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
@@ -6,7 +6,7 @@ import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
 
 import * as common from '../common';
-import { OcticonButton, Editable } from '../common/components';
+import { OcticonButton, Editable, EditableState } from '../common/components';
 
 import { Status, Task, ScopeType, Scope } from './state';
 import { MOUNT_NEXT_DAY_TIME } from './main';
@@ -61,6 +61,43 @@ const taskSameScope = (left: Task, right: Task) => {
 };
 
 const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
+  hover(props, monitor, component) {
+    if (!monitor) return;
+
+    const dragIndex = (monitor.getItem() as TaskProps).task.Order;
+    const hoverIndex = props.task.Order;
+
+    if (dragIndex === hoverIndex) return;
+
+    const hoverBoundingRect =
+      ReactDOM.findDOMNode(component as React.ReactInstance).getBoundingClientRect();
+
+		// Get vertical middle
+		const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+		// Determine mouse position
+		const clientOffset = monitor.getClientOffset();
+
+		// Get pixels to the top
+		const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+		// Only perform the move when the mouse has crossed half of the items height
+		// When dragging downwards, only move when the cursor is below 50%
+		// When dragging upwards, only move when the cursor is above 50%
+
+		// Dragging downwards
+		if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+			return;
+		}
+
+		// Dragging upwards
+		if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+      return;
+    }
+
+    console.log(dragIndex, hoverIndex);
+  },
+
   drop(props, monitor, component) {
 
     if (component && monitor) {
@@ -71,7 +108,6 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
       if (src.ID === target.ID) {
         return;
       }
-
 
       // Task dropped on task in same scope; trigger a re-order
       if (taskSameScope(src, target)) {
@@ -88,12 +124,16 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
   },
 };
 
+interface TaskState extends EditableState {
+  style: any;
+}
+
 /**
  * Component representing a task.
  * This is decorated immediately after using react-dnd methods;
  * for some reason using them directly as decorators fails.
  */
-export class CTaskImpl extends Editable<TaskProps> {
+export class CTaskImpl extends Editable<TaskProps, TaskState> {
   cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % Status.WRAP };
     common.post(`/habits/update`, task);
@@ -261,23 +301,7 @@ export class CTaskImpl extends Editable<TaskProps> {
     const taskButton = 
       connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
 
-    const opacity = isDragging ? 0.5 : 1;
-    const backgroundColor = isOver ? '#cccccc' : '';
-    const style = { opacity } as any;
-
-    // If a dragged task is hovering over this, draw a black border beneath it
-    if (isOver) {
-      style['border'] = '0px';
-      style['borderBottom'] = '2px';
-      style['borderColor'] = 'black';
-      style['borderStyle'] = 'solid';
-    }
-
-    const result = <section className={`task ${lastModified}`} style={style} ref = {(elt) => {
-      if (elt) {
-          console.log(elt.clientHeight);
-        }
-      }}>
+    const result = <section className={`task ${lastModified}`}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}
@@ -324,7 +348,10 @@ const CTaskImplDraggable = ReactDnd.DragSource('TASK', taskSource, (connect, mon
 
 // Decorate task component as a drop target
 const CTask = ReactDnd.DropTarget('TASK', taskTarget, (connect, monitor) => {
+  // console.log(monitor.getDifferenceFromInitialOffset());
   return {
+    // draggedTask: (monitor.getItem() as any),
+    offset: monitor.getDifferenceFromInitialOffset(),
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
     isOverCurrent: monitor.isOver({ shallow: true }),

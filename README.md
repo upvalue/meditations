@@ -27,6 +27,11 @@ Go to your workspace's source.
 
     $ go build
     $ yarn
+
+Run the following command if you'd like to seed the application with some example data.
+
+    $ ./meditations seed 2018-02-22 # put in today's date
+
     $ ./meditations serve --port 8080 --database sample.sqlite3 --migrate 
 
 ## Dependencies
