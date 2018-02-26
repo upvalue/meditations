@@ -301,7 +301,7 @@ const JournalNavigation = connect(state => state)
 
   render() {
     return <div className="d-flex flex-column flex-md-row mb-1 ml-2">
-      <form className="form-inline d-flex flex-column flex-md-row" style={{ display: 'inline' }}
+      <form className="form-inline d-flex flex-column flex-md-row" 
         onSubmit={e => this.search(e)}>
           <DatePicker className="form-control mb-1 mb-md-0"
             onChange={date => this.createEntry(date)} 
@@ -335,12 +335,12 @@ const JournalNavigation = connect(state => state)
 export const JournalRoot = common.connect()(class extends React.Component<JournalState, {}> {
   render() { 
     return <CommonUI {...this.props}>
-      <div className="d-flex flex-column flex-md-row flex-justify-between mr-1">
+      <div className="d-flex flex-column flex-md-row flex-justify-between mr-md-1">
         <div id="journal-sidebar" className="mb-1">
           <JournalSidebar  />
         </div>
 
-        <div id="journal-main" className="ml-1 ">
+        <div id="journal-main" className="ml-md-1">
           <JournalNavigation />
           {((this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') ||
             this.props.searchResults) &&

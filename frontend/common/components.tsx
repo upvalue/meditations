@@ -154,26 +154,27 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
 
   render() {
     const smallunit = this.props.daysOnly ? 'day' : 'month';
-    return <div className="d-flex flex-justify-between mb-1">
+    return <div className="d-flex flex-justify-between flex-md-row flex-column mb-1">
+      <div className="d-flex flex-row">
       {!this.props.daysOnly &&
-        <OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-1"
+        <OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-md-1"
           href={`#${this.props.getRoute('subtract', 'year')}`}
           onClick={() => this.navigate('subtract', 'year')}
           tooltipDirection="e" />}
 
       <OcticonButton name="chevron-left" tooltip={`Go back one ${smallunit}`}
-        octiconClass="mr-1" tooltipDirection="e"
+        octiconClass="mr-md-1" tooltipDirection="e"
         href={`#${this.props.getRoute('subtract', smallunit)}`}
         onClick={() => this.navigate('subtract', smallunit)} />
 
       <OcticonButton name="calendar" tooltip="Go to current date" tooltipDirection="e"
-        octiconClass="mr-1"
+        octiconClass="mr-md-1"
         href={`#${this.props.getRoute('reset')}`}
         onClick={() => this.navigate('reset')} />
 
       <OcticonButton name="chevron-right" tooltip={`Go forward one ${smallunit}`}
         tooltipDirection="e"
-        octiconClass="mr-1"
+        octiconClass="mr-md-1"
         href={`#${this.props.getRoute('add', smallunit)}`}
         onClick={() => this.navigate('add', smallunit)} />
 
@@ -181,8 +182,9 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
         <OcticonButton name="triangle-right" tooltip="Go forward one year"
           tooltipDirection="e"
           href={`#${this.props.getRoute('add', 'year')}`}
-          octiconClass="mr-1"
+          octiconClass="mr-md-1 mr-0"
           onClick={() => this.navigate('add', 'year')} />}
+      </div>
 
       <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
     </div>;
