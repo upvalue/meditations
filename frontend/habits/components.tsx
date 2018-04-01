@@ -51,7 +51,7 @@ interface TimeScopeProps {
 }
 
 export class TimeScope extends
-  React.Component<TimeScopeProps> {
+    React.Component<TimeScopeProps> {
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === ScopeType.MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -150,9 +150,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
   }
 
   render() {
-    const tasks = this.props.scope.Tasks.map((t, i) => {
-      return createCTask(t);
-    });
+    const tasks = this.props.scope.Tasks.map(t => createCTask(t));
 
     return <section className="scope bg-gray">
       <div className="scope-header d-flex flex-row flex-justify-between p-1 ">
@@ -506,7 +504,10 @@ common.connect()(class extends React.PureComponent<HabitsState> {
         <div className="d-flex flex-column flex-md-row">
           <div id="scope-days" className="scope-column mr-md-1">
             {this.props.days ?  
-              this.props.days.map((d, i) => this.renderTimeScope(d, i)) :
+              this.props.days
+                // Only render a single day in advance of the current time
+                .filter((d, i) => d.Date <= moment() || i === 1)
+                .map((d, i) => this.renderTimeScope(d, i)) :
               <Spinner /> }
           </div>
           <div id="scope-month" className="scope-column mr-md-1">

@@ -151,7 +151,6 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
     }
   }
 
-
   render() {
     const smallunit = this.props.daysOnly ? 'day' : 'month';
     return <div className="d-flex flex-justify-between flex-md-row flex-column mb-1">
