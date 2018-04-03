@@ -45,6 +45,11 @@ func DBMigrate() {
 	)
 	DBCreate()
 
+	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_date ON tasks (date);")
+	DB.Exec("CREATE INDEX IF NOT EXISTS idx_entries_date ON entries (date);")
+	DB.Exec("CREATE INDEX IF NOT EXISTS idx_entries_date_scope ON entries (date, scope);")
+	DB.Exec("CREATE INDEX IF NOT EXISTS idx_entries_order ON entries (`order`);")
+
 	// By hand migrations
 	settings := Settings{Name: "settings"}
 	DB.First(&settings)
