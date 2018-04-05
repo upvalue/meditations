@@ -506,7 +506,7 @@ common.connect()(class extends React.PureComponent<HabitsState> {
             {this.props.days ?  
               this.props.days
                 // Only render a single day in advance of the current time
-                .filter((d, i) => d.Date <= moment() || i === 1)
+                .filter((d, i) => (d.Date < moment().add(MOUNT_NEXT_DAY_TIME, 'hours')) || i === 1)
                 .map((d, i) => this.renderTimeScope(d, i)) :
               <Spinner /> }
           </div>
