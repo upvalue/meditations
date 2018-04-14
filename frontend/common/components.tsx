@@ -59,7 +59,18 @@ export class Editable<Props,
 
       const editor = new MediumEditor(this.body, options);
 
+      const listener = function (e: BeforeUnloadEvent) {
+        const msg = 'You have unsaved changes';
+        e.returnValue = msg;
+        return msg;
+      };
+
+      editor.subscribe('focus', () => {
+        window.addEventListener('beforeunload', listener);
+      });
+
       editor.subscribe('blur', () => {
+        window.removeEventListener('beforeunload', listener);
         // It is possible that blur may have been called because copy-paste causes MediumEditor to
         // create a 'pastebin' element, in which case we do not want to trigger a save.
         if (document.activeElement.id.startsWith('medium-editor-pastebin')) {

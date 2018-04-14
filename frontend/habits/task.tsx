@@ -95,7 +95,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
       return;
     }
 
-    console.log(dragIndex, hoverIndex);
+    // console.log(dragIndex, hoverIndex);
   },
 
   drop(props, monitor, component) {
@@ -301,7 +301,15 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     const taskButton = 
       connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
 
-    const result = <section className={`task ${lastModified}`}>
+    const style : any = {};
+
+    if (isOverCurrent) {
+      style['borderBottom'] = '1px solid';
+      style['borderColor'] = 'black';
+      console.log(style);
+    }
+
+    const result = <section className={`task ${lastModified}`} style={style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}
