@@ -75,7 +75,7 @@ export const main = () => {
     },
     
     name: (name: string) => {
-      common.setTitle('Notes', `${name}`);
+      common.setTitle('Notes', `${decodeURI(name)}`);
       dispatch((dispatch) => {
         common.get(`/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);

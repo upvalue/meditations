@@ -68,7 +68,7 @@
     "medium-editor": "^5.23.2",
     "medium-editor-tables": "git+https://github.com/ioddly/medium-editor-tables.git",
     "moment": "^2.18.1",
-    "node-sass": "^4.5.3",
+    "node-sass": "4.9.0",
     "octicons": "^3.5.0",
     "primer": "^10.3.0",
     "react": "16.2.0",
