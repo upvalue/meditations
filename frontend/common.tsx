@@ -405,7 +405,9 @@ export function makeSocket(
  * @param title Actual title
  */
 export function setTitle(page: string, title: string) {
-  document.title = `${title} | ${page} | meditations`;
+  // In some cases, 'title' may be derived directly from the URI and so we want to make sure
+  // it doesn't have URI elements like %20 in it.
+  document.title = `${decodeURI(title)} | ${page} | meditations`;
 }
 
 /**

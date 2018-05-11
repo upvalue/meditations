@@ -8,6 +8,8 @@ import MediumEditorTable from 'medium-editor-tables';
 
 import { CommonState } from '../common';
 
+import { commonContext } from '../common/context';
+
 export interface EditableState {
   editor: MediumEditor.MediumEditor;
   editorOpen: boolean;
@@ -292,9 +294,11 @@ export class CommonUI extends React.Component<CommonState, {}> {
     }
 
     return <div>
-      {this.props.modalOpen && this.renderModal()}
-      {this.renderPopups()}
-      <div {...clickCatch} {...filterAll}>{this.props.children}</div>
+      <commonContext.Provider value={{ modalOpen: false }}>
+        {this.props.modalOpen && this.renderModal()}
+        {this.renderPopups()}
+        <div {...clickCatch} {...filterAll}>{this.props.children}</div>
+      </commonContext.Provider>
     </div>;
   }
 }

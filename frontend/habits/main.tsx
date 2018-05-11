@@ -216,5 +216,5 @@ export const main = () => {
   });
   
   ///// RENDER
-  common.render('root', store, <HabitsRoot />);
+  common.render('root', store, React.createElement(HabitsRoot));
 };

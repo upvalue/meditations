@@ -403,7 +403,8 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-3 mr-2 mt-2 mb-2">
-      <TimeNavigator daysOnly={false} getRoute={this.navigatorRoute} currentDate={this.props.currentDate}  />
+      <TimeNavigator daysOnly={false} getRoute={this.navigatorRoute}
+        currentDate={this.props.currentDate}  />
 
       <div className="d-flex flex-column flex-md-row">
         <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-"
@@ -506,7 +507,8 @@ common.connect()(class extends React.PureComponent<HabitsState> {
             {this.props.days ?  
               this.props.days
                 // Only render a single day in advance of the current time
-                .filter((d, i) => (d.Date < moment().add(MOUNT_NEXT_DAY_TIME, 'hours')) || i === 1)
+                .filter((d, i) =>
+                  (d.Date < moment().add(MOUNT_NEXT_DAY_TIME, 'hours')) || i === 1)
                 .map((d, i) => this.renderTimeScope(d, i)) :
               <Spinner /> }
           </div>

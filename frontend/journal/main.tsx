@@ -75,7 +75,7 @@ export const main = () => {
     },
     
     name: (name: string) => {
-      common.setTitle('Notes', `${decodeURI(name)}`);
+      common.setTitle('Notes', `${name}`);
       dispatch((dispatch) => {
         common.get(`/journal/entries/name/${name}`, (entry: Entry) => {
           common.processModel(entry);
@@ -137,7 +137,7 @@ export const main = () => {
   }, () => {
     ///// RENDER 
     // After socket connects
-    common.render('journal-root', store, <JournalRoot />);
+    common.render('journal-root', store, React.createElement(JournalRoot));
 
     // Fetch sidebar
     common.post('/journal/sidebar');

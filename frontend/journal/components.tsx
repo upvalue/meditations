@@ -262,9 +262,7 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
 
 
 // tslint:disable-next-line:variable-name
-const JournalNavigation = connect(state => state)
-(class extends React.Component<JournalState, { searching: boolean }> {
-
+class JournalNavigation1 extends React.Component<JournalState, { searching: boolean }> {
   searchText!: HTMLInputElement;
 
   constructor(props: any) {
@@ -329,7 +327,9 @@ const JournalNavigation = connect(state => state)
         </div>
       </div>;
   }
-});
+}
+
+const JournalNavigation = common.connect()(JournalNavigation1);
 
 // tslint:disable-next-line:variable-name
 export const JournalRoot = common.connect()(class extends React.Component<JournalState, {}> {
@@ -337,11 +337,11 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
     return <CommonUI {...this.props}>
       <div className="d-flex flex-column flex-md-row flex-justify-between mr-md-1">
         <div id="journal-sidebar" className="mb-1">
-          <JournalSidebar  />
+          {React.createElement(JournalSidebar)}
         </div>
 
         <div id="journal-main" className="ml-md-1">
-          <JournalNavigation />
+          {React.createElement(JournalNavigation)}
           {((this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') ||
             this.props.searchResults) &&
             <BrowseChrono 

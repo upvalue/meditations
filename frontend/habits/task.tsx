@@ -69,6 +69,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 
     if (dragIndex === hoverIndex) return;
 
+    /*
     const hoverBoundingRect =
       ReactDOM.findDOMNode(component as React.ReactInstance).getBoundingClientRect();
 
@@ -94,6 +95,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 		if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return;
     }
+    */
 
     // console.log(dragIndex, hoverIndex);
   },
