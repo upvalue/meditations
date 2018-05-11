@@ -6,9 +6,10 @@ import route from 'riot-route';
 import * as MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
 
+
 import { CommonState } from '../common';
 
-import { commonContext } from '../common/context';
+import { commonContext, commonContextInitial, MeditationsContext } from '../common/context';
 
 export interface EditableState {
   editor: MediumEditor.MediumEditor;
@@ -20,7 +21,8 @@ export class Editable<Props,
     State extends EditableState = EditableState> extends React.Component<Props, State> {
   /** 
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
-   * subclass's render method */
+   * subclass's render method
+   */
   body!: HTMLElement;
 
   componentWillMount() {
@@ -29,13 +31,13 @@ export class Editable<Props,
 
   /** Abstract method; should compare body against model to determine if an update is warranted */
   editorUpdated() {
-    console.warn('editorUpdated not implemented');
+    console.error('editorUpdated not implemented');
     return false;
   }
 
   /** Abstract method; dispatch an asynchronous update of the Editable in question */
   editorSave() {
-    console.warn('editorSave not implemented');
+    console.error('editorSave not implemented');
   }
 
   /** Lazily create an editor; if it already exists, focus on it */
@@ -105,40 +107,61 @@ export class Editable<Props,
 
 interface OcticonButtonProps {
   name: string;
-  onClick: () => void;
+  title?: string;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   /** Tooltip text */
-  tooltip: string;
+  tooltip?: string;
   /** Tooltip direction, default w */
   tooltipDirection?: string;
   /** Additional classes to apply */
   className?: string;
-  /** Octicon class defaulting to btn-octicon, can be overriden */
-  octiconClass?: string;
+
+  normalButton?: boolean;
+
   /** Href for a link, if given */
   href?: string;
+  /** If true, just a span, not a button */
+  span?: boolean;
 }
 
-/** A muted Octicon button */
+/**
+ * A muted Octicon button. Also used to implement octicon spans.
+ */
 export const OcticonButton: React.SFC<OcticonButtonProps> =
-  ({ name, onClick, href, tooltip, octiconClass, tooltipDirection, className }) => {
-    const clickWrap = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
-      onClick();
-    };
+  ({ name, children, 
+      onClick, href, tooltip, normalButton,
+      tooltipDirection, className, span, title }) => {
 
-    return <a href={href} className={`btn ${octiconClass} tooltipped tooltipped-${tooltipDirection}
-        ${className}`}
-        aria-label={tooltip}
-        onClick={clickWrap} >
-        <span className={`octicon octicon-${name}`} />
-      </a>;
+    let klassName = `${span ? ' ' : 'btn '} ${className} `;
+
+    if (tooltip) {
+      klassName = `${klassName} tooltipped tooltipped-${tooltipDirection}`;
+    }
+
+    if (!normalButton) {
+      klassName = `${klassName} btn-octicon`;
+    }
+
+    return React.createElement(span ? 'span' : 'a', {
+      href,
+      title,
+      onClick,
+      className: klassName,
+      'aria-label': tooltip,
+    }, <><span className={`octicon octicon-${name}`} /> {children}</>);
   };
 
+/**
+ * A muted, non-clickable Octicon.
+ */
+export const OcticonSpan: React.SFC<OcticonButtonProps> =
+  props => <OcticonButton {...props} span={true} />;
 
 OcticonButton.defaultProps = {
+  tooltip: undefined,
   tooltipDirection: 'w',
   className: '',
-  octiconClass: 'btn-octicon',
+  normalButton: false,
 };
 
 interface TimeNavigatorProps {
@@ -149,7 +172,8 @@ interface TimeNavigatorProps {
   /** Date to work off of */
   currentDate: moment.Moment;
 
-  /** If true, only one set of arrows is available and it navigates days rather than 
+  /**
+   * If true, only one set of arrows is available and it navigates days rather than 
    * months and years.
    */
   daysOnly: boolean;
@@ -169,32 +193,35 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
     return <div className="d-flex flex-justify-between flex-md-row flex-column mb-1">
       <div className="d-flex flex-row">
       {!this.props.daysOnly &&
-        <OcticonButton name="triangle-left" tooltip="Go back one year" octiconClass="mr-md-1"
+        <OcticonButton name="triangle-left" tooltip="Go back one year" 
+          className="mr-md-1"
+          normalButton={true}
           href={`#${this.props.getRoute('subtract', 'year')}`}
           onClick={() => this.navigate('subtract', 'year')}
           tooltipDirection="e" />}
 
       <OcticonButton name="chevron-left" tooltip={`Go back one ${smallunit}`}
-        octiconClass="mr-md-1" tooltipDirection="e"
+        tooltipDirection="e"
+        className="mr-md-1" normalButton={true}
         href={`#${this.props.getRoute('subtract', smallunit)}`}
         onClick={() => this.navigate('subtract', smallunit)} />
 
       <OcticonButton name="calendar" tooltip="Go to current date" tooltipDirection="e"
-        octiconClass="mr-md-1"
+        className="mr-md-1" normalButton={true}
         href={`#${this.props.getRoute('reset')}`}
         onClick={() => this.navigate('reset')} />
 
       <OcticonButton name="chevron-right" tooltip={`Go forward one ${smallunit}`}
         tooltipDirection="e"
-        octiconClass="mr-md-1"
+        className="mr-md-1" normalButton={true}
         href={`#${this.props.getRoute('add', smallunit)}`}
         onClick={() => this.navigate('add', smallunit)} />
 
       {!this.props.daysOnly &&
         <OcticonButton name="triangle-right" tooltip="Go forward one year"
+          className="mr-md-1 mr-0" normalButton={true}
           tooltipDirection="e"
           href={`#${this.props.getRoute('add', 'year')}`}
-          octiconClass="mr-md-1 mr-0"
           onClick={() => this.navigate('add', 'year')} />}
       </div>
 
@@ -260,11 +287,8 @@ export class CommonUI extends React.Component<CommonState, {}> {
 
   renderModal() {
     return <div id="modal" className="bg-white border border-gray-dark p-2">
-      <div className="float-right">
-        <button className="btn btn-sm mb-2" onClick={() => this.props.dismissModal()}>
-          <span className="octicon octicon-x"
-            aria-label="Dismiss prompt" />
-        </button>
+      <div className="float-right pb-1">
+        <OcticonButton name={'x'} tooltip={'Dismiss prompt'} onClick={this.props.dismissModal} />
       </div>
       {this.props.modalBody}
     </div>;
@@ -294,7 +318,13 @@ export class CommonUI extends React.Component<CommonState, {}> {
     }
 
     return <div>
-      <commonContext.Provider value={{ modalOpen: false }}>
+      <commonContext.Provider value={commonContextInitial}>
+        <commonContext.Consumer>
+          {(state) => {
+            // return state.data.modalOpen ? <p>Modal open</p> : <p>Modal closed</p>;
+            return <></>;
+          }}
+        </commonContext.Consumer>
         {this.props.modalOpen && this.renderModal()}
         {this.renderPopups()}
         <div {...clickCatch} {...filterAll}>{this.props.children}</div>

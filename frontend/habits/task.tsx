@@ -6,7 +6,7 @@ import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
 
 import * as common from '../common';
-import { OcticonButton, Editable, EditableState } from '../common/components';
+import { OcticonButton, Editable, EditableState, OcticonSpan } from '../common/components';
 
 import { Status, Task, ScopeType, Scope } from './state';
 import { MOUNT_NEXT_DAY_TIME } from './main';
@@ -320,13 +320,17 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         <div className="task-controls d-flex">
           {this.hasTime() && <span className="pr-1 tooltipped tooltipped-w"
               aria-label="Average time">
-            <span className="octicon octicon-clock "></span>
+            <OcticonSpan name={'clock'} />
             {this.renderTime()}
           </span>}
-          {this.hasStreak() && <span className="streak pr-1 ">
-            <span className="octicon octicon-dashboard"></span>
-            <span>{this.props.task.Streak}/{this.props.task.BestStreak}</span>
-            </span>}
+
+          {this.hasStreak() && 
+            <OcticonSpan name="dashboard" className="streak pr-1"
+                tooltip="Streak (current / best)">
+              {this.props.task.Streak}/{this.props.task.BestStreak}
+            </OcticonSpan>
+          }
+
 
           {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
           {this.props.task.Scope === ScopeType.DAY && 

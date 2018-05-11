@@ -10,7 +10,8 @@ import DatePicker from 'react-datepicker';
 import * as Autosuggest from 'react-autosuggest';
 
 import * as common from '../common';
-import { TimeNavigator, OcticonButton, Editable, CommonUI } from '../common/components';
+import { TimeNavigator, Editable, CommonUI, OcticonButton, OcticonSpan }
+  from '../common/components';
 
 import { store, dispatch, JournalState, Entry, Tag } from './state';
 import { SidebarState, JournalSidebar } from './sidebar';
@@ -31,6 +32,13 @@ interface CEntryState {
 
 /** A journal entry. */
 class CEntry extends Editable<CEntryProps> {
+  constructor(props: CEntryProps) {
+    super(props);
+
+    this.changeName = this.changeName.bind(this);
+    this.addTag = this.addTag.bind(this);
+  }
+
   changeName() {
     common.modalPromptAllowEmpty('What would you like to name this entry? (leave empty to delete)',
       'Name entry', this.props.entry.Name,
@@ -80,10 +88,6 @@ class CEntry extends Editable<CEntryProps> {
     });
   }
 
-  btnClass(title: string) {
-    return `journal-control btn btn-link btn-sm octicon octicon-${title}`;
-  }
-
   render() {
     // Create an array of tag links
     let tags : ReadonlyArray<React.ReactElement<undefined>> = [];
@@ -123,8 +127,8 @@ class CEntry extends Editable<CEntryProps> {
       <div className="entry-header border-bottom">
         <div className="d-flex flex-row flex-justify-between flex-items-center">
           <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
-            <OcticonButton name="text-size" onClick={() => this.changeName()}
-              tooltip="Change name" tooltipDirection="e" octiconClass="p-1 mr-2" />
+            <OcticonButton name="text-size" onClick={this.changeName}
+              tooltip="Change name" tooltipDirection="e" normalButton={true} className="p-1 mr-2" />
             <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
 
               <span className="d-flex flex-column flex-md-row">
@@ -135,8 +139,8 @@ class CEntry extends Editable<CEntryProps> {
 
             <div className="ml-2 d-flex flex-md-row flex-column" style={{ display: 'inline' }}>
               <OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
-                octiconClass="p-1 mr-2"
-                onClick={() => this.addTag()} />
+                className="p-1 mr-2" normalButton={true}
+                onClick={this.addTag} />
               {tags}        
             </div>
           </div>
@@ -148,11 +152,7 @@ class CEntry extends Editable<CEntryProps> {
             }</strong>
 
             {ctxLink && 
-              <a className="tooltipped tooltipped-w" aria-label="Go to context" href={ctxLink}>
-                <button className="btn btn-octicon octicon octicon-link" 
-                style={{ color: 'black' }} />
-              </a>
-                  }
+              <OcticonButton tooltip="Go to context" name="link" href={ctxLink} />}
 
             <OcticonButton name="trashcan" onClick={() => this.deleteEntry()}
               tooltip="Delete this entry" className="btn-danger ml-1" />
@@ -322,7 +322,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
             <button className="tooltipped tooltipped-s tag" onClick={this.clearSearch}
               aria-label="Clear search results">
               Displaying <strong>{this.props.searchResults}</strong> results
-              <span className="octicon octicon-x ml-1" />
+              <OcticonSpan name="x" className="ml-1" />
             </button> : ''}
         </div>
       </div>;

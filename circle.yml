@@ -24,7 +24,7 @@ dependencies:
     - rsync -azC ./ "$GO_WORKSPACE/src/$IMPORT_PATH"
     - go get github.com/tools/godep
   override:
-    - yarn
+    - npm i
     - npm rebuild node-sass
     - ls "$GO_WORKSPACE/src/$IMPORT_PATH"
     - cd "$GO_WORKSPACE/src/$IMPORT_PATH" && godep go build ./...

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
 
 import { connect, DAY_FORMAT } from '../common';
-import { Spinner } from '../common/components';
+import { Spinner, OcticonButton, OcticonSpan } from '../common/components';
 import LinkTree, { LinkTreeNode } from './linktree';
 import * as moment from 'moment';
 import DatePicker from 'react-datepicker';
@@ -141,9 +141,9 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
         <Tabs defaultIndex={defaultTab}>
 
           <TabList>
-            <Tab><span className="octicon octicon-clock" />Time</Tab>
-            <Tab><span className="octicon octicon-text-size" />Title</Tab>
-            <Tab><span className="octicon octicon-tag" />Tag</Tab>
+            <Tab><OcticonSpan name="clock" />Time</Tab>
+            <Tab><OcticonSpan name="text-size" />Title</Tab>
+            <Tab><OcticonSpan name="tag" />Tag</Tab>
           </TabList>
           
           <TabPanel>

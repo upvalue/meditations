@@ -10,7 +10,8 @@ import route from 'riot-route';
 import * as Scroll from 'react-scroll';
 
 import * as common from '../common';
-import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner } from '../common/components';
+import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner, OcticonSpan }
+  from '../common/components';
 
 import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
   MountScope, dispatchProjectListUpdate }
@@ -18,6 +19,7 @@ import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, 
 import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
 
 import { createCTask } from './task';
+import { commonContext } from '../common/context';
 
 ///// SCOPES
 
@@ -52,6 +54,13 @@ interface TimeScopeProps {
 
 export class TimeScope extends
     React.Component<TimeScopeProps> {
+
+  constructor(props: TimeScopeProps) {
+    super(props);
+
+    this.addTask = this.addTask.bind(this);
+  }
+
   navigate(method: 'add' | 'subtract') {
     const unit = this.props.scope.Scope === ScopeType.MONTH ? 'month' : 'year';
     const ndate = this.props.currentDate.clone()[method](1, unit);
@@ -99,12 +108,20 @@ export class TimeScope extends
       return createCTask(t, this.props.lastModifiedTask);
     });
 
+    // <commonContext.Consumer>
+    //   {ctx => }
+    //
 
     const title =
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
-    return <PresentScope title={title} addTask={() => this.addTask()}>
-      {...tasks}      
-    </PresentScope>;
+
+    return <commonContext.Consumer>
+      {ctx => 
+        <PresentScope title={title} addTask={this.addTask}>
+        {...tasks}      
+        </PresentScope>
+      }
+    </commonContext.Consumer>;
   }
 }
 
@@ -112,7 +129,7 @@ export class TimeScope extends
 const projectActivityIcon = (p: Project, days: number) => { 
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
-  return <span className={`octicon octicon-flame project-activity-${projectActivityClass}`}
+  return <OcticonSpan name="flame" className={`project-activity-${projectActivityClass}`}
     title={`${p.CompletedTasks} in the last ${days} days`} />;
 };
 
@@ -202,9 +219,12 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
   renderProjectLink(project: Project) {
     const hours = Math.floor(project.Minutes / 60);
     const minutes = project.Minutes % 60;
+
+    let timeString = hours > 0 ? `${hours}h${minutes > 0 ? ' ' : ''}` : '';
+    timeString = minutes > 0 ? `${timeString}${minutes}m` : `${timeString}`;
+
     return <div key={project.ID} className="d-flex flex-row flex-justify-between">
       <div>
-
         {project.Pinned && projectActivityIcon(project, this.props.projectStatsDays)}
 
         <a href={urlForView('current', project.ID)}>{project.Name}</a>
@@ -212,16 +232,16 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
       <div className="project-controls">
         {(project.CompletedTasks > 0) && 
-          <span className="mr-1 tooltipped tooltipped-w" aria-label="Completed tasks"> 
-            <span className="octicon octicon-check" />
+          <OcticonSpan name="check" tooltip="Completed tasks">
             {project.CompletedTasks}
-          </span>}
+          </OcticonSpan>}
 
         {(hours > 0 || minutes > 0) &&
           <span className="mr-1 tooltipped tooltipped-w" aria-label="Time">
-            <span className="octicon octicon-clock" />
-            {hours > 0 && `${hours}h${minutes > 0 ? ' ' : ''}`}
-            {minutes > 0 && `${minutes}m`}
+            <OcticonSpan tooltip="Time" name="clock" className="ml-1">
+              {hours > 0 && `${hours}h${minutes > 0 ? ' ' : ''}`}
+              {minutes > 0 && `${minutes}m`}
+            </OcticonSpan>
           </span>}
 
         <OcticonButton name="clippy" tooltip="Copy to left"
@@ -448,7 +468,7 @@ class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
 
   render() {
     return <div id="mobile-menu" className="d-flex flex-column">
-      <OcticonButton name="three-bars" tooltip="Toggle mobile menu"  octiconClass=""
+      <OcticonButton name="three-bars" tooltip="Toggle mobile menu" normalButton={true}
         className="flex-self-end mb-1"
         onClick={() => this.toggle()} />
       {this.state.opened && 

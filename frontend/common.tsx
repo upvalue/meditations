@@ -142,7 +142,7 @@ export function createStore<State extends CommonState, Action extends redux.Acti
 
 ///// ACTION CREATE-AND-DISPATCHERS
 
-interface ModalPromptOptions {
+export interface ModalPromptOptions {
   allowEmpty?: boolean;
   checker?: (chk: string) => string;
 }

@@ -26,7 +26,7 @@ under the `docs` directory.
 Go to your workspace's source.
 
     $ go build
-    $ yarn
+    $ npm i
 
 Run the following command if you'd like to seed the application with some example data.
 
