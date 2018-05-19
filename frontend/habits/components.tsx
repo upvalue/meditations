@@ -57,8 +57,6 @@ export class TimeScope extends
 
   constructor(props: TimeScopeProps) {
     super(props);
-
-    this.addTask = this.addTask.bind(this);
   }
 
   navigate(method: 'add' | 'subtract') {
@@ -67,7 +65,7 @@ export class TimeScope extends
     route(routeForView(ndate, this.props.currentProject));
   }
 
-  addTask() {
+  addTask = () => {
     common.modalPrompt('Enter name:', 'Add new task', (name: string) => {
       if (name) {
         common.post(`/habits/new`, {
@@ -142,7 +140,6 @@ export interface ProjectScopeProps {
 export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
   constructor(props: ProjectScopeProps) {
     super(props);
-    this.addTask = this.addTask.bind(this);
   }
 
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
@@ -154,7 +151,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
     route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
   }
 
-  addTask() {
+  addTask = () => {
     common.modalPrompt('Enter task name', 'New task', (name) => {
       if (name) {
         common.post(`/habits/new`, {
@@ -325,12 +322,10 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 export class HabitsControlBar extends React.PureComponent<HabitsState> {
   constructor(props: HabitsState) {
     super(props);
-    this.navigate = this.navigate.bind(this);
-    this.navigatorRoute = this.navigatorRoute.bind(this);
   }
 
   /** Callback that gives page-appropriate routes to TimeNavigator */
-  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') {
+  navigatorRoute = (method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') => {
     if (method === 'reset') {
       return routeForView(moment(), this.props.currentProject);
     } else if (unit) {
@@ -339,7 +334,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
     }
   }
 
-  navigate(method: 'add' | 'subtract', unit: 'month' | 'year') {
+  navigate = (method: 'add' | 'subtract', unit: 'month' | 'year') => {
     const ndate = this.props.currentDate.clone()[method](1, unit);
     route(routeForView(ndate, this.props.currentProject));
   }

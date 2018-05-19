@@ -23,6 +23,7 @@ export interface TaskProps {
   // Actual props
   task: Task;
   lastModified: boolean;
+  style: any;
 }
 
 // Drag and drop implementation details
@@ -63,18 +64,22 @@ const taskSameScope = (left: Task, right: Task) => {
 const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
   hover(props, monitor, component) {
     if (!monitor) return;
-
+    if (!component) return;
+    
     const dragIndex = (monitor.getItem() as TaskProps).task.Order;
     const hoverIndex = props.task.Order;
 
     if (dragIndex === hoverIndex) return;
 
-    /*
-    const hoverBoundingRect =
-      ReactDOM.findDOMNode(component as React.ReactInstance).getBoundingClientRect();
+    const node = ReactDOM.findDOMNode(component as React.ReactInstance) as Element;
+
+    const n2 = node.querySelector('.task-status') as HTMLElement;
+
+    const hoverBoundingRect = node.getBoundingClientRect();
 
 		// Get vertical middle
-		const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+    const hoverMiddleY = hoverBoundingRect.bottom - n2.clientHeight;
+    // (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
 		// Determine mouse position
 		const clientOffset = monitor.getClientOffset();
@@ -84,18 +89,24 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 
 		// Only perform the move when the mouse has crossed half of the items height
 		// When dragging downwards, only move when the cursor is below 50%
-		// When dragging upwards, only move when the cursor is above 50%
+    // When dragging upwards, only move when the cursor is above 50%
+
+    component.setState({ style: { transform: `translateY(0)` } });
 
 		// Dragging downwards
 		if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+      component.setState({ style: { transform: `translateY(-${n2.clientHeight}px)` } });
 			return;
 		}
 
 		// Dragging upwards
 		if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+      component.setState({ style: { transform: `translateY(${n2.clientHeight}px)` } });
       return;
     }
-    */
+
+    // console.log(component, hoverClientY);
+
 
     // console.log(dragIndex, hoverIndex);
   },
@@ -303,15 +314,23 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     const taskButton = 
       connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
 
-    const style : any = {};
+    const style : any = this.state.style || {};
+
+    /*
+    console.log(this.props.style);
+
+    if (Object.keys(style).length > 0) {
+      console.log('style', style);
+    }
+    */
 
     if (isOverCurrent) {
-      style['borderBottom'] = '1px solid';
-      style['borderColor'] = 'black';
-      console.log(style);
+      // style['borderBottom'] = '1px solid';
+      // style['borderColor'] = 'black';
+      // console.log(style);
     }
 
-    const result = <section className={`task ${lastModified}`} style={style}>
+    const result = <section className={`task ${lastModified}`} style={this.props.style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}

@@ -35,11 +35,9 @@ class CEntry extends Editable<CEntryProps> {
   constructor(props: CEntryProps) {
     super(props);
 
-    this.changeName = this.changeName.bind(this);
-    this.addTag = this.addTag.bind(this);
   }
 
-  changeName() {
+  changeName = () => {
     common.modalPromptAllowEmpty('What would you like to name this entry? (leave empty to delete)',
       'Name entry', this.props.entry.Name,
     (name) => {
@@ -53,7 +51,7 @@ class CEntry extends Editable<CEntryProps> {
     });
   }
 
-  addTag() {
+  addTag = () => {
     common.modalPrompt(
       'What tag would you like to add to this entry? (leave empty to cancel)', 'Tag entry',
     (tname) => {
@@ -180,10 +178,9 @@ interface BrowseChronoProps {
 class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
   constructor(props: BrowseChronoProps) {
     super(props);
-    this.navigatorRoute = this.navigatorRoute.bind(this);
   }
 
-  navigatorRoute(method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') {
+  navigatorRoute = (method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') => {
     if (method === 'reset') {
       return `view/${moment().format(common.MONTH_FORMAT)}`;
     } else if (unit) {
@@ -267,7 +264,6 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
 
   constructor(props: any) {
     super(props);
-    this.clearSearch = this.clearSearch.bind(this);
   }
 
   createEntry(date: moment.Moment | null) {
@@ -284,7 +280,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
 
   }
 
-  clearSearch() {
+  clearSearch = () => {
     // TODO: Clear to previous URL.
     route(`view/${moment().format(common.MONTH_FORMAT)}`);
   }
