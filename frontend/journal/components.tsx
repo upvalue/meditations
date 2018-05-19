@@ -161,7 +161,7 @@ class CEntry extends Editable<CEntryProps> {
       <div className="entry-body p-2 " id={`entry-body-${this.props.entry.ID}`} 
         ref={(body) => { if (body) this.body = body; }}
         dangerouslySetInnerHTML={{ __html: body }}
-        onClick={e => this.editorOpen(e)} />
+        onClick={this.editorOpen} />
       
     </section>;
   }
@@ -266,7 +266,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
     super(props);
   }
 
-  createEntry(date: moment.Moment | null) {
+  createEntry = (date: moment.Moment | null) => {
     if (date !== null) {
       common.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
     }
@@ -285,7 +285,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
     route(`view/${moment().format(common.MONTH_FORMAT)}`);
   }
 
-  search(e: React.FormEvent<HTMLFormElement>) {
+  search = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (this.searchText.value.length > 0) {
       this.setState({ searching: true });
@@ -296,9 +296,9 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
   render() {
     return <div className="d-flex flex-column flex-md-row mb-1 ml-2">
       <form className="form-inline d-flex flex-column flex-md-row" 
-        onSubmit={e => this.search(e)}>
+        onSubmit={this.search}>
           <DatePicker className="form-control mb-1 mb-md-0"
-            onChange={date => this.createEntry(date)} 
+            onChange={this.createEntry} 
             placeholderText="Click to add new entry"
             />
           <input type="text" className="form-control mb-1 mb-md-0 ml-md-2"

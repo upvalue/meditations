@@ -114,7 +114,7 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
     return <LinkTree data={tree} />;
   }
 
-  viewDays(date: moment.Moment | null) {
+  viewDays = (date: moment.Moment | null) => {
     if (date) {
       route(`viewdays/${date.format(DAY_FORMAT)}`);
     }
@@ -131,7 +131,7 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
       return <div>
         <DatePicker 
           className="form-control mb-1"
-          onChange={date => this.viewDays(date)}
+          onChange={this.viewDays}
           isClearable={true}
           placeholderText={'View all posts from day'}
           openToDate={(this.props.route === 'VIEW_DAYS' || this.props.route === 'VIEW_MONTH') ? 

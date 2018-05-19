@@ -292,7 +292,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         <div
           className={`task-comment border border-gray mt-1 ${commentClasses}`}
           ref={(body) => { if (body) { this.body = body; } }} 
-          onClick={e => this.editorOpen(e)}
+          onClick={this.editorOpen}
           dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />
       </div>;
     }

@@ -339,10 +339,10 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
     route(routeForView(ndate, this.props.currentProject));
   }
 
-  filterByName(name: string) {
-    dispatch({ name, type: 'FILTER_BY_NAME' });
+  filterByName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ name: e.target.value, type: 'FILTER_BY_NAME' });
   }
-
+    
   filterByDate(end: boolean, date: moment.Moment | null) {
     if (date) {
       dispatch({ date, end, type: 'FILTER_BY_DATE' });
@@ -423,7 +423,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
 
       <div className="d-flex flex-column flex-md-row">
         <input type="text" placeholder="Filter by name" className="form-control mb-md-0 mb-1 ml-"
-          onChange={e => this.filterByName(e.target.value)} />
+          onChange={this.filterByName} />
 
         {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
 

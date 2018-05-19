@@ -41,7 +41,7 @@ export class Editable<Props,
   }
 
   /** Lazily create an editor; if it already exists, focus on it */
-  editorOpen(e?: React.MouseEvent<HTMLElement>) {
+  editorOpen = (e?: React.MouseEvent<HTMLElement>) => {
     console.log('!!! editorOpen Called');
     if (!this.state.editor) {
       const options = {
