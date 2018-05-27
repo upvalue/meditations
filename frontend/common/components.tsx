@@ -6,9 +6,9 @@ import route from 'riot-route';
 import * as MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
 
+import Octicon, { OcticonSymbol } from 'react-component-octicons';
 
 import { CommonState } from '../common';
-
 import { commonContext, commonContextInitial, MeditationsContext } from '../common/context';
 
 export interface EditableState {
@@ -117,6 +117,7 @@ interface OcticonButtonProps {
   className?: string;
 
   normalButton?: boolean;
+  children?: any;
 
   /** Href for a link, if given */
   href?: string;
@@ -128,11 +129,11 @@ interface OcticonButtonProps {
  * A muted Octicon button. Also used to implement octicon spans.
  */
 export const OcticonButton: React.SFC<OcticonButtonProps> =
-  ({ name, children, 
+  (props: OcticonButtonProps) => {
+    const { name, children,
       onClick, href, tooltip, normalButton,
-      tooltipDirection, className, span, title }) => {
-
-    let klassName = `${span ? ' ' : 'btn '} ${className} `;
+      tooltipDirection, className, span, title } = props;
+    let klassName = `${span ? ' ' : 'btn '} ${className} `; 
 
     if (tooltip) {
       klassName = `${klassName} tooltipped tooltipped-${tooltipDirection}`;
@@ -148,7 +149,7 @@ export const OcticonButton: React.SFC<OcticonButtonProps> =
       onClick,
       className: klassName,
       'aria-label': tooltip,
-    }, <><span className={`octicon octicon-${name}`} /> {children}</>);
+    }, <><Octicon name={name as OcticonSymbol}  /> {children}</>);
   };
 
 /**
@@ -194,7 +195,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
       <div className="d-flex flex-row">
       {!this.props.daysOnly &&
         <OcticonButton name="triangle-left" tooltip="Go back one year" 
-          className="mr-md-1"
+          className="mr-md-1 d-flex flex-items-center"
           normalButton={true}
           href={`#${this.props.getRoute('subtract', 'year')}`}
           onClick={() => this.navigate('subtract', 'year')}
@@ -202,24 +203,24 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
 
       <OcticonButton name="chevron-left" tooltip={`Go back one ${smallunit}`}
         tooltipDirection="e"
-        className="mr-md-1" normalButton={true}
+        className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('subtract', smallunit)}`}
         onClick={() => this.navigate('subtract', smallunit)} />
 
       <OcticonButton name="calendar" tooltip="Go to current date" tooltipDirection="e"
-        className="mr-md-1" normalButton={true}
+        className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('reset')}`}
         onClick={() => this.navigate('reset')} />
 
       <OcticonButton name="chevron-right" tooltip={`Go forward one ${smallunit}`}
         tooltipDirection="e"
-        className="mr-md-1" normalButton={true}
+        className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('add', smallunit)}`}
         onClick={() => this.navigate('add', smallunit)} />
 
       {!this.props.daysOnly &&
         <OcticonButton name="triangle-right" tooltip="Go forward one year"
-          className="mr-md-1 mr-0" normalButton={true}
+          className="mr-md-1 mr-0 d-flex flex-items-center" normalButton={true}
           tooltipDirection="e"
           href={`#${this.props.getRoute('add', 'year')}`}
           onClick={() => this.navigate('add', 'year')} />}

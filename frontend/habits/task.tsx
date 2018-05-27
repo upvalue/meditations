@@ -63,6 +63,7 @@ const taskSameScope = (left: Task, right: Task) => {
 
 const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
   hover(props, monitor, component) {
+    /*
     if (!monitor) return;
     if (!component) return;
     
@@ -109,6 +110,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 
 
     // console.log(dragIndex, hoverIndex);
+    */
   },
 
   drop(props, monitor, component) {
@@ -277,7 +279,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   /** Render an octicon button tied to a specific task action */
   renderControl(tip: string, icon:string, callback: () => void, danger?: boolean) {
     return <OcticonButton tooltip={tip} name={icon} onClick={callback} 
-      className="pl-1 flex-self-end" />;
+      className="d-flex flex-items-center pl-1" />;
   }
 
   renderComment() {
@@ -336,7 +338,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
           {taskButton}
         </div>
 
-        <div className="task-controls d-flex">
+        <div className="task-controls d-flex flex-items-center">
           {this.hasTime() && <span className="pr-1 tooltipped tooltipped-w"
               aria-label="Average time">
             <OcticonSpan name={'clock'} />
@@ -349,7 +351,6 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
               {this.props.task.Streak}/{this.props.task.BestStreak}
             </OcticonSpan>
           }
-
 
           {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
           {this.props.task.Scope === ScopeType.DAY && 

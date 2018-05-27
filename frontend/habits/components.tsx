@@ -128,7 +128,7 @@ const projectActivityIcon = (p: Project, days: number) => {
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
   return <OcticonSpan name="flame" className={`project-activity-${projectActivityClass}`}
-    title={`${p.CompletedTasks} in the last ${days} days`} />;
+      title={`${p.CompletedTasks} in the last ${days} days`} />;
 };
 
 export interface ProjectScopeProps {
@@ -222,12 +222,13 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
     return <div key={project.ID} className="d-flex flex-row flex-justify-between">
       <div>
-        {project.Pinned && projectActivityIcon(project, this.props.projectStatsDays)}
+        {project.Pinned &&
+          projectActivityIcon(project, this.props.projectStatsDays)}
 
         <a href={urlForView('current', project.ID)}>{project.Name}</a>
       </div>
 
-      <div className="project-controls">
+      <div className="project-controls d-flex flex-items-center">
         {(project.CompletedTasks > 0) && 
           <OcticonSpan name="check" tooltip="Completed tasks">
             {project.CompletedTasks}
@@ -240,6 +241,8 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
               {minutes > 0 && `${minutes}m`}
             </OcticonSpan>
           </span>}
+
+        &nbsp;
 
         <OcticonButton name="clippy" tooltip="Copy to left"
           onClick={() => this.copyLeft(project)} />

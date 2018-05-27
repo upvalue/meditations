@@ -126,7 +126,8 @@ class CEntry extends Editable<CEntryProps> {
         <div className="d-flex flex-row flex-justify-between flex-items-center">
           <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
             <OcticonButton name="text-size" onClick={this.changeName}
-              tooltip="Change name" tooltipDirection="e" normalButton={true} className="p-1 mr-2" />
+              tooltip="Change name" tooltipDirection="e" normalButton={true}
+              className="p-1 mr-2 d-flex flex-items-center" />
             <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
 
               <span className="d-flex flex-column flex-md-row">
@@ -137,7 +138,7 @@ class CEntry extends Editable<CEntryProps> {
 
             <div className="ml-2 d-flex flex-md-row flex-column" style={{ display: 'inline' }}>
               <OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
-                className="p-1 mr-2" normalButton={true}
+                className="p-1 mr-2 d-flex flex-items-center" normalButton={true}
                 onClick={this.addTag} />
               {tags}        
             </div>
