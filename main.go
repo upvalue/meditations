@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ioddly/meditations/backend"
+import "./backend"
 
 func main() {
 	backend.Main()
