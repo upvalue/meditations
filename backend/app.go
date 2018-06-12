@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/go-macaron/pongo2"
@@ -73,8 +75,22 @@ func loadConfig(c *cli.Context) {
 	Config.Demo = c.Bool("demo")
 }
 
-// App configures returns a meditations web application
-func App() *macaron.Macaron {
+/**
+ * GetAppPath retrieves the application path.
+ * Some care is taken to make this work outside of the go path
+ */
+func GetAppPath() string {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+
+	// If this is a built executable
+	if strings.HasSuffix(ex, "meditations") == true {
+		return filepath.Dir(ex)
+	}
+
+	// If this is being run by `go run`
 	_, filename, _, ok := runtime.Caller(0)
 	if !ok {
 		panic("No caller information")
@@ -83,6 +99,13 @@ func App() *macaron.Macaron {
 	packagePath := path.Dir(filename)
 	// Go up from /backend directory
 	packagePath = path.Dir(packagePath)
+
+	return packagePath
+}
+
+// App configures returns a meditations web application
+func App() *macaron.Macaron {
+	packagePath := GetAppPath()
 
 	Config.PackagePath = packagePath
 
