@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import route from 'riot-route';
 
 import { JournalState, dispatch } from '../journal/state';
+import { OcticonClock, OcticonTextSize, OcticonTag } from '../common/octicons';
 
 export type ChronoLink = {
   Date: string;
@@ -141,9 +142,9 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
         <Tabs defaultIndex={defaultTab}>
 
           <TabList>
-            <Tab><OcticonSpan name="clock" />Time</Tab>
-            <Tab><OcticonSpan name="text-size" />Title</Tab>
-            <Tab><OcticonSpan name="tag" />Tag</Tab>
+            <Tab><OcticonSpan icon={OcticonClock} />Time</Tab>
+            <Tab><OcticonSpan icon={OcticonTextSize} />Title</Tab>
+            <Tab><OcticonSpan icon={OcticonTag} />Tag</Tab>
           </TabList>
           
           <TabPanel>

@@ -12,6 +12,10 @@ import * as Scroll from 'react-scroll';
 import * as common from '../common';
 import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner, OcticonSpan }
   from '../common/components';
+import {
+  OcticonPlus, OcticonFlame, OcticonClippy, OcticonTrashcan, OcticonPin, OcticonCheck,
+  OcticonClock, OcticonThreeBars,
+} from '../common/octicons';
 
 import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
   MountScope, dispatchProjectListUpdate }
@@ -33,7 +37,7 @@ const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title
     <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
       <h3 className="pl-2">{title}</h3>
       <div className="scope-controls pr-1 pt-1 ">
-        <OcticonButton className="" name="plus" onClick={addTask}
+        <OcticonButton className="" icon={OcticonPlus} onClick={addTask}
           tooltip="Add task" />
       </div>
     </div>
@@ -127,8 +131,10 @@ export class TimeScope extends
 const projectActivityIcon = (p: Project, days: number) => { 
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
-  return <OcticonSpan name="flame" className={`project-activity-${projectActivityClass}`}
-      title={`${p.CompletedTasks} in the last ${days} days`} />;
+  return <OcticonSpan
+    icon={OcticonFlame}
+    className={`project-activity-${projectActivityClass}`}
+    title={`${p.CompletedTasks} in the last ${days} days`} />;
 };
 
 export interface ProjectScopeProps {
@@ -173,7 +179,9 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
             Projects</a></span> 
           <span> &gt; {this.props.scope.Name}</span></h3>
 
-        <OcticonButton className="flex-self-center" name="plus"
+        <OcticonButton
+          className="flex-self-center"
+          icon={OcticonPlus}
           tooltip="New task" onClick={this.addTask} />
       </div>
 
@@ -230,13 +238,13 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
       <div className="project-controls d-flex flex-items-center">
         {(project.CompletedTasks > 0) && 
-          <OcticonSpan name="check" tooltip="Completed tasks">
+          <OcticonSpan icon={OcticonCheck} tooltip="Completed tasks">
             {project.CompletedTasks}
           </OcticonSpan>}
 
         {(hours > 0 || minutes > 0) &&
           <span className="mr-1 tooltipped tooltipped-w" aria-label="Time">
-            <OcticonSpan tooltip="Time" name="clock" className="ml-1">
+            <OcticonSpan icon={OcticonClock} tooltip="Time" className="ml-1">
               {hours > 0 && `${hours}h${minutes > 0 ? ' ' : ''}`}
               {minutes > 0 && `${minutes}m`}
             </OcticonSpan>
@@ -244,11 +252,11 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
         &nbsp;
 
-        <OcticonButton name="clippy" tooltip="Copy to left"
+        <OcticonButton icon={OcticonClippy} tooltip="Copy to left"
           onClick={() => this.copyLeft(project)} />
-        <OcticonButton name="pin" tooltip={project.Pinned ? 'Unpin project' : 'Pin project'}
+        <OcticonButton icon={OcticonPin} tooltip={project.Pinned ? 'Unpin project' : 'Pin project'}
           onClick={() => this.pinProject(project)} />
-        <OcticonButton name="trashcan" tooltip="Delete project"
+        <OcticonButton icon={OcticonTrashcan} tooltip="Delete project"
           onClick={() => this.deleteProject(project.ID)} />
       </div>
     </div>;
@@ -284,7 +292,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
         <h3 className="scope-title">Projects</h3>
         <div className="scope-controls pr-1 pt-1 flex-self-center">
-          <OcticonButton name="plus" tooltip="Add new project" 
+          <OcticonButton icon={OcticonPlus} tooltip="Add new project" 
             onClick={() => this.addProject()} />
         </div>
       </div>
@@ -466,7 +474,7 @@ class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
 
   render() {
     return <div id="mobile-menu" className="d-flex flex-column">
-      <OcticonButton name="three-bars" tooltip="Toggle mobile menu" normalButton={true}
+      <OcticonButton icon={OcticonThreeBars} tooltip="Toggle mobile menu" normalButton={true}
         className="flex-self-end mb-1"
         onClick={() => this.toggle()} />
       {this.state.opened && 

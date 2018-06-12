@@ -15,6 +15,9 @@ import { TimeNavigator, Editable, CommonUI, OcticonButton, OcticonSpan }
 
 import { store, dispatch, JournalState, Entry, Tag } from './state';
 import { SidebarState, JournalSidebar } from './sidebar';
+import {
+  OcticonTextSize, OcticonTag, OcticonTrashcan, OcticonLink, OcticonX,
+} from '../common/octicons';
 
 ///// REACT COMPONENTS
 
@@ -125,7 +128,7 @@ class CEntry extends Editable<CEntryProps> {
       <div className="entry-header border-bottom">
         <div className="d-flex flex-row flex-justify-between flex-items-center">
           <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
-            <OcticonButton name="text-size" onClick={this.changeName}
+            <OcticonButton icon={OcticonTextSize} onClick={this.changeName}
               tooltip="Change name" tooltipDirection="e" normalButton={true}
               className="p-1 mr-2 d-flex flex-items-center" />
             <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
@@ -137,7 +140,7 @@ class CEntry extends Editable<CEntryProps> {
             </h3>
 
             <div className="ml-2 d-flex flex-md-row flex-column" style={{ display: 'inline' }}>
-              <OcticonButton name="tag" tooltip="Add tag" tooltipDirection="n"
+              <OcticonButton icon={OcticonTag} tooltip="Add tag" tooltipDirection="n"
                 className="p-1 mr-2 d-flex flex-items-center" normalButton={true}
                 onClick={this.addTag} />
               {tags}        
@@ -151,9 +154,9 @@ class CEntry extends Editable<CEntryProps> {
             }</strong>
 
             {ctxLink && 
-              <OcticonButton tooltip="Go to context" name="link" href={ctxLink} />}
+              <OcticonButton tooltip="Go to context" icon={OcticonLink} href={ctxLink} />}
 
-            <OcticonButton name="trashcan" onClick={() => this.deleteEntry()}
+            <OcticonButton icon={OcticonTrashcan} onClick={() => this.deleteEntry()}
               tooltip="Delete this entry" className="btn-danger ml-1" />
           </div>
 
@@ -319,7 +322,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
             <button className="tooltipped tooltipped-s tag" onClick={this.clearSearch}
               aria-label="Clear search results">
               Displaying <strong>{this.props.searchResults}</strong> results
-              <OcticonSpan name="x" className="ml-1" />
+              <OcticonSpan icon={OcticonX} className="ml-1" />
             </button> : ''}
         </div>
       </div>;

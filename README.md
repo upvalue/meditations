@@ -25,6 +25,8 @@ under the `docs` directory.
     
 Go to your workspace's source.
 
+Make sure to use NPM instead of yarn due to the following issue: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/18484#issuecomment-319968097
+
     $ go build
     $ npm i
 

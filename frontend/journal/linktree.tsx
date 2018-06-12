@@ -1,6 +1,7 @@
 // linktree.tsx - implementation of an expandable tree of links
 import * as React from 'react';
 import { OcticonButton } from '../common/components';
+import { OcticonArrowRight, OcticonArrowDown } from '../common/octicons';
 
 export interface LinkTreeNode {
   title: string;
@@ -43,7 +44,7 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
         key={i}>
       <div className="">
       {node.children && 
-        <OcticonButton name={node.expanded ? 'arrow-down' : 'arrow-right'}
+        <OcticonButton icon={node.expanded ? OcticonArrowDown : OcticonArrowRight}
           className="link-tree-node-btn"
           onClick={e => e && this.toggleNode(e, node)} />
       }

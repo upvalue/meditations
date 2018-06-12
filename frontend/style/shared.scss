@@ -100,12 +100,11 @@ body {
 .btn-octicon {
   background: transparent;
   border:0;
-  color: $uiColorMuted;
   padding: 0;
 }
 
-button.btn-octicon svg {
-  fill: #09d;
+.octicon-svg {
+  fill: $uiColorSlightlyMuted;
 }
 
 .btn-danger svg {

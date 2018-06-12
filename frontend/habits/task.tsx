@@ -10,6 +10,9 @@ import { OcticonButton, Editable, EditableState, OcticonSpan } from '../common/c
 
 import { Status, Task, ScopeType, Scope } from './state';
 import { MOUNT_NEXT_DAY_TIME } from './main';
+import {
+  OcticonClock, OcticonDashboard, OcticonData, OcticonComment, OcticonClippy, OcticonTrashcan,
+} from '../common/octicons';
 
 export interface TaskProps {
   // Drag and drop implementation props
@@ -277,8 +280,8 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   /** Render an octicon button tied to a specific task action */
-  renderControl(tip: string, icon:string, callback: () => void, danger?: boolean) {
-    return <OcticonButton tooltip={tip} name={icon} onClick={callback} 
+  renderControl(tip: string, icon:OcticonData, callback: () => void, danger?: boolean) {
+    return <OcticonButton tooltip={tip} icon={icon} onClick={callback} 
       className="d-flex flex-items-center pl-1" />;
   }
 
@@ -341,23 +344,25 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         <div className="task-controls d-flex flex-items-center">
           {this.hasTime() && <span className="pr-1 tooltipped tooltipped-w"
               aria-label="Average time">
-            <OcticonSpan name={'clock'} />
+            <OcticonSpan icon={OcticonClock} />
             {this.renderTime()}
           </span>}
 
           {this.hasStreak() && 
-            <OcticonSpan name="dashboard" className="streak pr-1"
+            <OcticonSpan
+                icon={OcticonDashboard}
+                className="streak pr-1"
                 tooltip="Streak (current / best)">
               {this.props.task.Streak}/{this.props.task.BestStreak}
             </OcticonSpan>
           }
 
-          {this.renderControl('Add/edit comment', 'comment', () => this.editorOpen())}  
+          {this.renderControl('Add/edit comment', OcticonComment, () => this.editorOpen())}  
           {this.props.task.Scope === ScopeType.DAY && 
-            this.renderControl('Set time', 'clock', () => this.setTime())}
+            this.renderControl('Set time', OcticonClock, () => this.setTime())}
           {this.hasCopy() &&
-            this.renderControl('Copy to the left', 'clippy', () => this.copyLeft())}
-          {this.renderControl('Delete task', 'trashcan', () => this.destroy(), true)}  
+            this.renderControl('Copy to the left', OcticonClippy, () => this.copyLeft())}
+          {this.renderControl('Delete task', OcticonTrashcan, () => this.destroy(), true)}  
         </div>
       </div>
 

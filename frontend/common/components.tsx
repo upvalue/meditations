@@ -1,12 +1,16 @@
 // components.tsx - Common components
 
+
 import * as React from 'react';
 import * as moment from 'moment';
 import route from 'riot-route';
 import * as MediumEditor from 'medium-editor';
 import MediumEditorTable from 'medium-editor-tables';
 
-import Octicon, { OcticonSymbol } from 'react-component-octicons';
+import {
+  OcticonData, OcticonTriangleLeft, OcticonChevronLeft, OcticonCalendar, OcticonChevronRight,
+  OcticonTriangleRight, OcticonX,
+} from './octicons';
 
 import { CommonState } from '../common';
 import { commonContext, commonContextInitial, MeditationsContext } from '../common/context';
@@ -106,7 +110,7 @@ export class Editable<Props,
 }
 
 interface OcticonButtonProps {
-  name: string;
+  icon: OcticonData;
   title?: string;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   /** Tooltip text */
@@ -130,7 +134,7 @@ interface OcticonButtonProps {
  */
 export const OcticonButton: React.SFC<OcticonButtonProps> =
   (props: OcticonButtonProps) => {
-    const { name, children,
+    const { children, icon,
       onClick, href, tooltip, normalButton,
       tooltipDirection, className, span, title } = props;
     let klassName = `${span ? ' ' : 'btn '} ${className} `; 
@@ -149,7 +153,12 @@ export const OcticonButton: React.SFC<OcticonButtonProps> =
       onClick,
       className: klassName,
       'aria-label': tooltip,
-    }, <><Octicon name={name as OcticonSymbol}  /> {children}</>);
+    }, <>
+      <svg className="octicon-svg"
+        width={icon.width}
+        height={icon.height}
+        viewBox={icon.viewBox}>{icon.pathRender()}</svg>
+      {children}</>);
   };
 
 /**
@@ -194,32 +203,40 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
     return <div className="d-flex flex-justify-between flex-md-row flex-column mb-1">
       <div className="d-flex flex-row">
       {!this.props.daysOnly &&
-        <OcticonButton name="triangle-left" tooltip="Go back one year" 
+        <OcticonButton icon={OcticonTriangleLeft}
+          tooltip="Go back one year" 
           className="mr-md-1 d-flex flex-items-center"
           normalButton={true}
           href={`#${this.props.getRoute('subtract', 'year')}`}
           onClick={() => this.navigate('subtract', 'year')}
           tooltipDirection="e" />}
 
-      <OcticonButton name="chevron-left" tooltip={`Go back one ${smallunit}`}
+      <OcticonButton icon={OcticonChevronLeft}
+        tooltip={`Go back one ${smallunit}`}
         tooltipDirection="e"
         className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('subtract', smallunit)}`}
         onClick={() => this.navigate('subtract', smallunit)} />
 
-      <OcticonButton name="calendar" tooltip="Go to current date" tooltipDirection="e"
+      <OcticonButton
+        icon={OcticonCalendar}
+        tooltip="Go to current date" tooltipDirection="e"
         className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('reset')}`}
         onClick={() => this.navigate('reset')} />
 
-      <OcticonButton name="chevron-right" tooltip={`Go forward one ${smallunit}`}
+      <OcticonButton
+        icon={OcticonChevronRight}
+        tooltip={`Go forward one ${smallunit}`}
         tooltipDirection="e"
         className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('add', smallunit)}`}
         onClick={() => this.navigate('add', smallunit)} />
 
       {!this.props.daysOnly &&
-        <OcticonButton name="triangle-right" tooltip="Go forward one year"
+        <OcticonButton
+          icon={OcticonTriangleRight}
+          tooltip="Go forward one year"
           className="mr-md-1 mr-0 d-flex flex-items-center" normalButton={true}
           tooltipDirection="e"
           href={`#${this.props.getRoute('add', 'year')}`}
@@ -289,7 +306,8 @@ export class CommonUI extends React.Component<CommonState, {}> {
   renderModal() {
     return <div id="modal" className="bg-white border border-gray-dark p-2">
       <div className="float-right pb-1">
-        <OcticonButton name={'x'} tooltip={'Dismiss prompt'} onClick={this.props.dismissModal} />
+        <OcticonButton icon={OcticonX}
+          tooltip={'Dismiss prompt'} onClick={this.props.dismissModal} />
       </div>
       {this.props.modalBody}
     </div>;

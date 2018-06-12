@@ -157,9 +157,9 @@ $pa-colors: (
   @for $i from 0 to 6 {
     $pan: ($j * 6) + $i;
     .project-activity-#{$pan} {
-      color: mix(nth($pa-colors, $j + 1), nth($pa-colors, $j + 2), nth($pa-percentages, $i + 1));
       // font-size: 1em + ($pan / 24);
       svg {
+        fill: mix(nth($pa-colors, $j + 1), nth($pa-colors, $j + 2), nth($pa-percentages, $i + 1));
         width: #{(16+ceil(($pan / 4)))}px;
         height: #{(16+ceil(($pan / 4)))}px;
       }
