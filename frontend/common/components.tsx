@@ -261,7 +261,7 @@ export const Spinner = (props: any) => {
  * Common UI elements (currently just a notification bar that appears at the top)
  */
 export class CommonUI extends React.Component<CommonState, {}> {
-  reconnect() {
+  reconnect = () => {
     this.props.socketReconnect();
   }
   
@@ -282,7 +282,7 @@ export class CommonUI extends React.Component<CommonState, {}> {
       {this.props.socketClosed && <div>
         <div className="notification flash flash-error mb-2">
           <p>WebSocket connection failed!</p>
-          <button className="btn btn-primary" onClick={() => this.reconnect()}>
+          <button className="btn btn-primary" onClick={this.reconnect}>
             Attempt reconnection
           </button>
         </div>

@@ -2,13 +2,12 @@
 
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
-import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
 
 import * as common from '../common';
 import { OcticonButton, Editable, EditableState, OcticonSpan } from '../common/components';
 
-import { Status, Task, ScopeType, Scope } from './state';
+import { Status, Task, ScopeType } from './state';
 import { MOUNT_NEXT_DAY_TIME } from './main';
 import {
   OcticonClock, OcticonDashboard, OcticonData, OcticonComment, OcticonClippy, OcticonTrashcan,

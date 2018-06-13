@@ -1,25 +1,24 @@
 // components.tsx -- habits components
 import * as moment from 'moment';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as redux from 'redux';
 import * as ReactDnd from 'react-dnd';
 import DatePicker from 'react-datepicker';
 import HTML5Backend from 'react-dnd-html5-backend';
 import route from 'riot-route';
 import * as Scroll from 'react-scroll';
+import { times } from 'lodash';
 
 import * as common from '../common';
-import { OcticonButton, TimeNavigator, Editable, CommonUI, Spinner, OcticonSpan }
+import { OcticonButton, TimeNavigator, CommonUI, Spinner, OcticonSpan }
   from '../common/components';
 import {
   OcticonPlus, OcticonFlame, OcticonClippy, OcticonTrashcan, OcticonPin, OcticonCheck,
   OcticonClock, OcticonThreeBars,
 } from '../common/octicons';
 
-import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
-  MountScope, dispatchProjectListUpdate }
-  from './state';
+import {
+  ScopeType, FilterState, Scope, Project, HabitsState, dispatch, dispatchProjectListUpdate,
+} from './state';
 import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
 
 import { createCTask } from './task';
@@ -131,10 +130,17 @@ export class TimeScope extends
 const projectActivityIcon = (p: Project, days: number) => { 
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
-  return <OcticonSpan
-    icon={OcticonFlame}
-    className={`project-activity-${projectActivityClass}`}
-    title={`${p.CompletedTasks} in the last ${days} days`} />;
+  const flameCount = projectActivityClass / 4;
+
+  return (<>
+    {times(Math.max(1, flameCount), (i) => {
+      return <OcticonSpan
+        key={i}
+        icon={OcticonFlame}
+        className={`project-activity-${projectActivityClass}`}
+        title={`${p.CompletedTasks} in the last ${days} days`} />;
+    })}
+    </>);
 };
 
 export interface ProjectScopeProps {

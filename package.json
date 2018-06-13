@@ -47,6 +47,7 @@
   },
   "homepage": "https://github.com/ioddly/meditations#readme",
   "dependencies": {
+    "@types/lodash": "^4.14.109",
     "@types/medium-editor": "^5.0.1",
     "@types/react": "16.3.13",
     "@types/react-autosuggest": "^9.3.2",
