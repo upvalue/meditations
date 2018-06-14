@@ -408,7 +408,31 @@ func projectTogglePin(c *macaron.Context) {
 		return
 	}
 
-	scope.Pinned = !scope.Pinned
+	if scope.Visibility == VisibilityUnpinned {
+		scope.Visibility = VisibilityPinned
+	} else {
+		scope.Visibility = VisibilityUnpinned
+	}
+
+	DB.Save(&scope)
+	syncProjectList()
+	c.PlainText(http.StatusOK, []byte("OK"))
+}
+
+func projectToggleHide(c *macaron.Context) {
+	var scope Scope
+
+	_, err := projectPost(c, &scope)
+
+	if err != nil {
+		return
+	}
+
+	if scope.Visibility == VisibilityUnpinned {
+		scope.Visibility = VisibilityHidden
+	} else {
+		scope.Visibility = VisibilityUnpinned
+	}
 
 	DB.Save(&scope)
 	syncProjectList()
@@ -418,7 +442,6 @@ func projectTogglePin(c *macaron.Context) {
 func projectNew(c *macaron.Context) {
 	var scope Scope
 	scope.Name = c.Params("name")
-	scope.Pinned = false
 	DB.Save(&scope)
 
 	syncProjectList()
@@ -538,6 +561,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/projects/delete/:id:int", projectDelete)
 	m.Post("/projects/new/:name", projectNew)
 	m.Post("/projects/toggle-pin/:id:int", projectTogglePin)
+	m.Post("/projects/toggle-hide/:id:int", projectToggleHide)
 
 	m.Post("/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/new", binding.Bind(Task{}), taskNew)

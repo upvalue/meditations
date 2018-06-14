@@ -83,8 +83,9 @@ const (
 // or greater
 type Scope struct {
 	gorm.Model
-	Name   string `gorm:"not null;unique"`
-	Pinned bool   `gorm:"not null;default:'0'"`
+	Name string `gorm:"not null;unique"`
+	// Hidden projects will not be displayed unless a checkbox is checked
+	Visibility int `gorm:"not null;default:'1'"`
 	// Derived statistics
 	CompletedTasks int `gorm:"-"`
 	Minutes        int `gorm:"-"`
@@ -92,6 +93,17 @@ type Scope struct {
 	// it's used to grow or shrink the flame indicator
 	ProgressDirection int `gorm:"-"`
 }
+
+const (
+	// VisibilityHidden means a project will not be shown unless a checkbox to that effect is ticked
+	VisibilityHidden = 0
+	// VisibilityUnpinned means projects will be displayed with statistics for all-time, and no
+	// activity flame
+	VisibilityUnpinned = 1
+	// VisibilityPinned means projects will be displayed with statistics and a flame indicator
+	// based on recent activity
+	VisibilityPinned = 2
+)
 
 // Comment represents a task comment.
 type Comment struct {
@@ -425,7 +437,7 @@ func (project *Scope) CalculateProjectStats(days int) {
 	// has been doing more or less to progress on a particular project
 	compareDiff := (int(math.Ceil(float64(days) / 10)))
 
-	if project.Pinned == true {
+	if project.Visibility == VisibilityPinned {
 		past = time.Now().AddDate(0, 0, -days)
 
 		comparePastBegin = time.Now().AddDate(0, 0, -(days + compareDiff))
@@ -436,15 +448,9 @@ func (project *Scope) CalculateProjectStats(days int) {
 		past = time.Now().AddDate(-30, 0, 0)
 	}
 
-	var count, compareCount struct{ Count int }
+	var count struct{ Count int }
 	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
 		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
-
-	if project.Pinned == true {
-		DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and date < ? and status = ? and deleted_at is null",
-			ScopeDay, project.Name, comparePastBegin, comparePastEnd, TaskComplete).Scan(&compareCount)
-		project.ProgressDirection = count.Count - compareCount.Count
-	}
 
 	var minutes struct{ Minutes int }
 	DB.Table("tasks").Select("sum(minutes) as minutes").
@@ -461,15 +467,18 @@ func (project *Scope) CalculateProjectStats(days int) {
 type ProjectListMsg struct {
 	Pinned   []Scope
 	Unpinned []Scope
+	Hidden   []Scope
 }
 
 // getProjectList returns struct with slices of pinned and unpinned projects
 func getProjectList(days int) ProjectListMsg {
 	var pinnedProjects []Scope
 	var unpinnedProjects []Scope
+	var hiddenProjects []Scope
 
-	DB.Where("id >= ? and pinned = 1", ScopeProject).Order("name").Find(&pinnedProjects)
-	DB.Where("id >= ? and pinned = 0", ScopeProject).Order("name").Find(&unpinnedProjects)
+	DB.Where("id >= ? and visibility = 0", ScopeProject).Order("name").Find(&hiddenProjects)
+	DB.Where("id >= ? and visibility = 1", ScopeProject).Order("name").Find(&unpinnedProjects)
+	DB.Where("id >= ? and visibility = 2", ScopeProject).Order("name").Find(&pinnedProjects)
 
 	for i := range pinnedProjects {
 		pinnedProjects[i].CalculateProjectStats(days)
@@ -479,7 +488,7 @@ func getProjectList(days int) ProjectListMsg {
 		unpinnedProjects[i].CalculateProjectStats(days)
 	}
 
-	return ProjectListMsg{pinnedProjects, unpinnedProjects}
+	return ProjectListMsg{pinnedProjects, unpinnedProjects, hiddenProjects}
 }
 
 // syncProjectList sends an updated list of projects over the socket

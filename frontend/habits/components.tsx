@@ -13,16 +13,18 @@ import { OcticonButton, TimeNavigator, CommonUI, Spinner, OcticonSpan }
   from '../common/components';
 import {
   OcticonPlus, OcticonFlame, OcticonClippy, OcticonTrashcan, OcticonPin, OcticonCheck,
-  OcticonClock, OcticonThreeBars,
+  OcticonClock, OcticonThreeBars, OcticonArchive,
 } from '../common/octicons';
 
 import {
   ScopeType, FilterState, Scope, Project, HabitsState, dispatch, dispatchProjectListUpdate,
+  ProjectVisibility,
 } from './state';
 import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
 
 import { createCTask } from './task';
 import { commonContext } from '../common/context';
+import { storeUIState, fetchStoredUIState } from '../common/storage';
 
 ///// SCOPES
 
@@ -108,10 +110,6 @@ export class TimeScope extends
     const tasks = filteredTasks.map((t, i) => {
       return createCTask(t, this.props.lastModifiedTask);
     });
-
-    // <commonContext.Consumer>
-    //   {ctx => }
-    //
 
     const title =
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
@@ -199,11 +197,24 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
 export interface ProjectListProps {
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
+  hiddenProjects: Project[];
   projectStatsDays: number;
 }
 
-export class ProjectList extends React.PureComponent<ProjectListProps> {
+export interface ProjectListState {
+  showHiddenProjects: boolean;
+}
+
+export class ProjectList extends React.PureComponent<ProjectListProps, ProjectListState> {
   projectStatsDaysInput!: HTMLInputElement;
+
+  constructor(props: ProjectListProps) {
+    super(props);
+
+    this.state = {
+      showHiddenProjects: fetchStoredUIState().showHiddenProjects,
+    };
+  }
 
   deleteProject(id: number) {
     common.modalConfirm(
@@ -215,6 +226,10 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
   pinProject(p: Project) {
     common.post(`/habits/projects/toggle-pin/${p.ID}`);
+  }
+
+  hideProject(p: Project) {
+    common.post(`/habits/projects/toggle-hide/${p.ID}`);
   }
 
   copyLeft(p: Project) {
@@ -236,7 +251,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
     return <div key={project.ID} className="d-flex flex-row flex-justify-between">
       <div>
-        {project.Pinned &&
+        {project.Visibility === ProjectVisibility.Pinned &&
           projectActivityIcon(project, this.props.projectStatsDays)}
 
         <a href={urlForView('current', project.ID)}>{project.Name}</a>
@@ -260,8 +275,23 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
 
         <OcticonButton icon={OcticonClippy} tooltip="Copy to left"
           onClick={() => this.copyLeft(project)} />
-        <OcticonButton icon={OcticonPin} tooltip={project.Pinned ? 'Unpin project' : 'Pin project'}
-          onClick={() => this.pinProject(project)} />
+
+        {project.Visibility !== ProjectVisibility.Hidden &&
+          <OcticonButton icon={OcticonPin}
+            tooltip={
+              project.Visibility === ProjectVisibility.Pinned ? 'Unpin project' : 'Pin project'
+            }
+            onClick={() => this.pinProject(project)} />
+        }
+
+        {project.Visibility !== ProjectVisibility.Pinned &&
+          <OcticonButton
+            icon={OcticonArchive}
+            tooltip="(Un)hide project"
+            onClick={() => this.hideProject(project)} />
+        }
+
+
         <OcticonButton icon={OcticonTrashcan} tooltip="Delete project"
           onClick={() => this.deleteProject(project.ID)} />
       </div>
@@ -293,6 +323,16 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
     }
   }
 
+  toggleDisplayHidden = () => {
+    this.setState({ 
+      showHiddenProjects: !this.state.showHiddenProjects,
+    });
+
+    storeUIState({
+      showHiddenProjects: !this.state.showHiddenProjects,
+    });
+  }
+
   render() {
     return <section className="project-list border bg-gray ">
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
@@ -302,13 +342,27 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
             onClick={() => this.addProject()} />
         </div>
       </div>
+
       <div className="pl-1 pr-1 pt-1">
         {this.props.pinnedProjects.map(p => this.renderProjectLink(p))}
       </div>
+
       <hr className="mt-1 mb-1" />
+
       <div className="pl-1 pr-1">
         {this.props.unpinnedProjects.map(p => this.renderProjectLink(p))}
       </div>
+
+      {this.state.showHiddenProjects &&
+        (<>
+          <hr className="mt-1 mb-1" />
+          <div className="pl-1 pr-1">
+            {this.props.hiddenProjects.map(p => this.renderProjectLink(p))}
+          </div>
+        </>)
+      
+      }
+
       <hr className="mt-1 mb-1" />
       <div className="pl-1 pr-1 pt-1 pb-1">
         <div className="d-flex flex-row flex-justify-between">
@@ -330,6 +384,14 @@ export class ProjectList extends React.PureComponent<ProjectListProps> {
               Forever
             </button>
           </div>
+        </div>
+        <div className="d-flex flex-row">
+          <label>
+            <input type="checkbox"
+              checked={this.state.showHiddenProjects}
+              onClick={this.toggleDisplayHidden} />
+            &nbsp;Display hidden projects
+          </label>
         </div>
       </div>
     </section>;
@@ -515,6 +577,7 @@ common.connect()(class extends React.PureComponent<HabitsState> {
   renderProjects() {
     if (this.props.currentProject === 0) {
       return <ProjectList 
+        hiddenProjects={this.props.hiddenProjects}
         pinnedProjects={this.props.pinnedProjects}
         unpinnedProjects ={this.props.unpinnedProjects}
         projectStatsDays={this.props.projectStatsDays} />;

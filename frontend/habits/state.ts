@@ -55,13 +55,18 @@ export interface Scope {
   Tasks: Task[];
 }
 
+export enum ProjectVisibility {
+  Hidden,
+  Unpinned,
+  Pinned,
+}
+
 export type Project = {
   ID: number;
   Name: string;
-  Pinned: boolean;
+  Visibility: ProjectVisibility;
   CompletedTasks: number;
   Minutes: number;
-  ProgressDirection: number;
 };
 
 /** A list of tasks and a date; used to mount a bunch of days at once. */
@@ -97,6 +102,8 @@ export interface HabitsState extends common.CommonState {
   // UI tree
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
+  hiddenProjects: Project[];
+
   month: Scope;
   year: Scope;
   days: Scope[];
@@ -125,6 +132,7 @@ interface AddProjectList {
   type: 'PROJECT_LIST';
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
+  hiddenProjects: Project[];
   days: number;
 }
 
@@ -245,8 +253,11 @@ const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState 
 const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
   switch (action.type) {
     case 'PROJECT_LIST':
-      return { ...state, pinnedProjects: action.pinnedProjects,
-        unpinnedProjects: action.unpinnedProjects, projectStatsDays: action.days };
+      return { ...state, 
+        pinnedProjects: action.pinnedProjects,
+        unpinnedProjects: action.unpinnedProjects,
+        hiddenProjects: action.hiddenProjects,
+        projectStatsDays: action.days };
 
     case 'CHANGE_ROUTE':
       return { ...state, currentDate: action.date, currentProject: action.currentProject };
@@ -321,10 +332,16 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
         });
       };
 
+      let field : 'pinnedProjects' | 'hiddenProjects' | 'unpinnedProjects' = 'pinnedProjects'; 
+
+      if (action.project.Visibility === ProjectVisibility.Hidden) {
+        field = 'hiddenProjects';
+      } else if (action.project.Visibility === ProjectVisibility.Unpinned) {
+        field = 'unpinnedProjects';
+      }
+
       return { ...state, 
-        pinnedProjects: action.project.Pinned ? upd(state.pinnedProjects) : state.pinnedProjects,
-        unpinnedProjects: action.project.Pinned ? state.unpinnedProjects :
-          upd(state.unpinnedProjects),
+        [field]: upd(state[field]),
       };
     }
 
@@ -350,10 +367,12 @@ export const [store, dispatch] = common.createStore(reducer, initialState);
 export const dispatchProjectListUpdate = (days: number) => {
   dispatch((dispatch) => {
     common.get(`/habits/projects/${days}`, ((response:
-      { Pinned: Project[], Unpinned: Project[] }) => {
+      { Pinned: Project[], Unpinned: Project[], Hidden: Project[] }) => {
       dispatch({
         days,
-        type: 'PROJECT_LIST', pinnedProjects: response.Pinned,
+        type: 'PROJECT_LIST',
+        pinnedProjects: response.Pinned,
+        hiddenProjects: response.Hidden,
         unpinnedProjects: response.Unpinned,
       });
     }));
