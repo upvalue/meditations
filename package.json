@@ -76,7 +76,6 @@
     "octicons": "^7.3.0",
     "primer": "^10.3.0",
     "react": "^16.3.2",
-    "react-autosuggest": "^9.3.2",
     "react-datepicker": "0.61.0",
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "2.5.4",

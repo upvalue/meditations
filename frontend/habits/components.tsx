@@ -20,11 +20,12 @@ import {
   ScopeType, FilterState, Scope, Project, HabitsState, dispatch, dispatchProjectListUpdate,
   ProjectVisibility,
 } from './state';
-import { routeForView, urlForView, MOUNT_NEXT_DAY_TIME } from './main';
+import { routeForView, urlForView } from './main';
 
 import { createCTask } from './task';
 import { commonContext } from '../common/context';
 import { storeUIState, fetchStoredUIState } from '../common/storage';
+import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 
 ///// SCOPES
 

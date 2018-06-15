@@ -1,23 +1,19 @@
 import * as MediumEditor from 'medium-editor';
 import * as React from 'react';
 import * as moment from 'moment';
-import * as redux from 'redux';
-import { Provider, connect } from 'react-redux';
-import { render }from 'react-dom';
 import route from 'riot-route';
-import { Tab, Tabs, TabList, TabPanel } from'react-tabs';
 import DatePicker from 'react-datepicker';
-import * as Autosuggest from 'react-autosuggest';
 
 import * as common from '../common';
-import { TimeNavigator, Editable, CommonUI, OcticonButton, OcticonSpan }
+import { TimeNavigator, Editable, CommonUI, OcticonButton, OcticonSpan, Spinner }
   from '../common/components';
 
-import { store, dispatch, JournalState, Entry, Tag } from './state';
-import { SidebarState, JournalSidebar } from './sidebar';
+import { JournalState, Entry, Tag } from './state';
+import { JournalSidebar } from './sidebar';
 import {
   OcticonTextSize, OcticonTag, OcticonTrashcan, OcticonLink, OcticonX,
 } from '../common/octicons';
+import { JOURNAL_ROLLOVER_TIME } from '../common/constants';
 
 ///// REACT COMPONENTS
 
@@ -261,27 +257,37 @@ class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]},
   }
 }
 
+interface DatePickerButtonProps {
+  onClick: ((e: React.MouseEvent<HTMLButtonElement>) => void) | undefined;
+  value: string;
+}
 
-// tslint:disable-next-line:variable-name
+
 class JournalNavigation1 extends React.Component<JournalState, { searching: boolean }> {
   searchText!: HTMLInputElement;
 
   constructor(props: any) {
     super(props);
+
+    this.state = {
+      searching: false,
+    };
   }
 
-  createEntry = (date: moment.Moment | null) => {
-    if (date !== null) {
-      common.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
-    }
-  }
-
-  componentWillUpdate() {
+  createEntry = (arg: moment.Moment | null | React.MouseEvent<HTMLButtonElement>) => {
+    if (arg !== null) {
+      if (moment.isMoment(arg)) {
+        common.post(`/journal/new?date=${arg.format(common.DAY_FORMAT)}`, {});
+      } else {
+        let date = moment();
+        date = (date.hour() <= JOURNAL_ROLLOVER_TIME) ? date.subtract(1, 'day') : date;
+        common.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
+      }
+    } 
   }
 
   componentWillReceiveProps() {
     this.setState({ searching: false });
-
   }
 
   clearSearch = () => {
@@ -298,17 +304,33 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
   }
 
   render() {
-    return <div className="d-flex flex-column flex-md-row mb-1 ml-2">
+    return <div className="d-flex flex-column flex-md-row mb-1 ml-md-2 ">
+      <button
+        className="btn btn-primary mr-0 mr-md-1 mb-1 mr-mb-0"
+        onClick={this.createEntry}>
+        Add entry
+      </button>
+
+      <DatePicker
+        customInput={<button>
+          Add entry on specific date
+        </button>}
+        className="btn btn-secondary mb-1 mb-md-0"
+        onChange={this.createEntry} 
+        />
+
       <form className="form-inline d-flex flex-column flex-md-row" 
         onSubmit={this.search}>
-          <DatePicker className="form-control mb-1 mb-md-0"
-            onChange={this.createEntry} 
-            placeholderText="Click to add new entry"
-            />
           <input type="text" className="form-control mb-1 mb-md-0 ml-md-2"
             placeholder="Text to search for"
           ref={(searchText) => { if (searchText) this.searchText = searchText; }} />
-          <button className="btn btn-primary ml-md-1">Search for text</button>
+          <button
+            className="btn btn-primary ml-md-1"
+            disabled={this.state.searching}
+            >
+            {this.state.searching ?
+              <Spinner /> : 'Search for text' }
+          </button>
         </form>
 
         {this.state && this.state.searching &&

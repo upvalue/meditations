@@ -6,14 +6,11 @@ import route from 'riot-route';
 
 import * as common from '../common';
 
-import { ScopeType, FilterState, Status, Scope, Project, Task, store, dispatch, HabitsState, Day,
-  MountScope, PROJECT_STATS_DAYS_DEFAULT, dispatchProjectListUpdate } from './state';
+import {
+  ScopeType,  Project, Task, store, dispatch, HabitsState, Day, dispatchProjectListUpdate,
+} from './state';
 import { HabitsRoot } from './components';
-
-/**
- * Determines at what point in time the next day's scope will be made available. The default of 4
- * hours means it will be available at 8PM local time. */
-export const MOUNT_NEXT_DAY_TIME = 4;
+import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 
 /** Convenience method; returns route argument for a given date and project. */
 export const routeForView = (date: moment.Moment | 'current', project?: number) => {

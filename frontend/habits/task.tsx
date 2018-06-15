@@ -8,7 +8,7 @@ import * as common from '../common';
 import { OcticonButton, Editable, EditableState, OcticonSpan } from '../common/components';
 
 import { Status, Task, ScopeType } from './state';
-import { MOUNT_NEXT_DAY_TIME } from './main';
+import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 import {
   OcticonClock, OcticonDashboard, OcticonData, OcticonComment, OcticonClippy, OcticonTrashcan,
 } from '../common/octicons';
