@@ -93,7 +93,7 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
     case 'SOCKET_CLOSED':
       return { ...state, socketClosed: true };
     case 'SOCKET_OPENED':
-      return { ...state, socketClosed: false, socket: action.socket,
+      return { ...state, socketClosed: false, 
         socketReconnect: action.socketReconnect };
     case 'NOTIFICATIONS_DISMISS':
       return { ...state, notifications: undefined };
@@ -363,8 +363,9 @@ export function makeSocket(
 
     // Notify user of successfuly reconnetions
     if (reconnect) {
-      dispatch({ type: 'NOTIFICATION_OPEN', notification: { error: false,
-        message: 'Reconnection successful'}});
+      dispatch({ type: 'NOTIFICATION_OPEN',
+        notification: { error: false, message: 'Reconnection successful' },
+      });
     }
 
     dispatch({ socket, type: 'SOCKET_OPENED', socketReconnect: () => {

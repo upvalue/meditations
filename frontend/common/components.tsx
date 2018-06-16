@@ -13,7 +13,6 @@ import {
 } from './octicons';
 
 import { CommonState } from '../common';
-import { commonContext, commonContextInitial, MeditationsContext } from '../common/context';
 
 export interface EditableState {
   editor: MediumEditor.MediumEditor;
@@ -337,17 +336,9 @@ export class CommonUI extends React.Component<CommonState, {}> {
     }
 
     return <div>
-      <commonContext.Provider value={commonContextInitial}>
-        <commonContext.Consumer>
-          {(state) => {
-            // return state.data.modalOpen ? <p>Modal open</p> : <p>Modal closed</p>;
-            return <></>;
-          }}
-        </commonContext.Consumer>
-        {this.props.modalOpen && this.renderModal()}
-        {this.renderPopups()}
-        <div {...clickCatch} {...filterAll}>{this.props.children}</div>
-      </commonContext.Provider>
+      {this.props.modalOpen && this.renderModal()}
+      {this.renderPopups()}
+      <div {...clickCatch} {...filterAll}>{this.props.children}</div>
     </div>;
   }
 }

@@ -23,7 +23,6 @@ import {
 import { routeForView, urlForView } from './main';
 
 import { createCTask } from './task';
-import { commonContext } from '../common/context';
 import { storeUIState, fetchStoredUIState } from '../common/storage';
 import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 
@@ -115,13 +114,9 @@ export class TimeScope extends
     const title =
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
 
-    return <commonContext.Consumer>
-      {ctx => 
-        <PresentScope title={title} addTask={this.addTask}>
-        {...tasks}      
-        </PresentScope>
-      }
-    </commonContext.Consumer>;
+    return <PresentScope title={title} addTask={this.addTask}>
+      {...tasks}      
+    </PresentScope>;
   }
 }
 
