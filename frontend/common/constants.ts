@@ -13,4 +13,4 @@ export const MOUNT_NEXT_DAY_TIME = 4;
  * 
  * In hours.
  */
-export const JOURNAL_ROLLOVER_TIME = 23;
+export const JOURNAL_ROLLOVER_TIME = 4;
