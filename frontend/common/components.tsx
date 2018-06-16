@@ -190,7 +190,13 @@ interface TimeNavigatorProps {
 
 /** Navigate by months or years */
 export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
-  navigate(operation: 'subtract' | 'add' | 'reset', unit?: 'year' | 'month' | 'day') {
+  navigate(e: React.MouseEvent<HTMLElement> | undefined, 
+      operation: 'subtract' | 'add' | 'reset', unit?: 'year' | 'month' | 'day') {
+
+    if (e) {
+      e.preventDefault();
+    }
+
     const routestr = this.props.getRoute(operation, unit);
     if (routestr) {
       route(routestr);
@@ -207,7 +213,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
           className="mr-md-1 d-flex flex-items-center"
           normalButton={true}
           href={`#${this.props.getRoute('subtract', 'year')}`}
-          onClick={() => this.navigate('subtract', 'year')}
+          onClick={e => this.navigate(e, 'subtract', 'year')}
           tooltipDirection="e" />}
 
       <OcticonButton icon={OcticonChevronLeft}
@@ -215,14 +221,14 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
         tooltipDirection="e"
         className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('subtract', smallunit)}`}
-        onClick={() => this.navigate('subtract', smallunit)} />
+        onClick={e => this.navigate(e, 'subtract', smallunit)} />
 
       <OcticonButton
         icon={OcticonCalendar}
         tooltip="Go to current date" tooltipDirection="e"
         className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('reset')}`}
-        onClick={() => this.navigate('reset')} />
+        onClick={e => this.navigate(e, 'reset')} />
 
       <OcticonButton
         icon={OcticonChevronRight}
@@ -230,7 +236,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
         tooltipDirection="e"
         className="mr-md-1 d-flex flex-items-center" normalButton={true}
         href={`#${this.props.getRoute('add', smallunit)}`}
-        onClick={() => this.navigate('add', smallunit)} />
+        onClick={e => this.navigate(e, 'add', smallunit)} />
 
       {!this.props.daysOnly &&
         <OcticonButton
@@ -239,7 +245,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
           className="mr-md-1 mr-0 d-flex flex-items-center" normalButton={true}
           tooltipDirection="e"
           href={`#${this.props.getRoute('add', 'year')}`}
-          onClick={() => this.navigate('add', 'year')} />}
+          onClick={e => this.navigate(e, 'add', 'year')} />}
       </div>
 
       <h2 className="navigation-title ml-1">{this.props.currentDate.format('MMMM YYYY')}</h2>
