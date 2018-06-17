@@ -332,7 +332,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       style['borderColor'] = 'black';
     }
 
-    const result = <section className={`task ${lastModified}`} style={this.props.style}>
+    const result = <section className={`task ${lastModified}`} style={style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}
