@@ -1,6 +1,5 @@
 // components.tsx - Common components
 
-
 import * as React from 'react';
 import * as moment from 'moment';
 import route from 'riot-route';
@@ -22,7 +21,7 @@ export interface EditableState {
 /** An item that has an editable body. Used for task comments and journal entries */
 export class Editable<Props,
     State extends EditableState = EditableState> extends React.Component<Props, State> {
-  /** 
+  /**
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
    * subclass's render method
    */
@@ -49,7 +48,7 @@ export class Editable<Props,
     if (!this.state.editor) {
       const options = {
         autoLink: true,
-        placeholder: true, 
+        placeholder: true,
 
         toolbar: {
           buttons: ['bold', 'italic', 'underline',
@@ -136,7 +135,7 @@ export const OcticonButton: React.SFC<OcticonButtonProps> =
     const { children, icon,
       onClick, href, tooltip, normalButton,
       tooltipDirection, className, span, title } = props;
-    let klassName = `${span ? ' ' : 'btn '} ${className} `; 
+    let klassName = `${span ? ' ' : 'btn '} ${className} `;
 
     if (tooltip) {
       klassName = `${klassName} tooltipped tooltipped-${tooltipDirection}`;
@@ -182,7 +181,7 @@ interface TimeNavigatorProps {
   currentDate: moment.Moment;
 
   /**
-   * If true, only one set of arrows is available and it navigates days rather than 
+   * If true, only one set of arrows is available and it navigates days rather than
    * months and years.
    */
   daysOnly: boolean;
@@ -190,7 +189,7 @@ interface TimeNavigatorProps {
 
 /** Navigate by months or years */
 export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
-  navigate(e: React.MouseEvent<HTMLElement> | undefined, 
+  navigate(e: React.MouseEvent<HTMLElement> | undefined,
       operation: 'subtract' | 'add' | 'reset', unit?: 'year' | 'month' | 'day') {
 
     if (e) {
@@ -209,7 +208,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
       <div className="d-flex flex-row">
       {!this.props.daysOnly &&
         <OcticonButton icon={OcticonTriangleLeft}
-          tooltip="Go back one year" 
+          tooltip="Go back one year"
           className="mr-md-1 d-flex flex-items-center"
           normalButton={true}
           href={`#${this.props.getRoute('subtract', 'year')}`}
@@ -269,7 +268,7 @@ export class CommonUI extends React.Component<CommonState, {}> {
   reconnect = () => {
     this.props.socketReconnect();
   }
-  
+
   renderPopups() {
     if (!this.props.notifications && !this.props.socketClosed) {
       return <span />;
@@ -321,7 +320,7 @@ export class CommonUI extends React.Component<CommonState, {}> {
   render() {
     // When socket is not active, blur UI to indicate it is unusable.
     // TODO: Figure out how to capture user interaction as well
-  
+
     let filterAll: any;
     let clickCatch: any;
     if (this.props.modalOpen) {
@@ -348,4 +347,3 @@ export class CommonUI extends React.Component<CommonState, {}> {
     </div>;
   }
 }
-

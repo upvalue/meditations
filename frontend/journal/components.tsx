@@ -99,7 +99,7 @@ class CEntry extends Editable<CEntryProps> {
 
     // A link to the month the entry was written, if viewing in a non time based context (e.g. by
     // name or by tag)
-    const ctxLink = this.props.context ? 
+    const ctxLink = this.props.context ?
       // tslint:disable-next-line
       `#view/${this.props.entry.CreatedAt.local().format(common.MONTH_FORMAT)}/${this.props.entry.ID}` :
       false;
@@ -107,7 +107,7 @@ class CEntry extends Editable<CEntryProps> {
     // In order, render:
     // A header with title and title-changing control, then tags
     // Other controls and timestamp on the rightmost
-    
+
     let body = this.props.entry.Body.slice(0);
 
     if (!this.state.editorOpen && this.props.searchString) {
@@ -116,7 +116,7 @@ class CEntry extends Editable<CEntryProps> {
       const searchString = this.props.searchString.slice(0);
       const esc = searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const reg = new RegExp(esc, 'ig');
-      body = body.replace(reg, 
+      body = body.replace(reg,
         `<span class="entry-highlight">${this.props.searchString}</span>`);
     }
 
@@ -139,7 +139,7 @@ class CEntry extends Editable<CEntryProps> {
               <OcticonButton icon={OcticonTag} tooltip="Add tag" tooltipDirection="n"
                 className="p-1 mr-2 d-flex flex-items-center" normalButton={true}
                 onClick={this.addTag} />
-              {tags}        
+              {tags}
             </div>
           </div>
 
@@ -149,7 +149,7 @@ class CEntry extends Editable<CEntryProps> {
                 .format(this.props.context ? 'M-D-YY h:mm A' : 'h:mm A')
             }</strong>
 
-            {ctxLink && 
+            {ctxLink &&
               <OcticonButton tooltip="Go to context" icon={OcticonLink} href={ctxLink} />}
 
             <OcticonButton icon={OcticonTrashcan} onClick={() => this.deleteEntry()}
@@ -158,11 +158,11 @@ class CEntry extends Editable<CEntryProps> {
 
         </div>
       </div>
-      <div className="entry-body p-2 " id={`entry-body-${this.props.entry.ID}`} 
+      <div className="entry-body p-2 " id={`entry-body-${this.props.entry.ID}`}
         ref={(body) => { if (body) this.body = body; }}
         dangerouslySetInnerHTML={{ __html: body }}
         onClick={this.editorOpen} />
-      
+
     </section>;
   }
 }
@@ -183,7 +183,8 @@ class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
   navigatorRoute = (method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') => {
     if (method === 'reset') {
       return `view/${moment().format(common.MONTH_FORMAT)}`;
-    } else if (unit) {
+    }
+    if (unit) {
       const ndate = this.props.date.clone()[method](1, unit);
       const fmt = unit === 'day' ? common.DAY_FORMAT : common.MONTH_FORMAT;
       const route = this.props.daysView ? 'viewdays' : 'view';
@@ -262,7 +263,6 @@ interface DatePickerButtonProps {
   value: string;
 }
 
-
 class JournalNavigation1 extends React.Component<JournalState, { searching: boolean }> {
   searchText!: HTMLInputElement;
 
@@ -283,7 +283,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
         date = (date.hour() <= JOURNAL_ROLLOVER_TIME) ? date.subtract(1, 'day') : date;
         common.post(`/journal/new?date=${date.format(common.DAY_FORMAT)}`, {});
       }
-    } 
+    }
   }
 
   componentWillReceiveProps() {
@@ -316,10 +316,10 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
           Add entry on specific date
         </button>}
         className="btn btn-secondary mb-1 mb-md-0"
-        onChange={this.createEntry} 
+        onChange={this.createEntry}
         />
 
-      <form className="form-inline d-flex flex-column flex-md-row" 
+      <form className="form-inline d-flex flex-column flex-md-row"
         onSubmit={this.search}>
           <input type="text" className="form-control mb-1 mb-md-0 ml-md-2"
             placeholder="Text to search for"
@@ -338,7 +338,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
 
         <div className="ml-1 flex-self-center">
           {(this.props.searchResults === 0) &&
-            <span className="flash flash-warn p-1">No search results :(</span> 
+            <span className="flash flash-warn p-1">No search results :(</span>
           }
           {(this.props.searchResults && this.props.searchResults > 0) ?
             <button className="tooltipped tooltipped-s tag" onClick={this.clearSearch}
@@ -355,7 +355,7 @@ const JournalNavigation = common.connect()(JournalNavigation1);
 
 // tslint:disable-next-line:variable-name
 export const JournalRoot = common.connect()(class extends React.Component<JournalState, {}> {
-  render() { 
+  render() {
     return <CommonUI {...this.props}>
       <div className="d-flex flex-column flex-md-row flex-justify-between mr-md-1">
         <div id="journal-sidebar" className="mb-1">
@@ -366,7 +366,7 @@ export const JournalRoot = common.connect()(class extends React.Component<Journa
           {React.createElement(JournalNavigation)}
           {((this.props.route === 'VIEW_MONTH' || this.props.route === 'VIEW_DAYS') ||
             this.props.searchResults) &&
-            <BrowseChrono 
+            <BrowseChrono
               searchString={this.props.searchString}
               daysView={this.props.route === 'VIEW_DAYS'}
               date={

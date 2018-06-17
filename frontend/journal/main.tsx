@@ -2,7 +2,6 @@ import * as React from 'react';
 import route from 'riot-route';
 import * as Scroll from 'react-scroll';
 
-
 import * as moment from 'moment';
 import * as common from '../common';
 
@@ -73,7 +72,7 @@ export const main = () => {
         }));
       });
     },
-    
+
     name: (name: string) => {
       common.setTitle('Notes', `${name}`);
       dispatch((dispatch) => {
@@ -127,7 +126,7 @@ export const main = () => {
       case 'SEARCH':
         msg.Datum.Entries.forEach(common.processModel);
         dispatch({
-          type: 'SEARCH', 
+          type: 'SEARCH',
           string: msg.Datum.String,
           entries: msg.Datum.Entries,
         });
@@ -135,7 +134,7 @@ export const main = () => {
 
     }
   }, () => {
-    ///// RENDER 
+    ///// RENDER
     // After socket connects
     common.render('journal-root', store, React.createElement(JournalRoot));
 

@@ -128,7 +128,7 @@ export function createStore<State extends CommonState, Action extends redux.Acti
     return state as State;
   };
 
-  const store = redux.createStore<State>(combinedReducer, redux.applyMiddleware(thunk, logger));
+  const store = redux.createStore(combinedReducer, redux.applyMiddleware(thunk, logger));
 
   type AsyncAction = ((thunk: (action: Action) => void) => void);
   const typedDispatch = (action: Action | AsyncAction) => {

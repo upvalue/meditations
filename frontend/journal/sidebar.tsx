@@ -39,14 +39,14 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
     const selectedTag = this.props.route === 'VIEW_TAG' ? this.props.tag : '';
 
     return <div className="menu">
-      {this.props.sidebar.TagLinks.map((l, i) => 
-        <div className={`${selectedTag === l.Name ? 'selected' : ''}  
+      {this.props.sidebar.TagLinks.map((l, i) =>
+        <div className={`${selectedTag === l.Name ? 'selected' : ''}
           menu-item pt-0 pb-0`} key={i}>
           <a href={`#tag/${l.Name}`}>#{l.Name} <span className="counter">({l.Count})</span></a>
         </div>)}
     </div>;
   }
-  
+
   /** Render alphabetical navigation links */
   renderAlphabetically() {
     if (this.props.sidebar.ChronoLinks === null) {
@@ -95,7 +95,7 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
 
     return <LinkTree data={tree} />;
   }
-  
+
   /** Render chronological navigation links */
   renderChronologically() {
     if (!this.props.sidebar.ChronoLinks || this.props.sidebar.ChronoLinks.length === 0) {
@@ -120,7 +120,7 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
       route(`viewdays/${date.format(DAY_FORMAT)}`);
     }
   }
-  
+
   render() {
     if (this.props.sidebar && this.props.sidebar.mounted) {
       // Select tabs according to what page is currently being viewed (e.g. view tabs tag if the
@@ -130,12 +130,12 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
      }[this.props.route];
 
       return <div>
-        <DatePicker 
+        <DatePicker
           className="form-control mb-1"
           onChange={this.viewDays}
           isClearable={true}
           placeholderText={'View all posts from day'}
-          openToDate={(this.props.route === 'VIEW_DAYS' || this.props.route === 'VIEW_MONTH') ? 
+          openToDate={(this.props.route === 'VIEW_DAYS' || this.props.route === 'VIEW_MONTH') ?
             this.props.date :  moment()}
           />
 
@@ -146,7 +146,7 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
             <Tab><OcticonSpan icon={OcticonTextSize} />Title</Tab>
             <Tab><OcticonSpan icon={OcticonTag} />Tag</Tab>
           </TabList>
-          
+
           <TabPanel>
             {this.renderChronologically()}
           </TabPanel>
@@ -158,9 +158,8 @@ export const JournalSidebar = connect()(class extends React.Component<JournalSta
           </TabPanel>
         </Tabs>
         </div>;
-    } else {
-      return <Spinner />;
     }
+    return <Spinner />;
   }
 },
 );

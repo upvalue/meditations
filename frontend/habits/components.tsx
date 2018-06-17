@@ -28,7 +28,7 @@ import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 
 ///// SCOPES
 
-/** 
+/**
  * Scope presentation element. Made because time-based and project-based scopes have some different
  * functionality
  */
@@ -115,13 +115,13 @@ export class TimeScope extends
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
 
     return <PresentScope title={title} addTask={this.addTask}>
-      {...tasks}      
+      {...tasks}
     </PresentScope>;
   }
 }
 
 /** Returns project activity indicator */
-const projectActivityIcon = (p: Project, days: number) => { 
+const projectActivityIcon = (p: Project, days: number) => {
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
   const flameCount = projectActivityClass / 4;
@@ -176,7 +176,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
       <div className="scope-header d-flex flex-row flex-justify-between p-1 ">
         <h3 className="scope-title border-bottom ">
           <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
-            Projects</a></span> 
+            Projects</a></span>
           <span> &gt; {this.props.scope.Name}</span></h3>
 
         <OcticonButton
@@ -254,7 +254,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
       </div>
 
       <div className="project-controls d-flex flex-items-center">
-        {(project.CompletedTasks > 0) && 
+        {(project.CompletedTasks > 0) &&
           <OcticonSpan icon={OcticonCheck} tooltip="Completed tasks">
             {project.CompletedTasks}
           </OcticonSpan>}
@@ -286,7 +286,6 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
             tooltip="(Un)hide project"
             onClick={() => this.hideProject(project)} />
         }
-
 
         <OcticonButton icon={OcticonTrashcan} tooltip="Delete project"
           onClick={() => this.deleteProject(project.ID)} />
@@ -320,7 +319,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
   }
 
   toggleDisplayHidden = () => {
-    this.setState({ 
+    this.setState({
       showHiddenProjects: !this.state.showHiddenProjects,
     });
 
@@ -334,7 +333,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
       <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
         <h3 className="scope-title">Projects</h3>
         <div className="scope-controls pr-1 pt-1 flex-self-center">
-          <OcticonButton icon={OcticonPlus} tooltip="Add new project" 
+          <OcticonButton icon={OcticonPlus} tooltip="Add new project"
             onClick={() => this.addProject()} />
         </div>
       </div>
@@ -356,7 +355,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
             {this.props.hiddenProjects.map(p => this.renderProjectLink(p))}
           </div>
         </>)
-      
+
       }
 
       <hr className="mt-1 mb-1" />
@@ -403,7 +402,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
   navigatorRoute = (method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') => {
     if (method === 'reset') {
       return routeForView(moment(), this.props.currentProject);
-    } else if (unit) {
+    } else if (unit) { // tslint:disable-line
       const ndate = this.props.currentDate.clone()[method](1, unit);
       return routeForView(ndate, this.props.currentProject);
     }
@@ -417,7 +416,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
   filterByName = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ name: e.target.value, type: 'FILTER_BY_NAME' });
   }
-    
+
   filterByDate(end: boolean, date: moment.Moment | null) {
     if (date) {
       dispatch({ date, end, type: 'FILTER_BY_DATE' });
@@ -467,7 +466,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
 
   renderDatePicker(end: boolean, defaultPlaceholder: string,  value?: moment.Moment | null) {
     // TODO: Datepicker onClearable does not work unless a SELECTED value is also passed
-    return <DatePicker 
+    return <DatePicker
       className="form-control ml-1 mb-md-0 mb-1"
       onChange={date => this.filterByDate(end, date)}
       isClearable={true}
@@ -527,7 +526,7 @@ class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
   }
 
   renderLink(name:string, text: string) {
-    // NOTE: activeClass doesn't work here when there are not many tasks as 
+    // NOTE: activeClass doesn't work here when there are not many tasks as
     // the month/year/projects scope may fit into the screen without going past the day tasks
     return <Scroll.Link to={name} smooth={true} duration={500} spy={true}
       onClick={() => this.toggle()}
@@ -541,7 +540,7 @@ class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}> {
       <OcticonButton icon={OcticonThreeBars} tooltip="Toggle mobile menu" normalButton={true}
         className="flex-self-end mb-1"
         onClick={() => this.toggle()} />
-      {this.state.opened && 
+      {this.state.opened &&
         <nav className="menu" id="mobile-menu-nav">
           {this.renderLink('scope-days', 'Day')}
           {this.renderLink('scope-month', 'Month')}
@@ -564,28 +563,27 @@ common.connect()(class extends React.PureComponent<HabitsState> {
       return <TimeScope currentProject={this.props.currentProject}
         key={i} currentDate={this.props.currentDate} scope={s}
         filter={this.props.filter} lastModifiedTask={this.props.lastModifiedTask} />;
-    } else {
-      return <Spinner />;
     }
+    return <Spinner />;
   }
 
   /** Render either a list of projects or the currently open project */
   renderProjects() {
     if (this.props.currentProject === 0) {
-      return <ProjectList 
+      return <ProjectList
         hiddenProjects={this.props.hiddenProjects}
         pinnedProjects={this.props.pinnedProjects}
         unpinnedProjects ={this.props.unpinnedProjects}
         projectStatsDays={this.props.projectStatsDays} />;
-    } else {
-      if (this.props.project && this.props.currentProject === this.props.project.Scope) {
-        return <ProjectScope  currentDate={this.props.currentDate} scope={this.props.project}
-          projectStatsDays={this.props.projectStatsDays} />;
-      } else {
-        // In case the route has changed, but the project data has not been loaded yet.
-        return <Spinner />;
-      }
     }
+
+    if (this.props.project && this.props.currentProject === this.props.project.Scope) {
+      return <ProjectScope  currentDate={this.props.currentDate} scope={this.props.project}
+        projectStatsDays={this.props.projectStatsDays} />;
+    }
+
+    // In case the route has changed, but the project data has not been loaded yet.
+    return <Spinner />;
   }
 
   render() {
@@ -595,7 +593,7 @@ common.connect()(class extends React.PureComponent<HabitsState> {
         <HabitsMobileMenu />
         <div className="d-flex flex-column flex-md-row">
           <div id="scope-days" className="scope-column mr-md-1">
-            {this.props.days ?  
+            {this.props.days ?
               this.props.days
                 // Only render a single day in advance of the current time
                 .filter((d, i) =>

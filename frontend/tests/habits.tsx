@@ -29,8 +29,8 @@ const testTask = (name: string) => {
 
 const renderTask = (task: Task) => {
   return renderer.create(
-    <CTaskImpl 
-      task={task} 
+    <CTaskImpl
+      task={task}
       lastModified={false}
       connectDragSource={el => el}
       connectDragPreview={el => el}
@@ -45,7 +45,5 @@ const renderTask = (task: Task) => {
 test('task renders', () => {
   const task = renderTask(testTask('Diet'));
 
-
   expect(task.root.findAllByType('button')[0].children).toEqual(['Diet']);
-
 });

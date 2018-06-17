@@ -1,4 +1,4 @@
-// storage.tsx - Local storage of UI state, so things 
+// storage.tsx - Local storage of UI state, so things
 // stay consistent across uses
 
 interface UIState {
@@ -34,4 +34,3 @@ export const storeUIState = (updates: Partial<UIState>) => {
 
   return newState;
 };
-

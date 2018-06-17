@@ -34,7 +34,6 @@ export const dispatchProjectUpdate = (id: number, days: number) => {
   });
 };
 
-
 /** Habits entry point. Sets up router, socket, and renders root. */
 export const main = () => {
   ///// INSTALL ROUTER
@@ -211,7 +210,7 @@ export const main = () => {
         break;
     }
   });
-  
+
   ///// RENDER
   common.render('root', store, React.createElement(HabitsRoot));
 };

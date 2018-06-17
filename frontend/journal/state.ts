@@ -57,7 +57,7 @@ export type JournalState = ViewTag | ViewNamedEntry | ViewMonth | ViewSearch | V
 export type JournalAction = {
   type: 'VIEW_MONTH';
   date: moment.Moment;
-  entries: Entry[];  
+  entries: Entry[];
 } | {
   type: 'VIEW_DAYS';
   date: moment.Moment;
@@ -67,10 +67,10 @@ export type JournalAction = {
   entries: Entry[];
 } | {
   type: 'CREATE_ENTRY';
-  entry: Entry;  
+  entry: Entry;
 } | {
   type: 'UPDATE_ENTRY';
-  entry: Entry;  
+  entry: Entry;
 } | {
   type: 'DELETE_ENTRY';
   ID: number;
@@ -81,7 +81,7 @@ export type JournalAction = {
 } | {
   type: 'MOUNT_SIDEBAR';
   sidebar: SidebarState;
-} | { 
+} | {
   type: 'SEARCH';
   entries: Entry[];
   string: string;
@@ -156,7 +156,7 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         searchResults: action.entries.length,
       };
     }
-    case 'MOUNT_SIDEBAR': 
+    case 'MOUNT_SIDEBAR':
       const nstate =  { ...state, sidebar: action.sidebar };
       nstate.sidebar.mounted = true;
       return nstate;
@@ -165,6 +165,5 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
   }
   return state;
 };
-
 
 export const [store, dispatch] = common.createStore(reducer, initialState);

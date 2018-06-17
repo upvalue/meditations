@@ -21,7 +21,7 @@ export interface TaskProps {
   isDragging: boolean;
   isOver: boolean;
   isOverCurrent: boolean;
-  
+
   // Actual props
   task: Task;
   lastModified: boolean;
@@ -68,7 +68,7 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
     /*
     if (!monitor) return;
     if (!component) return;
-    
+
     const dragIndex = (monitor.getItem() as TaskProps).task.Order;
     const hoverIndex = props.task.Order;
 
@@ -109,7 +109,6 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
     }
 
     // console.log(component, hoverClientY);
-
 
     // console.log(dragIndex, hoverIndex);
     */
@@ -171,7 +170,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     } else if (time.length === 2) {
       hours = parseInt(time[0], 10);
       minutes = parseInt(time[1], 10);
-    } 
+    }
 
     return [hours, minutes];
   }
@@ -238,7 +237,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   hasStats() {
     return this.props.task.CompletedTasks > 0;
   }
-  
+
   hasTime() {
     return this.props.task.Minutes > 0;
   }
@@ -251,7 +250,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     let string = '';
     if (hours > 0) {
       string += `${hours}h `;
-    } 
+    }
     if (minutes > 0) {
       string += `${minutes}m`;
     }
@@ -273,14 +272,14 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
 
   renderStats() {
     return <span>{' '}
-      {this.props.task.CompletedTasks}/{this.props.task.TotalTasks} 
+      {this.props.task.CompletedTasks}/{this.props.task.TotalTasks}
       {' '}({this.props.task.CompletionRate}%)
     </span>;
   }
 
   /** Render an octicon button tied to a specific task action */
   renderControl(tip: string, icon:OcticonData, callback: () => void, danger?: boolean) {
-    return <OcticonButton tooltip={tip} icon={icon} onClick={callback} 
+    return <OcticonButton tooltip={tip} icon={icon} onClick={callback}
       className="d-flex flex-items-center pl-1" />;
   }
 
@@ -295,7 +294,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       return <div className={`ml-2 mr-2`}>
         <div
           className={`task-comment border border-gray mt-1 ${commentClasses}`}
-          ref={(body) => { if (body) { this.body = body; } }} 
+          ref={(body) => { if (body) { this.body = body; } }}
           onClick={this.editorOpen}
           dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />
       </div>;
@@ -315,7 +314,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         {this.hasStats() && this.renderStats()}
       </button>;
 
-    const taskButton = 
+    const taskButton =
       connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
 
     const style : any = this.state.style || {};
@@ -329,9 +328,8 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     */
 
     if (isOverCurrent) {
-      // style['borderBottom'] = '1px solid';
-      // style['borderColor'] = 'black';
-      // console.log(style);
+      style['borderBottom'] = '1px solid';
+      style['borderColor'] = 'black';
     }
 
     const result = <section className={`task ${lastModified}`} style={this.props.style}>
@@ -347,7 +345,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
             {this.renderTime()}
           </span>}
 
-          {this.hasStreak() && 
+          {this.hasStreak() &&
             <OcticonSpan
                 icon={OcticonDashboard}
                 className="streak pr-1"
@@ -356,15 +354,14 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
             </OcticonSpan>
           }
 
-          {this.renderControl('Add/edit comment', OcticonComment, () => this.editorOpen())}  
-          {this.props.task.Scope === ScopeType.DAY && 
+          {this.renderControl('Add/edit comment', OcticonComment, () => this.editorOpen())}
+          {this.props.task.Scope === ScopeType.DAY &&
             this.renderControl('Set time', OcticonClock, () => this.setTime())}
           {this.hasCopy() &&
             this.renderControl('Copy to the left', OcticonClippy, () => this.copyLeft())}
-          {this.renderControl('Delete task', OcticonTrashcan, () => this.destroy(), true)}  
+          {this.renderControl('Delete task', OcticonTrashcan, () => this.destroy(), true)}
         </div>
       </div>
-
 
       {this.props.task.Comment && this.renderComment()}
     </section>;

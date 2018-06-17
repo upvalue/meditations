@@ -43,19 +43,19 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
     return <div className={`pt-0 pb-0 ${classes} link-tree-node`}
         key={i}>
       <div className="">
-      {node.children && 
+      {node.children &&
         <OcticonButton icon={node.expanded ? OcticonArrowDown : OcticonArrowRight}
           className="link-tree-node-btn"
           onClick={e => e && this.toggleNode(e, node)} />
       }
-      {node.href ? 
+      {node.href ?
           <a href={node.href}
-            style={{ textDecoration: node.children ? 'underline' : 'none' }}          
+            style={{ textDecoration: node.children ? 'underline' : 'none' }}
             >{node.title}</a>
          : <a className="link-tree-node-anchor"
               onClick={e => this.toggleNode(e, node)}>{node.title}</a>}
       </div>
-      {node.expanded === true && 
+      {node.expanded === true &&
          node.children && node.children.map((n, i) => this.renderNode(n, i))}
     </div>;
   }

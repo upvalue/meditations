@@ -17,7 +17,7 @@ export interface OcticonData {
   viewBox: string;
   pathRender: () => any;
 }
-  `)
+`)
 
 for(const o of Object.keys(octicons)) {
   // Convert name
@@ -29,14 +29,15 @@ for(const o of Object.keys(octicons)) {
   let string = `export const Octicon${tsName} : OcticonData = {
   name: '${o}',
   width: ${octicons[o].width},
-  height: ${octicons[o].height}, 
-  viewBox: '${octicons[o].options.viewBox}', 
+  height: ${octicons[o].height},
+  viewBox: '${octicons[o].options.viewBox}',
   pathRender: () => {
     // tslint:disable-next-line
     return ${octicons[o].path}
   },
 };
-  `;
+`;
   string = string.replace('fill-rule', 'fillRule');
   console.log(string);
 }
+console.log('// suppress tslint error');

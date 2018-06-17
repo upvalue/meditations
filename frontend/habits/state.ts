@@ -109,7 +109,7 @@ export interface HabitsState extends common.CommonState {
   days: Scope[];
   project: Scope;
 
-  /** 
+  /**
    * Name of the last modified task. Used to highlight monthly/yearly tasks after daily tasks are
    * modified to reinforce rules
    */
@@ -117,7 +117,7 @@ export interface HabitsState extends common.CommonState {
 
   /** Filter date-scoped tasks */
   filter: FilterState;
-  
+
   /** Days to track project activity for */
   projectStatsDays: number;
 }
@@ -178,9 +178,9 @@ interface FilterClear {
   type: 'FILTER_CLEAR';
 }
 
-type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays | 
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays |
   ChangeRoute | AddProjectList | FilterByName | FilterByDate | FilterClear | UpdateTasks |
-  UpdateProject; 
+  UpdateProject;
 
 const initialState = {
   currentDate: moment(),
@@ -210,7 +210,6 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
   return false;
 };
 
-
 /** Check whether a task is currently rendered and thus needs to be updated in the UI */
 const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   if (scopeIsTimeBased(task.Scope)) {
@@ -238,8 +237,8 @@ const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState 
   const scope = { Scope: action.scope, Date: action.date, Tasks: action.tasks } as Scope;
 
   switch (action.scope) {
-    case ScopeType.DAY: 
-      return {...state, 
+    case ScopeType.DAY:
+      return {...state,
         days: state.days.map((s, i) => {
           // TODO is diff okay here?
           return s.Date.diff(action.date, 'days') === 0 ? scope : s;
@@ -253,7 +252,7 @@ const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState 
 const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
   switch (action.type) {
     case 'PROJECT_LIST':
-      return { ...state, 
+      return { ...state,
         pinnedProjects: action.pinnedProjects,
         unpinnedProjects: action.unpinnedProjects,
         hiddenProjects: action.hiddenProjects,
@@ -291,9 +290,8 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
               if (t.ID === task.ID) {
                 append = false;
                 return task;
-              } else {
-                return t;
               }
+              return t;
             });
             if (append) {
               tasks.push(task);
@@ -307,7 +305,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
             nstate.year = updateScope(nstate.year);
           } else if (task.Scope === ScopeType.DAY) {
             // Update only the specific day using diff
-            nstate.days = 
+            nstate.days =
               [...state.days.map(s =>
                 s.Date.format(common.DAY_FORMAT) === task.Date.format(common.DAY_FORMAT) ?
                   updateScope(s) : s)];
@@ -327,12 +325,12 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
         return array.map((p) => {
           if (p.Name === action.project.Name) {
             return action.project;
-          } 
+          }
           return p;
         });
       };
 
-      let field : 'pinnedProjects' | 'hiddenProjects' | 'unpinnedProjects' = 'pinnedProjects'; 
+      let field : 'pinnedProjects' | 'hiddenProjects' | 'unpinnedProjects' = 'pinnedProjects';
 
       if (action.project.Visibility === ProjectVisibility.Hidden) {
         field = 'hiddenProjects';
@@ -340,7 +338,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
         field = 'unpinnedProjects';
       }
 
-      return { ...state, 
+      return { ...state,
         [field]: upd(state[field]),
       };
     }
