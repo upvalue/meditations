@@ -29,11 +29,11 @@ dependencies:
     - ls "$GO_WORKSPACE/src/$IMPORT_PATH"
     - cd "$GO_WORKSPACE/src/$IMPORT_PATH" && godep go build ./...
   cache_directories:
-    - ~/.cache/yarn
+    - ~/.npm
 
 test:
   pre:
     - echo ''
   override:
-    - yarn run test-frontend
+    - npm run test-frontend
     - cd "$GO_WORKSPACE/src/$IMPORT_PATH" && godep go test ./backend
