@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - master
+
+    docker:
+      - image: alpine:3.7
+
+    steps:
+      - checkout
+
+      - run:
+        name: Install dependencies
+        command: apk add --no-cache nodejs go
+
+      - run: 
+        name: Move project to GOPATH
+        command: mkdir -p ~/go/src/github.com/ioddly && mv ~/project ~/go/src/github.com/ioddly/meditations
