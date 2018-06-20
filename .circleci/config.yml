@@ -1,20 +1,51 @@
 version: 2
 jobs:
   build:
+    working_directory: /root/go/src/github.com/ioddly/meditations
     branches:
       only:
         - master
 
     docker:
-      - image: alpine:3.7
+      - image: ubuntu:latest
+        environment:
+          GOPATH: /root/go
 
     steps:
+      - run:
+          name: Install dependencies
+          command: apt update && apt install -y nodejs build-essential golang-go git npm
+
       - checkout
 
       - run:
-        name: Install dependencies
-        command: apk add --no-cache nodejs go
+          name: Set environment variables
+          command: |
+            echo 'export PATH=/root/go/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
 
-      - run: 
-        name: Move project to GOPATH
-        command: mkdir -p ~/go/src/github.com/ioddly && mv ~/project ~/go/src/github.com/ioddly/meditations
+      - run:
+          name: Echo GOPATH
+          command: |
+            echo "HELLO WORLD" > /tmp/artifact-1
+            echo $GOPATH >> /tmp/artifact-1
+
+      - run:
+          name: Install godep
+          command: go get -u github.com/tools/godep
+
+      - store_artifacts:
+          path: /tmp/artifact-1
+          destination: artifact-file
+
+      - run:
+          name: Run golang backend tests
+          command: cd /root/go/src/github.com/ioddly/meditations && godep go test -v -race $(go list ./... | grep -v /vendor/)
+
+      - run:
+          name: Install npm dependencies
+          command: npm install --ignore-scripts
+
+      - run:
+          name: Run React frontend tests
+          command: npm run test-frontend
