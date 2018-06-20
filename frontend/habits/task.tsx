@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
+import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
 
 import * as common from '../common';
@@ -12,6 +13,7 @@ import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 import {
   OcticonClock, OcticonDashboard, OcticonData, OcticonComment, OcticonClippy, OcticonTrashcan,
 } from '../common/octicons';
+import { modalContext, ModalProvider } from '../common/modal';
 
 export interface TaskProps {
   // Drag and drop implementation props
@@ -94,24 +96,32 @@ const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
 		// When dragging downwards, only move when the cursor is below 50%
     // When dragging upwards, only move when the cursor is above 50%
 
-    component.setState({ style: { transform: `translateY(0)` } });
+    // console.log((monitor.getItem() as TaskProps).task.Name);
+    */
+
+    /*
+    const decoratedComponentInstance : any = (component as any).decoratedComponentInstance;
+    decoratedComponentInstance.setState({ style: { transform: `translateY(0)` } });
+    console.log(decoratedComponentInstance)
+    // Perhaps: Go through list, and translate all tasks BEFORE insertion one upwards.
 
 		// Dragging downwards
 		if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-      component.setState({ style: { transform: `translateY(-${n2.clientHeight}px)` } });
+      decoratedComponentInstance.setState({
+        style: { transform: `translateY(-${n2.clientHeight}px)` },
+      });
 			return;
 		}
 
 		// Dragging upwards
-		if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-      component.setState({ style: { transform: `translateY(${n2.clientHeight}px)` } });
+		if (dragIndex < hoverIndex && hoverClientY > hoverMiddleY) {
+      decoratedComponentInstance.setState({
+        style: { transform: `translateY(${n2.clientHeight}px)` },
+      });
       return;
     }
-
-    // console.log(component, hoverClientY);
-
-    // console.log(dragIndex, hoverIndex);
     */
+
   },
 
   drop(props, monitor, component) {
@@ -175,8 +185,8 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     return [hours, minutes];
   }
 
-  setTime() {
-    common.modalPromptChecked('Log time (HH:MM or MM, 0 to reset)', 'Set time',
+  setTime(modal: ModalProvider) {
+    return modal.openModalPromptChecked('Log time (HH:MM or MM, 0 to reset)', 'Set time',
       '',
       (timestr: string) => {
         const [hours, minutes] = this.parseTime(timestr);
@@ -197,12 +207,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       });
   }
 
-  destroy() {
-    common.modalConfirm('Are you sure you want to delete this task?',
-      'Delete this task!', () => common.post('/habits/delete', this.props.task));
-  }
-
-  copyLeft() {
+  copyLeft = () => {
     const scope = this.props.task.Scope - 1;
     const date = this.props.task.Date.utc();
     // Create task on current day from monthly task
@@ -317,19 +322,13 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     const taskButton =
       connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
 
-    const style : any = this.state.style || {};
-
-    /*
-    console.log(this.props.style);
-
-    if (Object.keys(style).length > 0) {
-      console.log('style', style);
-    }
-    */
+    const style: any = { ...this.state.style } || {};
 
     if (isOverCurrent) {
       style['borderBottom'] = '1px solid';
       style['borderColor'] = 'black';
+    } else if (isDragging) {
+      style['visibility'] = 'hidden';
     }
 
     const result = <section className={`task ${lastModified}`} style={style}>
@@ -355,11 +354,21 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
           }
 
           {this.renderControl('Add/edit comment', OcticonComment, () => this.editorOpen())}
-          {this.props.task.Scope === ScopeType.DAY &&
-            this.renderControl('Set time', OcticonClock, () => this.setTime())}
-          {this.hasCopy() &&
-            this.renderControl('Copy to the left', OcticonClippy, () => this.copyLeft())}
-          {this.renderControl('Delete task', OcticonTrashcan, () => this.destroy(), true)}
+          <modalContext.Consumer>
+            {modal =>
+              <>
+                {this.props.task.Scope === ScopeType.DAY &&
+                  this.renderControl('Set time', OcticonClock, this.setTime(modal))}
+
+                {this.hasCopy() &&
+                  this.renderControl('Copy to the left', OcticonClippy, this.copyLeft)}
+
+                {this.renderControl('Delete task', OcticonTrashcan,
+                  modal.openModalConfirm('Are you sure you want to delete this task?',
+                    'Delete this task!', () => common.post('/habits/delete', this.props.task)))}
+              </>
+            }
+          </modalContext.Consumer>
         </div>
       </div>
 

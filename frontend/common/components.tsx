@@ -13,6 +13,8 @@ import {
 
 import { CommonState } from '../common';
 
+import { modalContext, ModalProvider } from './modal';
+
 export interface EditableState {
   editor: MediumEditor.MediumEditor;
   editorOpen: boolean;
@@ -307,43 +309,12 @@ export class CommonUI extends React.Component<CommonState, {}> {
     </div>;
   }
 
-  renderModal() {
-    return <div id="modal" className="bg-white border border-gray-dark p-2">
-      <div className="float-right pb-1">
-        <OcticonButton icon={OcticonX}
-          tooltip={'Dismiss prompt'} onClick={this.props.dismissModal} />
-      </div>
-      {this.props.modalBody}
-    </div>;
-  }
-
   render() {
-    // When socket is not active, blur UI to indicate it is unusable.
-    // TODO: Figure out how to capture user interaction as well
-
-    let filterAll: any;
-    let clickCatch: any;
-    if (this.props.modalOpen) {
-      filterAll = { style: { filter: 'opacity(80%)' } };
-      clickCatch = {
-        onClick: (e: MouseEvent) => {
-          e.preventDefault();
-          this.props.dismissModal();
-        },
-      };
-    }
-
-    if (this.props.socketClosed) {
-      filterAll = { style: { filter: 'blur(1px)' } };
-      clickCatch = {
-        onClick: (e: MouseEvent) => e.preventDefault(),
-      };
-    }
-
     return <div>
-      {this.props.modalOpen && this.renderModal()}
       {this.renderPopups()}
-      <div {...clickCatch} {...filterAll}>{this.props.children}</div>
+      <ModalProvider socketClosed={this.props.socketClosed}>
+        {this.props.children}
+      </ModalProvider>
     </div>;
   }
 }

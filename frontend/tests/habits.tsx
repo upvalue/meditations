@@ -4,6 +4,7 @@ import * as renderer from 'react-test-renderer';
 import { Task } from '../habits/state';
 import { CTaskImpl } from '../habits/task';
 import * as moment from 'moment';
+import { ModalProvider } from '../common/modal';
 
 const testTask = (name: string) => {
   return {
@@ -29,16 +30,18 @@ const testTask = (name: string) => {
 
 const renderTask = (task: Task) => {
   return renderer.create(
-    <CTaskImpl
-      task={task}
-      lastModified={false}
-      connectDragSource={el => el}
-      connectDragPreview={el => el}
-      connectDropTarget={el => el}
-      isDragging={false}
-      isOver={false}
-      isOverCurrent={false}
-    />,
+    <ModalProvider socketClosed={false}>
+      <CTaskImpl
+        task={task}
+        lastModified={false}
+        connectDragSource={el => el}
+        connectDragPreview={el => el}
+        connectDropTarget={el => el}
+        isDragging={false}
+        isOver={false}
+        isOverCurrent={false}
+      />
+    </ModalProvider>,
   );
 };
 

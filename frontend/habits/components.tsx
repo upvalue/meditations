@@ -25,28 +25,49 @@ import { routeForView, urlForView } from './main';
 import { createCTask } from './task';
 import { storeUIState, fetchStoredUIState } from '../common/storage';
 import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
+import { modalContext, ModalProvider } from '../common/modal';
 
 ///// SCOPES
+
+interface PresentScopeProps {
+  title: string;
+  addTask: () => void;
+  scope: Scope;
+}
 
 /**
  * Scope presentation element. Made because time-based and project-based scopes have some different
  * functionality
  */
-const PresentScope: React.SFC<{ title: string, addTask: () => void }> = ({ title, addTask,
-    children }) => {
-  return <section className="scope bg-gray mb-2">
-    <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
-      <h3 className="pl-2">{title}</h3>
-      <div className="scope-controls pr-1 pt-1 ">
-        <OcticonButton className="" icon={OcticonPlus} onClick={addTask}
-          tooltip="Add task" />
-      </div>
-    </div>
+const PresentScope: React.SFC<PresentScopeProps> = ({ title, addTask,
+    scope, children }) => {
+  return <modalContext.Consumer>
+    {modal =>
+      <section className="scope bg-gray mb-2">
+        <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
+          <h3 className="pl-2">{title}</h3>
+          <div className="scope-controls pr-1 pt-1 ">
+            <OcticonButton className=""
+              icon={OcticonPlus}
+              onClick={modal.openModalPrompt('Enter name:', 'Add new task', (name: string) => {
+                  if (name) {
+                    common.post(`/habits/new`, {
+                      name,
+                      date: scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
+                      scope: scope.Scope,
+                    });
+                  }
+                })}
+              tooltip="Add task" />
+          </div>
+        </div>
 
-    <div className="scope-tasks mt-1">
-      {children}
-    </div>
-  </section>;
+        <div className="scope-tasks mt-1">
+          {children}
+        </div>
+      </section>
+    }
+  </modalContext.Consumer>;
 };
 
 interface TimeScopeProps {
@@ -71,6 +92,7 @@ export class TimeScope extends
   }
 
   addTask = () => {
+    /*
     common.modalPrompt('Enter name:', 'Add new task', (name: string) => {
       if (name) {
         common.post(`/habits/new`, {
@@ -80,6 +102,7 @@ export class TimeScope extends
         });
       }
     });
+    */
   }
 
   render() {
@@ -114,7 +137,7 @@ export class TimeScope extends
     const title =
       this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
 
-    return <PresentScope title={title} addTask={this.addTask}>
+    return <PresentScope scope={this.props.scope} title={title} addTask={this.addTask}>
       {...tasks}
     </PresentScope>;
   }
@@ -157,8 +180,8 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
     route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
   }
 
-  addTask = () => {
-    common.modalPrompt('Enter task name', 'New task', (name) => {
+  addTask = (modal: ModalProvider) => {
+    return modal.openModalPrompt('Enter task name', 'New task', (name) => {
       if (name) {
         common.post(`/habits/new`, {
           name,
@@ -179,10 +202,15 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
             Projects</a></span>
           <span> &gt; {this.props.scope.Name}</span></h3>
 
-        <OcticonButton
-          className="flex-self-center"
-          icon={OcticonPlus}
-          tooltip="New task" onClick={this.addTask} />
+        <modalContext.Consumer>
+          {modal =>
+            <OcticonButton
+              className="flex-self-center"
+              icon={OcticonPlus}
+              tooltip="New task" onClick={this.addTask(modal)} />
+          }
+        </modalContext.Consumer>
+
       </div>
 
       {...tasks}
@@ -212,8 +240,8 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
     };
   }
 
-  deleteProject(id: number) {
-    common.modalConfirm(
+  deleteProject(modal: ModalProvider, id: number) {
+    return modal.openModalConfirm(
       'Are you sure you want to delete this project?', 'Delete this project!',
       () => {
         common.post(`/habits/projects/delete/${id}`);
@@ -238,7 +266,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
     common.post('/habits/new', task);
   }
 
-  renderProjectLink(project: Project) {
+  renderProjectLink = (modal: ModalProvider, project: Project) => {
     const hours = Math.floor(project.Minutes / 60);
     const minutes = project.Minutes % 60;
 
@@ -288,13 +316,13 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
         }
 
         <OcticonButton icon={OcticonTrashcan} tooltip="Delete project"
-          onClick={() => this.deleteProject(project.ID)} />
+          onClick={this.deleteProject(modal, project.ID)} />
       </div>
     </div>;
   }
 
-  addProject() {
-    common.modalPrompt('New project name', 'Add new project', (name) => {
+  addProject(modal: ModalProvider) {
+    return modal.openModalPrompt('New project name', 'Add new project', (name) => {
       if (name) {
         common.post(`/habits/projects/new/${name}`);
       }
@@ -329,67 +357,72 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
   }
 
   render() {
-    return <section className="project-list border bg-gray ">
-      <div className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
-        <h3 className="scope-title">Projects</h3>
-        <div className="scope-controls pr-1 pt-1 flex-self-center">
-          <OcticonButton icon={OcticonPlus} tooltip="Add new project"
-            onClick={() => this.addProject()} />
-        </div>
-      </div>
+    return <modalContext.Consumer>
+      {modal =>
+        <section className="project-list border bg-gray ">
+          <div
+            className="d-flex flex-row flex-justify-between border-bottom scope-header pl-1 pr-1">
+            <h3 className="scope-title">Projects</h3>
+            <div className="scope-controls pr-1 pt-1 flex-self-center">
+              <OcticonButton icon={OcticonPlus} tooltip="Add new project"
+                onClick={this.addProject(modal)} />
+            </div>
+          </div>
 
-      <div className="pl-1 pr-1 pt-1">
-        {this.props.pinnedProjects.map(p => this.renderProjectLink(p))}
-      </div>
+          <div className="pl-1 pr-1 pt-1">
+            {this.props.pinnedProjects.map(p => this.renderProjectLink(modal, p))}
+          </div>
 
-      <hr className="mt-1 mb-1" />
-
-      <div className="pl-1 pr-1">
-        {this.props.unpinnedProjects.map(p => this.renderProjectLink(p))}
-      </div>
-
-      {this.state.showHiddenProjects &&
-        (<>
           <hr className="mt-1 mb-1" />
+
           <div className="pl-1 pr-1">
-            {this.props.hiddenProjects.map(p => this.renderProjectLink(p))}
+            {this.props.unpinnedProjects.map(p => this.renderProjectLink(modal, p))}
           </div>
-        </>)
 
+          {this.state.showHiddenProjects &&
+            (<>
+              <hr className="mt-1 mb-1" />
+              <div className="pl-1 pr-1">
+                {this.props.hiddenProjects.map(p => this.renderProjectLink(modal, p))}
+              </div>
+            </>)
+
+          }
+
+          <hr className="mt-1 mb-1" />
+          <div className="pl-1 pr-1 pt-1 pb-1">
+            <div className="d-flex flex-row flex-justify-between">
+              <div>
+                Showing stats for last <button className="btn btn-sm ">
+                  {this.props.projectStatsDays}
+                </button> days
+              </div>
+              <div>
+                <input ref={(ref) => { if (ref) this.projectStatsDaysInput = ref; }}
+                  type="text" size={2} placeholder="72" className="mr-1 form-control input-sm"
+                  onBlur={() => this.statsFromInput()} />
+                <button className="btn btn-sm btn-secondary mr-1"
+                  onClick={() => this.statsFromStartOfYear()}>
+                  Start of year
+                </button>
+                <button className="btn btn-sm btn-secondary"
+                  onClick={() => this.statsFromForever()}>
+                  Forever
+                </button>
+              </div>
+            </div>
+            <div className="d-flex flex-row">
+              <label>
+                <input type="checkbox"
+                  checked={this.state.showHiddenProjects}
+                  onChange={this.toggleDisplayHidden} />
+                &nbsp;Display hidden projects
+              </label>
+            </div>
+          </div>
+        </section>
       }
-
-      <hr className="mt-1 mb-1" />
-      <div className="pl-1 pr-1 pt-1 pb-1">
-        <div className="d-flex flex-row flex-justify-between">
-          <div>
-            Showing stats for last <button className="btn btn-sm ">
-              {this.props.projectStatsDays}
-            </button> days
-          </div>
-          <div>
-            <input ref={(ref) => { if (ref) this.projectStatsDaysInput = ref; }}
-              type="text" size={2} placeholder="72" className="mr-1 form-control input-sm"
-              onBlur={() => this.statsFromInput()} />
-            <button className="btn btn-sm btn-secondary mr-1"
-              onClick={() => this.statsFromStartOfYear()}>
-              Start of year
-            </button>
-            <button className="btn btn-sm btn-secondary"
-              onClick={() => this.statsFromForever()}>
-              Forever
-            </button>
-          </div>
-        </div>
-        <div className="d-flex flex-row">
-          <label>
-            <input type="checkbox"
-              checked={this.state.showHiddenProjects}
-              onClick={this.toggleDisplayHidden} />
-            &nbsp;Display hidden projects
-          </label>
-        </div>
-      </div>
-    </section>;
+    </modalContext.Consumer>;
   }
 }
 

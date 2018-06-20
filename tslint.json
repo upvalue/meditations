@@ -9,7 +9,8 @@
       "import-name": false,
       "variable-name": false,
       "indent": false,
-      "ter-indent": false
+      "ter-indent": false,
+      "no-else-after-return": false
     },
     "rulesDirectory": []
 }

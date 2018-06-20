@@ -46,18 +46,9 @@ export type NotificationOpen = {
   notification: Notification;
 };
 
-/** Action that causes a modal prompt to be opened */
-export type ModalPrompt = {
-  type: 'MODAL_PROMPT';
-  modalBody: React.ReactNode;
-};
-
-export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } | ModalPrompt |
+export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } |
   { type: 'SOCKET_OPENED', socket: WebSocket, socketReconnect: () => void } |
-  { type: 'SOCKET_CLOSED' } | { type: 'MODAL_DISMISS' };
-
-export type ModalPromptDispatcher =
-  (text:string, ok: string, onClose: (result: string) => void) => void;
+  { type: 'SOCKET_CLOSED' };
 
 export type CommonActionDispatcher = (a: CommonAction) => void;
 
@@ -66,13 +57,6 @@ export type CommonState = {
   notifications?: Notification[];
   socket: WebSocket;
 
-  // Using a React.ReactNode created with a callback is not good style, but is a lot simpler than
-  // dealing with the myriad types of modals we need to create.
-
-  modalBody: React.ReactNode;
-  modalOpen: boolean;
-
-  dismissModal: () => void;
   dismissNotifications: () => void;
   /** Method for attempting a socket reconnect */
   socketReconnect: () => void;
@@ -88,31 +72,26 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
         return {...state,
           notifications: [...state.notifications, action.notification],
         };
-      } 
+      }
       return { ...state, notifications: [action.notification] };
     case 'SOCKET_CLOSED':
       return { ...state, socketClosed: true };
     case 'SOCKET_OPENED':
-      return { ...state, socketClosed: false, 
+      return { ...state, socketClosed: false,
         socketReconnect: action.socketReconnect };
     case 'NOTIFICATIONS_DISMISS':
       return { ...state, notifications: undefined };
-    case 'MODAL_DISMISS':
-      return { ...state, modalOpen: false };
-    case 'MODAL_PROMPT':
-      return { ...state, modalOpen: true, 
-        modalBody: action.modalBody };
   }
   return state;
 }
 
 /**
- * This creates a store with thunk & logger middleware applied and a common reducer added. 
+ * This creates a store with thunk & logger middleware applied and a common reducer added.
  * The store is also saved off so that common UI items can dispatch actions to it without it needing
  * to be passed as a parameter.
- * @param reducer 
- * @param initialState 
- * @returns a tuple containing the store and a dispatcher that type-checks synchronous and 
+ * @param reducer
+ * @param initialState
+ * @returns a tuple containing the store and a dispatcher that type-checks synchronous and
  * asynchronous actions
  */
 export function createStore<State extends CommonState, Action extends redux.Action>(
@@ -141,106 +120,6 @@ export function createStore<State extends CommonState, Action extends redux.Acti
 }
 
 ///// ACTION CREATE-AND-DISPATCHERS
-
-export interface ModalPromptOptions {
-  allowEmpty?: boolean;
-  checker?: (chk: string) => string;
-}
-
-/**
- * Open a modal prompt with a text input
- * @param body Text of the prompt
- * @param ok Text of the prompt submission button
- * @param cb Success callback
- * @param defaultValue Default value of the input field
- * @param checker Can return an error representing an input issue which will be displayed in the
- *   modal
- * @param allowEmpty If true, allow submission of empty string
- */
-export const modalPrompt = (body: string, ok: string, cb: (result: string) => void,
-    defaultValue?: string, options?: ModalPromptOptions) => {
-
-  const allowEmpty = options && options.allowEmpty;
-  const checker = options && options.checker;
-
-  let ref: HTMLInputElement;
-  let err: HTMLElement;
-  let errmsg = '';
-
-  const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
-
-  const submit = (e?: React.FormEvent<HTMLFormElement>) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    // Optionally, arguments can be checked for validity before submission.
-    if (checker) {
-      errmsg = checker(ref.value);
-      if (errmsg !== '') {
-        err.className = 'flash flash-error mt-1 mb-1';
-        err.innerText = errmsg;
-        return;
-      }
-    }
-
-    if (allowEmpty || ref.value !== '') {
-      cb(ref.value);
-    }
-    dismiss();
-  };
-
-  dispatch({
-    type: 'MODAL_PROMPT',
-    modalBody: <form onSubmit={e => submit(e)}>
-      <span>{body}</span>
-      <div ref={(elt) => { if (elt) { err = elt; } }} />
-      <input defaultValue={defaultValue || ''} ref={(e) => { if (e) { ref = e; e.focus(); } }}
-        className="form-control input-block mb-1" type="text" />
-      <button className="btn btn-primary btn-block mb-1" onClick={() => submit()}>{ok}</button>
-      <button className="btn btn-secondary btn-block" onClick={dismiss}
-      >Close</button>
-    </form>,
-  });
-};
-
-/**
- * Open a yes/no confirmation prompt
- * @param bodyText Text of the body
- * @param confirmText Text of the yes button
- * @param cb Callback when yes button is clicked
- * @param allowEmpty if true, callback will be called if an empty string is provided
- */
-export const modalConfirm = (bodyText: string, confirmText: string, cb: () => void) => {
-
-  const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
-
-  dispatch({
-    type: 'MODAL_PROMPT',
-    modalBody: <div>
-      <span>{bodyText}</span>
-      <button className="btn btn-danger btn-block mb-1" onClick={() => {dismiss(); cb(); }}
-        ref={(e) => { if (e) { e.focus(); } }} >
-        {confirmText}
-      </button>
-      <button className="btn btn-secondary btn-block mb-1" onClick={dismiss}>
-        Cancel
-      </button>
-    </div>,
-  });
-};
-
-export const modalPromptAllowEmpty = (body: string, ok: string, defaultValue: string,
-  callback: (result: string) => void) => {
-
-  modalPrompt(body, ok, callback, defaultValue, { allowEmpty: true });
-};
-
-export const modalPromptChecked = (body: string, ok: string, defaultValue: string,
-    checker: (chk: string) => string,
-    callback: (result: string) => void) => {
-  modalPrompt(body, ok, callback, defaultValue, { checker });
-};
 
 /**
  * Shorthand for fetch which reports errors to user via redux
@@ -287,7 +166,6 @@ export function get<ResponseType>(url: string, then: (res: ResponseType) => void
   return request<ResponseType>('GET', undefined, url, then);
 }
 
-
 export function post<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
   return request<ResponseType>('POST', body, url, then);
 }
@@ -296,10 +174,7 @@ export function connect() {
   return reactredux.connect(
     state => state,
     (dispatch: (a: CommonAction) => void) => {
-      const dismiss = () => dispatch({ type: 'MODAL_DISMISS' });
       return {
-        dismissModal: dismiss,
-
         dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' }),
       };
     },
@@ -430,7 +305,7 @@ export function installRouter(base: string, first: string,
     console.log(`Common.installRouter: dispatching ${action ? action : 'base'}`);
 
     if (routes[action]) {
-      routes[action].apply(this, arguments);      
+      routes[action].apply(this, arguments);
     } else if (action === '' && routes['no_action']) {
       routes['no_action'].apply(this, arguments);
     } else {
@@ -449,5 +324,5 @@ export function installRouter(base: string, first: string,
     if (first) {
       route(first);
     }
-  } 
+  }
 }
