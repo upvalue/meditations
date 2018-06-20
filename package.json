@@ -64,6 +64,7 @@
     "@types/websocket": "^0.0.33",
     "awesome-typescript-loader": "^3.2.3",
     "bootstrap": "4.0.0-alpha.6",
+    "classnames": "^2.2.6",
     "css-loader": "^0.26.1",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.10.0",
