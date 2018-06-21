@@ -107,15 +107,22 @@ func App() *macaron.Macaron {
 	packagePath := GetAppPath()
 
 	Config.PackagePath = packagePath
+	cwd, err := os.Getwd()
 
 	fmt.Printf("Using %s as path\n", packagePath)
 
 	webpackCheck := path.Join(Config.PackagePath, "assets/webpack/bundle-habits.js")
 
-	_, err := os.Stat(webpackCheck)
+	_, err = os.Stat(webpackCheck)
 
 	if os.IsNotExist(err) {
-		panic(fmt.Sprintf("%s not found; have you run yarn and webpack?", webpackCheck))
+		webpackCheck2 := path.Join(cwd, "assets/webpack/bundle-habits.js")
+		_, err = os.Stat(webpackCheck2)
+		packagePath = cwd
+		println("Scratch that, using CWD %s as path\n", packagePath)
+		if os.IsNotExist(err) {
+			panic(fmt.Sprintf("Could not find bundle-habits.js at %s or %s; have you run yarn and webpack?", webpackCheck, webpackCheck2))
+		}
 	}
 
 	m := macaron.Classic()
@@ -139,7 +146,7 @@ func App() *macaron.Macaron {
 	}))
 
 	// Serve static files from /assets
-	m.Use(macaron.Static("assets", macaron.StaticOptions{Prefix: "assets"}))
+	m.Use(macaron.Static(path.Join(packagePath, "assets"), macaron.StaticOptions{Prefix: "assets"}))
 
 	// Expose configuration variables to templates & javascript
 	cfgjsonc, err := json.Marshal(Config)
