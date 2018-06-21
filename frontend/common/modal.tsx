@@ -241,7 +241,8 @@ export class ModalProvider extends React.Component<{ socketClosed: boolean }, Mo
             {this.state.modalType === 'CONFIRM' &&
               <div>
                 <span>{this.state.modalData.bodyText}</span>
-                <button className="btn btn-danger btn-block mb-1" onClick={this.submitModal}>
+                <button className="btn btn-danger btn-block mb-1" onClick={this.submitModal}
+                  ref={(e) => { if (e) { e.focus(); } }}>
                   {this.state.modalData.confirmText}
                 </button>
                 <button className="btn btn-secondary btn-block mb-1" onClick={this.dismissModal}>
