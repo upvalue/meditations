@@ -2,18 +2,17 @@
 
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
-import * as ReactDOM from 'react-dom';
 import * as moment from 'moment';
 
-import * as common from '../common';
-import { OcticonButton, Editable, EditableState, OcticonSpan } from '../common/components';
+import * as common from '../../common';
+import { OcticonButton, Editable, EditableState, OcticonSpan } from '../../common/components';
 
-import { Status, Task, ScopeType } from './state';
-import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
+import { Status, Task, ScopeType } from '../state';
+import { MOUNT_NEXT_DAY_TIME } from '../../common/constants';
 import {
   OcticonClock, OcticonDashboard, OcticonData, OcticonComment, OcticonClippy, OcticonTrashcan,
-} from '../common/octicons';
-import { modalContext, ModalProvider } from '../common/modal';
+} from '../../common/octicons';
+import { modalContext, ModalProvider } from '../../common/modal';
 
 export interface TaskProps {
   // Drag and drop implementation props

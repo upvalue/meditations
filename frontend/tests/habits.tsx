@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 
 import { Task } from '../habits/state';
-import { CTaskImpl } from '../habits/task';
+import { CTaskImpl } from '../habits/components/Task';
 import * as moment from 'moment';
 import { ModalProvider } from '../common/modal';
 
@@ -39,6 +39,7 @@ const renderTask = (task: Task) => {
         connectDropTarget={el => el}
         isDragging={false}
         isOver={false}
+        style={null}
         isOverCurrent={false}
       />
     </ModalProvider>,

@@ -87,11 +87,15 @@ interface ModalPromptOptions {
   checker?: (chk: string) => string;
 }
 
+export interface ModalProviderProps {
+  socketClosed: boolean;
+}
+
 /**
  * Modal provider handles global modal state. It is also responsible for styling the entire app
  * in the case of error notifications or modals.
  */
-export class ModalProvider extends React.Component<{ socketClosed: boolean }, ModalState> {
+export class ModalProvider extends React.Component<ModalProviderProps, ModalState> {
   modalInput?: HTMLInputElement;
 
   constructor(props: any) {
@@ -102,8 +106,19 @@ export class ModalProvider extends React.Component<{ socketClosed: boolean }, Mo
       modalType: 'EMPTY',
       modalData: null,
     };
-
   }
+
+  /*
+  componentWillUpdate(nextProps : ModalProviderProps, nextState: ModalState) {
+    if (this.state.modalOpen && !nextState.modalOpen) {
+      mousetrap.unbind(KEYSEQ_MODAL_EXIT);
+    } else if (!this.state.modalOpen && nextState.modalOpen) {
+      mousetrap.bindGlobal('escape', () => {
+        console.log('quit modal');
+      });
+    }
+  }
+  */
 
   openModalPrompt(body: string, ok: string, callback: (result: string) => void,
     defaultValue?: string, options?: ModalPromptOptions) {

@@ -14,3 +14,13 @@ export const MOUNT_NEXT_DAY_TIME = 4;
  * In hours.
  */
 export const JOURNAL_ROLLOVER_TIME = 4;
+
+/**
+ * Keybinding to add a task to the current day. Only available when viewing the current month.
+ */
+export const KEYSEQ_TASK_ADD = 'g a';
+
+/**
+ * Mousetrap key sequence that will trigger focus on the filter by name field.
+ */
+export const KEYSEQ_FILTER_FOCUS = 'g s';

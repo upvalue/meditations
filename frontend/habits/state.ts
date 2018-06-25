@@ -46,11 +46,13 @@ export interface Task extends common.Model {
 /** Default amount of days to track project activity for */
 export const PROJECT_STATS_DAYS_DEFAULT = 72;
 
-/** Note that this does not track the structure of the backend
- * Scope table but is used for rendering */
+/**
+ * Note that this does not track the structure of the backend
+ * Scope table but is used for rendering
+ */
 export interface Scope {
   Name: string;
-  Scope: number;
+  Scope: ScopeType;
   Date: moment.Moment;
   Tasks: Task[];
 }
