@@ -25,9 +25,13 @@ export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
   renderTimeScope(s?: Scope, i?: number) {
     if (s) {
       // TODO: Filter by date?
-      return <TimeScope currentProject={this.props.currentProject}
-        key={i} currentDate={this.props.currentDate} scope={s}
-        filter={this.props.filter} lastModifiedTask={this.props.lastModifiedTask}
+      return <TimeScope
+        currentProject={this.props.currentProject}
+        key={i}
+        currentDate={this.props.currentDate}
+        scope={s}
+        filter={this.props.filter}
+        lastModifiedTask={this.props.lastModifiedTask}
         mostRecentDay={(i && i === 1) ? true : false}
         />;
     }
@@ -53,6 +57,30 @@ export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
     return <Spinner />;
   }
 
+  renderDays() {
+    let { days } = this.props;
+
+    const today = moment();
+
+    if (this.props.currentDate.month() === today.month()
+        && this.props.currentDate.year() === today.year()) {
+
+      // Current month
+      // 1) Always display first day of month, in case no tasks have been added to it
+      // 2) Display all days up to curent day
+      // 3) Display next day if within a certain amount of hours (specified in constants file)
+
+      days = days.filter((d, i) => (
+        i === days.length ||
+        // Present date
+        d.Date.date() <= today.date() ||
+        (d.Date.date() === today.date() + 1 && today.hour() > (24 - MOUNT_NEXT_DAY_TIME))
+      ));
+    }
+
+    return days.map((d, i) => this.renderTimeScope(d, i));
+  }
+
   render() {
     return <div id="habits-root-sub">
       <CommonUI {...this.props}>
@@ -60,13 +88,7 @@ export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
         <HabitsMobileMenu />
         <div className="d-flex flex-column flex-md-row">
           <div id="scope-days" className="scope-column mr-md-1">
-            {this.props.days ?
-              this.props.days
-                // Only render a single day in advance of the current time
-                .filter((d, i) =>
-                  (d.Date < moment().add(MOUNT_NEXT_DAY_TIME, 'hours')) || i === 1)
-                .map((d, i) => this.renderTimeScope(d, i)) :
-              <Spinner /> }
+            {this.props.days ? this.renderDays() : <Spinner />}
           </div>
           <div id="scope-month" className="scope-column mr-md-1">
             {this.renderTimeScope(this.props.month)}

@@ -65,7 +65,7 @@ export class TimeScope extends React.Component<TimeScopeProps> {
     });
 
     const title =
-      this.props.scope.Date.format(['', 'dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope]);
+      this.props.scope.Date.format(['dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope - 1]);
 
     return <PresentScope
         scope={this.props.scope}

@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
@@ -59,62 +58,23 @@ func jsonTasksInScope(c *macaron.Context, scope int) {
 	}
 }
 
-// DayTasks represents a list of dates and task arrays, representing all tasks in a set of days for a month
-type DayTasks struct {
-	Date  string
-	Tasks []Task
-}
-
-func tasksInDays(c *macaron.Context, results *[]DayTasks) error {
+func tasksInDays(c *macaron.Context, results *[]Task) error {
 	date, err := time.Parse(DateFormat, c.Query("date"))
 	if err != nil {
 		serverError(c, "error parsing date %s", c.Query("date"))
 		return err
 	}
 
-	limit := int64(0)
-	// This function supports limit as an optional query variable;
-	// if viewing the current month, this will not show days in the future
-	if c.Query("limit") != "" {
-		limit, err = strconv.ParseInt(c.Query("limit"), 10, 32)
-		if err != nil {
-			serverError(c, "error parsing limit int %s", c.Query("limit"))
-			return err
-		}
-
-	}
-
 	// Prints days in reverse order (because that's how the UI sorts them)
 	begin, end := _between(date, ScopeMonth)
-	begin = begin.AddDate(0, 0, -1)
-	end = end.AddDate(0, 0, -1)
 
-	// end.Day should max out at limit
-	if limit != 0 {
-		end = end.AddDate(0, 0, -(end.Day() - int(limit) + 1))
-	}
+	fmt.Printf("%v %v\n", begin.Format(DateFormat), end.Format(DateFormat))
 
-	for end != begin {
-		var tasks []Task
-		tasksInScope(&tasks, ScopeDay, end)
-		// This could be pre-allocated rather than built by append
-		(*results) = append(*results, DayTasks{end.Format(DateFormat), tasks})
-		end = end.AddDate(0, 0, -1)
-	}
+	DB.
+		Where("date BETWEEN ? and ? and scope = ?", begin, end, ScopeDay).Order("`order` asc, date asc").
+		Preload("Comment").Find(results)
 
 	return nil
-}
-
-func jsonTasksInDays(c *macaron.Context) {
-	var results []DayTasks
-	if tasksInDays(c, &results) == nil {
-		c.JSON(http.StatusOK, results)
-	}
-}
-
-func tasksInMonth(c *macaron.Context) {
-	//tasksInScopeR(c, ScopeMonth)
-	jsonTasksInScope(c, ScopeMonth)
 }
 
 func tasksInYear(c *macaron.Context) {
@@ -123,7 +83,7 @@ func tasksInYear(c *macaron.Context) {
 }
 
 func tasksInMonthAndDays(c *macaron.Context) {
-	var daysTasks []DayTasks
+	var daysTasks []Task
 	var monthTasks []Task
 	var err error
 
@@ -132,7 +92,7 @@ func tasksInMonthAndDays(c *macaron.Context) {
 		err = tasksInScopeRequest(c, ScopeMonth, &monthTasks)
 
 		type Result struct {
-			Days  []DayTasks
+			Days  []Task
 			Month []Task
 		}
 
@@ -550,8 +510,6 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/", habitsIndex)
 
 	m.Get("/in-year", tasksInYear)
-	m.Get("/in-month", tasksInMonth)
-	m.Get("/in-days", jsonTasksInDays)
 	m.Get("/in-month-and-days", tasksInMonthAndDays)
 
 	m.Get("/in-project/:id:int", tasksInProject)

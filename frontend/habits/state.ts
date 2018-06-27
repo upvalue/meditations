@@ -267,14 +267,12 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
       return mountScopeReducer(state, action);
 
     case 'MOUNT_DAYS':
-      const days = Array<Scope>();
-      for (const day of action.days) {
-        days.push({
-          Date: moment(day.Date, common.DAY_FORMAT),
-          Scope: ScopeType.DAY,
-          Tasks: day.Tasks,
-        } as Scope);
-      }
+      const days : Scope[] = action.days.map(day => ({
+        Name: '',
+        Date: moment(day.Date, common.DAY_FORMAT),
+        Scope: ScopeType.DAY,
+        Tasks: day.Tasks,
+      }));
       return { ...state, days, mounted: true };
 
     case 'UPDATE_TASKS': {

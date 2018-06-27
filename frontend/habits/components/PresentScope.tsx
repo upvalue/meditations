@@ -49,7 +49,7 @@ export class PresentScope extends React.Component<PresentScopeProps> {
   }
 
   render() {
-    const { title, scope, children } = this.props;
+    const { title, children } = this.props;
 
     return <modalContext.Consumer>
       {modal =>

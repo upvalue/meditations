@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import route from 'riot-route';
+import { reverse, rangeRight } from 'lodash';
 
 import * as common from '../common';
 
@@ -86,40 +87,31 @@ export const main = () => {
       // Get day scopes
       if (timeChanged === 'CHANGE_YEAR' || timeChanged === 'CHANGE_MONTH') {
         dispatch((dispatch) => {
-          let limit = null;
-          const today = moment();
-
-          // If we are showing days for the current month,
-          // we won't render days that haven't happened yet in advance
-          if (today.month() === date.month() && today.year() === date.year()) {
-            limit = today.date() + 1;
-
-            // But do mount the next day if it's within 4 hours before midnight so tasks can be
-            // added at nighttime. Unless the next day is in the next month.
-            const next = today.clone().add(MOUNT_NEXT_DAY_TIME, 'hours');
-            if (next.date() !== today.date() && next.month() === today.month()) {
-              limit += 1;
-            }
-          }
-
-          // Build query string to pull all tasks in the month and day
-          let qs = `/habits/in-month-and-days?date=${date.format(common.DAY_FORMAT)}`;
-          qs += `${limit ? '&limit=' + limit : ''}`;
-
+          const qs = `/habits/in-month-and-days?date=${date.format(common.DAY_FORMAT)}`;
           common.get(qs,
-            ((response: { Days: Day[], Month: Task[] }) => {
-              response.Days.forEach((d) => {
-                d.Tasks.forEach(common.processModel);
+            ((response: { Days: Task[], Month: Task[] }) => {
+
+              // Create TimeScope display array
+              const array = rangeRight(date.daysInMonth()).map((_, i) => ({
+                Date: moment(date).clone().date(i + 1).format(common.DAY_FORMAT),
+                Tasks: [] as Task[],
+              }));
+
+              response.Days.forEach((t) => {
+                common.processModel(t);
+                array[t.Date.date() - 1].Tasks.push(t);
               });
 
               response.Month.forEach(common.processModel);
 
-              dispatch({ date, type: 'MOUNT_DAYS', days: response.Days });
-              dispatch({ date, type: 'MOUNT_SCOPE', scope: ScopeType.MONTH,
-                tasks: response.Month });
+              dispatch({ date, type: 'MOUNT_DAYS', days: reverse(array) });
+              dispatch({ date,
+                type: 'MOUNT_SCOPE',
+                scope: ScopeType.MONTH,
+                tasks: response.Month,
+              });
             }),
            );
-
         });
       }
 

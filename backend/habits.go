@@ -109,7 +109,7 @@ const (
 type Comment struct {
 	gorm.Model
 	Body   string
-	TaskID int
+	TaskID uint
 }
 
 //
@@ -418,12 +418,19 @@ func between(start time.Time, scope int) (string, string) {
 	return from.Format(DateFormat), to.Format(DateFormat)
 }
 
+var tasksInScopeCalls = 0
+
 // tasksInScope returns all the tasks in a given scope and timeframe, ordered by order
 func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 	if scope >= ScopeProject {
 		DB.Where("scope = ?", scope).Preload("Comment").Order("`order` asc").Find(tasks)
 	} else {
 		from, to := between(start, scope)
+
+		tasksInScopeCalls = tasksInScopeCalls + 1
+
+		//DB.Table("tasks").Joins("left join comments on comments.task_id = tasks.id").
+		//	Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("`order` asc").Find(tasks)
 
 		DB.Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("`order` asc").
 			Preload("Comment").Find(tasks)
