@@ -48,3 +48,4 @@ Run the following command if you'd like to seed the application with some exampl
 ## Attribution
 
 The favicon.ico was used under public domain from [Tango](http://tango.freedesktop.org)
+The logo at the top of the file was created by [@reallinfo](https://github.com/reallinfo). Thank you! :)
