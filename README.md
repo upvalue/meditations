@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/horizontal.png" alt="meditations" height="80px"></p>
+
 ![CircleCI Badge](https://circleci.com/gh/ioddly/meditations.png?circle-token=:circle-token&style=shield)
 
 meditations is an application for tracking progress towards goals that builds on habit formation and long term
