@@ -10,8 +10,8 @@
 		},
 		{
 			"ImportPath": "github.com/flosch/pongo2",
-			"Comment": "v1.0-rc1-230-g1f4be1e",
-			"Rev": "1f4be1efe3b3529b7e58861f75d70120a9567dc4"
+			"Comment": "v1.0-rc1-233-g67f4ff8",
+			"Rev": "67f4ff8560dfa2b00920118f228c0a2f68760631"
 		},
 		{
 			"ImportPath": "github.com/go-macaron/binding",
@@ -31,8 +31,8 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Comment": "v1.2.0-12-g71fa72d",
-			"Rev": "71fa72d4842364bc5f74185f4161e0099ea3624a"
+			"Comment": "v1.2.0-44-g5ed622c",
+			"Rev": "5ed622c449da6d44c3c8329331ff47a9e5844f71"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/gorm",
@@ -81,8 +81,8 @@
 		},
 		{
 			"ImportPath": "gopkg.in/macaron.v1",
-			"Comment": "v1.2.3",
-			"Rev": "534b5803c7c0bfb3a59632359a94bc761d393d4c"
+			"Comment": "v1.3.1",
+			"Rev": "c1be95e6d21e769e44e1ec33cec9da5837861c10"
 		}
 	]
 }

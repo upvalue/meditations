@@ -71,7 +71,7 @@ export class TimeScope extends React.Component<TimeScopeProps> {
         scope={this.props.scope}
         title={title}
         mostRecentDay={this.props.mostRecentDay}>
-      {...tasks}
+      {filteredTasks.map((t, i) => createCTask(t, this.props.lastModifiedTask))}
     </PresentScope>;
   }
 }
