@@ -13,7 +13,7 @@ import {
 
 import { CommonState } from '../common';
 
-import { modalContext, ModalProvider } from './modal';
+import { ModalProvider } from './modal';
 
 export interface EditableState {
   editor: MediumEditor.MediumEditor;
@@ -84,10 +84,6 @@ export class Editable<Props,
         if (document.activeElement.id.startsWith('medium-editor-pastebin')) {
           return;
         }
-
-        // Called on editor blur, check if anything needs to be updated and call the appropriate
-        // method if so.
-        const newBody = this.body.innerHTML;
 
         // Do not update if nothing has changed
         if (!this.editorUpdated()) {
