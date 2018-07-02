@@ -275,16 +275,24 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   renderStats() {
-    return <span>{' '}
-      {this.props.task.CompletedTasks}/{this.props.task.TotalTasks}
-      {' '}({this.props.task.CompletionRate}%)
-    </span>;
+    return (
+      <span>{' '}
+        {this.props.task.CompletedTasks}/{this.props.task.TotalTasks}
+        {' '}({this.props.task.CompletionRate}%)
+      </span>
+    );
   }
 
   /** Render an octicon button tied to a specific task action */
   renderControl(tip: string, icon:OcticonData, callback: () => void, danger?: boolean) {
-    return <OcticonButton tooltip={tip} icon={icon} onClick={callback}
-      className="d-flex flex-items-center pl-1" />;
+    return (
+      <OcticonButton
+        tooltip={tip}
+        icon={icon}
+        onClick={callback}
+        className="d-flex flex-items-center pl-1"
+      />
+    );
   }
 
   renderComment() {
@@ -295,13 +303,16 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         commentClasses = 'no-display';
       }
 
-      return <div className={`ml-2 mr-2`}>
-        <div
-          className={`task-comment border border-gray mt-1 ${commentClasses}`}
-          ref={(body) => { if (body) { this.body = body; } }}
-          onClick={this.editorOpen}
-          dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }} />
-      </div>;
+      return (
+        <div className={`ml-2 mr-2`}>
+          <div
+            className={`task-comment border border-gray mt-1 ${commentClasses}`}
+            ref={(body) => { if (body) { this.body = body; } }}
+            onClick={this.editorOpen}
+            dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }}
+          />
+        </div>
+      );
     }
   }
 
@@ -311,12 +322,15 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       isOver, isOverCurrent } = this.props;
     // Create a draggable task button.
     const klass = ['task-unset', 'task-complete', 'task-incomplete'][this.props.task.Status];
-    const taskButton_ =
-      <button className={`task-status btn btn btn-sm ${klass}`}
-          onClick={() => this.cycleStatus()}>
+    const taskButton_ = (
+      <button
+        className={`task-status btn btn btn-sm ${klass}`}
+        onClick={() => this.cycleStatus()}
+      >
         {this.props.task.Name}
         {this.hasStats() && this.renderStats()}
-      </button>;
+      </button>
+    );
 
     const taskButton =
       connectDragPreview(<span>{connectDragSource(taskButton_)}</span>);
@@ -330,24 +344,30 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       style['visibility'] = 'hidden';
     }
 
-    const result = <section className={`task ${lastModified}`} style={style}>
+    const result = (
+    <section className={`task ${lastModified}`} style={style}>
       <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
         <div>
           {taskButton}
         </div>
 
         <div className="task-controls d-flex flex-items-center">
-          {this.hasTime() && <span className="pr-1 tooltipped tooltipped-w"
-              aria-label="Average time">
-            <OcticonSpan icon={OcticonClock} />
+          {this.hasTime() && (
+            <span
+              className="pr-1 tooltipped tooltipped-w"
+              aria-label="Average time"
+            >
+              <OcticonSpan icon={OcticonClock} />
             {this.renderTime()}
-          </span>}
+            </span>
+          )}
 
           {this.hasStreak() &&
             <OcticonSpan
                 icon={OcticonDashboard}
                 className="streak pr-1"
-                tooltip="Streak (current / best)">
+                tooltip="Streak (current / best)"
+            >
               {this.props.task.Streak}/{this.props.task.BestStreak}
             </OcticonSpan>
           }
@@ -372,7 +392,8 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       </div>
 
       {this.props.task.Comment && this.renderComment()}
-    </section>;
+    </section>
+    );
 
     return connectDropTarget(result);
   }

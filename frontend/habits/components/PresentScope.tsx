@@ -15,8 +15,9 @@ export interface PresentScopeProps {
 }
 
 /**
- * Scope presentation element. Made because time-based and project-based scopes have some different
- * functionality
+ * PresentScope contains either a TimeScope or ProjectScope.
+ * Made in order to share some functionality between them (such as adding tasks)
+ * even though they are visibly quite different
  */
 export class PresentScope extends React.Component<PresentScopeProps> {
   bindAddTask(modal: ModalProvider) {
@@ -51,26 +52,29 @@ export class PresentScope extends React.Component<PresentScopeProps> {
   render() {
     const { title, children } = this.props;
 
-    return <modalContext.Consumer>
-      {modal =>
-        <section className="scope bg-gray mb-2">
-          { this.props.mostRecentDay && this.bindAddTask(modal) }
-          <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
-            <h3 className="pl-2">{title}</h3>
-            <div className="scope-controls pr-1 pt-1 ">
-              <OcticonButton
-                className=""
-                icon={OcticonPlus}
-                onClick={this.addTask(modal)}
-                tooltip="Add task" />
+    return (
+      <modalContext.Consumer>
+        {modal =>
+          <section className="scope bg-gray mb-2">
+            {this.props.mostRecentDay && this.bindAddTask(modal)}
+            <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
+              <h3 className="pl-2">{title}</h3>
+              <div className="scope-controls pr-1 pt-1 ">
+                <OcticonButton
+                  className=""
+                  icon={OcticonPlus}
+                  onClick={this.addTask(modal)}
+                  tooltip="Add task"
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="scope-tasks mt-1">
-            {children}
-          </div>
-        </section>
-      }
-    </modalContext.Consumer>;
+            <div className="scope-tasks mt-1">
+              {children}
+            </div>
+          </section>
+        }
+      </modalContext.Consumer>
+    );
   }
 }

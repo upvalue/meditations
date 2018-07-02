@@ -11,7 +11,6 @@ import {
   ScopeType,  Project, Task, store, dispatch, HabitsState, Day, dispatchProjectListUpdate,
 } from './state';
 import { HabitsRoot } from './containers/HabitsRoot';
-import { MOUNT_NEXT_DAY_TIME } from '../common/constants';
 
 /** Convenience method; returns route argument for a given date and project. */
 export const routeForView = (date: moment.Moment | 'current', project?: number) => {

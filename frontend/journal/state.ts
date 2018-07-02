@@ -2,7 +2,7 @@ import * as moment from 'moment';
 
 import * as common from '../common';
 
-import { SidebarState, JournalSidebar } from './sidebar';
+import { SidebarState } from './components/Sidebar';
 
 ///// BACKEND INTERACTION
 

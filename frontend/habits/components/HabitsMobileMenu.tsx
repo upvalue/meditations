@@ -20,26 +20,39 @@ export class HabitsMobileMenu extends React.PureComponent<{}, {opened: boolean}>
   renderLink(name:string, text: string) {
     // NOTE: activeClass doesn't work here when there are not many tasks as
     // the month/year/projects scope may fit into the screen without going past the day tasks
-    return <Scroll.Link to={name} smooth={true} duration={500} spy={true}
-      onClick={() => this.toggle()}
-      className="menu-item" >
-      {text}
-    </Scroll.Link>;
+    return (
+      <Scroll.Link
+        to={name}
+        smooth={true}
+        duration={500}
+        spy={true}
+        onClick={() => this.toggle()}
+        className="menu-item"
+      >
+        {text}
+      </Scroll.Link>
+    );
   }
 
   render() {
-    return <div id="mobile-menu" className="d-flex flex-column">
-      <OcticonButton icon={OcticonThreeBars} tooltip="Toggle mobile menu" normalButton={true}
-        className="flex-self-end mb-1"
-        onClick={() => this.toggle()} />
-      {this.state.opened &&
-        <nav className="menu" id="mobile-menu-nav">
-          {this.renderLink('scope-days', 'Day')}
-          {this.renderLink('scope-month', 'Month')}
-          {this.renderLink('scope-year', 'Year')}
-          {this.renderLink('scope-projects', 'Projects')}
-        </nav>
-      }
-    </div>;
+    return (
+      <div id="mobile-menu" className="d-flex flex-column">
+        <OcticonButton
+          icon={OcticonThreeBars}
+          tooltip="Toggle mobile menu"
+          normalButton={true}
+          className="flex-self-end mb-1"
+          onClick={() => this.toggle()}
+        />
+        {this.state.opened &&
+          <nav className="menu" id="mobile-menu-nav">
+            {this.renderLink('scope-days', 'Day')}
+            {this.renderLink('scope-month', 'Month')}
+            {this.renderLink('scope-year', 'Year')}
+            {this.renderLink('scope-projects', 'Projects')}
+          </nav>
+        }
+      </div>
+    );
   }
 }

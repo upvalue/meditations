@@ -5,8 +5,8 @@ import * as Scroll from 'react-scroll';
 import * as moment from 'moment';
 import * as common from '../common';
 
-import { JournalRoot } from './components';
-import { SidebarState } from './sidebar';
+import { JournalRoot } from './containers/JournalRoot';
+import { SidebarState } from './components/Sidebar';
 import { store, dispatch, Entry } from './state';
 
 export const main = () => {

@@ -226,13 +226,17 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
   }
 
   render() {
-    return <>
+    return (
+    <>
       <modalContext.Provider value={this}>
         {this.state.modalOpen &&
           <div id="modal" className="bg-white border border-gray-dark p-2">
             <div className="float-right pb-1">
-              <OcticonButton icon={OcticonX} tooltip="Dismiss prompt"
-                onClick={this.dismissModal} />
+              <OcticonButton
+                icon={OcticonX}
+                tooltip="Dismiss prompt"
+                onClick={this.dismissModal}
+              />
             </div>
 
             {this.state.modalType === 'INPUT' &&
@@ -241,8 +245,11 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
                 {this.state.modalError &&
                   <div className="flash flash-error mt-1 mb-1">{this.state.modalError}</div>
                 }
-                <input ref={(e) => { if (e) { this.modalInput = e; e.focus(); } }}
-                  className="form-control input-block mb-1" type="text" />
+                <input
+                  ref={(e) => { if (e) { this.modalInput = e; e.focus(); } }}
+                  className="form-control input-block mb-1"
+                  type="text"
+                />
                 <button className="btn btn-primary btn-block mb-1" onClick={this.submitModal}>
                   {this.state.modalData.ok}
                 </button>
@@ -256,8 +263,11 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
             {this.state.modalType === 'CONFIRM' &&
               <div>
                 <span>{this.state.modalData.bodyText}</span>
-                <button className="btn btn-danger btn-block mb-1" onClick={this.submitModal}
-                  ref={(e) => { if (e) { e.focus(); } }}>
+                <button
+                  className="btn btn-danger btn-block mb-1"
+                  onClick={this.submitModal}
+                  ref={(e) => { if (e) { e.focus(); } }}
+                >
                   {this.state.modalData.confirmText}
                 </button>
                 <button className="btn btn-secondary btn-block mb-1" onClick={this.dismissModal}>
@@ -272,6 +282,7 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
           {this.props.children}
         </div>
       </modalContext.Provider>
-    </>;
+    </>
+    );
   }
 }

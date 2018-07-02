@@ -24,6 +24,9 @@ interface TimeScopeProps {
   mostRecentDay: boolean;
 }
 
+/**
+ * Displays tasks within a particular time scope (day, month or year)
+ */
 export class TimeScope extends React.Component<TimeScopeProps> {
   constructor(props: TimeScopeProps) {
     super(props);
@@ -60,18 +63,17 @@ export class TimeScope extends React.Component<TimeScopeProps> {
       }
     }
 
-    const tasks = filteredTasks.map((t, i) => {
-      return createCTask(t, this.props.lastModifiedTask);
-    });
-
     const title =
       this.props.scope.Date.format(['dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope - 1]);
 
-    return <PresentScope
+    return (
+      <PresentScope
         scope={this.props.scope}
         title={title}
-        mostRecentDay={this.props.mostRecentDay}>
-      {filteredTasks.map((t, i) => createCTask(t, this.props.lastModifiedTask))}
-    </PresentScope>;
+        mostRecentDay={this.props.mostRecentDay}
+      >
+        {filteredTasks.map((t, i) => createCTask(t, this.props.lastModifiedTask))}
+      </PresentScope>
+    );
   }
 }

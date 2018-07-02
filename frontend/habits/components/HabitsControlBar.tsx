@@ -101,13 +101,16 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
 
   renderDatePicker(end: boolean, defaultPlaceholder: string,  value?: moment.Moment | null) {
     // TODO: Datepicker onClearable does not work unless a SELECTED value is also passed
-    return <DatePicker
-      className="form-control ml-1 mb-md-0 mb-1"
-      onChange={date => this.filterByDate(end, date)}
-      isClearable={true}
-      placeholderText={defaultPlaceholder}
-      value={value ? value.format(common.DAY_FORMAT) : ''}
-      openToDate={this.props.currentDate} />;
+    return (
+      <DatePicker
+        className="form-control ml-1 mb-md-0 mb-1"
+        onChange={date => this.filterByDate(end, date)}
+        isClearable={true}
+        placeholderText={defaultPlaceholder}
+        value={value ? value.format(common.DAY_FORMAT) : ''}
+        openToDate={this.props.currentDate}
+      />
+    );
   }
 
   render() {
@@ -117,34 +120,45 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
     const placeholderEnd = this.props.filter.end ?
       this.props.filter.end.format(common.HUMAN_DAY_FORMAT) : '...to';
 
-    const buttonsDisabled = { disabled: true };
-
     // If any filters have been entered, we'll render a clear button
-    if (this.props.filter.name || this.props.filter.begin || this.props.filter.end) {
-      // And if a name and/or a date RANGE have been entered, we'll allow export
-      buttonsDisabled['disabled'] = false;
-    }
+    const disableButton =
+      !(this.props.filter.name || this.props.filter.begin || this.props.filter.end);
 
     // tslint:disable-next-line
     return <div id="controls" className="d-flex flex-column flex-md-row flex-items-start flex-justify-between ml-3 mr-2 mt-2 mb-2">
-      <TimeNavigator daysOnly={false} getRoute={this.navigatorRoute}
-        currentDate={this.props.currentDate}  />
+      <TimeNavigator
+        daysOnly={false}
+        getRoute={this.navigatorRoute}
+        currentDate={this.props.currentDate}
+      />
 
       <div className="d-flex flex-column flex-md-row">
-        <input type="text"
+        <input
+          type="text"
           placeholder={`Filter by name (Key: ${KEYSEQ_FILTER_FOCUS})`}
           ref={e => this.filterByNameElement = e}
           className="form-control mb-md-0 mb-1 ml-"
-          onChange={this.filterByName} />
+          onChange={this.filterByName}
+        />
 
         {this.renderDatePicker(false, 'Filter from...', this.props.filter.begin)}
 
         {this.renderDatePicker(true, '...to', this.props.filter.end)}
 
-        <button className="btn btn-secondary btn-block ml-1 mb-md-0 mb-1" {...buttonsDisabled}
-          onClick={() => this.clearFilter()}>Clear date filter</button>
-        <button className="btn btn-primary btn-block ml-1 mb-md-0 mb-1" {...buttonsDisabled}
-          onClick={() => this.exportTasks()}>Export selected tasks</button>
+        <button
+          disabled={disableButton}
+          className="btn btn-secondary btn-block ml-1 mb-md-0 mb-1"
+          onClick={() => this.clearFilter()}
+        >
+          Clear date filter
+        </button>
+        <button
+          disabled={disableButton}
+          className="btn btn-primary btn-block ml-1 mb-md-0 mb-1"
+          onClick={() => this.exportTasks()}
+        >
+          Export selected tasks
+        </button>
       </div>
     </div>;
   }

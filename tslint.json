@@ -1,7 +1,8 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint-config-airbnb"
+        "tslint-config-airbnb",
+        "tslint-react"
     ],
     "jsRules": {},
     "rules": {
@@ -10,7 +11,9 @@
       "variable-name": false,
       "indent": false,
       "ter-indent": false,
-      "no-else-after-return": false
+      "no-else-after-return": false,
+      "jsx-no-multiline-js": false,
+      "jsx-no-lambda": false
     },
     "rulesDirectory": []
 }

@@ -5,7 +5,7 @@
   "private": true,
   "main": "electron-main.js",
   "scripts": {
-    "lint-frontend": "tslint -c tslint.json frontend/**/*.{ts,tsx} frontend/**/**/*.{ts,tsx} frontend/*.ts",
+    "lint-frontend": "./node_modules/.bin/tslint -c tslint.json frontend/**/*.{ts,tsx} frontend/**/**/*.{ts,tsx} frontend/*.ts",
     "lint-backend": "golint backend/*.go",
     "lint": "yarn run lint-frontend && yarn run lint-backend",
     "postinstall": "npm rebuild node-sass && webpack -p",
