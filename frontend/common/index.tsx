@@ -1,4 +1,4 @@
-///<reference path="bindings.d.ts" />
+///<reference path="../bindings.d.ts" />
 
 import * as moment from 'moment';
 import * as redux from 'redux';

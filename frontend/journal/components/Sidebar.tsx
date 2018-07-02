@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
 
 import { connect, DAY_FORMAT } from '../../common';
-import { Spinner, OcticonSpan } from '../../common/components';
+import { OcticonSpan } from '../../common/components/OcticonButton';
 import LinkTree, { LinkTreeNode } from '../components/LinkTree';
 import * as moment from 'moment';
 import DatePicker from 'react-datepicker';
@@ -10,6 +10,7 @@ import route from 'riot-route';
 
 import { JournalState } from '../state';
 import { OcticonClock, OcticonTextSize, OcticonTag } from '../../common/octicons';
+import { Spinner } from '../../common/components/Spinner';
 
 export type ChronoLink = {
   Date: string;

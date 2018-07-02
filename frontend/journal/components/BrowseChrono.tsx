@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import * as common from '../../common';
 import { Entry } from '../state';
 import { CEntry } from '../components/CEntry';
-import { TimeNavigator } from '../../common/components';
+import { TimeNavigator } from '../../common/components/TimeNavigator';
 
 // TODO: SFC
 interface BrowseChronoProps {

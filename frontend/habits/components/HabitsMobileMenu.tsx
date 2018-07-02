@@ -1,7 +1,7 @@
 import * as React from 'react';
 import DatePicker from 'react-datepicker';
 import * as Scroll from 'react-scroll';
-import { OcticonButton } from '../../common/components';
+import { OcticonButton } from '../../common/components/OcticonButton';
 import { OcticonThreeBars } from '../../common/octicons';
 
 /**

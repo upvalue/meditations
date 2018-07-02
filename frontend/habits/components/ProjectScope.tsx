@@ -5,7 +5,7 @@ import { ModalProvider, modalContext } from '../../common/modal';
 import * as common from '../../common';
 import { Scope } from '../state';
 import { createCTask } from './Task';
-import { OcticonButton } from '../../common/components';
+import { OcticonButton } from '../../common/components/OcticonButton';
 import { OcticonPlus } from '../../common/octicons';
 
 export interface ProjectScopeProps {

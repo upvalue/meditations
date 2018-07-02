@@ -7,8 +7,8 @@ import { dispatch, HabitsState } from '../state';
 import DatePicker from 'react-datepicker';
 
 import * as common from '../../common';
-import { TimeNavigator } from '../../common/components';
 import { KEYSEQ_FILTER_FOCUS } from '../../common/constants';
+import { TimeNavigator } from '../../common/components/TimeNavigator';
 
 /**
  * Common user interface controls: task filtering and time-based navigation

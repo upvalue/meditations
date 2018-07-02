@@ -1,7 +1,7 @@
 // modal.tsx - Modal implementation based on React 16 Contexts
 
 import * as React from 'react';
-import { OcticonButton } from './components';
+import { OcticonButton } from './components/OcticonButton';
 import { OcticonX } from './octicons';
 
 export const modalContext = React.createContext<ModalProvider>(undefined as any as ModalProvider);

@@ -5,7 +5,7 @@ import { times } from 'lodash';
 
 import * as common from '../../common';
 import { OcticonButton, OcticonSpan }
-  from '../../common/components';
+  from '../../common/components/OcticonButton';
 import {
   OcticonPlus, OcticonFlame, OcticonClippy, OcticonTrashcan, OcticonPin, OcticonCheck,
   OcticonClock, OcticonArchive,

@@ -6,7 +6,8 @@ import * as moment from 'moment';
 import * as common from '../../common';
 import { MOUNT_NEXT_DAY_TIME } from '../../common/constants';
 import { HabitsState, Scope } from '../state';
-import { Spinner, CommonUI } from '../../common/components';
+import { CommonUI } from '../../common/components/CommonUI';
+import { Spinner } from '../../common/components/Spinner';
 
 import { HabitsControlBar } from '../components/HabitsControlBar';
 import { TimeScope } from '../components/TimeScope';

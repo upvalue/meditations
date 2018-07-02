@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Entry, Tag } from '../state';
-import { Editable, OcticonButton } from '../../common/components';
+import { OcticonButton } from '../../common/components/OcticonButton';
 
 import * as common from '../../common';
 import {
@@ -9,6 +9,7 @@ import {
 } from '../../common/octicons';
 
 import { modalContext, ModalProvider } from '../../common/modal';
+import { Editable } from '../../common/components/Editable';
 
 ///// REACT COMPONENTS
 

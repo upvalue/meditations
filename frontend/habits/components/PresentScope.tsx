@@ -5,7 +5,7 @@ import * as common from '../../common';
 import { modalContext, ModalProvider } from '../../common/modal';
 import { Scope } from '../state';
 import { OcticonPlus } from '../../common/octicons';
-import { OcticonButton } from '../../common/components';
+import { OcticonButton } from '../../common/components/OcticonButton';
 import { KEYSEQ_TASK_ADD } from '../../common/constants';
 
 export interface PresentScopeProps {

@@ -6,8 +6,9 @@ import DatePicker from 'react-datepicker';
 
 import * as common from '../../common';
 import { JOURNAL_ROLLOVER_TIME } from '../../common/constants';
-import { OcticonSpan, Spinner } from '../../common/components';
+import { OcticonSpan } from '../../common/components/OcticonButton';
 import { OcticonX } from '../../common/octicons';
+import { Spinner } from '../../common/components/Spinner';
 
 class JournalNavigation1 extends React.Component<JournalState, { searching: boolean }> {
   searchText!: HTMLInputElement;

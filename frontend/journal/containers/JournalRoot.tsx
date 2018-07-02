@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 
 import * as common from '../../common';
-import { CommonUI }
-  from '../../common/components';
+import { CommonUI } from '../../common/components/CommonUI';
 
 import { JournalState, Entry } from '../state';
 import { JournalSidebar } from '../components/Sidebar';
