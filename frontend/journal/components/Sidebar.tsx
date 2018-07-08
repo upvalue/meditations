@@ -3,7 +3,7 @@ import { TabPanel, Tab, TabList, Tabs } from 'react-tabs';
 
 import { connect, DAY_FORMAT } from '../../common';
 import { OcticonSpan } from '../../common/components/OcticonButton';
-import LinkTree, { LinkTreeNode } from '../components/LinkTree';
+import { LinkTree, LinkTreeNode } from '../components/LinkTree';
 import * as moment from 'moment';
 import DatePicker from 'react-datepicker';
 import route from 'riot-route';

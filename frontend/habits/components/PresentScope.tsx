@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as mousetrap from 'mousetrap';
 
-import * as common from '../../common';
+import * as common from '../../common/index';
+import * as api from '../api';
 import { modalContext, ModalProvider } from '../../common/modal';
 import { Scope } from '../state';
 import { OcticonPlus } from '../../common/octicons';
@@ -38,14 +39,12 @@ export class PresentScope extends React.Component<PresentScopeProps> {
   addTask = (modal: ModalProvider) => {
     const { scope } = this.props;
 
-    return modal.openModalPrompt('Enter name:', 'Add new task', (name: string) => {
-      if (name) {
-        common.post(`/habits/new`, {
-          name,
-          date: scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
-          scope: scope.Scope,
-        });
-      }
+    return modal.openModalPrompt('Enter name:', 'Add new task', (Name: string) => {
+      api.TaskNew({
+        Name,
+        Date: scope.Date,
+        Scope: scope.Scope,
+      });
     });
   }
 

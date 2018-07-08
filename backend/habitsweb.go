@@ -104,11 +104,39 @@ func tasksInMonthAndDays(c *macaron.Context) {
 
 }
 
-// Update a task's fields by JSON
-// Only used when updating statuses at the moment
-func taskUpdate(c *macaron.Context, task Task) {
-	DB.Where("id = ?", c.Params("id")).First(&task)
+// taskPatch updates a task's fields with JSON, and optionally will create
+// or update a comment as well
+func taskPatch(c *macaron.Context, task Task) {
+	DB.Where("id = ?", c.ParamsInt("id"))
+
+	// Extract comment for separate update/insertion
+	comment := task.Comment
+	cid := comment.ID
+	comment.TaskID = task.ID
+	empty := (len(comment.Body) == 0 || comment.Body == "<p><br></p>")
+	//DB.Where("ID = ?", comment.TaskID).Find(&task)
+
+	if cid == 0 && empty == true {
+		// Empty, do not create or update comment
+	} else if cid > 0 && empty == true {
+		// Empty body: delete existing comment
+		task.Comment = Comment{}
+		DB.Delete(&comment)
+	} else {
+		// See if there's an existing comment and use that as a base for this update
+		var test Comment
+		DB.Where("task_id = ?", task.ID).First(&test)
+		if test.ID > 0 {
+			comment.ID = test.ID
+			comment.CreatedAt = test.CreatedAt
+		}
+
+		task.Comment = comment
+	}
+
 	DB.Save(&task)
+
+	fmt.Printf("%v %v\n", task.Comment, comment)
 
 	task.clearCache()
 	task.Sync(false, true, true)
@@ -138,11 +166,13 @@ func taskNew(c *macaron.Context, task Task) {
 	c.PlainText(http.StatusOK, []byte("OK"))
 }
 
-func taskDelete(c *macaron.Context, task Task) {
+func taskDelete(c *macaron.Context) {
 	var comment Comment
 	var tasks []Task
 
-	DB.Where("id = ?", c.Params("id")).First(&task)
+	var task Task
+
+	DB.Where("id = ?", c.ParamsInt("id")).First(&task)
 
 	task.clearCache()
 	task.Near(&tasks)
@@ -156,7 +186,9 @@ func taskDelete(c *macaron.Context, task Task) {
 		tx.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
 	}
 
-	// Reorder tasks after this one
+	// Task deletion necessitates re-ordering every task after this task,
+	// within its scope
+
 	for _, t := range tasks {
 		if t.Order > task.Order {
 			t.Order = t.Order - 1
@@ -270,40 +302,6 @@ func taskReorder(c *macaron.Context) {
 
 	syncScopeImpl(srcScope, srcDate)
 
-	c.PlainText(200, []byte("OK"))
-}
-
-// commentUpdate updates or creates a comment
-func commentUpdate(c *macaron.Context, comment Comment) {
-	var task Task
-
-	cid := comment.ID
-	log.Printf("%+v", comment)
-
-	empty := (len(comment.Body) == 0 || comment.Body == "<p><br></p>")
-	DB.Where("ID = ?", comment.TaskID).Find(&task)
-
-	if cid == 0 && empty == true {
-		// Empty, do not create or update comment
-		c.PlainText(200, []byte("OK"))
-		return
-	} else if cid > 0 && empty == true {
-		// Delete existing comment
-		DB.Delete(&comment)
-	} else {
-		if cid == 0 {
-			// Update existing comment
-			var test Comment
-			DB.Where("task_id = ?", comment.TaskID).First(&test)
-			if test.ID > 0 {
-				comment.ID = test.ID
-			}
-		}
-		// Create or update comment
-		DB.Save(&comment)
-		task.Comment = comment
-	}
-	task.Sync(false, true, true)
 	c.PlainText(200, []byte("OK"))
 }
 
@@ -521,12 +519,15 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/projects/toggle-pin/:id:int", projectTogglePin)
 	m.Post("/projects/toggle-hide/:id:int", projectToggleHide)
 
-	m.Post("/update", binding.Bind(Task{}), taskUpdate)
 	m.Post("/new", binding.Bind(Task{}), taskNew)
 	m.Post("/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/reorder/:src:int/:target:int", taskReorder)
-	m.Post("/comment-update", binding.Bind(Comment{}), commentUpdate)
 	m.Post("/export", export)
+
+	// REST-ish api
+	m.Post("/task/:id:int", binding.Bind(Task{}), taskPatch)
+	m.Put("/task", binding.Bind(Task{}), taskNew)
+	m.Delete("/task/:id:int", taskDelete)
 
 	m.Get("/sync", habitSync.Handler())
 }

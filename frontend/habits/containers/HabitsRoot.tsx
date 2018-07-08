@@ -33,7 +33,7 @@ export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
           scope={s}
           filter={this.props.filter}
           lastModifiedTask={this.props.lastModifiedTask}
-          mostRecentDay={(i && i === 1) ? true : false}
+          mostRecentDay={(i !== undefined && i === 0) ? true : false}
         />
       );
     }

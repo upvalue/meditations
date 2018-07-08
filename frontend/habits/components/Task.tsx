@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
 import * as moment from 'moment';
 
-import * as common from '../../common';
+import * as common from '../../common/index';
 import { OcticonButton, OcticonSpan } from '../../common/components/OcticonButton';
 
 import { Status, Task, ScopeType } from '../state';
@@ -14,6 +14,7 @@ import {
 } from '../../common/octicons';
 import { modalContext, ModalProvider } from '../../common/modal';
 import { EditableState, Editable } from '../../common/components/Editable';
+import * as api from '../api';
 
 export interface TaskProps {
   // Drag and drop implementation props
@@ -162,11 +163,8 @@ interface TaskState extends EditableState {
 export class CTaskImpl extends Editable<TaskProps, TaskState> {
   cycleStatus() {
     const task = { ...this.props.task, Status: (this.props.task.Status + 1) % Status.WRAP };
-    common.post(`/habits/update`, task);
-  }
 
-  command(path: string) {
-    common.post(`/habits/${path}`, this.props.task);
+    api.TaskUpdate(task);
   }
 
   parseTime(timestr: string) {
@@ -203,7 +201,8 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         // Do not update comment
         const task = { ...this.props.task, Minutes: minutes + (hours * 60) };
         delete task.Comment;
-        common.post(`/habits/update`, task);
+
+        api.TaskUpdate(task);
       });
   }
 
@@ -218,13 +217,11 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
       date.date(moment().date());
     }
 
-    const task = {
+    api.TaskNew({
       Name: this.props.task.Name,
       Scope: scope,
-      Date: date.format('YYYY-MM-DDTHH:mm:ssZ'),
-    };
-
-    common.post('/habits/new', task);
+      Date: date,
+    });
   }
 
   editorUpdated() {
@@ -232,10 +229,13 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   editorSave() {
-    common.post(`/habits/comment-update`, {
-      ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
-      Body: this.body.innerHTML,
-      TaskID: this.props.task.ID,
+    api.TaskUpdate({
+      ...this.props.task,
+      Comment: {
+        ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
+        Body: this.body.innerHTML,
+        TaskID: this.props.task.ID,
+      },
     });
   }
 
@@ -385,7 +385,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
 
                 {this.renderControl('Delete task', OcticonTrashcan,
                   modal.openModalConfirm('Are you sure you want to delete this task?',
-                    'Delete this task!', () => common.post('/habits/delete', this.props.task)))}
+                    'Delete this task!', () => api.TaskDelete(this.props.task)))}
               </>
             }
           </modalContext.Consumer>

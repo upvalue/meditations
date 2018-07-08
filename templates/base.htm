@@ -16,7 +16,14 @@
         <div class="float-right pr-3 d-flex">
         </div>
         <nav class="tabnav-tabs">
-          <span style="font-weight:bold">meditations</span>
+          <span style="font-weight:bold">
+            meditations
+            {% if Config.Development %}
+            <span style="color:red;">(dev)</span>
+            {% else %}
+              {% if Config.Demo %}(demo){% endif %}
+            {% endif %}
+          </span>
 
           <a id="habits-link" class="tabnav-tab {% if Page == "habits"%}selected{% endif %}" href="/habits#">
             Habits

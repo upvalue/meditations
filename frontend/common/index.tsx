@@ -8,6 +8,7 @@ import route from 'riot-route';
 import * as React from 'react';
 import * as reactredux from 'react-redux';
 import * as ReactDOM from 'react-dom';
+import { fetchStoredUIState, storeUIState } from './storage';
 
 declare global {
   /** Extend window with a meditations object for simple console interaction. */
@@ -170,6 +171,18 @@ export function post<ResponseType>(url: string, body?: any, then?: (res: Respons
   return request<ResponseType>('POST', body, url, then);
 }
 
+export function patch<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
+  return request<ResponseType>('PATCH', body, url, then);
+}
+
+export function put<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
+  return request<ResponseType>('PUT', body, url, then);
+}
+
+export function delete_<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
+  return request<ResponseType>('DELETE', body, url, then);
+}
+
 export function connect() {
   return reactredux.connect(
     state => state,
@@ -324,5 +337,32 @@ export function installRouter(base: string, first: string,
     if (first) {
       route(first);
     }
+  }
+
+  // Dispatch introductory messag
+
+  const introMessageSeen = fetchStoredUIState().introMessageSeen;
+
+  if (!introMessageSeen) {
+    dispatch({
+      type: 'NOTIFICATION_OPEN',
+      notification: {
+        error: false,
+        /* tslint:disable */
+        message: `Welcome to meditations
+        
+  Meditations is a daily task manager based on the principles of habit formation.
+        
+  If you'd like to read more about meditations and how to use it , the best place to start is its README: https://github.com/ioddly/meditations.
+
+  If you'd like to learn more about its creator or need a similar application, visit https://upvalue.io.
+
+  Enjoy,
+  Phil.`,
+  /* tslint:enable */
+      },
+    });
+
+    storeUIState({ introMessageSeen: true });
   }
 }

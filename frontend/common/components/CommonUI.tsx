@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CommonState } from '..';
+import { CommonState } from '../index';
 import { ModalProvider } from '../modal';
 
 /**
@@ -46,7 +46,9 @@ export class CommonUI extends React.Component<CommonState> {
               className={`notification flash
               flash-with-icon mb-2 ${n.error ? 'flash-danger' : ''}`}
             >
-              {n.message}
+              <pre style={{ wordWrap: 'break-word' }}>
+                {n.message}
+              </pre>
             </div>
           );
         })}

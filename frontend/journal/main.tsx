@@ -45,11 +45,9 @@ export const main = () => {
     },
 
     search: (text: string) => {
-
       common.setTitle('Notes', `Search: ${text}`);
 
       common.post(`/journal/search?string=${text}`);
-
     },
 
     viewdays: (datestr: string) => {

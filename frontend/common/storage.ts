@@ -3,9 +3,11 @@
 
 interface UIState {
   showHiddenProjects: boolean;
+  introMessageSeen: boolean;
 }
 
 export let uiState: UIState = {
+  introMessageSeen: false,
   showHiddenProjects: false,
 };
 
@@ -20,7 +22,7 @@ export const fetchStoredUIState = () => {
     return uiState;
   }
 
-  return JSON.parse(state);
+  return JSON.parse(state) as UIState;
 };
 
 export const storeUIState = (updates: Partial<UIState>) => {

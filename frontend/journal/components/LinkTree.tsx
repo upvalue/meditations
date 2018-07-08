@@ -10,15 +10,15 @@ export interface LinkTreeNode {
   children?: LinkTreeNode[];
 }
 
-export interface LinkTreeItemProps {
+interface LinkTreeItemProps {
   node: LinkTreeNode;
 }
 
-export interface LinkTreeItemState {
+interface LinkTreeItemState {
   expanded: boolean;
 }
 
-export class LinkTreeItem extends React.Component<LinkTreeItemProps, LinkTreeItemState> {
+class LinkTreeItem extends React.Component<LinkTreeItemProps, LinkTreeItemState> {
   constructor(props: {node: LinkTreeNode}) {
     super(props);
 
@@ -90,5 +90,3 @@ export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
     );
   }
 }
-
-export default LinkTree;

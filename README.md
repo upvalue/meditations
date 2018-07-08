@@ -38,12 +38,25 @@ Run the following command if you'd like to seed the application with some exampl
 
     $ ./meditations serve --port 8080 --database sample.sqlite3 --migrate 
 
+## API
+
+Meditations has an API to enable external programs to interact with it. Examples of external programs interacting with meditations might be:
+
+- A program that tracks internet usage and automatically adds a daily 'Internet' task with usage time
+- A phone/smartwatch run tracking program that adds or updates a daily 'Exercise' task with a comment reflecting run/location, statistics, and time spent
+
+For API documentation, see `habits/model.ts` for type definitions and `habits/api.ts` for API details. Note that any non-GET API method (POST, PUT, PATCH, DELETE) will cause a UI update to be
+sent to all connected clients.
+
 ## Dependencies
 
 - Go libraries: See Godeps/Godeps.json
 - JS libraries: See package.json
 - Programs: Pandoc (only necessary for exporting markdown/plaintext descriptions of progress)
-- Browser: Meditations relies on modern browser features like `fetch,` and does not include polyfills. It is developed against the latest version of Chrome.
+- Browser: Meditations relies on modern browser features like `fetch,` and does not include
+polyfills. It is developed against the latest version of Chrome, but should work on other
+evergreen browsers.
+
 
 ## Attribution
 

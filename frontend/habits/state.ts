@@ -1,7 +1,7 @@
 // state.ts - Habits state and backend interaction
 import * as moment from 'moment';
 
-import * as common from '../common';
+import * as common from '../common/index';
 
 export enum Status {
   UNSET = -1,
@@ -34,6 +34,7 @@ export interface Task extends common.Model {
   Scope: number;
   Name: string;
   Comment?: Comment;
+  Date: moment.Moment;
   // Derived statistics
   Streak: number;
   BestStreak: number;
