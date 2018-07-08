@@ -1,13 +1,71 @@
 // linktree.tsx - implementation of an expandable tree of links
 import * as React from 'react';
+
 import { OcticonButton } from '../../common/components/OcticonButton';
 import { OcticonArrowRight, OcticonArrowDown } from '../../common/octicons';
 
 export interface LinkTreeNode {
   title: string;
   href?: string;
-  expanded? : boolean;
   children?: LinkTreeNode[];
+}
+
+export interface LinkTreeItemProps {
+  node: LinkTreeNode;
+}
+
+export interface LinkTreeItemState {
+  expanded: boolean;
+}
+
+export class LinkTreeItem extends React.Component<LinkTreeItemProps, LinkTreeItemState> {
+  constructor(props: {node: LinkTreeNode}) {
+    super(props);
+
+    this.state = {
+      expanded: false,
+    };
+  }
+
+  toggleNode = () => {
+    this.setState({
+      expanded: !this.state.expanded,
+    });
+  }
+
+  render(): any {
+    return (
+      <div className="pt-0 pb-0 link-tree-node">
+        {this.props.node.children &&
+          <OcticonButton
+            icon={this.state.expanded ? OcticonArrowDown : OcticonArrowRight}
+            className="link-tree-node-btn"
+            onClick={e => e && this.toggleNode()}
+          />
+        }
+
+        {this.props.node.href ?
+          <a
+            href={this.props.node.href}
+            style={{ textDecoration: this.props.children ? 'underline' : 'none' }}
+          >
+            {this.props.node.title}
+          </a> : <a
+                   className="link-tree-node-anchor"
+                   onClick={e => this.toggleNode()}
+          >
+            {this.props.node.title}
+          </a>}
+
+        {this.state.expanded && this.props.node.children &&
+          this.props.node.children.map((n, i) => {
+            return <LinkTreeItem node={n} key={i} />;
+          })
+        }
+      </div>
+    );
+  }
+
 }
 
 export interface LinkTreeProps {
@@ -22,61 +80,12 @@ export interface LinkTreeState {
 export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
   constructor(props: LinkTreeProps) {
     super(props);
-    // Deep copy of data
-    this.state = { data: JSON.parse(JSON.stringify(props.data)) };
-  }
-
-  componentWillReceiveProps(nextProps: LinkTreeProps) {
-    this.setState({
-      data: JSON.parse(JSON.stringify(nextProps.data)),
-    });
-  }
-
-  toggleNode(e: React.MouseEvent<HTMLElement>, node: LinkTreeNode) {
-    e.preventDefault();
-    node.expanded = !node.expanded;
-    this.setState({ data: this.state.data });
-  }
-
-  renderNode(node: LinkTreeNode, i: number): React.ReactElement<undefined> {
-    const classes = node.children ? 'link-tree-parent' : '';
-    return (
-      <div
-        className={`pt-0 pb-0 ${classes} link-tree-node`}
-        key={i}
-      >
-        <div className="">
-        {node.children &&
-          <OcticonButton
-            icon={node.expanded ? OcticonArrowDown : OcticonArrowRight}
-            className="link-tree-node-btn"
-            onClick={e => e && this.toggleNode(e, node)}
-          />
-        }
-        {node.href ?
-            <a
-              href={node.href}
-              style={{ textDecoration: node.children ? 'underline' : 'none' }}
-            >
-              {node.title}
-            </a>
-          : <a
-              className="link-tree-node-anchor"
-              onClick={e => this.toggleNode(e, node)}
-          >
-            {node.title}
-          </a>}
-        </div>
-        {node.expanded === true &&
-          node.children && node.children.map((n, i) => this.renderNode(n, i))}
-      </div>
-    );
   }
 
   render() {
     return (
       <div className="link-tree-top">
-        {this.state.data.map((node, i) => this.renderNode(node, i))}
+        {this.props.data.map((node, i) => <LinkTreeItem node={node} key={i} />)}
       </div>
     );
   }

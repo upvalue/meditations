@@ -196,6 +196,7 @@ func journalDeleteEntry(c *macaron.Context) {
 
 	c.PlainText(200, []byte("OK"))
 	journalSync.Send("DELETE_ENTRY", id)
+	syncSidebarNamed()
 }
 
 func journalRemoveEntryName(c *macaron.Context) {
