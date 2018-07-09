@@ -10,7 +10,8 @@ import { JournalSidebar } from '../components/Sidebar';
 import { BrowseChrono } from '../components/BrowseChrono';
 import { BrowseTag } from '../components/BrowseTag';
 import { CEntry } from '../components/CEntry';
-import { JournalNavigation } from '../containers/JournalNavigation';
+import { JournalNavigation } from './JournalNavigation';
+import { formFactorContext } from '../../common/components/FormFactorProvider';
 
 const ViewEntry = (props: {entry: Entry | null}) => {
   return props.entry ? <CEntry context={true} entry={props.entry} /> : <p>Entry deleted</p>;

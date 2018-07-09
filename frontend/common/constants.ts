@@ -24,3 +24,8 @@ export const KEYSEQ_TASK_ADD = 'g a';
  * Mousetrap key sequence that will trigger focus on the filter by name field.
  */
 export const KEYSEQ_FILTER_FOCUS = 'g s';
+
+/**
+ * Width at which to make adjustments for mobile, in px
+ */
+export const MOBILE_WIDTH = 1024;

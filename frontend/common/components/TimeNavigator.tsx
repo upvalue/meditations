@@ -1,5 +1,7 @@
 import * as moment from 'moment';
 import * as React from 'react';
+import route from 'riot-route';
+
 import { OcticonButton } from './OcticonButton';
 import {
   OcticonTriangleLeft, OcticonChevronLeft, OcticonCalendar, OcticonChevronRight,
@@ -45,7 +47,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
             <OcticonButton
               icon={OcticonTriangleLeft}
               tooltip="Go back one year"
-              className="mr-md-1 d-flex flex-items-center"
+              className="mr-1 d-flex flex-items-center"
               normalButton={true}
               href={`#${this.props.getRoute('subtract', 'year')}`}
               onClick={e => this.navigate(e, 'subtract', 'year')}
@@ -56,7 +58,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
             icon={OcticonChevronLeft}
             tooltip={`Go back one ${smallunit}`}
             tooltipDirection="e"
-            className="mr-md-1 d-flex flex-items-center"
+            className="mr-1 d-flex flex-items-center"
             normalButton={true}
             href={`#${this.props.getRoute('subtract', smallunit)}`}
             onClick={e => this.navigate(e, 'subtract', smallunit)}
@@ -66,7 +68,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
             icon={OcticonCalendar}
             tooltip="Go to current date"
             tooltipDirection="e"
-            className="mr-md-1 d-flex flex-items-center"
+            className="mr-1 d-flex flex-items-center"
             normalButton={true}
             href={`#${this.props.getRoute('reset')}`}
             onClick={e => this.navigate(e, 'reset')}
@@ -76,7 +78,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
             icon={OcticonChevronRight}
             tooltip={`Go forward one ${smallunit}`}
             tooltipDirection="e"
-            className="mr-md-1 d-flex flex-items-center"
+            className="mr-1 d-flex flex-items-center"
             normalButton={true}
             href={`#${this.props.getRoute('add', smallunit)}`}
             onClick={e => this.navigate(e, 'add', smallunit)}
@@ -86,7 +88,7 @@ export class TimeNavigator extends React.PureComponent<TimeNavigatorProps> {
             <OcticonButton
               icon={OcticonTriangleRight}
               tooltip="Go forward one year"
-              className="mr-md-1 mr-0 d-flex flex-items-center"
+              className="mr-1 mr-0 d-flex flex-items-center"
               normalButton={true}
               tooltipDirection="e"
               href={`#${this.props.getRoute('add', 'year')}`}

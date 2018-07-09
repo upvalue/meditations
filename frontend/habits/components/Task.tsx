@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
 import * as moment from 'moment';
 
-import * as common from '../../common/index';
+import * as common from '../../common';
 import { OcticonButton, OcticonSpan } from '../../common/components/OcticonButton';
 
 import { Status, Task, ScopeType } from '../state';

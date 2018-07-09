@@ -52,7 +52,7 @@ class JournalNavigation1 extends React.Component<JournalState, { searching: bool
 
   render() {
     return (
-      <div className="d-flex flex-column flex-md-row mb-1 ml-md-2 ">
+      <div className="d-flex flex-column flex-md-row mb-1 ml-md-2">
         <button
           className="btn btn-primary mr-0 mr-md-1 mb-1 mr-mb-0"
           onClick={this.createEntry}

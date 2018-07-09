@@ -103,7 +103,7 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
     // TODO: Datepicker onClearable does not work unless a SELECTED value is also passed
     return (
       <DatePicker
-        className="form-control ml-1 mb-md-0 mb-1"
+        className="form-control ml-0 ml-md-1 mb-md-0 mb-1"
         onChange={date => this.filterByDate(end, date)}
         isClearable={true}
         placeholderText={defaultPlaceholder}
@@ -147,14 +147,14 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
 
         <button
           disabled={disableButton}
-          className="btn btn-secondary btn-block ml-1 mb-md-0 mb-1"
+          className="btn btn-secondary btn-block ml-0 ml-md-1 mb-md-0 mb-1"
           onClick={() => this.clearFilter()}
         >
           Clear date filter
         </button>
         <button
           disabled={disableButton}
-          className="btn btn-primary btn-block ml-1 mb-md-0 mb-1"
+          className="btn btn-primary btn-block ml-0 ml-md-1 mb-md-0 mb-1"
           onClick={() => this.exportTasks()}
         >
           Export selected tasks

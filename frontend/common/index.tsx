@@ -48,7 +48,7 @@ export type NotificationOpen = {
 };
 
 export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } |
-  { type: 'SOCKET_OPENED', socket: WebSocket, socketReconnect: () => void } |
+  { type: 'SOCKET_OPENED', socketReconnect: () => void } |
   { type: 'SOCKET_CLOSED' };
 
 export type CommonActionDispatcher = (a: CommonAction) => void;
@@ -56,7 +56,6 @@ export type CommonActionDispatcher = (a: CommonAction) => void;
 export type CommonState = {
   socketClosed: boolean;
   notifications?: Notification[];
-  socket: WebSocket;
 
   dismissNotifications: () => void;
   /** Method for attempting a socket reconnect */
@@ -252,7 +251,7 @@ export function makeSocket(
       });
     }
 
-    dispatch({ socket, type: 'SOCKET_OPENED', socketReconnect: () => {
+    dispatch({ type: 'SOCKET_OPENED', socketReconnect: () => {
       console.log('Attempting to reopen socket');
       makeSocket(location, onmessage, onopen, true);
     }});
@@ -344,7 +343,7 @@ export function installRouter(base: string, first: string,
       type: 'NOTIFICATION_OPEN',
       notification: {
         error: false,
-        message: `INTRO`
+        message: ``,
       },
     });
 

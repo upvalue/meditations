@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { CommonState } from '../index';
+import { CommonState } from '..';
 import { ModalProvider } from '../modal';
+import { FormFactorManager, formFactorContext } from './FormFactorProvider';
 
 const IntroMessage = () => {
   return (
@@ -37,7 +38,7 @@ export class CommonUI extends React.Component<CommonState> {
 
   renderPopups() {
     if (!this.props.notifications && !this.props.socketClosed) {
-      return <span />;
+      return <></>;
     }
 
     return (
@@ -87,12 +88,14 @@ export class CommonUI extends React.Component<CommonState> {
 
   render() {
     return (
-      <div>
+      <>
         {this.renderPopups()}
-        <ModalProvider socketClosed={this.props.socketClosed}>
-          {this.props.children}
-        </ModalProvider>
-      </div>
+        <FormFactorManager>
+          <ModalProvider socketClosed={this.props.socketClosed}>
+            {this.props.children}
+          </ModalProvider>
+        </FormFactorManager>
+      </>
     );
   }
 }

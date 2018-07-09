@@ -20,7 +20,9 @@ $bodyBg: white;
 $uiColorMuted: #586069;
 $uiColorSlightlyMuted: #23282d;
 $bgSlightlyMuted: #c8cfd6;
+
 // Width at which to put the UI into mobile mode
+// NOTE: This should also be changed in constants.ts
 $mobileWidth: 1024px;
 $editableBg: #fcfcfc;
 

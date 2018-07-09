@@ -8,7 +8,7 @@ import { OcticonButton, OcticonSpan }
   from '../../common/components/OcticonButton';
 import {
   OcticonPlus, OcticonFlame, OcticonClippy, OcticonTrashcan, OcticonPin, OcticonCheck,
-  OcticonClock, OcticonArchive,
+  OcticonClock, OcticonArchive, OcticonArrowRight, OcticonArrowDown,
 } from '../../common/octicons';
 
 import {
@@ -225,6 +225,18 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
               {this.props.unpinnedProjects.map(p => this.renderProjectLink(modal, p))}
             </div>
 
+            <div className="d-flex flex-row pt-1 pl-1">
+              <h4
+                onClick={this.toggleDisplayHidden}
+                style={{ cursor: 'pointer' }}
+              >
+                <OcticonButton
+                  icon={this.state.showHiddenProjects ? OcticonArrowDown : OcticonArrowRight}
+                />
+                &nbsp;Inactive projects
+              </h4>
+            </div>
+
             {this.state.showHiddenProjects &&
               (<>
                 <hr className="mt-1 mb-1" />
@@ -237,18 +249,18 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
 
             <hr className="mt-1 mb-1" />
             <div className="pl-1 pr-1 pt-1 pb-1">
-              <div className="d-flex flex-row flex-justify-between">
+              <div className="d-flex flex-column flex-md-row flex-justify-between">
                 <div>
                   Showing stats for last <button className="btn btn-sm ">
                     {this.props.projectStatsDays}
                   </button> days
-              </div>
-                <div>
+                </div>
+                <div className="pt-1 pt-md-0">
                   <input
                     ref={(ref) => { if (ref) this.projectStatsDaysInput = ref; }}
                     type="text"
                     size={2}
-                    placeholder="72"
+                    placeholder="Enter days"
                     className="mr-1 form-control input-sm"
                     onBlur={() => this.statsFromInput()}
                   />
@@ -266,16 +278,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
                   </button>
                 </div>
               </div>
-              <div className="d-flex flex-row">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={this.state.showHiddenProjects}
-                    onChange={this.toggleDisplayHidden}
-                  />
-                  &nbsp;Display hidden projects
-              </label>
-              </div>
+
             </div>
           </section>
         }

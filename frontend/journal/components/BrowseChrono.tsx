@@ -1,12 +1,56 @@
 import * as React from 'react';
 import * as moment from 'moment';
+import { groupBy } from 'lodash';
 
 import * as common from '../../common';
 import { Entry } from '../state';
 import { CEntry } from '../components/CEntry';
 import { TimeNavigator } from '../../common/components/TimeNavigator';
 
-// TODO: SFC
+interface ChronoSectionProps {
+  date: moment.Moment;
+  entries: Entry[];
+  daysView: boolean;
+  searchString?: string;
+}
+
+/**
+ * Chronological entry section (header for each day, with entries)
+ */
+class ChronoSection extends React.Component<ChronoSectionProps> {
+  render() {
+    const firstEntryID = this.props.entries.length > 0 ? this.props.entries[0].ID : 0;
+    return (
+      <>
+        <h3 className="pb-1">
+          {this.props.date.format('dddd')},{' '}
+          {/* Generate permalink for user convenience */}
+          <a href={`#view/${this.props.date.format(common.MONTH_FORMAT)}/${firstEntryID}`}>
+            {this.props.date.format('MMMM')}
+          </a>
+          {' '}
+          {this.props.date.format('Do')}
+          {' '}
+          {this.props.daysView && this.props.date.format('YYYY')}
+        </h3>
+
+        {this.props.entries.map(e =>
+          <CEntry
+            key={e.ID}
+            entry={e}
+            context={false}
+            searchString={this.props.searchString}
+          />,
+        )}
+
+        <hr />
+      </>
+    );
+    return <h1>{this.props.date.format(common.DAY_FORMAT)}</h1>;
+  }
+
+}
+
 interface BrowseChronoProps {
   date: moment.Moment;
   entries: Entry[];
@@ -15,7 +59,7 @@ interface BrowseChronoProps {
 }
 
 /**
- * Browse journal chronologically
+ * List journal entries chronologically
  */
 export class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
   constructor(props: BrowseChronoProps) {
@@ -35,43 +79,9 @@ export class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
   }
 
   render() {
-    // This could be simplified with some kind of reduce comparison
-    const res = Array<React.ReactElement<{key: number}>>();
-
-    let lastDate : moment.Moment | null = null;
-    let key = 0;
-    this.props.entries.forEach((e) => {
-      if (!lastDate || (lastDate.format(common.DAY_FORMAT) !== e.Date.format(common.DAY_FORMAT))) {
-        lastDate = e.Date;
-        // Add a nicely formatted and linky date header for each day with entries
-        if (key !== 0) {
-          // Append HR after date headers
-          key += 1;
-          res.push(<hr key={key} />);
-        }
-        key += 1;
-        res.push((
-          <h3 className="pb-1" key={key}>
-            {lastDate.format('dddd')}, {' '}
-            <a href={`#view/${lastDate.format(common.MONTH_FORMAT)}/${e.ID}`}>
-              {lastDate.format('MMMM')}
-            </a>{' '}
-            {lastDate.format('Do')}
-            {' '}
-            {this.props.daysView && lastDate.format('YYYY')}
-          </h3>
-        ));
-      }
-      key += 1;
-      res.push((
-        <CEntry
-          searchString={this.props.searchString}
-          context={false}
-          key={key}
-          entry={e}
-        />
-      ));
-    });
+    const dateEntries = groupBy(this.props.entries, e =>
+      e.Date.format(common.DAY_FORMAT),
+    );
 
     return (
       <div className="ml-md-2">
@@ -82,7 +92,16 @@ export class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
             currentDate={this.props.date}
           />
         </div>
-        {res}
+
+        {Object.keys(dateEntries).map(k =>
+          <ChronoSection
+            key={k}
+            daysView={this.props.daysView}
+            searchString={this.props.searchString}
+            date={moment(k)}
+            entries={dateEntries[k]}
+          />,
+        )}
       </div>
     );
   }
