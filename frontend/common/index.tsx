@@ -171,10 +171,6 @@ export function post<ResponseType>(url: string, body?: any, then?: (res: Respons
   return request<ResponseType>('POST', body, url, then);
 }
 
-export function patch<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
-  return request<ResponseType>('PATCH', body, url, then);
-}
-
 export function put<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
   return request<ResponseType>('PUT', body, url, then);
 }
@@ -348,18 +344,7 @@ export function installRouter(base: string, first: string,
       type: 'NOTIFICATION_OPEN',
       notification: {
         error: false,
-        /* tslint:disable */
-        message: `Welcome to meditations
-        
-  Meditations is a daily task manager based on the principles of habit formation.
-        
-  If you'd like to read more about meditations and how to use it , the best place to start is its README: https://github.com/ioddly/meditations.
-
-  If you'd like to learn more about its creator or need a similar application, visit https://upvalue.io.
-
-  Enjoy,
-  Phil.`,
-  /* tslint:enable */
+        message: `INTRO`
       },
     });
 

@@ -104,9 +104,9 @@ func tasksInMonthAndDays(c *macaron.Context) {
 
 }
 
-// taskPatch updates a task's fields with JSON, and optionally will create
+// taskUpdate updates a task's fields with JSON, and optionally will create
 // or update a comment as well
-func taskPatch(c *macaron.Context, task Task) {
+func taskUpdate(c *macaron.Context, task Task) {
 	DB.Where("id = ?", c.ParamsInt("id"))
 
 	// Extract comment for separate update/insertion
@@ -519,13 +519,11 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/projects/toggle-pin/:id:int", projectTogglePin)
 	m.Post("/projects/toggle-hide/:id:int", projectToggleHide)
 
-	m.Post("/new", binding.Bind(Task{}), taskNew)
-	m.Post("/delete", binding.Bind(Task{}), taskDelete)
 	m.Post("/reorder/:src:int/:target:int", taskReorder)
 	m.Post("/export", export)
 
 	// REST-ish api
-	m.Post("/task/:id:int", binding.Bind(Task{}), taskPatch)
+	m.Post("/task/:id:int", binding.Bind(Task{}), taskUpdate)
 	m.Put("/task", binding.Bind(Task{}), taskNew)
 	m.Delete("/task/:id:int", taskDelete)
 

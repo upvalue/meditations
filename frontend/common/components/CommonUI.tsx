@@ -2,6 +2,31 @@ import * as React from 'react';
 import { CommonState } from '../index';
 import { ModalProvider } from '../modal';
 
+const IntroMessage = () => {
+  return (
+    <>
+      <p><strong>Welcome to meditations!</strong></p>
+
+      <p>Meditations is a daily task manager based on the principles of habit formation.</p>
+
+      <p>
+        If you'd like to read more about meditations and how to use it,
+        the best place to start is its README:
+      </p>
+      <p>
+        <a href="https://github.com/ioddly/meditations">https://github.com/ioddly/meditations</a>
+      </p>
+
+      <p>
+        If you'd like to learn more about its creator or need a similar application developed,
+        visit <a href="https://upvalue.io">https://upvalue.io</a>.</p>
+
+      <p>Enjoy.</p>
+
+    </>
+  );
+};
+
 /**
  * Common UI elements (currently just a notification bar that appears at the top)
  */
@@ -46,9 +71,13 @@ export class CommonUI extends React.Component<CommonState> {
               className={`notification flash
               flash-with-icon mb-2 ${n.error ? 'flash-danger' : ''}`}
             >
-              <pre style={{ wordWrap: 'break-word' }}>
-                {n.message}
-              </pre>
+              {n.message === 'INTRO' ?
+                <IntroMessage />
+              :
+                <pre style={{ whiteSpace: 'pre-wrap' }}>
+                  {n.message}
+                </pre>
+              }
             </div>
           );
         })}
