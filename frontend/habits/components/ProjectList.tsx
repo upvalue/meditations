@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as React from 'react';
 import { times } from 'lodash';
 
-import * as common from '../../common/index';
+import * as common from '../../common';
 import { OcticonButton, OcticonSpan }
   from '../../common/components/OcticonButton';
 import {

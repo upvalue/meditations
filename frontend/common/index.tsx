@@ -343,7 +343,7 @@ export function installRouter(base: string, first: string,
       type: 'NOTIFICATION_OPEN',
       notification: {
         error: false,
-        message: ``,
+        message: `INTRO`,
       },
     });
 

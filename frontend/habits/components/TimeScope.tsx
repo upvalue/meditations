@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { Scope, FilterState, ScopeType } from '../state';
 import { routeForView } from '../main';
 import { createCTask } from './Task';
-import { PresentScope } from '../components/PresentScope';
+import { PresentScope } from './PresentScope';
 
 interface TimeScopeProps {
   currentProject: number;

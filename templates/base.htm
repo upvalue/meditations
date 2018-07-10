@@ -18,10 +18,9 @@
         <nav class="tabnav-tabs">
           <span style="font-weight:bold">
             meditations
-            {% if Config.Development %}
-            <span style="color:red;">(dev)</span>
-            {% else %}
-              {% if Config.Demo %}(demo){% endif %}
+            {% if Config.Demo %}<span style="color:red">(demo)</span>
+            {% elif Config.Development %}
+              <span style="color:red;">(dev)</span>
             {% endif %}
           </span>
 

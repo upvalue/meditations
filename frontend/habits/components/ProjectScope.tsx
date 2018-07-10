@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { ModalProvider, modalContext } from '../../common/modal';
 
-import * as common from '../../common/index';
+import * as common from '../../common';
 import { Scope } from '../state';
 import { createCTask } from './Task';
 import { OcticonButton } from '../../common/components/OcticonButton';

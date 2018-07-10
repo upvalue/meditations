@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Entry } from '../state';
-import { CEntry } from '../components/CEntry';
+import { CEntry } from './CEntry';
 
 export class BrowseTag extends React.PureComponent<{tagName: string, entries: Entry[]}, {}> {
   render() {

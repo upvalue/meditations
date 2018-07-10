@@ -4,7 +4,7 @@ import { groupBy } from 'lodash';
 
 import * as common from '../../common';
 import { Entry } from '../state';
-import { CEntry } from '../components/CEntry';
+import { CEntry } from './CEntry';
 import { TimeNavigator } from '../../common/components/TimeNavigator';
 
 interface ChronoSectionProps {

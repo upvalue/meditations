@@ -1,7 +1,7 @@
 // state.ts - Habits state and backend interaction
 import * as moment from 'moment';
 
-import * as common from '../common/index';
+import * as common from '../common';
 
 export enum Status {
   UNSET = -1,
