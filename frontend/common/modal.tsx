@@ -249,6 +249,7 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
                   ref={(e) => { if (e) { this.modalInput = e; e.focus(); } }}
                   className="form-control input-block mb-1"
                   type="text"
+                  value={this.state.modalData.defaultValue}
                 />
                 <button className="btn btn-primary btn-block mb-1" onClick={this.submitModal}>
                   {this.state.modalData.ok}
