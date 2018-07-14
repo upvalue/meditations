@@ -194,7 +194,7 @@ func journalDeleteEntry(c *macaron.Context) {
 	DB.Where("id = ?", id).First(&entry).Delete(&entry)
 	DB.Exec("DELETE FROM entry_tags WHERE entry_id = ?", id)
 
-	c.PlainText(200, []byte("OK"))
+	serverOK(c)
 	journalSync.Send("DELETE_ENTRY", id)
 	syncSidebarNamed()
 }
@@ -208,7 +208,7 @@ func journalRemoveEntryName(c *macaron.Context) {
 	syncEntry(entry)
 	syncSidebarNamed()
 
-	c.PlainText(200, []byte("OK"))
+	serverOK(c)
 }
 
 func journalNameEntry(c *macaron.Context) {
@@ -221,7 +221,7 @@ func journalNameEntry(c *macaron.Context) {
 	syncEntry(entry)
 	syncSidebarNamed()
 
-	c.PlainText(200, []byte("ok"))
+	serverOK(c)
 }
 
 type searchResult struct {
@@ -240,7 +240,7 @@ func journalSearch(c *macaron.Context) {
 		String:  c.Query("string"),
 		Entries: entries,
 	})
-	c.PlainText(200, []byte("ok"))
+	serverOK(c)
 }
 
 func journalIndex(c *macaron.Context) {

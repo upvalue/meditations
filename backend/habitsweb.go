@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Unknwon/com"
 	"github.com/go-macaron/binding"
 	"github.com/jinzhu/gorm"
 	macaron "gopkg.in/macaron.v1"
@@ -36,7 +37,8 @@ func tasksInProject(c *macaron.Context) {
 	})
 }
 
-// tasksInScopeRequest fetches tasks with statistics in a given scope, extracting a date from a Macaron context
+// tasksInScopeRequest fetches tasks with statistics in a given scope, extracting a date from
+// the Macaron context
 func tasksInScopeRequest(c *macaron.Context, scope int, tasks *[]Task) error {
 	date, err := time.Parse(DateFormat, c.Query("date"))
 	if err != nil {
@@ -105,75 +107,81 @@ func tasksInMonthAndDays(c *macaron.Context) {
 
 }
 
-func taskSelectScope(status *int) func(db *gorm.DB) *gorm.DB {
+func taskSelectScope(date *time.Time, to *time.Time, name *string, scope *int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("status = ?", *status)
+		// If to is set, this is a date range
+		if to != nil {
+			db = db.Where("date between ? and ?", date.Format(DateFormat), to.AddDate(0, 0, 1).Format(DateFormat))
+		} else if date != nil {
+			// Otherwise it's just a date
+			db = db.Where("date(date) = date(?)", *date)
+		}
+
+		if name != nil {
+			db = db.Where("name = ?", name)
+		}
+
+		if scope != nil {
+			db = db.Where("scope = ?", scope)
+		}
+
+		return db
 	}
 }
 
 func taskSelect(c *macaron.Context) {
 	var tasks []Task
-	var task Task
 
-	scope := DB.NewScope(Task{})
-	query := scope.Search.Where("")
-
-	if c.Query("name") != "" {
-		query = scope.Search.Where("name = ?", c.Query("name"))
-	}
+	var from *time.Time
+	var to *time.Time
+	var name *string
 
 	if c.Query("date") != "" {
 		date, err := time.Parse(DateFormat, c.Query("date"))
-
 		if err != nil {
-			serverError(c, "malformed date %s", c.Query("date"))
-			return
+			serverError(c, "invalid date %s", date)
+		}
+		from = &date
+	} else if c.Query("from") != "" {
+		if c.Query("to") == "" {
+			serverError(c, "expected `to` in addition to `from`")
 		}
 
-		query = query.Where("strftime('%Y-%m-%d', date) = date(?)", date)
-	} else if c.Query("from") != "" && c.Query("to") != "" {
-		from, err := time.Parse(DateFormat, c.Query("from"))
-		to, err2 := time.Parse(DateFormat, c.Query("to"))
-
+		date, err := time.Parse(DateFormat, c.Query("from"))
 		if err != nil {
-			serverError(c, "malformed from date %s", c.Query("from"))
-			return
-		} else if err2 != nil {
-			serverError(c, "malformed to date %s", c.Query("to"))
-			return
+			serverError(c, "invalid date %s", date)
 		}
+		from = &date
 
-		query = query.Where("date between ? and ?", from, to)
-
-	} else if c.Query("from") != "" || c.Query("to") != "" {
-		serverError(c, "expected both `from` and `to` in query string")
+		date2, err2 := time.Parse(DateFormat, c.Query("to"))
+		if err2 != nil {
+			serverError(c, "invalid date %s", date)
+		}
+		to = &date2
 	}
 
-	// Check for multiple scopes (and if so, run multiple queries to separate result sets)
+	if c.Query("name") != "" {
+		names := c.Query("name")
+		name = &names
+	}
+
 	if c.Query("scope") != "" {
-		scopeString := c.Query("scope")
-		if false && strings.Contains(scopeString, ",") {
-			/*
-				m := make(map[int]([]Task))
+		scopes := strings.Split(c.Query("scope"), ",")
+		results := make(map[int]interface{})
+		for _, scope := range scopes {
+			scopeint := com.StrTo(scope).MustInt()
 
-				scopes := strings.Split(scopeString, ",")
-					for scope := scopes {
-					}
-				fmt.Printf("%v\n", scopes)
-			*/
-		} else {
-			query = query.Where("scope = ?", c.QueryInt("scope"))
+			db := DB.Scopes(taskSelectScope(from, to, name, &scopeint))
+			db.Find(&tasks)
+
+			results[scopeint] = tasks
 		}
+
+		c.JSON(http.StatusOK, results)
+	} else {
+		DB.Scopes(taskSelectScope(from, to, name, nil)).Find(&tasks)
+		c.JSON(http.StatusOK, tasks)
 	}
-
-	task.Scope = 1
-	task.Date = time.Date(2018, 07, 11, 0, 0, 0, 0, time.Local)
-
-	DB.Where(&task).Find(&tasks)
-
-	// DB.Find(query)
-	// query.Find(&tasks)
-	c.JSON(http.StatusOK, tasks)
 }
 
 // taskUpdate updates a task's fields with JSON, and optionally will create
@@ -596,8 +604,8 @@ func habitsInit(m *macaron.Macaron) {
 
 	// REST-ish api
 	m.Get("/tasks", taskSelect)
-	m.Post("/tasks/:id:int", binding.Bind(Task{}), taskUpdate)
-	m.Put("/tasks", binding.Bind(Task{}), taskNew)
+	m.Put("/tasks/:id:int", binding.Bind(Task{}), taskUpdate)
+	m.Post("/tasks", binding.Bind(Task{}), taskNew)
 	m.Delete("/tasks/:id:int", taskDelete)
 
 	m.Get("/sync", habitSync.Handler())

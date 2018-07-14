@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { ModalProvider, modalContext } from '../../common/modal';
 
+import { TaskNew } from '../api';
 import * as common from '../../common';
 import { Scope } from '../state';
 import { createCTask } from './Task';
@@ -32,12 +33,12 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
   }
 
   addTask = (modal: ModalProvider) => {
-    return modal.openModalPrompt('Enter task name', 'New task', (name) => {
-      if (name) {
-        common.post(`/habits/new`, {
-          name,
-          date: this.props.scope.Date.format('YYYY-MM-DDTHH:mm:ssZ'),
-          scope: this.props.scope.Scope,
+    return modal.openModalPrompt('Enter task name', 'New task', (Name) => {
+      if (Name) {
+        TaskNew({
+          Name,
+          Date: this.props.scope.Date,
+          Scope: this.props.scope.Scope,
         });
       }
     });

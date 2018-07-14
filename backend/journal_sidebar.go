@@ -132,5 +132,5 @@ func syncSidebarTags() {
 func journalSidebarInfo(c *macaron.Context) {
 	syncSidebar(true, true, true)
 
-	c.PlainText(200, []byte("OK"))
+	serverOK(c)
 }

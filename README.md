@@ -116,20 +116,20 @@ Body: string (HTML)
 
 Note that `Date` is the field that meditations uses to determine where a task should be.
 CreatedAt, UpdatedAt and DeletedAt are internal fields maintained by the ORM, and only DeletedAt
-will effect the functionality of meditations.
+will effect the functionality of meditations (if it's set, the row will be ignored).
 
 ### API Methods
 
 #### GET /tasks
 
-Accepts the following query string parameters: `scope`, `status`. You can pass `date` to get tasks
-from a specific date, or `from` and `to` to fetch a range of dates.
+Accepts the following query string parameters: `scope`, `name`. You can pass `date` to get tasks
+from a specific date, or `from` and `to` to fetch a range of dates, inclusively.
 
-#### PUT /tasks
+#### POST /tasks
 
 Given a new task in JSON format, add a new task.
 
-#### POST /tasks/:id:int
+#### PUT /tasks/:id:int
 
 Update an existing task. If given a comment, this will also add or update a comment as necessary.
 

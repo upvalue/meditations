@@ -18,7 +18,7 @@ type PartialTaskWithPartialComment =
  * @param task Task (ID is mandatory, other fields optional)
  */
 export const TaskUpdate = (task: PartialTaskWithPartialComment) => {
-  return common.post(`/habits/tasks/${task.ID}`, task);
+  return common.put(`/habits/tasks/${task.ID}`, task);
 };
 
 /**
@@ -26,7 +26,7 @@ export const TaskUpdate = (task: PartialTaskWithPartialComment) => {
  * @param task (Name is mandatory, other fields optional)
  */
 export const TaskNew = (task: Pick<Task, 'Name'> & Partial<Task>) => {
-  return common.put(`/habits/tasks`, task);
+  return common.post(`/habits/tasks`, task);
 };
 
 /**

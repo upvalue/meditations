@@ -52,7 +52,7 @@ export const PROJECT_STATS_DAYS_DEFAULT = 72;
  * Scope table but is used for rendering
  */
 export interface Scope {
-  Name: string;
+  Name?: string;
   Scope: ScopeType;
   Date: moment.Moment;
   Tasks: Task[];
@@ -237,7 +237,7 @@ const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState 
     console.log('Scope not visible, ignoring');
     return state;
   }
-  const scope = { Scope: action.scope, Date: action.date, Tasks: action.tasks } as Scope;
+  const scope = { Scope: action.scope, Date: action.date, Tasks: action.tasks };
 
   switch (action.scope) {
     case ScopeType.DAY:
@@ -268,8 +268,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
       return mountScopeReducer(state, action);
 
     case 'MOUNT_DAYS':
-      const days : Scope[] = action.days.map(day => ({
-        Name: '',
+      const days = action.days.map(day => ({
         Date: moment(day.Date, common.DAY_FORMAT),
         Scope: ScopeType.DAY,
         Tasks: day.Tasks,
@@ -305,7 +304,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
           } else if (task.Scope === ScopeType.YEAR) {
             nstate.year = updateScope(nstate.year);
           } else if (task.Scope === ScopeType.DAY) {
-            // Update only the specific day using diff
+            // Update only the specific day 
             nstate.days =
               [...state.days.map(s =>
                 s.Date.format(common.DAY_FORMAT) === task.Date.format(common.DAY_FORMAT) ?
@@ -314,7 +313,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
             nstate.project = updateScope(nstate.project);
           }
         } else {
-          console.log('Tasks not visible, ignoring');
+          console.log('Task not visible, ignoring');
         }
 
       }
