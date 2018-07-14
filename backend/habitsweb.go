@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/go-macaron/binding"
+	"github.com/jinzhu/gorm"
 	macaron "gopkg.in/macaron.v1"
 )
 
@@ -104,6 +105,77 @@ func tasksInMonthAndDays(c *macaron.Context) {
 
 }
 
+func taskSelectScope(status *int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("status = ?", *status)
+	}
+}
+
+func taskSelect(c *macaron.Context) {
+	var tasks []Task
+	var task Task
+
+	scope := DB.NewScope(Task{})
+	query := scope.Search.Where("")
+
+	if c.Query("name") != "" {
+		query = scope.Search.Where("name = ?", c.Query("name"))
+	}
+
+	if c.Query("date") != "" {
+		date, err := time.Parse(DateFormat, c.Query("date"))
+
+		if err != nil {
+			serverError(c, "malformed date %s", c.Query("date"))
+			return
+		}
+
+		query = query.Where("strftime('%Y-%m-%d', date) = date(?)", date)
+	} else if c.Query("from") != "" && c.Query("to") != "" {
+		from, err := time.Parse(DateFormat, c.Query("from"))
+		to, err2 := time.Parse(DateFormat, c.Query("to"))
+
+		if err != nil {
+			serverError(c, "malformed from date %s", c.Query("from"))
+			return
+		} else if err2 != nil {
+			serverError(c, "malformed to date %s", c.Query("to"))
+			return
+		}
+
+		query = query.Where("date between ? and ?", from, to)
+
+	} else if c.Query("from") != "" || c.Query("to") != "" {
+		serverError(c, "expected both `from` and `to` in query string")
+	}
+
+	// Check for multiple scopes (and if so, run multiple queries to separate result sets)
+	if c.Query("scope") != "" {
+		scopeString := c.Query("scope")
+		if false && strings.Contains(scopeString, ",") {
+			/*
+				m := make(map[int]([]Task))
+
+				scopes := strings.Split(scopeString, ",")
+					for scope := scopes {
+					}
+				fmt.Printf("%v\n", scopes)
+			*/
+		} else {
+			query = query.Where("scope = ?", c.QueryInt("scope"))
+		}
+	}
+
+	task.Scope = 1
+	task.Date = time.Date(2018, 07, 11, 0, 0, 0, 0, time.Local)
+
+	DB.Where(&task).Find(&tasks)
+
+	// DB.Find(query)
+	// query.Find(&tasks)
+	c.JSON(http.StatusOK, tasks)
+}
+
 // taskUpdate updates a task's fields with JSON, and optionally will create
 // or update a comment as well
 func taskUpdate(c *macaron.Context, task Task) {
@@ -140,7 +212,7 @@ func taskUpdate(c *macaron.Context, task Task) {
 
 	task.clearCache()
 	task.Sync(false, true, true)
-	c.PlainText(200, []byte("OK"))
+	serverOK(c)
 }
 
 func taskNew(c *macaron.Context, task Task) {
@@ -163,7 +235,7 @@ func taskNew(c *macaron.Context, task Task) {
 	task.CalculateStats()
 
 	task.Sync(false, true, true)
-	c.PlainText(http.StatusOK, []byte("OK"))
+	serverOK(c)
 }
 
 func taskDelete(c *macaron.Context) {
@@ -200,7 +272,7 @@ func taskDelete(c *macaron.Context) {
 
 	task.Sync(true, true, false)
 
-	c.PlainText(http.StatusOK, []byte("OK"))
+	serverOK(c)
 }
 
 // taskReorder places a task (the src) after a given task (the target), and reorders the entire
@@ -302,7 +374,7 @@ func taskReorder(c *macaron.Context) {
 
 	syncScopeImpl(srcScope, srcDate)
 
-	c.PlainText(200, []byte("OK"))
+	serverOK(c)
 }
 
 // getProject retrieves information about a particular project;
@@ -353,7 +425,7 @@ func projectDelete(c *macaron.Context) {
 	DB.Delete(&scope)
 
 	syncProjectList()
-	c.PlainText(http.StatusOK, []byte("OK"))
+	serverOK(c)
 }
 
 // projectTogglePin pins or unpins a project
@@ -374,7 +446,7 @@ func projectTogglePin(c *macaron.Context) {
 
 	DB.Save(&scope)
 	syncProjectList()
-	c.PlainText(http.StatusOK, []byte("OK"))
+	serverOK(c)
 }
 
 func projectToggleHide(c *macaron.Context) {
@@ -394,7 +466,7 @@ func projectToggleHide(c *macaron.Context) {
 
 	DB.Save(&scope)
 	syncProjectList()
-	c.PlainText(http.StatusOK, []byte("OK"))
+	serverOK(c)
 }
 
 func projectNew(c *macaron.Context) {
@@ -403,7 +475,7 @@ func projectNew(c *macaron.Context) {
 	DB.Save(&scope)
 
 	syncProjectList()
-	c.PlainText(http.StatusOK, []byte("OK"))
+	serverOK(c)
 }
 
 // export a summary of tasks in human readable format (e.g. to give an exercise or diet log to your
@@ -523,9 +595,10 @@ func habitsInit(m *macaron.Macaron) {
 	m.Post("/export", export)
 
 	// REST-ish api
-	m.Post("/task/:id:int", binding.Bind(Task{}), taskUpdate)
-	m.Put("/task", binding.Bind(Task{}), taskNew)
-	m.Delete("/task/:id:int", taskDelete)
+	m.Get("/tasks", taskSelect)
+	m.Post("/tasks/:id:int", binding.Bind(Task{}), taskUpdate)
+	m.Put("/tasks", binding.Bind(Task{}), taskNew)
+	m.Delete("/tasks/:id:int", taskDelete)
 
 	m.Get("/sync", habitSync.Handler())
 }

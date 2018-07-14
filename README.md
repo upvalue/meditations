@@ -38,6 +38,10 @@ Run the following command if you'd like to seed the application with some exampl
 
     $ ./meditations serve --port 8080 --database sample.sqlite3 --migrate 
 
+## Doc rewrite
+
+Below is an initial rewrite of the docs, still under construction.
+
 ## Philosophy and usage
 
 Meditations is based around the concept of using habit formation to accomplish long-term
@@ -68,7 +72,8 @@ up to you -- meditations just handles the boring tracking part of it.
 
 ## API
 
-Meditations has an API to enable external programs to interact with it. Examples of external programs interacting with meditations might be:
+Meditations has an API to enable external programs to interact with it. Examples of external
+programs interacting with meditations might be:
 
 - A program that tracks internet usage and automatically adds a daily 'Internet' task with usage
     time
@@ -84,18 +89,22 @@ sent to all connected clients.
 
 All dates have the internal format of YYYY-MM-DD or YYYY-MM-DDZHH:MM:SS.
 
+All objects returned by meditations have a CreatedAt, UpdatedAt, and DeletedAt field. These are
+managed by the ORM. In the case of objects where dates are important, like tasks, the date is
+determined by an additional Date field. This is because tasks might be added in advance or logged
+after the fact.
+
 ### Tasks
 
 Tasks are the main item of interest in meditations. Each task has the following fields:
 
-```
-ID: number
-Name: string
-Date: date 
-CreatedAt: date
-UpdatedAt: date
-DeletedAt: date
-```
+| Name   | Type   | Description                                             |
+|--------|--------|---------------------------------------------------------|
+| ID     | int    | Task ID                                                 |
+| Name   | string | Task name                                               |
+| Scope  | int    | Task scope (1 = day, 2 = month, 3 = year, 4+ = project) |
+| Status | int    | 0 = unset, 1 = success, 2 = failure                     |
+| Order  | int    | Order within scope                                      |
 
 Tasks also have a one-to-one relationship with comments, which have the following fields
 
@@ -108,6 +117,36 @@ Body: string (HTML)
 Note that `Date` is the field that meditations uses to determine where a task should be.
 CreatedAt, UpdatedAt and DeletedAt are internal fields maintained by the ORM, and only DeletedAt
 will effect the functionality of meditations.
+
+### API Methods
+
+#### GET /tasks
+
+Accepts the following query string parameters: `scope`, `status`. You can pass `date` to get tasks
+from a specific date, or `from` and `to` to fetch a range of dates.
+
+#### PUT /tasks
+
+Given a new task in JSON format, add a new task.
+
+#### POST /tasks/:id:int
+
+Update an existing task. If given a comment, this will also add or update a comment as necessary.
+
+```json
+{
+    "ID": 4,
+    "Name": "Exercise",
+    "Status": 1,
+    "Comment": {
+        "Body": "<p>ran 3 miles</p>"
+    }
+}
+```
+
+#### DELETE /tasks/:id:int
+
+Delete a task by ID.
 
 ## Dependencies
 

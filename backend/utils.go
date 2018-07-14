@@ -20,3 +20,8 @@ func serverError(c *macaron.Context, format string, a ...interface{}) {
 	log.Printf("Server error: %s\n", s)
 	c.PlainText(http.StatusInternalServerError, []byte(s))
 }
+
+// serverOK returns an OK response
+func serverOK(c *macaron.Context) {
+	c.PlainText(http.StatusOK, []byte("OK"))
+}

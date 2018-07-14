@@ -45,6 +45,7 @@ const projectActivityIcon = (p: Project, days: number) => {
     </>
   );
 };
+
 export interface ProjectListProps {
   pinnedProjects: Project[];
   unpinnedProjects: Project[];
