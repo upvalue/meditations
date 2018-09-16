@@ -187,8 +187,6 @@ func taskSelect(c *macaron.Context) {
 // taskUpdate updates a task's fields with JSON, and optionally will create
 // or update a comment as well
 func taskUpdate(c *macaron.Context, task Task) {
-	DB.Where("id = ?", c.ParamsInt("id"))
-
 	// Extract comment for separate update/insertion
 	comment := task.Comment
 	cid := comment.ID
@@ -216,7 +214,7 @@ func taskUpdate(c *macaron.Context, task Task) {
 
 	DB.Save(&task)
 
-	fmt.Printf("%v %v\n", task.Comment, comment)
+	// fmt.Printf("%v %v\n", task.Comment, comment)
 
 	task.clearCache()
 	task.Sync(false, true, true)
@@ -436,51 +434,25 @@ func projectDelete(c *macaron.Context) {
 	serverOK(c)
 }
 
-// projectTogglePin pins or unpins a project
-func projectTogglePin(c *macaron.Context) {
+func projectNew(c *macaron.Context, project Scope) {
+	// Allow recreation of deleted projects
 	var scope Scope
+	DB.Where("name = ? AND deleted_at != NULL", project.Name).Find(&scope)
 
-	_, err := projectPost(c, &scope)
-
-	if err != nil {
-		return
-	}
-
-	if scope.Visibility == VisibilityUnpinned {
-		scope.Visibility = VisibilityPinned
+	if scope.DeletedAt != nil {
+		// Allow recreation of deleted projects
+		scope.DeletedAt = nil
+		DB.Save(&scope)
 	} else {
-		scope.Visibility = VisibilityUnpinned
+		DB.Save(&project)
 	}
 
-	DB.Save(&scope)
 	syncProjectList()
 	serverOK(c)
 }
 
-func projectToggleHide(c *macaron.Context) {
-	var scope Scope
-
-	_, err := projectPost(c, &scope)
-
-	if err != nil {
-		return
-	}
-
-	if scope.Visibility == VisibilityUnpinned {
-		scope.Visibility = VisibilityHidden
-	} else {
-		scope.Visibility = VisibilityUnpinned
-	}
-
-	DB.Save(&scope)
-	syncProjectList()
-	serverOK(c)
-}
-
-func projectNew(c *macaron.Context) {
-	var scope Scope
-	scope.Name = c.Params("name")
-	DB.Save(&scope)
+func projectUpdate(c *macaron.Context, project Scope) {
+	DB.Save(&project)
 
 	syncProjectList()
 	serverOK(c)
@@ -593,11 +565,7 @@ func habitsInit(m *macaron.Macaron) {
 	m.Get("/in-project/:id:int", tasksInProject)
 	m.Get("/project/:id:int/:days:int", getProject)
 	m.Get("/projects/:days:int", getProjects)
-
-	m.Post("/projects/delete/:id:int", projectDelete)
-	m.Post("/projects/new/:name", projectNew)
-	m.Post("/projects/toggle-pin/:id:int", projectTogglePin)
-	m.Post("/projects/toggle-hide/:id:int", projectToggleHide)
+	// m.Post("/projects/new/:name", projectNew)
 
 	m.Post("/reorder/:src:int/:target:int", taskReorder)
 	m.Post("/export", export)
@@ -607,6 +575,10 @@ func habitsInit(m *macaron.Macaron) {
 	m.Put("/tasks/:id:int", binding.Bind(Task{}), taskUpdate)
 	m.Post("/tasks", binding.Bind(Task{}), taskNew)
 	m.Delete("/tasks/:id:int", taskDelete)
+
+	m.Post("/projects", binding.Bind(Scope{}), projectNew)
+	m.Put("/projects/:id:int", binding.Bind(Scope{}), projectUpdate)
+	m.Delete("/projects/:id:int", projectDelete)
 
 	m.Get("/sync", habitSync.Handler())
 }

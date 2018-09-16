@@ -1,7 +1,7 @@
 // api.ts - Habits API
 
 import * as common from '../common';
-import { Task, Comment } from './state';
+import { Task, Comment, Project } from './state';
 
 // This little dance is necessary to make all fields of comment optional
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
@@ -37,3 +37,14 @@ export const TaskDelete = (task: Pick<Task, 'ID'>) => {
   return common.delete_(`/habits/tasks/${task.ID}`);
 };
 
+export const ProjectNew = (project: Pick<Project, 'Name'>) => {
+  return common.post(`/habits/projects`, project);
+};
+
+export const ProjectUpdate = (project: Pick<Project, 'ID'> & Partial<Project>) => {
+  return common.put(`/habits/projects/${project.ID}`, project);
+};
+
+export const ProjectDelete = (project: Pick<Project, 'ID'>) => {
+  return common.delete_(`/habits/projects/${project.ID}`);
+};

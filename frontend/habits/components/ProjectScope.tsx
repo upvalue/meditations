@@ -68,7 +68,7 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
 
         </div>
 
-        {...tasks}
+        {tasks}
       </section>
     );
   }

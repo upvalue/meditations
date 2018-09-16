@@ -103,9 +103,10 @@ export const main = () => {
 
               response.Month.forEach(common.processModel);
 
-              dispatch({ date, type: 'MOUNT_DAYS', days: reverse(array) });
-              dispatch({ date,
-                type: 'MOUNT_SCOPE',
+              dispatch({
+                date,
+                type: 'MOUNT_DAYS_AND_SCOPE',
+                days: reverse(array),
                 scope: ScopeType.MONTH,
                 tasks: response.Month,
               });

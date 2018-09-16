@@ -3,6 +3,8 @@ import * as moment from 'moment';
 
 import * as common from '../common';
 
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export enum Status {
   UNSET = -1,
   COMPLETE = 0,
@@ -139,12 +141,6 @@ interface AddProjectList {
   days: number;
 }
 
-interface MountDays {
-  type: 'MOUNT_DAYS';
-  date: moment.Moment;
-  days: Day[];
-}
-
 export interface MountScope {
   type: 'MOUNT_SCOPE';
   scope: number;
@@ -152,6 +148,12 @@ export interface MountScope {
   tasks: Task[];
   date: moment.Moment;
 }
+
+export type MountScopeAndDays = Omit<MountScope, 'type'> & {
+  type: 'MOUNT_DAYS_AND_SCOPE';
+  days: Day[];
+  date: moment.Moment;
+};
 
 interface UpdateTasks {
   type: 'UPDATE_TASKS';
@@ -181,9 +183,9 @@ interface FilterClear {
   type: 'FILTER_CLEAR';
 }
 
-type HabitsAction = common.CommonAction | MountScope | UpdateTasks | MountDays |
+type HabitsAction = common.CommonAction | MountScope | UpdateTasks |
   ChangeRoute | AddProjectList | FilterByName | FilterByDate | FilterClear | UpdateTasks |
-  UpdateProject;
+  UpdateProject | MountScopeAndDays;
 
 const initialState = {
   currentDate: moment(),
@@ -221,7 +223,8 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
   return task.Scope === state.project.Scope;
 };
 
-const mountScopeReducer = (state: HabitsState, action: MountScope): HabitsState => {
+const mountScopeReducer =
+    (state: HabitsState, action: MountScope | MountScopeAndDays): HabitsState => {
   if (action.name) {
     if (state.currentProject !== action.scope) {
       // console.log('Project scope not visible, ignoring');
@@ -267,13 +270,19 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
     case 'MOUNT_SCOPE':
       return mountScopeReducer(state, action);
 
-    case 'MOUNT_DAYS':
+    case 'MOUNT_DAYS_AND_SCOPE':
       const days = action.days.map(day => ({
         Date: moment(day.Date, common.DAY_FORMAT),
         Scope: ScopeType.DAY,
         Tasks: day.Tasks,
       }));
-      return { ...state, days, mounted: true };
+
+      return {
+        ...(action.type === 'MOUNT_DAYS_AND_SCOPE' ?
+          mountScopeReducer(state, action) : state),
+        days,
+        mounted: true,
+      };
 
     case 'UPDATE_TASKS': {
       const nstate = { ...state };
@@ -304,7 +313,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
           } else if (task.Scope === ScopeType.YEAR) {
             nstate.year = updateScope(nstate.year);
           } else if (task.Scope === ScopeType.DAY) {
-            // Update only the specific day 
+            // Update only the specific day
             nstate.days =
               [...state.days.map(s =>
                 s.Date.format(common.DAY_FORMAT) === task.Date.format(common.DAY_FORMAT) ?

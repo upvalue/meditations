@@ -29,3 +29,8 @@ export const KEYSEQ_FILTER_FOCUS = 'g s';
  * Width at which to make adjustments for mobile, in px
  */
 export const MOBILE_WIDTH = 1024;
+
+/**
+ * Timestamp format, suitable for passing to backend DB.
+ */
+export const TIMESTAMP_FORMAT = 'YYYY-MM-DDTHH:mm:ss:Z';

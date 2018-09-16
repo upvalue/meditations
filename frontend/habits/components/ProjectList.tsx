@@ -3,7 +3,6 @@ import * as moment from 'moment';
 import * as React from 'react';
 import { times } from 'lodash';
 
-import * as common from '../../common';
 import { OcticonButton, OcticonSpan }
   from '../../common/components/OcticonButton';
 import {
@@ -19,6 +18,12 @@ import { urlForView } from '../main';
 
 import { storeUIState, fetchStoredUIState } from '../../common/storage';
 import { modalContext, ModalProvider } from '../../common/modal';
+import { TaskNew, ProjectUpdate, ProjectDelete, ProjectNew } from '../api';
+
+interface ProjectActivityIconProps {
+  p: Project;
+  days: number;
+}
 
 /**
  * Project activity indicator. Returns flame icons with repeated flames and
@@ -27,7 +32,8 @@ import { modalContext, ModalProvider } from '../../common/modal';
  * @param p Project
  * @param days Number of days
  */
-const projectActivityIcon = (p: Project, days: number) => {
+const ProjectActivityIcon = (props: ProjectActivityIconProps) => {
+  const { p, days } = props;
   const projectActivityClass = Math.min(p.CompletedTasks, 23);
 
   const flameCount = projectActivityClass / 4;
@@ -57,58 +63,55 @@ export interface ProjectListState {
   showHiddenProjects: boolean;
 }
 
-/**
- * List of projects that allows hiding, pinning and displays project statistics.
- */
-export class ProjectList extends React.PureComponent<ProjectListProps, ProjectListState> {
-  projectStatsDaysInput!: HTMLInputElement;
+interface ProjectListItemProps {
+  project: Project;
+  projectStatsDays?: number;
+}
 
-  constructor(props: ProjectListProps) {
-    super(props);
-
-    this.state = {
-      showHiddenProjects: fetchStoredUIState().showHiddenProjects,
-    };
+export class ProjectListItem extends React.Component<ProjectListItemProps> {
+  copyLeft = () => {
+    TaskNew({
+      Name: this.props.project.Name,
+      Scope: ScopeType.DAY,
+      Date: moment(),
+    });
   }
 
-  deleteProject(modal: ModalProvider, id: number) {
+  togglePin = () => {
+    ProjectUpdate({
+      ...this.props.project,
+      Visibility:
+        this.props.project.Visibility === ProjectVisibility.Pinned ?
+          ProjectVisibility.Unpinned : ProjectVisibility.Pinned,
+    });
+  }
+
+  hideProject = () => {
+    ProjectUpdate({
+      ...this.props.project,
+      Visibility:
+        this.props.project.Visibility === ProjectVisibility.Hidden ?
+          ProjectVisibility.Unpinned : ProjectVisibility.Hidden,
+    });
+  }
+
+  deleteProject(modal: ModalProvider) {
     return modal.openModalConfirm(
       'Are you sure you want to delete this project?', 'Delete this project!',
-      () => {
-        common.post(`/habits/projects/delete/${id}`);
-      });
+      () => ProjectDelete(this.props.project));
   }
 
-  pinProject(p: Project) {
-    common.post(`/habits/projects/toggle-pin/${p.ID}`);
-  }
+  render() {
+    const project = this.props.project;
 
-  hideProject(p: Project) {
-    common.post(`/habits/projects/toggle-hide/${p.ID}`);
-  }
-
-  copyLeft(p: Project) {
-    const task = {
-      Name: p.Name,
-      Scope: ScopeType.DAY,
-      Date: moment().format('YYYY-MM-DDTHH:mm:ssZ'),
-    };
-
-    common.post('/habits/new', task);
-  }
-
-  renderProjectLink = (modal: ModalProvider, project: Project) => {
     const hours = Math.floor(project.Minutes / 60);
     const minutes = project.Minutes % 60;
 
-    let timeString = hours > 0 ? `${hours}h${minutes > 0 ? ' ' : ''}` : '';
-    timeString = minutes > 0 ? `${timeString}${minutes}m` : `${timeString}`;
-
     return (
-      <div key={project.ID} className="d-flex flex-row flex-justify-between">
+      <div className="d-flex flex-row flex-justify-between">
         <div>
-          {project.Visibility === ProjectVisibility.Pinned &&
-            projectActivityIcon(project, this.props.projectStatsDays)}
+          {this.props.projectStatsDays &&
+            <ProjectActivityIcon p={project} days={this.props.projectStatsDays} />}
 
           <a href={urlForView('current', project.ID)}>{project.Name}</a>
         </div>
@@ -132,7 +135,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
           <OcticonButton
             icon={OcticonClippy}
             tooltip="Copy to left"
-            onClick={() => this.copyLeft(project)}
+            onClick={this.copyLeft}
           />
 
           {project.Visibility !== ProjectVisibility.Hidden &&
@@ -141,7 +144,7 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
               tooltip={
                 project.Visibility === ProjectVisibility.Pinned ? 'Unpin project' : 'Pin project'
               }
-              onClick={() => this.pinProject(project)}
+              onClick={this.togglePin}
             />
           }
 
@@ -149,39 +152,58 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
             <OcticonButton
               icon={OcticonArchive}
               tooltip="(Un)hide project"
-              onClick={() => this.hideProject(project)}
+              onClick={this.hideProject}
             />
           }
 
-          <OcticonButton
-            icon={OcticonTrashcan}
-            tooltip="Delete project"
-            onClick={this.deleteProject(modal, project.ID)}
-          />
+          <modalContext.Consumer>
+            {modal => (
+              <OcticonButton
+                icon={OcticonTrashcan}
+                tooltip="Delete project"
+                onClick={this.deleteProject(modal)}
+              />
+            )}
+          </modalContext.Consumer>
         </div>
       </div>
     );
   }
+}
+
+/**
+ * List of projects that allows hiding, pinning and displays project statistics.
+ */
+export class ProjectList extends React.PureComponent<ProjectListProps, ProjectListState> {
+  projectStatsDaysInput!: HTMLInputElement;
+
+  constructor(props: ProjectListProps) {
+    super(props);
+
+    this.state = {
+      showHiddenProjects: fetchStoredUIState().showHiddenProjects,
+    };
+  }
 
   addProject(modal: ModalProvider) {
-    return modal.openModalPrompt('New project name', 'Add new project', (name) => {
-      if (name) {
-        common.post(`/habits/projects/new/${name}`);
+    return modal.openModalPrompt('New project name', 'Add new project', (Name) => {
+      if (Name !== '') {
+        ProjectNew({ Name });
       }
     });
   }
 
   /** Calculate stats from the beginning of the year */
-  statsFromStartOfYear() {
+  statsFromStartOfYear = () => {
     const days = moment().diff(moment().startOf('year'), 'days');
     dispatchProjectListUpdate(days);
   }
 
-  statsFromForever() {
+  statsFromForever = () => {
     dispatchProjectListUpdate(365 * 30);
   }
 
-  statsFromInput() {
+  statsFromInput = () => {
     const n = parseInt(this.projectStatsDaysInput.value, 10);
     if (!isNaN(n)) {
       dispatchProjectListUpdate(n);
@@ -217,13 +239,18 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
             </div>
 
             <div className="pl-1 pr-1 pt-1">
-              {this.props.pinnedProjects.map(p => this.renderProjectLink(modal, p))}
+              {this.props.pinnedProjects.map(p =>
+                <ProjectListItem
+                  projectStatsDays={this.props.projectStatsDays}
+                  key={p.ID}
+                  project={p}
+                />)}
             </div>
 
             <hr className="mt-1 mb-1" />
 
             <div className="pl-1 pr-1">
-              {this.props.unpinnedProjects.map(p => this.renderProjectLink(modal, p))}
+              {this.props.unpinnedProjects.map(p => <ProjectListItem key={p.ID} project={p} />)}
             </div>
 
             <div className="d-flex flex-row pt-1 pl-1">
@@ -242,19 +269,19 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
               (<>
                 <hr className="mt-1 mb-1" />
                 <div className="pl-1 pr-1">
-                  {this.props.hiddenProjects.map(p => this.renderProjectLink(modal, p))}
+                  {this.props.hiddenProjects.map(p =>
+                    <ProjectListItem key={p.ID} project={p} />)}
                 </div>
               </>)
-
             }
 
             <hr className="mt-1 mb-1" />
             <div className="pl-1 pr-1 pt-1 pb-1">
               <div className="d-flex flex-column flex-md-row flex-justify-between">
                 <div>
-                  Showing stats for last <button className="btn btn-sm ">
+                  Pinned stats for last <strong>
                     {this.props.projectStatsDays}
-                  </button> days
+                  </strong> days
                 </div>
                 <div className="pt-1 pt-md-0">
                   <input
@@ -263,17 +290,17 @@ export class ProjectList extends React.PureComponent<ProjectListProps, ProjectLi
                     size={2}
                     placeholder="Enter days"
                     className="mr-1 form-control input-sm"
-                    onBlur={() => this.statsFromInput()}
+                    onBlur={this.statsFromInput}
                   />
                   <button
                     className="btn btn-sm btn-secondary mr-1"
-                    onClick={() => this.statsFromStartOfYear()}
+                    onClick={this.statsFromStartOfYear}
                   >
                     Start of year
                   </button>
                   <button
                     className="btn btn-sm btn-secondary"
-                    onClick={() => this.statsFromForever()}
+                    onClick={this.statsFromForever}
                   >
                     Forever
                   </button>

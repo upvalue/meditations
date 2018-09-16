@@ -356,7 +356,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
           {this.hasTime() && (
             <span
               className="pr-1 tooltipped tooltipped-w"
-              aria-label="Average time"
+              aria-label="Total time"
             >
               <OcticonSpan icon={OcticonClock} />
             {this.renderTime()}
