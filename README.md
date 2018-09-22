@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/horizontal.png" alt="meditations" height="80px"></p>
 
-![CircleCI Badge](https://circleci.com/gh/ioddly/meditations.png?circle-token=:circle-token&style=shield)
+![CircleCI Badge](https://circleci.com/gh/upvalue/meditations.png?circle-token=:circle-token&style=shield)
 
 meditations is an application for tracking progress towards goals that builds on habit formation and long term
 thinking.
@@ -18,12 +18,12 @@ In addition, it has a note-taking application that supports tagging and organizi
 # Manual
 
 For information on how to use Meditations as well as some documentation of its architecture, see
-[the documentation](https://ioddly.github.io/meditations). Also available in your local install
+[the documentation](https://upvalue.github.io/meditations). Also available in your local install
 under the `docs` directory.
 
 ## Running from command line
 
-    $ go get github.com/ioddly/meditations
+    $ go get github.com/upvalue/meditations
     
 Go to your workspace's source.
 
