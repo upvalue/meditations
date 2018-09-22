@@ -15,7 +15,7 @@ jobs:
     steps:
       - run:
           name: Install dependencies
-          command: apt update && apt install -y nodejs build-essential stow git npm wget
+          command: apt update && apt install -y nodejs build-essential stow git npm wget 
 
       # We need go 1.11 for modules
       - run:
@@ -47,7 +47,7 @@ jobs:
 
       - run:
           name: Install npm dependencies
-          command: npm ci --ignore-scripts
+          command: npm install --ignore-scripts
 
       - run:
           name: Run React frontend tests
