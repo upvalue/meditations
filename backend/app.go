@@ -15,7 +15,6 @@ import (
 
 	"github.com/go-macaron/pongo2"
 	"github.com/jinzhu/gorm"
-	"github.com/tylerb/graceful"
 	"github.com/urfave/cli"
 	"gopkg.in/macaron.v1"
 )
@@ -119,7 +118,7 @@ func App() *macaron.Macaron {
 		webpackCheck2 := path.Join(cwd, "assets/webpack/bundle-habits.js")
 		_, err = os.Stat(webpackCheck2)
 		packagePath = cwd
-		println("Scratch that, using CWD %s as path\n", packagePath)
+		fmt.Printf("Scratch that, using CWD %s as path\n", cwd)
 		if os.IsNotExist(err) {
 			panic(fmt.Sprintf("Could not find bundle-habits.js at %s or %s; have you run yarn and webpack?", webpackCheck, webpackCheck2))
 		}
@@ -188,23 +187,11 @@ func App() *macaron.Macaron {
 }
 
 // Server returns a server that closes gracefully
-func Server() *graceful.Server {
-	server := &graceful.Server{
-		Timeout: 10 * time.Second,
-		Server: &http.Server{
-			Addr:    fmt.Sprintf("%s:%v", Config.Host, Config.Port),
-			Handler: App(),
-		},
+func Server() *http.Server {
+	return &http.Server{
+		Addr:    fmt.Sprintf("%s:%v", Config.Host, Config.Port),
+		Handler: App(),
 	}
-
-	server.BeforeShutdown = func() bool {
-		log.Printf("closing database")
-		DBClose()
-		log.Printf("shutting down server")
-		return true
-	}
-
-	return server
 }
 
 // Main is the entry point for meditations; it handles CLI options and starts
