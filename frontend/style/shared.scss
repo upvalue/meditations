@@ -134,3 +134,8 @@ blockquote {
   padding-bottom: .5em;
   margin-bottom: .5em;
 }
+
+// For time navigator, don't allow dragging and dropping of buttons
+.btn.navigator-btn {
+  -webkit-user-drag: none;
+}

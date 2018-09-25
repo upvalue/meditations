@@ -27,6 +27,7 @@ require (
 	github.com/mattn/go-sqlite3 v0.0.0-20171024025710-615c193e01d8
 	github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf // indirect
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
+	github.com/tylerb/graceful v1.2.15 // indirect
 	github.com/urfave/cli v0.0.0-20171014202726-7bc6a0acffa5
 	golang.org/x/crypto v0.0.0-20171023145632-2509b142fb2b // indirect
 	google.golang.org/appengine v1.2.0 // indirect
