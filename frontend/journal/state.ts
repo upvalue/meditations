@@ -100,7 +100,8 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
   console.log(state);
   switch (action.type) {
     case 'VIEW_MONTH':
-      return {...state,
+      return {
+        ...state,
         route: 'VIEW_MONTH',
         date: action.date,
         entries: action.entries,
@@ -108,7 +109,8 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         searchString: undefined,
       } as ViewMonth;
     case 'VIEW_DAYS':
-      return {...state,
+      return {
+        ...state,
         route: 'VIEW_DAYS',
         date: action.date,
         entries: action.entries,
@@ -116,7 +118,8 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         searchString: undefined,
       } as ViewDays;
     case 'VIEW_TAG':
-      return { ...state,
+      return {
+        ...state,
         route: 'VIEW_TAG',
         tag: action.tag,
         entries: action.entries,
@@ -124,7 +127,8 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
         searchString: undefined,
       } as ViewTag;
     case 'MOUNT_ENTRIES':
-      return {...state,
+      return {
+        ...state,
         entries: action.entries,
       };
     case 'CREATE_ENTRY':
@@ -142,22 +146,25 @@ const reducer = (state: JournalState, action: JournalAction): JournalState => {
       // but it probably doesn't matter as
       // long as the UI is snappy. Alternative would be building a map of IDs at render-time
 
-      return {...state,
+      return {
+        ...state,
         entries: state.entries.slice().map(v => v.ID === action.entry.ID ? action.entry : v),
       };
     case 'DELETE_ENTRY':
-      return {...state,
+      return {
+        ...state,
         entries: state.entries.slice().filter(v => v.ID !== action.ID),
       };
     case 'SEARCH': {
-      return { ...state,
+      return {
+        ...state,
         entries: action.entries,
         searchString: action.string,
         searchResults: action.entries.length,
       };
     }
     case 'MOUNT_SIDEBAR':
-      const nstate =  { ...state, sidebar: action.sidebar };
+      const nstate = { ...state, sidebar: action.sidebar };
       nstate.sidebar.mounted = true;
       return nstate;
     case 'VIEW_NAMED_ENTRY':

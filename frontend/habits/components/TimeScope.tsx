@@ -6,11 +6,12 @@ import { routeForView } from '../main';
 import { createCTask } from './Task';
 import { PresentScope } from './PresentScope';
 
-interface TimeScopeProps {
+export interface TimeScopeProps {
   currentProject: number;
   currentDate: moment.Moment;
   scope: Scope;
   filter: FilterState;
+
 
   /**
    * The task name the user most recently interacted with. Used to bolden the task name across
