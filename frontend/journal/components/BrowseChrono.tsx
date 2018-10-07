@@ -62,10 +62,6 @@ interface BrowseChronoProps {
  * List journal entries chronologically
  */
 export class BrowseChrono extends React.PureComponent<BrowseChronoProps> {
-  constructor(props: BrowseChronoProps) {
-    super(props);
-  }
-
   navigatorRoute = (method: 'add' | 'subtract' | 'reset', unit?: 'month' | 'year' | 'day') => {
     if (method === 'reset') {
       return `view/${moment().format(common.MONTH_FORMAT)}`;

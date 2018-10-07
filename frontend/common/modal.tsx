@@ -227,63 +227,63 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
 
   render() {
     return (
-    <>
-      <modalContext.Provider value={this}>
-        {this.state.modalOpen &&
-          <div id="modal" className="bg-white border border-gray-dark p-2">
-            <div className="float-right pb-1">
-              <OcticonButton
-                icon={OcticonX}
-                tooltip="Dismiss prompt"
-                onClick={this.dismissModal}
-              />
-            </div>
-
-            {this.state.modalType === 'INPUT' &&
-              <form onSubmit={this.submitModal}>
-                <span>{this.state.modalData.body}</span>
-                {this.state.modalError &&
-                  <div className="flash flash-error mt-1 mb-1">{this.state.modalError}</div>
-                }
-                <input
-                  ref={(e) => { if (e) { this.modalInput = e; e.focus(); } }}
-                  className="form-control input-block mb-1"
-                  type="text"
-                  defaultValue={this.state.modalData.defaultValue}
+      <>
+        <modalContext.Provider value={this}>
+          {this.state.modalOpen &&
+            <div id="modal" className="bg-white border border-gray-dark p-2">
+              <div className="float-right pb-1">
+                <OcticonButton
+                  icon={OcticonX}
+                  tooltip="Dismiss prompt"
+                  onClick={this.dismissModal}
                 />
-                <button className="btn btn-primary btn-block mb-1" onClick={this.submitModal}>
-                  {this.state.modalData.ok}
-                </button>
-
-                <button className="btn btn-secondary btn-block" onClick={this.dismissModal}>
-                  Close
-                </button>
-              </form>
-            }
-
-            {this.state.modalType === 'CONFIRM' &&
-              <div>
-                <span>{this.state.modalData.bodyText}</span>
-                <button
-                  className="btn btn-danger btn-block mb-1"
-                  onClick={this.submitModal}
-                  ref={(e) => { if (e) { e.focus(); } }}
-                >
-                  {this.state.modalData.confirmText}
-                </button>
-                <button className="btn btn-secondary btn-block mb-1" onClick={this.dismissModal}>
-                  Cancel
-                </button>
               </div>
-            }
-          </div>
-        }
 
-        <div style={this.getGlobalStyleOverride()}>
-          {this.props.children}
-        </div>
-      </modalContext.Provider>
-    </>
+              {this.state.modalType === 'INPUT' &&
+                <form onSubmit={this.submitModal}>
+                  <span>{this.state.modalData.body}</span>
+                  {this.state.modalError &&
+                    <div className="flash flash-error mt-1 mb-1">{this.state.modalError}</div>
+                  }
+                  <input
+                    ref={(e) => { if (e) { this.modalInput = e; e.focus(); } }}
+                    className="form-control input-block mb-1"
+                    type="text"
+                    defaultValue={this.state.modalData.defaultValue}
+                  />
+                  <button className="btn btn-primary btn-block mb-1" onClick={this.submitModal}>
+                    {this.state.modalData.ok}
+                  </button>
+
+                  <button className="btn btn-secondary btn-block" onClick={this.dismissModal}>
+                    Close
+                </button>
+                </form>
+              }
+
+              {this.state.modalType === 'CONFIRM' &&
+                <div>
+                  <span>{this.state.modalData.bodyText}</span>
+                  <button
+                    className="btn btn-danger btn-block mb-1"
+                    onClick={this.submitModal}
+                    ref={(e) => { if (e) { e.focus(); } }}
+                  >
+                    {this.state.modalData.confirmText}
+                  </button>
+                  <button className="btn btn-secondary btn-block mb-1" onClick={this.dismissModal}>
+                    Cancel
+                </button>
+                </div>
+              }
+            </div>
+          }
+
+          <div style={this.getGlobalStyleOverride()}>
+            {this.props.children}
+          </div>
+        </modalContext.Provider>
+      </>
     );
   }
 }

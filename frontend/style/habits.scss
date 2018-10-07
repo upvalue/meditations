@@ -40,8 +40,17 @@ $commentBackground: #fcfcfc;
   display:inline; 
 }
 
-.scope-controls .btn, .task-controls .btn, .project-controls .btn, .entry-controls .btn {
+.scope-day-empty {
+  padding: 1em 2em 1em 2em;
+  color: lighten(#000, 50%);
 }
+
+.scope-day-empty-task label {
+  color: #000;
+}
+
+
+// .scope-controls .btn, .task-controls .btn, .project-controls .btn, .entry-controls .btn {}
 
 /** Highlight hovered tasks */
 .task:hover {

@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-macaron/binding"
 	"github.com/graphql-go/graphql"
@@ -104,11 +105,96 @@ func graphqlInit(m *macaron.Macaron) {
 					return task, nil
 				},
 			},
+
+			"tasksInScope": &graphql.Field{
+				Type: taskInterface,
+				Args: graphql.FieldConfigArgument{
+					"from": &graphql.ArgumentConfig{
+						Description: "Begin date",
+						Type:        graphql.NewNonNull(graphql.DateTime),
+					},
+				},
+			},
+		},
+	})
+
+	///// MUTATIONS
+
+	_ = graphql.NewObject(graphql.ObjectConfig{
+		Name: "Add tasks",
+		Fields: graphql.Fields{
+			"Scope": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.Int),
+				Description: "Scope type",
+			},
+			"Date": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.DateTime),
+				Description: "Scope date",
+			},
+			"TaskNames": &graphql.Field{
+				Type:        graphql.NewList(graphql.String),
+				Description: "Task names",
+			},
+		},
+	})
+
+	mutationType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Mutation",
+		Fields: graphql.Fields{
+			"addTasks": &graphql.Field{
+				Type: graphql.String,
+				Args: graphql.FieldConfigArgument{
+					"date": &graphql.ArgumentConfig{
+						Description: "Task date",
+						Type:        graphql.NewNonNull(graphql.DateTime),
+					},
+					"scope": &graphql.ArgumentConfig{
+						Description: "Task scope",
+						Type:        graphql.NewNonNull(graphql.Int),
+					},
+					"names": &graphql.ArgumentConfig{
+						Description: "Task names",
+						Type:        graphql.NewList(graphql.NewNonNull(graphql.String)),
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					datestr, _ := p.Args["date"].(string)
+					fmt.Printf("DATE %s\n", datestr)
+					date, _ := time.Parse("2006-01-02T15:04:05-07:00", datestr)
+					// date := graphql.DateTime.ParseValue(datestr)
+
+					scope, _ := p.Args["scope"].(int)
+
+					names, _ := p.Args["names"].([]interface{})
+
+					// TODO handle reordering
+
+					tx := DB.Begin()
+
+					var task Task
+
+					for _, n := range names {
+						task = Task{
+							Name:  fmt.Sprintf("%s", n),
+							Date:  date,
+							Scope: scope,
+						}
+						tx.Create(&task)
+						task.Sync(false, true, true)
+					}
+
+					tx.Commit()
+
+					// TODO sensible return value
+					return "A thing has happened", nil
+				},
+			},
 		},
 	})
 
 	schema, _ := graphql.NewSchema(graphql.SchemaConfig{
-		Query: queryType,
+		Query:    queryType,
+		Mutation: mutationType,
 	})
 
 	executeQuery := func(query string, schema graphql.Schema) *graphql.Result {
@@ -128,7 +214,7 @@ func graphqlInit(m *macaron.Macaron) {
 
 	m.Post("/graphql", binding.Bind(Query{}), func(c *macaron.Context, q Query) {
 		result := executeQuery(q.Query, schema)
-		c.JSON(http.StatusOK, result)
 
+		c.JSON(http.StatusOK, result)
 	})
 }

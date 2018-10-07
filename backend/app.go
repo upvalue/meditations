@@ -74,9 +74,7 @@ func loadConfig(c *cli.Context) {
 	Config.Demo = c.Bool("demo")
 }
 
-/** GetAppPath retrieves the application path.
- * Some care is taken to make this work outside of the go path
- */
+// GetAppPath retrieves the application path.  Some care is taken to make this work outside of the go path
 func GetAppPath() string {
 	ex, err := os.Executable()
 	if err != nil {

@@ -263,6 +263,7 @@ func taskDelete(c *macaron.Context) {
 	task.clearCache()
 	task.Near(&tasks)
 
+	DB.LogMode(true)
 	log.Printf("%+v", task)
 
 	tx := DB.Begin()
@@ -276,6 +277,9 @@ func taskDelete(c *macaron.Context) {
 	// within its scope
 
 	for _, t := range tasks {
+		if t.ID == task.ID {
+			continue
+		}
 		if t.Order > task.Order {
 			t.Order = t.Order - 1
 		}
@@ -283,6 +287,7 @@ func taskDelete(c *macaron.Context) {
 	}
 
 	tx.Commit()
+	DB.LogMode(false)
 
 	task.Sync(true, true, false)
 

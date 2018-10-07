@@ -6,10 +6,18 @@ require (
 	github.com/denisenkom/go-mssqldb v0.0.0-20180901172138-1eb28afdf9b6 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/flosch/pongo2 v0.0.0-20170906222041-1f4be1efe3b3 // indirect
+	github.com/getlantern/context v0.0.0-20160525112039-624d99b1798d // indirect
+	github.com/getlantern/errors v0.0.0-20180829142810-e24b7f4ff7c7 // indirect
+	github.com/getlantern/golog v0.0.0-20170508214112-cca714f7feb5 // indirect
+	github.com/getlantern/hex v0.0.0-20160523043825-083fba3033ad // indirect
+	github.com/getlantern/hidden v0.0.0-20160523043807-d52a649ab33a // indirect
+	github.com/getlantern/ops v0.0.0-20170904182230-37353306c908 // indirect
+	github.com/getlantern/systray v0.0.0-20180823171129-3fd1443dac5c // indirect
 	github.com/go-macaron/binding v0.0.0-20170611065819-ac54ee249c27
 	github.com/go-macaron/inject v0.0.0-20160627170012-d8a0b8677191 // indirect
 	github.com/go-macaron/pongo2 v0.0.0-20161222080235-28e8bf81cad7
 	github.com/go-sql-driver/mysql v1.4.0 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/groupcache v0.0.0-20170421005642-b710c8433bd1
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c // indirect
@@ -25,6 +33,7 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v0.0.0-20171024025710-615c193e01d8
+	github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2 // indirect
 	github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf // indirect
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
 	github.com/tylerb/graceful v1.2.15 // indirect

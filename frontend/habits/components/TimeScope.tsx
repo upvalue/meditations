@@ -2,16 +2,15 @@ import * as React from 'react';
 import * as moment from 'moment';
 
 import { Scope, FilterState, ScopeType } from '../state';
-import { routeForView } from '../main';
 import { createCTask } from './Task';
 import { PresentScope } from './PresentScope';
+import { DayScopeEmpty } from './DayScopeEmpty';
 
 export interface TimeScopeProps {
   currentProject: number;
   currentDate: moment.Moment;
   scope: Scope;
   filter: FilterState;
-
 
   /**
    * The task name the user most recently interacted with. Used to bolden the task name across
@@ -29,17 +28,14 @@ export interface TimeScopeProps {
  * Displays tasks within a particular time scope (day, month or year)
  */
 export class TimeScope extends React.Component<TimeScopeProps> {
-  constructor(props: TimeScopeProps) {
-    super(props);
-  }
-
-  navigate(method: 'add' | 'subtract') {
-    const unit = this.props.scope.Scope === ScopeType.MONTH ? 'month' : 'year';
-    const ndate = this.props.currentDate.clone()[method](1, unit);
-    route(routeForView(ndate, this.props.currentProject));
-  }
-
   render() {
+    const title =
+      this.props.scope.Date.format(['dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope - 1]);
+
+    if (this.props.scope.Scope === ScopeType.DAY && this.props.scope.Tasks.length === 0) {
+      return <DayScopeEmpty day={this.props.scope} title={title} />;
+    }
+
     let filteredTasks = this.props.scope.Tasks;
 
     // Apply filters
@@ -64,8 +60,6 @@ export class TimeScope extends React.Component<TimeScopeProps> {
       }
     }
 
-    const title =
-      this.props.scope.Date.format(['dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope - 1]);
 
     return (
       <PresentScope
@@ -73,7 +67,7 @@ export class TimeScope extends React.Component<TimeScopeProps> {
         title={title}
         mostRecentDay={this.props.mostRecentDay}
       >
-        {filteredTasks.map((t, i) => createCTask(t, this.props.lastModifiedTask))}
+        {filteredTasks.map(t => createCTask(t, this.props.lastModifiedTask))}
       </PresentScope>
     );
   }
