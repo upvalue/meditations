@@ -48,7 +48,7 @@ const (
 
 // Task represents a task in the database
 type Task struct {
-	gorm.Model
+	ID   uint
 	Name string
 	// The actual date of the task, regardless of when it was created
 	Date time.Time

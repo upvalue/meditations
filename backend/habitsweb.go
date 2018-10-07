@@ -129,6 +129,14 @@ func taskSelectScope(date *time.Time, to *time.Time, name *string, scope *int) f
 	}
 }
 
+func taskSelectSingle(c *macaron.Context) {
+	var task Task
+
+	DB.Where("id = ?", c.ParamsInt("id")).First(&task)
+
+	c.JSON(http.StatusOK, task)
+}
+
 func taskSelect(c *macaron.Context) {
 	var tasks []Task
 
@@ -572,6 +580,7 @@ func habitsInit(m *macaron.Macaron) {
 
 	// REST-ish api
 	m.Get("/tasks", taskSelect)
+	m.Get("/tasks/:id:int", taskSelectSingle)
 	m.Put("/tasks/:id:int", binding.Bind(Task{}), taskUpdate)
 	m.Post("/tasks", binding.Bind(Task{}), taskNew)
 	m.Delete("/tasks/:id:int", taskDelete)

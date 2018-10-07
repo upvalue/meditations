@@ -25,8 +25,8 @@ github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c h1:16eHWuMGvCjSf
 github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/websocket v0.0.0-20171013020858-71fa72d48423 h1:wkOcdLjYkjfxpi9H4cZeErBrLIAhTRp6MWSk/kS9/h4=
 github.com/gorilla/websocket v0.0.0-20171013020858-71fa72d48423/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
-github.com/ioddly/meditations v0.0.0-20180916035201-d37afab02bcc h1:Li77fICAum5vaudArxXivp6FZSZMGtpK6Zel1oX1R+o=
-github.com/ioddly/meditations v0.0.0-20180916035201-d37afab02bcc/go.mod h1:BFWhLlK0r8ReCJvxa6JEsVRknxpQnCTvgoFaTyZk+SM=
+github.com/graphql-go/graphql v0.7.6 h1:3Bn1IFB5OvPoANEfu03azF8aMyks0G/H6G1XeTfYbM4=
+github.com/graphql-go/graphql v0.7.6/go.mod h1:k6yrAYQaSP59DC5UVxbgxESlmVyojThKdORUqGDGmrI=
 github.com/jinzhu/gorm v0.0.0-20171010132839-0a51f6cdc55d h1:9IrSs6/EmI/VUBGKVl2bDDqDW+MDif7nQ3/GqMKRpIk=
 github.com/jinzhu/gorm v0.0.0-20171010132839-0a51f6cdc55d/go.mod h1:Vla75njaFJ8clLU1W44h34PjIkijhjHIYnZxMqCdxqo=
 github.com/jinzhu/inflection v0.0.0-20170102125226-1c35d901db3d h1:jRQLvyVGL+iVtDElaEIDdKwpPqUIZJfzkNLV34htpEc=

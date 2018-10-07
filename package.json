@@ -11,7 +11,7 @@
     "postinstall": "npm rebuild node-sass && webpack -p",
     "cloc": "cloc frontend backend",
     "doc-frontend": "typedoc --out docs",
-    "doc-backend": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/ioddly/meditations/backend",
+    "doc-backend": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/upvalue/meditations/backend",
     "test-backend": "godep go test -v ./backend --cover",
     "test-frontend": "./node_modules/.bin/jest",
     "test": "yarn run test-frontend && yarn run test-backend",
@@ -34,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ioddly/meditations.git"
+    "url": "git+https://github.com/upvalue/meditations.git"
   },
   "keywords": [],
   "author": "",
@@ -43,9 +43,9 @@
     "node": ">=7.10.0"
   },
   "bugs": {
-    "url": "https://github.com/ioddly/meditations/issues"
+    "url": "https://github.com/upvalue/meditations/issues"
   },
-  "homepage": "https://github.com/ioddly/meditations#readme",
+  "homepage": "https://github.com/upvalue/meditations#readme",
   "dependencies": {
     "@types/jest": "^23.1.0",
     "@types/lodash": "^4.14.109",
@@ -71,7 +71,7 @@
     "jest-cli": "^23.6.0",
     "lodash": "^4.17.10",
     "medium-editor": "^5.23.2",
-    "medium-editor-tables": "git+https://github.com/ioddly/medium-editor-tables.git",
+    "medium-editor-tables": "git+https://github.com/upvalue/medium-editor-tables.git",
     "moment": "^2.18.1",
     "mousetrap": "^1.6.2",
     "node-sass": "^4.9.2",

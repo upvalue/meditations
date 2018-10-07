@@ -14,7 +14,7 @@ require (
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c // indirect
 	github.com/gorilla/websocket v0.0.0-20171013020858-71fa72d48423
-	github.com/ioddly/meditations v0.0.0-20180916035201-d37afab02bcc
+	github.com/graphql-go/graphql v0.7.6
 	github.com/jinzhu/gorm v0.0.0-20171010132839-0a51f6cdc55d
 	github.com/jinzhu/inflection v0.0.0-20170102125226-1c35d901db3d // indirect
 	github.com/jinzhu/now v0.0.0-20170212112655-d939ba741945
