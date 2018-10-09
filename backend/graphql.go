@@ -107,12 +107,43 @@ func graphqlInit(m *macaron.Macaron) {
 			},
 
 			"tasksInScope": &graphql.Field{
-				Type: taskInterface,
+				Type: graphql.NewList(taskInterface),
 				Args: graphql.FieldConfigArgument{
 					"from": &graphql.ArgumentConfig{
 						Description: "Begin date",
 						Type:        graphql.NewNonNull(graphql.DateTime),
 					},
+					"to": &graphql.ArgumentConfig{
+						Description: "End date",
+						Type:        graphql.NewNonNull(graphql.DateTime),
+					},
+					"scope": &graphql.ArgumentConfig{
+						Description: "Scope (optional)",
+						Type:        graphql.Int,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					fromstr, _ := p.Args["from"].(string)
+					from, _ := time.Parse(DateFormat, fromstr)
+					tostr, _ := p.Args["to"].(string)
+					to, _ := time.Parse(DateFormat, tostr)
+
+					var tasks []Task
+					DB.LogMode(true)
+					db := DB.Where("date between ? and ?", from.Format(DateFormat), to.Format(DateFormat))
+
+					var scope interface{}
+					scope = p.Args["scope"]
+
+					if scope != nil {
+						db = db.Where("scope = ?", scope.(int))
+					}
+
+					db.Find(&tasks)
+					fmt.Printf("%+v\n", tasks)
+					DB.LogMode(false)
+
+					return tasks, nil
 				},
 			},
 		},

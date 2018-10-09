@@ -197,7 +197,7 @@ const initialState = {
 
 /** Check whether a particular scope+date combo is
  * currently rendered and thus needs to be updated */
-const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): boolean =>  {
+const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): boolean => {
   const date1 = moment.utc(date);
   const date2 = state.currentDate;
 
@@ -216,7 +216,7 @@ const dateVisible = (state: HabitsState, scope: number, date: moment.Moment): bo
 };
 
 /** Check whether a task is currently rendered and thus needs to be updated in the UI */
-const taskVisible = (state: HabitsState, task: Task): boolean =>  {
+const taskVisible = (state: HabitsState, task: Task): boolean => {
   if (scopeIsTimeBased(task.Scope)) {
     return dateVisible(state, task.Scope, task.Date);
   }
@@ -224,45 +224,58 @@ const taskVisible = (state: HabitsState, task: Task): boolean =>  {
 };
 
 const mountScopeReducer =
-    (state: HabitsState, action: MountScope | MountScopeAndDays): HabitsState => {
-  if (action.name) {
-    if (state.currentProject !== action.scope) {
-      // console.log('Project scope not visible, ignoring');
+  (state: HabitsState, action: MountScope | MountScopeAndDays): HabitsState => {
+    if (action.name) {
+      if (state.currentProject !== action.scope) {
+        // console.log('Project scope not visible, ignoring');
+        return state;
+      }
+      return {
+        ...state, mounted: true, project:
+          { Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment() }
+      };
+    }
+
+    // If not provided, this is a time scope and may or may not need to be mounted
+    const visible = dateVisible(state, action.scope, action.date);
+    if (!visible) {
+      console.log('Scope not visible, ignoring');
       return state;
     }
-    return {...state, mounted: true, project:
-      { Name: action.name, Scope: action.scope, Tasks: action.tasks, Date: moment() } };
-  }
+    const scope = { Scope: action.scope, Date: action.date, Tasks: action.tasks };
 
-  // If not provided, this is a time scope and may or may not need to be mounted
-  const visible = dateVisible(state, action.scope, action.date);
-  if (!visible) {
-    console.log('Scope not visible, ignoring');
+    switch (action.scope) {
+      case ScopeType.DAY:
+        return {
+          ...state,
+          days: state.days.map((s, i) => {
+            if (s.Date.format(common.DAY_FORMAT) === action.date.format(common.DAY_FORMAT)) {
+              console.log(s.Date.format(common.DAY_FORMAT), (action.date.format(common.DAY_FORMAT)));
+            }
+            return s.Date.format(common.DAY_FORMAT) === action.date.format(common.DAY_FORMAT) ? scope : s;
+            // TODO is diff okay here?
+            /*if (s.Date.diff(action.date, 'days') === 0) {
+              console.log('updating day', s.Date.format('YYYY-MM-DD'));
+            }*/
+            return s.Date.diff(action.date, 'days') === 0 ? scope : s;
+          })
+        };
+      case ScopeType.MONTH: return { ...state, mounted: true, month: scope };
+      case ScopeType.YEAR: return { ...state, mounted: true, year: scope };
+    }
     return state;
-  }
-  const scope = { Scope: action.scope, Date: action.date, Tasks: action.tasks };
-
-  switch (action.scope) {
-    case ScopeType.DAY:
-      return {...state,
-        days: state.days.map((s, i) => {
-          // TODO is diff okay here?
-          return s.Date.diff(action.date, 'days') === 0 ? scope : s;
-        })};
-    case ScopeType.MONTH: return { ...state, mounted: true, month: scope };
-    case ScopeType.YEAR: return { ...state, mounted: true, year: scope };
-  }
-  return state;
-};
+  };
 
 const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
   switch (action.type) {
     case 'PROJECT_LIST':
-      return { ...state,
+      return {
+        ...state,
         pinnedProjects: action.pinnedProjects,
         unpinnedProjects: action.unpinnedProjects,
         hiddenProjects: action.hiddenProjects,
-        projectStatsDays: action.days };
+        projectStatsDays: action.days
+      };
 
     case 'CHANGE_ROUTE':
       return { ...state, currentDate: action.date, currentProject: action.currentProject };
@@ -339,7 +352,7 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
         });
       };
 
-      let field : 'pinnedProjects' | 'hiddenProjects' | 'unpinnedProjects' = 'pinnedProjects';
+      let field: 'pinnedProjects' | 'hiddenProjects' | 'unpinnedProjects' = 'pinnedProjects';
 
       if (action.project.Visibility === ProjectVisibility.Hidden) {
         field = 'hiddenProjects';
@@ -347,7 +360,8 @@ const reducer = (state: HabitsState, action: HabitsAction): HabitsState => {
         field = 'unpinnedProjects';
       }
 
-      return { ...state,
+      return {
+        ...state,
         [field]: upd(state[field]),
       };
     }

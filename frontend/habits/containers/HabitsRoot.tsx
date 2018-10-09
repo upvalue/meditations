@@ -16,7 +16,7 @@ import { ProjectScope } from '../components/ProjectScope';
 import { ProjectList } from '../components/ProjectList';
 
 export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
-  common.connect()(class extends React.PureComponent<HabitsState> {
+  common.connect()(class extends React.Component<HabitsState> {
     /**
      * Render a time-based scope (daily, monthly, yearly)
      * @param s The scope; if undefined, returns a spinner

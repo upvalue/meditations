@@ -260,6 +260,11 @@ func taskDelete(c *macaron.Context) {
 
 	DB.Where("id = ?", c.ParamsInt("id")).First(&task)
 
+	if task.ID == 0 {
+		serverOK(c)
+		return
+	}
+
 	task.clearCache()
 	task.Near(&tasks)
 
