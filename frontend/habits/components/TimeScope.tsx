@@ -37,7 +37,7 @@ export class TimeScope extends React.Component<TimeScopeProps> {
 
     //(d.Date.date() === today.date() + 1 && today.hour() > (24 - MOUNT_NEXT_DAY_TIME))
 
-    const now = moment();
+    // const now = moment();
 
 
     if (this.props.scope.Scope === ScopeType.DAY &&

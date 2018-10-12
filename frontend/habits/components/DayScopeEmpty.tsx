@@ -7,6 +7,7 @@ import { HabitsState, Scope, ScopeType } from '../state';
 import { PresentScope } from './PresentScope';
 import { client, gql } from '../../common/graphql';
 import { MOUNT_NEXT_DAY_TIME } from '../../common/constants';
+import { DAY_FORMAT } from '../../common';
 
 interface Props {
   day: Scope;
@@ -64,12 +65,9 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
    */
 
   copyOver = () => {
-    const tasks = this.props.month.Tasks.filter(t => this.state.checked[t.ID]);
+    const tasks = this.props.month.Tasks.filter(t => this.state.checked[t.ID] && t.CompletedTasks > 0);
 
-    const nextDayMounted = moment().hour() < MOUNT_NEXT_DAY_TIME;
-    const date = nextDayMounted ? moment().add(1, 'day') : moment();
-
-    console.log(tasks);
+    const date = this.props.day.Date.clone();
 
     client.request(`mutation CopyOverTasks {
         first: addTasks(
