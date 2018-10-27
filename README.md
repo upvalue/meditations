@@ -129,7 +129,7 @@ from a specific date, or `from` and `to` to fetch a range of dates, inclusively.
 
 Given a new task in JSON format, add a new task.
 
-#### PUT /tasks/\:id\:int
+#### PUT /tasks/:taskid:int
 
 Update an existing task. If given a comment, this will also add or update a comment as necessary.
 
@@ -144,7 +144,7 @@ Update an existing task. If given a comment, this will also add or update a comm
 }
 ```
 
-#### DELETE /tasks/\:id\:int
+#### DELETE /tasks/:taskid:int
 
 Delete a task by ID.
 
