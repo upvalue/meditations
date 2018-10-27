@@ -65,7 +65,9 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
    */
 
   copyOver = () => {
-    const tasks = this.props.month.Tasks.filter(t => this.state.checked[t.ID] && t.CompletedTasks > 0);
+    const tasks = this.props.month.Tasks.filter(
+      t => this.state.checked[t.ID] && t.CompletedTasks > 0
+    );
 
     const date = this.props.day.Date.clone();
 
