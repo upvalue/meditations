@@ -5,8 +5,6 @@ import { Scope, FilterState, ScopeType } from '../state';
 import { createCTask } from './Task';
 import { PresentScope } from './PresentScope';
 import { DayScopeEmpty } from './DayScopeEmpty';
-import { DAY_FORMAT } from '../../common';
-import { MOUNT_NEXT_DAY_TIME } from '../../common/constants';
 
 export interface TimeScopeProps {
   currentProject: number;
@@ -34,16 +32,7 @@ export class TimeScope extends React.Component<TimeScopeProps> {
     const title =
       this.props.scope.Date.format(['dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope - 1]);
 
-
-    //(d.Date.date() === today.date() + 1 && today.hour() > (24 - MOUNT_NEXT_DAY_TIME))
-
-    // const now = moment();
-
-
     if (this.props.scope.Scope === ScopeType.DAY &&
-      //((now.format(DAY_FORMAT) === this.props.scope.Date.format(DAY_FORMAT) &&
-      //now.hour() < (24 - MOUNT_NEXT_DAY_TIME)) ||
-      //(now.clone().add(1, 'day').format(DAY_FORMAT) === this.props.scope.Date.format(DAY_FORMAT)) &&
       this.props.scope.Tasks.length === 0) {
 
       return <DayScopeEmpty day={this.props.scope} title={title} />;

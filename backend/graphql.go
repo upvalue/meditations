@@ -204,11 +204,13 @@ func graphqlInit(m *macaron.Macaron) {
 
 					var task Task
 
-					for _, n := range names {
+					for i, n := range names {
+						fmt.Printf("Adding task %s %d\n", n, i)
 						task = Task{
 							Name:  fmt.Sprintf("%s", n),
 							Date:  date,
 							Scope: scope,
+							Order: i,
 						}
 						tx.Create(&task)
 						task.Sync(false, true, true)
