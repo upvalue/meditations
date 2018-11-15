@@ -91,19 +91,26 @@ func graphqlInit(m *macaron.Macaron) {
 		Name:        "DateScopeReturn",
 		Description: "A listing of tasks within a particular date scope",
 		Fields: graphql.Fields{
-			"Name": &graphql.Field{
-				Type:        graphql.NewNonNull(graphql.String),
-				Description: "Name (Days, Month, Year)",
+			"Year": &graphql.Field{
+				Type:        graphql.NewList(taskInterface),
+				Description: "Month",
+			},
+			"Days": &graphql.Field{
+				Type:        graphql.NewList(taskInterface),
+				Description: "Month",
+			},
+			"Month": &graphql.Field{
+				Type:        graphql.NewList(taskInterface),
+				Description: "Month",
 			},
 		},
 	})
-	fmt.Printf("%v\n", dateScopeReturn)
 
 	dateScopeEnum := graphql.NewEnum(graphql.EnumConfig{
-		Name:        "Date scope",
+		Name:        "DateScope",
 		Description: "Date scope",
 		Values: graphql.EnumValueConfigMap{
-			"DAY": &graphql.EnumValueConfig{
+			"DAYS": &graphql.EnumValueConfig{
 				Value:       ScopeDay,
 				Description: "Day",
 			},
@@ -137,23 +144,23 @@ func graphqlInit(m *macaron.Macaron) {
 				},
 			},
 
+			// Tasks by date query. Pulls tasks for particular scopes given a YYYY-MM-DD date.
+
 			"tasksByDate": &graphql.Field{
-				Type: graphql.Boolean,
+				Type: graphql.NewNonNull(dateScopeReturn),
 				Args: graphql.FieldConfigArgument{
-					"dates": &graphql.ArgumentConfig{
-						Description: "Date",
-						Type:        graphql.NewList(graphql.NewNonNull(graphql.String)),
+					"date": &graphql.ArgumentConfig{
+						Type:        graphql.NewNonNull(graphql.String),
+						Description: "Date to fetch scopes for",
 					},
 					"scopes": &graphql.ArgumentConfig{
-						Description: "Scopes to fetch for",
 						Type:        graphql.NewList(dateScopeEnum),
+						Description: "Scopes to fetch for",
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					type TasksByDate struct {
-						Days  []Task
 						Month []Task
-						Year  []Task
 					}
 
 					/*
@@ -163,16 +170,28 @@ func graphqlInit(m *macaron.Macaron) {
 
 						          }
 					*/
-					dates := p.Args["dates"].([]interface{})
-					for i, _ := range dates {
-						datestr := (dates[i]).(string)
-						fmt.Printf("Returning scope for %s\n", datestr)
-						// date, err := time.Parse(DateFormat, datestr)
+					datestr := p.Args["date"].(string)
+					date, err := time.Parse(DateFormat, datestr)
+
+					if err != nil {
+						return nil, err
 					}
 
-					// date := time.Parse(DateFormat, datestr)
+					tasksByDate := TasksByDate{}
 
-					return true, nil
+					fmt.Printf("Fetching scopes for date %s\n", date)
+					scopes := p.Args["scopes"].([]interface{})
+					for i := range scopes {
+						scopei := (scopes[i]).(int)
+
+						if scopei == ScopeMonth {
+							tasksInScope(&tasksByDate.Month, ScopeMonth, date)
+						}
+					}
+
+					fmt.Printf("%v\n", tasksByDate)
+
+					return tasksByDate, nil
 				},
 			},
 
