@@ -93,11 +93,11 @@ func graphqlInit(m *macaron.Macaron) {
 		Fields: graphql.Fields{
 			"Year": &graphql.Field{
 				Type:        graphql.NewList(taskInterface),
-				Description: "Month",
+				Description: "Year",
 			},
 			"Days": &graphql.Field{
 				Type:        graphql.NewList(taskInterface),
-				Description: "Month",
+				Description: "Days",
 			},
 			"Month": &graphql.Field{
 				Type:        graphql.NewList(taskInterface),
@@ -160,16 +160,11 @@ func graphqlInit(m *macaron.Macaron) {
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					type TasksByDate struct {
+						Days  []Task
 						Month []Task
+						Year  []Task
 					}
 
-					/*
-											tasksByDate := TasksByDate{}
-
-											fillDates := func(date string) {
-
-						          }
-					*/
 					datestr := p.Args["date"].(string)
 					date, err := time.Parse(DateFormat, datestr)
 
@@ -186,10 +181,18 @@ func graphqlInit(m *macaron.Macaron) {
 
 						if scopei == ScopeMonth {
 							tasksInScope(&tasksByDate.Month, ScopeMonth, date)
+						} else if scopei == ScopeYear {
+							tasksInScope(&tasksByDate.Year, ScopeYear, date)
+						} else if scopei == ScopeDay {
+							begin, end := _between(date, ScopeMonth)
+
+							DB.
+								Where("date BETWEEN ? and ? and scope = ?", begin, end, ScopeDay).Order("`order` asc, date asc").
+								Preload("Comment").Find(&tasksByDate.Days)
 						}
 					}
 
-					fmt.Printf("%v\n", tasksByDate)
+					// fmt.Printf("%v\n", tasksByDate)
 
 					return tasksByDate, nil
 				},
