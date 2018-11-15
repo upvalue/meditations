@@ -87,6 +87,37 @@ func graphqlInit(m *macaron.Macaron) {
 		},
 	})
 
+	dateScopeReturn := graphql.NewObject(graphql.ObjectConfig{
+		Name:        "DateScopeReturn",
+		Description: "A listing of tasks within a particular date scope",
+		Fields: graphql.Fields{
+			"Name": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "Name (Days, Month, Year)",
+			},
+		},
+	})
+	fmt.Printf("%v\n", dateScopeReturn)
+
+	dateScopeEnum := graphql.NewEnum(graphql.EnumConfig{
+		Name:        "Date scope",
+		Description: "Date scope",
+		Values: graphql.EnumValueConfigMap{
+			"DAY": &graphql.EnumValueConfig{
+				Value:       ScopeDay,
+				Description: "Day",
+			},
+			"MONTH": &graphql.EnumValueConfig{
+				Value:       ScopeMonth,
+				Description: "Month",
+			},
+			"YEAR": &graphql.EnumValueConfig{
+				Value:       ScopeYear,
+				Description: "Year",
+			},
+		},
+	})
+
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
@@ -103,6 +134,45 @@ func graphqlInit(m *macaron.Macaron) {
 					DB.Where("id = ?", p.Args["id"]).Preload("Comment").First(&task)
 
 					return task, nil
+				},
+			},
+
+			"tasksByDate": &graphql.Field{
+				Type: graphql.Boolean,
+				Args: graphql.FieldConfigArgument{
+					"dates": &graphql.ArgumentConfig{
+						Description: "Date",
+						Type:        graphql.NewList(graphql.NewNonNull(graphql.String)),
+					},
+					"scopes": &graphql.ArgumentConfig{
+						Description: "Scopes to fetch for",
+						Type:        graphql.NewList(dateScopeEnum),
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					type TasksByDate struct {
+						Days  []Task
+						Month []Task
+						Year  []Task
+					}
+
+					/*
+											tasksByDate := TasksByDate{}
+
+											fillDates := func(date string) {
+
+						          }
+					*/
+					dates := p.Args["dates"].([]interface{})
+					for i, _ := range dates {
+						datestr := (dates[i]).(string)
+						fmt.Printf("Returning scope for %s\n", datestr)
+						// date, err := time.Parse(DateFormat, datestr)
+					}
+
+					// date := time.Parse(DateFormat, datestr)
+
+					return true, nil
 				},
 			},
 
@@ -123,10 +193,19 @@ func graphqlInit(m *macaron.Macaron) {
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					fromstr, _ := p.Args["from"].(string)
-					from, _ := time.Parse(DateFormat, fromstr)
-					tostr, _ := p.Args["to"].(string)
-					to, _ := time.Parse(DateFormat, tostr)
+					fromstr := p.Args["from"].(string)
+					from, err := time.Parse(DateFormat, fromstr)
+
+					if err != nil {
+						return nil, err
+					}
+
+					tostr := p.Args["to"].(string)
+					to, err := time.Parse(DateFormat, tostr)
+
+					if err != nil {
+						return nil, err
+					}
 
 					var tasks []Task
 					DB.LogMode(true)
@@ -173,7 +252,7 @@ func graphqlInit(m *macaron.Macaron) {
 		Name: "Mutation",
 		Fields: graphql.Fields{
 			"addTasks": &graphql.Field{
-				Type: graphql.String,
+				Type: graphql.Boolean,
 				Args: graphql.FieldConfigArgument{
 					"date": &graphql.ArgumentConfig{
 						Description: "Task date",
@@ -218,8 +297,7 @@ func graphqlInit(m *macaron.Macaron) {
 
 					tx.Commit()
 
-					// TODO sensible return value
-					return "A thing has happened", nil
+					return true, nil
 				},
 			},
 		},
