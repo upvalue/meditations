@@ -309,7 +309,6 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 })
 
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
-	fmt.Printf("GraphQL Query %s\n", query)
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,
 		RequestString: query,

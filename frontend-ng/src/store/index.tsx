@@ -5,4 +5,3 @@ export const store = createStore(
   () => ({}),
   applyMiddleware(logger)
 );
-

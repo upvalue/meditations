@@ -1,0 +1,15 @@
+@import '@upvalueio/third-coast/index.scss';
+
+body {
+  background-color: $light-gray5;
+}
+
+header.dark {
+  background-color: $white;
+  color: $black;
+}
+
+header{
+  background-color: $dark-gray4;
+  color: $white;
+}

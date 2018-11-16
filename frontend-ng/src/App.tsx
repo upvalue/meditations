@@ -8,6 +8,8 @@ import { ThirdCoast, Button } from '@upvalueio/third-coast';
 import '@upvalueio/third-coast/index.scss';
 
 import { store } from './store';
+import { Header } from './Header';
+import './styles/main.scss';
 
 interface DefaultRouteProps {
   default: boolean;
@@ -16,8 +18,7 @@ interface DefaultRouteProps {
 const DefaultRoute = (props: DefaultRouteProps) => {
   return (
     <div className="App">
-      <Button>Boop the snoot</Button>
-      <p>howdy</p>
+      <p>one two three four</p>
     </div>
   );
 }
@@ -27,9 +28,12 @@ class App extends Component {
     return (
       <ThirdCoast>
         <Provider store={store}>
-          <Router>
-            <DefaultRoute default={true} />
-          </Router>
+          <React.Fragment>
+            <Header />
+            <Router>
+              <DefaultRoute default={true} />
+            </Router>
+          </React.Fragment>
         </Provider>
       </ThirdCoast>
     );

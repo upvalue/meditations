@@ -43,7 +43,7 @@ jobs:
 
       - run:
           name: Run golang backend tests
-          command: cd /root/go/src/github.com/upvalue/meditations && go test -v -race $(go list ./... | grep -v /vendor/)
+          command: cd /root/go/src/github.com/upvalue/meditations && go test -cover -v -race $(go list ./... | grep -v /vendor/)
 
       - run:
           name: Install npm dependencies
