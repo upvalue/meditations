@@ -26,6 +26,7 @@ require (
 	github.com/jinzhu/gorm v0.0.0-20171010132839-0a51f6cdc55d
 	github.com/jinzhu/inflection v0.0.0-20170102125226-1c35d901db3d // indirect
 	github.com/jinzhu/now v0.0.0-20170212112655-d939ba741945
+	github.com/jmoiron/jsonq v0.0.0-20150511023944-e874b168d07e
 	github.com/jtolds/gls v4.2.1+incompatible // indirect
 	github.com/juju/errors v0.0.0-20170703010042-c7d06af17c68 // indirect
 	github.com/juju/loggo v0.0.0-20180524022052-584905176618 // indirect
