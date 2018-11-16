@@ -859,9 +859,9 @@
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.2.tgz#e13182e1b69871a422d7863e11a4a6f5b814a4bd"
 
-"@upvalueio/third-coast@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@upvalueio/third-coast/-/third-coast-0.1.5.tgz#607b022b1172c7688fffbd221da0b5134d0a2393"
+"@upvalueio/third-coast@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@upvalueio/third-coast/-/third-coast-0.1.7.tgz#5e84374f647c0eb0fafcecb6063591097e7a1cd1"
   dependencies:
     "@types/react" "^16.7.3"
     "@types/react-dom" "^16.0.9"

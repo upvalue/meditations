@@ -1,15 +1,13 @@
+/// <reference path="../node_modules/@types/reach__router/index.d.ts" />
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 
-/// <reference path="../node_modules/@types/reach__router/index.d.ts" />
 import { Router } from '@reach/router';
 
 import { ThirdCoast, Button } from '@upvalueio/third-coast';
-import '@upvalueio/third-coast/index.scss';
 
 import { store } from './store';
 import { Header } from './Header';
-import './styles/main.scss';
 
 interface DefaultRouteProps {
   default: boolean;

@@ -1,3 +1,12 @@
+@import '@upvalueio/third-coast/index.scss';
+
+@import './colors.scss';
+@import '../Header.scss';
+
+body {
+  background-color: $background;
+}
+
 #root {
   display: flex;
   flex-direction: column;
