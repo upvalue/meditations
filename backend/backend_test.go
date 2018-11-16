@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"os"
 	"testing"
 )
@@ -32,7 +33,19 @@ func TestStatistics(t *testing.T) {
 	}
 }
 
+// TestGraphQL tests the most basic possible GraphQL query
+func TestGraphQL(t *testing.T) {
+	result := executeQuery("{\n\tping\n}", schema)
+	bytes, _ := json.Marshal(result.Data)
+	json := string(bytes)
+
+	if json != "{\"ping\":\"pong\"}" {
+		t.Fail()
+	}
+}
+
 func TestMain(m *testing.M) {
+	graphqlInitialize()
 	Config.DBPath = ":memory:"
 	DBOpen()
 	DBSeed("2017-07")

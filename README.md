@@ -1,5 +1,6 @@
 <p align="center"><img src="assets/horizontal.png" alt="meditations" height="80px"></p>
 
+![Have a nice day badge](https://img.shields.io/badge/have%20a-nice%20day-0099dd.svg)
 ![CircleCI Badge](https://circleci.com/gh/upvalue/meditations.png?circle-token=:circle-token&style=shield)
 
 meditations is an application for tracking progress towards goals that builds on habit formation and long term

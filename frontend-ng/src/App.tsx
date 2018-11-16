@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
+
+/// <reference path="../node_modules/@types/reach__router/index.d.ts" />
 import { Router } from '@reach/router';
 
 import { ThirdCoast, Button } from '@upvalueio/third-coast';
 import '@upvalueio/third-coast/index.scss';
 
 import { store } from './store';
-
 
 interface DefaultRouteProps {
   default: boolean;
@@ -27,7 +28,7 @@ class App extends Component {
       <ThirdCoast>
         <Provider store={store}>
           <Router>
-            <DefaultRoute default />
+            <DefaultRoute default={true} />
           </Router>
         </Provider>
       </ThirdCoast>
