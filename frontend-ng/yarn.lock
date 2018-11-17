@@ -906,6 +906,11 @@
     "@svgr/core" "^2.4.1"
     loader-utils "^1.1.0"
 
+"@types/classnames@^2.2.6":
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.6.tgz#dbe8a666156d556ed018e15a4c65f08937c3f628"
+  integrity sha512-XHcYvVdbtAxVstjKxuULYqYaWIzHR15yr1pZj4fnGChuBVJlIAp9StJna0ZJNSgxPh4Nac2FL4JM3M11Tm6fqQ==
+
 "@types/history@*":
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.2.tgz#0e670ea254d559241b6eeb3894f8754991e73220"
@@ -965,10 +970,10 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.2.tgz#e13182e1b69871a422d7863e11a4a6f5b814a4bd"
   integrity sha512-42zEJkBpNfMEAvWR5WlwtTH22oDzcMjFsL9gDGExwF8X8WvAiw7Vwop7hPw03QT8TKfec83LwbHj6SvpqM4ELQ==
 
-"@upvalueio/third-coast@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@upvalueio/third-coast/-/third-coast-0.1.9.tgz#4e47c4f0e740cb119a5f7e730f65405afb2cb683"
-  integrity sha512-+tNNXq8Zjk4/X9t/k0YwDVjgmWKD66SIgg70/qZ/OS1XEAVk32d0THjLzHpGX+MW5MSeP6OgDk+nBfjyk7iHJA==
+"@upvalueio/third-coast@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@upvalueio/third-coast/-/third-coast-0.1.10.tgz#367842d77158f295c7877438acd15a7103335f59"
+  integrity sha512-3pJL9CxMj7St137GRV/vkr5YNdUjl7F/Ok2jIonCF7nlIlblYjKxptna8RG2f7oFIaklxvEfTFqTGg96VQTlTA==
   dependencies:
     "@types/react" "^16.7.3"
     "@types/react-dom" "^16.0.9"
@@ -2286,6 +2291,11 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
+
+classnames@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
 
 clean-css@4.2.x:
   version "4.2.1"

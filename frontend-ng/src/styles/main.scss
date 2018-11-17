@@ -5,9 +5,23 @@
 
 body {
   background-color: $background;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex: 1 1 auto;
 }
 
 #root {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+}
+
+
+.ThemedBody {
+  box-shadow: 0 10px $background;
+  flex: 1 1 auto;
+  &.dark {
+    background-color: $dark-background;
+  }
 }
