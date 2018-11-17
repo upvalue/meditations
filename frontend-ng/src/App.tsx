@@ -1,5 +1,5 @@
 /// <reference path="../node_modules/@types/reach__router/index.d.ts" />
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import { Router } from '@reach/router';
@@ -19,6 +19,12 @@ const DefaultRoute = (props: DefaultRouteProps) => {
       <p>one two three four</p>
     </div>
   );
+}
+
+const Butan = () => {
+  const [count, setCount] = useState(0);
+
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
 }
 
 class App extends Component {

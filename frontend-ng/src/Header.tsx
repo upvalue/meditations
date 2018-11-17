@@ -16,13 +16,13 @@ export const Header = () => {
         padding={['px2']}
         style={{ display: 'flex', flexDirection: 'row', height: '55px', alignItems: 'center' }}
       >
-        <div className="flex items-center">
-          <h1 className="m0" style={{ display: 'inline' }}>meditations</h1>
+        <View flex={['items-center']}>
+          <h1 className="m0" style={{ display: 'inline ' }}>meditations</h1>
           <div style={{ alignItems: 'end' }}>
             <strong className="ml4">Habits</strong>
             <span className="ml4">Notes</span>
           </div>
-        </div>
+        </View>
         <div style={{ flex: '1 1 auto' }}>
         </div>
         <div>
@@ -36,4 +36,4 @@ export const Header = () => {
       </div>
     </React.Fragment>
   );
-}
+};
