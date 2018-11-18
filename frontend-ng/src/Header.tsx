@@ -48,14 +48,14 @@ export const Header = () => {
       <View flex={['flex-auto']}>
         <View padding="px2" margin="ml2" flex="items-center">
           <h1 className="m0" style={{ display: 'inline ' }}>meditations</h1>
-          <div style={{ alignItems: 'end' }}>
+          <nav>
             <Link to="/" getProps={headerLinkProps}>
               Habits
             </Link>
             <Link to="/notes" getProps={headerLinkProps}>
               Notes
             </Link>
-          </div>
+          </nav>
         </View>
       </View>
 

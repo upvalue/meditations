@@ -1,0 +1,36 @@
+
+.sidebar {
+  // border-radius: 4px;
+  padding: 1rem;
+  border-right: 1px solid $light-gray1;
+  background-color: white;
+  box-shadow: 1px 0px 1px 0px $light-gray1;
+}
+
+.dark .sidebar {
+  background-color: $dark-gray5;
+  border-right: 1px solid $dark-gray5;
+  box-shadow: 1px 0px 1px 0px  $dark-gray3;
+}
+
+.raised {
+  padding: 1rem;
+  // background-color: darken($light-gray5, 2%);
+  background-color: $white;
+  border: 1px solid $light-gray5;
+  box-shadow: 0px 0px 3px 1px $light-gray1;
+  width: 15em;
+}
+
+.raised .button {
+  background-color: #0f9960;
+  // font-weight: bold;
+}
+
+.dark .raised {
+  box-shadow: none;
+  border-radius: 4px;
+  border: 1px solid $dark-gray3;
+  background-color: $dark-gray5;
+  // box-shadow: 0px 0px 1px 0px $dark-gray3;
+}

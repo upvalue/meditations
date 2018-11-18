@@ -2,6 +2,7 @@
 
 @import './colors.scss';
 @import '../Header.scss';
+@import '../habits/HabitsPage.scss';
 
 body {
   // background-color: $background;
@@ -20,7 +21,9 @@ body {
 .ThemedBody {
   box-shadow: 0 10px $background;
   flex: 1 1 auto;
-  // background-color: $light-gray5;
+  color: $foreground;
+  background-color: $background;
+  margin-top:-1px
 }
 
 .dark .ThemedBody {
