@@ -10,11 +10,12 @@
     "@types/react-dom": "^16.0.9",
     "@types/react-redux": "^6.0.9",
     "@types/redux-logger": "^3.0.6",
-    "@upvalueio/third-coast": "^0.1.10",
+    "@upvalueio/third-coast": "^0.1.13",
     "classnames": "^2.2.6",
     "react": "^16.7.0-alpha.2",
     "react-dev-utils": "^6.0.6-next.c662dfb0",
     "react-dom": "^16.7.0-alpha.2",
+    "react-icons": "^3.2.2",
     "react-redux": "^5.1.1",
     "react-testing-library": "^5.2.3",
     "redux": "^4.0.1",
@@ -25,8 +26,6 @@
     "typescript": "^3.1.6"
   },
   "devDependencies": {
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-react": "^1.1.7",
     "react-scripts": "^2.0.6-next.c662dfb0"
   },
   "scripts": {

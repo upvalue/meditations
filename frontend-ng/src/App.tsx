@@ -9,29 +9,18 @@ import { ThirdCoast, Button, useTheme } from '@upvalueio/third-coast';
 
 import { store } from './store';
 import { Header } from './Header';
-import { HelperProvider, useHelper } from './Helper';
+import { ThemeName } from '@upvalueio/third-coast/dist/Theme';
+import { NotesPage } from './notes/NotesPage';
+import { HabitsPage } from './habits/HabitsPage';
 
 interface DefaultRouteProps {
   default: boolean;
-}
-
-const HelpableText = () => {
-  const Helper = useHelper(`
-    You have been officially Helped.  
-  `);
-
-  return (
-    <Helper>
-      <p>This text can be helped on</p>
-    </Helper>
-  );
 }
 
 const DefaultRoute = (props: DefaultRouteProps) => {
   return (
     <div className="App">
       <p>one two three four</p>
-      <HelpableText />
     </div>
   );
 }
@@ -62,8 +51,13 @@ const ThemedBody = () => {
   const [theme] = useTheme();
 
   return (
-    <Router className={classNames('ThemedBody', theme)}>
-      <DefaultRoute default={true} />
+    <Router className="ThemedBody px3 py2">
+      <HabitsPage
+        default={true}
+      />
+      <NotesPage
+        path="/notes"
+      />
     </Router>
   );
 }
@@ -73,17 +67,28 @@ const ThemedBody = () => {
 // }, [])
 
 class App extends Component {
+  /**
+   * Set theme on root component in order
+   * to avoid unnecessary wrappers.
+   */
+  toggleTheme = (theme: ThemeName) => {
+    const root = document.getElementById('root');
+    if (root) {
+      root.setAttribute('class', classNames(theme));
+    }
+  }
+
   render() {
     return (
-      <ThirdCoast>
-        <HelperProvider>
-          <Provider store={store}>
-            <React.Fragment>
-              <Header />
-              <ThemedBody />
-            </React.Fragment>
-          </Provider>
-        </HelperProvider>
+      <ThirdCoast
+        onThemeChange={this.toggleTheme}
+      >
+        <Provider store={store}>
+          <>
+            <Header />
+            <ThemedBody />
+          </>
+        </Provider>
       </ThirdCoast>
     );
   }

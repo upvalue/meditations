@@ -23,7 +23,8 @@ export const HelperProvider = (props: HelperProviderProps) => {
 
   return (
     <HelperContext.Provider value={helperData}>
-      <div className={classNames('inline', active && 'helper-active')}>
+      
+      <div className={classNames('flex flex-column flex-auto', active && 'helper-active')}>
         {props.children}
       </div>
     </HelperContext.Provider >
@@ -51,7 +52,7 @@ export const useHelper = (message: string) => {
 
   return (props: HelperWrappingProps) => {
     return (
-      <div style={{ display: 'inline', outline: '1' }} onClick={helpAndDisable}>
+      <div style={{ display: 'inline', outline: '1' }} onClickCapture={helpAndDisable}>
         {props.children}
       </div>
     );

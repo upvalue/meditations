@@ -325,7 +325,7 @@ var graphqlinitialized = false
 
 func graphqlInitialize() {
 	if graphqlinitialized == false {
-		fmt.Printf("GraphQL Schema initialized")
+		fmt.Printf("GraphQL Schema initialized\n")
 		schema, _ = graphql.NewSchema(graphql.SchemaConfig{
 			Query:    queryType,
 			Mutation: mutationType,

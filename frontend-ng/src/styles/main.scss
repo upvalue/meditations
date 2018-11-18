@@ -4,7 +4,7 @@
 @import '../Header.scss';
 
 body {
-  background-color: $background;
+  // background-color: $background;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -17,11 +17,13 @@ body {
   flex: 1 1 auto;
 }
 
-
 .ThemedBody {
   box-shadow: 0 10px $background;
   flex: 1 1 auto;
-  &.dark {
-    background-color: $dark-background;
-  }
+  // background-color: $light-gray5;
+}
+
+.dark .ThemedBody {
+  background-color: $dark-background;
+  color: $white;
 }
