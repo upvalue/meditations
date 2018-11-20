@@ -13,24 +13,64 @@
   box-shadow: 1px 0px 1px 0px  $dark-gray3;
 }
 
-.raised {
-  padding: 1rem;
-  // background-color: darken($light-gray5, 2%);
+.scope {
   background-color: $white;
-  border: 1px solid $light-gray5;
-  box-shadow: 0px 0px 3px 1px $light-gray1;
+  //box-shadow: 0px 0px 3px 1px $light-gray1;
+  border-radius: 2px;
   width: 15em;
+  // background-color: darken($light-gray5, 2%);
+  //border: 1px solid $light-gray5;
+
+  .Comment {
+    font-family: $font-mono;
+    font-size: 0.8rem;
+  }
+
 }
 
-.raised .button {
-  background-color: #0f9960;
-  // font-weight: bold;
+.dark .Task {
+  // background-color: #395939;
+  border-color: $dark-gray4;
 }
 
-.dark .raised {
+.dark .scope {
   box-shadow: none;
-  border-radius: 4px;
-  border: 1px solid $dark-gray3;
+  // border-radius: 4px;
+  //border: 1px solid $dark-gray3;
   background-color: $dark-gray5;
   // box-shadow: 0px 0px 1px 0px $dark-gray3;
+}
+
+.Task {
+  border-radius: 2px;
+  //border:1px solid $gray5;
+  background-color: $white;
+  // background-color: #ecffec;
+  // background-color: $light-gray5;
+}
+
+
+.Task:nth-of-type(even) {
+  background-color: $light-gray5;
+}
+
+.Task:nth-of-type(odd) {
+  // background-color: $light-gray4;
+}
+
+.Task .button {
+  background-color: #449d44;
+  border:0;
+  border-left: 1px solid #449d44;
+  // border: 0;
+  //width: 50%;
+  text-align: left;
+  
+  border-radius: 2px 0 0 /*0px*/;
+  color: $white;
+  //color: $black;
+  //background-color: $white;
+  background-image: none;
+  box-shadow: none;
+  // border-radius: 0;
 }

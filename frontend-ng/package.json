@@ -10,7 +10,7 @@
     "@types/react-dom": "^16.0.9",
     "@types/react-redux": "^6.0.9",
     "@types/redux-logger": "^3.0.6",
-    "@upvalueio/third-coast": "^0.1.13",
+    "@upvalueio/third-coast": "^0.1.14",
     "classnames": "^2.2.6",
     "react": "^16.7.0-alpha.2",
     "react-dev-utils": "^6.0.6-next.c662dfb0",
