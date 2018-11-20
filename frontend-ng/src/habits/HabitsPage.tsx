@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { MdChevronLeft, MdArrowBack, MdChevronRight, MdArrowForward } from 'react-icons/md';
 import { HeaderIconButton } from '../Header';
 import { View, Button } from '@upvalueio/third-coast';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { MdCheckCircle } from 'react-icons/md';
 
@@ -14,7 +15,7 @@ export interface HabitsPageProps extends RouteComponentProps { }
 
 const Task = (props: any) => {
   return (
-    <div className="Task mt3 mb1">
+    <div className="Task p2 mb1">
       <div className="flex items-center justify-between">
         {/*<MdCheckCircle color={"green"} />
         <Button className="ml2" style={{ display: 'inline' }}>
@@ -40,7 +41,7 @@ const Task = (props: any) => {
 const Scope = (props: any) => {
   return (
     <div className={classNames('scope', 'p2', props.className)} style={props.style}>
-      <h4 className="my0 mt1 mx1">{props.name || 'November'}</h4>
+      <h4 className="my0 mt1 mx1 mb2">{props.name || 'November'}</h4>
 
       {/*<div className="Task mt3 mb1 p2">
         <Button intent="secondary">
