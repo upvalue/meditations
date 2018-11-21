@@ -17,7 +17,7 @@
   background-color: $white;
   box-shadow: 0px 0px 3px 1px $light-gray1;
   border-radius: 2px;
-  width: 15em;
+  max-width: 33%;
   // background-color: darken($light-gray5, 2%);
   //border: 1px solid $light-gray5;
 
@@ -55,6 +55,8 @@
   background-color: $white;
   // background-color: #ecffec;
   // background-color: $light-gray5;
+  transition: transform 5s ease;
+      //style={{ transform: 'translate3d(0, 100px, 0)', transition: 'transform 5s ease, top 5s ease' }}
 }
 
 
@@ -76,7 +78,7 @@
   //width: 50%;
   text-align: left;
   
-  border-radius: 2px 0 0 /*0px*/;
+  border-radius: 2px 0 0 2px;
   color: $white;
   //color: $black;
   //background-color: $white;

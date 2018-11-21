@@ -985,10 +985,10 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.2.tgz#e13182e1b69871a422d7863e11a4a6f5b814a4bd"
   integrity sha512-42zEJkBpNfMEAvWR5WlwtTH22oDzcMjFsL9gDGExwF8X8WvAiw7Vwop7hPw03QT8TKfec83LwbHj6SvpqM4ELQ==
 
-"@upvalueio/third-coast@^0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@upvalueio/third-coast/-/third-coast-0.1.14.tgz#914615e3ecb73eef5b39ff269faafc822626bc8c"
-  integrity sha512-cHrVYRXgW4GeMXVoJ9A3VXuPYcK3Ma0BFV/9jTWGqoV2OhqjDHFWOLF2kj5m1gSb637V6ebkjsZ1T4kSSegHQw==
+"@upvalueio/third-coast@^0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@upvalueio/third-coast/-/third-coast-0.1.15.tgz#116d2713602547fb61b716dde112ce53d7e88b85"
+  integrity sha512-rsMNpt5756dE5gj0JhbT18umsF58BSmlUUnYC1jWzoB0Tzp8Pf18IUxzT6rFTn2JLM4oyiy1jAcRuy2DSl9U9A==
   dependencies:
     "@types/react" "^16.7.3"
     "@types/react-dom" "^16.0.9"
