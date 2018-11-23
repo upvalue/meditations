@@ -1,3 +1,4 @@
+// graphql.go - GraphQL resolvers
 package backend
 
 import (
@@ -105,12 +106,15 @@ var dateScopeEnum = graphql.NewEnum(graphql.EnumConfig{
 var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
+		// Ping query, just for checking
 		"ping": &graphql.Field{
 			Type: graphql.String,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				return "pong", nil
 			},
 		},
+
+		// Task by id
 		"task": &graphql.Field{
 			Type: taskInterface,
 			Args: graphql.FieldConfigArgument{
@@ -128,7 +132,6 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		// Tasks by date query. Pulls tasks for particular scopes given a YYYY-MM-DD date.
-
 		"tasksByDate": &graphql.Field{
 			Type: graphql.NewNonNull(dateScopeReturn),
 			Args: graphql.FieldConfigArgument{
@@ -235,6 +238,22 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 ///// MUTATIONS
 
+var taskInputObject = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "InputTask",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"Name": &graphql.InputObjectFieldConfig{
+			Type: graphql.String,
+		},
+		"Minutes": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+		"MinutesDelta": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+	},
+})
+
+/*
 var TaskYnterface = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Add tasks",
 	Fields: graphql.Fields{
@@ -252,10 +271,66 @@ var TaskYnterface = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
+*/
 
 var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
 	Fields: graphql.Fields{
+
+		// Update or add task by name for a particular day
+		"updateOrAddTaskByName": &graphql.Field{
+			Type: taskInterface,
+			Args: graphql.FieldConfigArgument{
+				"date": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.String),
+					Description: "Day to add or update task on",
+				},
+				"name": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.String),
+					Description: "Task name",
+				},
+				"task": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(taskInputObject),
+					Description: "Task fields to update",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				datestr := p.Args["date"].(string)
+				date, err := time.Parse(DateFormat, datestr)
+
+				if err != nil {
+					return nil, err
+				}
+
+				name := p.Args["name"].(string)
+
+				task := Task{
+					Name:  name,
+					Scope: ScopeDay,
+					Date:  date,
+				}
+
+				inputTask := p.Args["task"].(map[string]interface{})
+
+				// fmt.Printf("Update task for minutes %d\n", minutes)
+				//fmt.Printf("%+v\n", p.Args["task"].(map[string]interface{})["Minutes"])
+
+				DB.Where("strftime('%Y-%m-%d', date) = ? and name = ? and scope = ?", datestr, name, ScopeDay).FirstOrCreate(&task)
+
+				if val, ok := inputTask["Minutes"]; ok {
+					task.Minutes = val.(int)
+				}
+
+				if val, ok := inputTask["MinutesDelta"]; ok {
+					task.Minutes += val.(int)
+				}
+
+				DB.Save(&task)
+
+				return task, nil
+			},
+		},
+
 		"addTasks": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{

@@ -21,7 +21,7 @@ const Task = (props: any) => {
       type="TASK"
     >
       {(provided, snapshot) => (
-        <div className="Task mb1" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+        <div className="Task p1 mb1" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
           <div className="flex items-center justify-between">
             {/*<MdCheckCircle color={"green"} />
         <Button className="ml2" style={{ display: 'inline' }}>
