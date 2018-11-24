@@ -52,4 +52,17 @@ export const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum
     }
   }`) as Promise<TasksByDateRequest>;
 
+export const updateTask = (task: Partial<Task>) =>
+  client.request(`mutation updateTask($taskId: Int!, $task: InputTask!) {
+    updateTask(ID: $taskId, task: $task) {
+      ID, Status
+    }
+  }`, { task, taskId: task.ID });
+
+export const cycleTaskStatus = (task: Partial<Task>) =>
+  updateTask({
+    ...task,
+    Status: ((task.Status || 0) + 1) % (TaskStatus.STATUS_INCOMPLETE + 1)
+  });
+
 (window as any).tasksByDate = tasksByDate;

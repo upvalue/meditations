@@ -74,6 +74,11 @@ main .scope {
     //color: $black;
   }
 
+  &.STATUS_INCOMPLETE {
+    background-color: red;
+    color: white;
+  }
+
   &.STATUS_COMPLETE {
     background-color: #449d44;
     color: $white;

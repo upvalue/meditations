@@ -2,11 +2,11 @@
 package backend
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/go-macaron/binding"
 	"github.com/graphql-go/graphql"
 	macaron "gopkg.in/macaron.v1"
 )
@@ -58,10 +58,12 @@ var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 			Description: "Task status",
 		},
 
-		"Comment": &graphql.Field{
-			Type:        graphql.NewNonNull(commentInterface),
-			Description: "Task comment",
-		},
+		/*
+					"Comment": &graphql.Field{
+						Type:        graphql.NewNonNull(commentInterface),
+						Description: "Task comment",
+			    },
+		*/
 
 		"CompletionRate": &graphql.Field{
 			Type:        graphql.Int,
@@ -262,6 +264,9 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 var taskInputObject = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "InputTask",
 	Fields: graphql.InputObjectConfigFieldMap{
+		"ID": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
 		"Name": &graphql.InputObjectFieldConfig{
 			Type: graphql.String,
 		},
@@ -269,6 +274,23 @@ var taskInputObject = graphql.NewInputObject(graphql.InputObjectConfig{
 			Type: graphql.Int,
 		},
 		"MinutesDelta": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+		"Scope": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+		"Status": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+		// Completely ignored. Defined here in order to allow pass through
+		// of tasks that result from some queries
+		"CompletedTasks": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+		"TotalTasks": &graphql.InputObjectFieldConfig{
+			Type: graphql.Int,
+		},
+		"CompletionRate": &graphql.InputObjectFieldConfig{
 			Type: graphql.Int,
 		},
 	},
@@ -297,6 +319,34 @@ var TaskYnterface = graphql.NewObject(graphql.ObjectConfig{
 var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
 	Fields: graphql.Fields{
+		"updateTask": &graphql.Field{
+			Type: taskInterface,
+			Args: graphql.FieldConfigArgument{
+				"ID": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Task ID",
+				},
+				"task": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(taskInputObject),
+					Description: "Task fields to update",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var task Task
+
+				DB.Where("id = ?", p.Args["ID"].(int)).Find(&task)
+
+				inputTask := p.Args["task"].(map[string]interface{})
+
+				if val, ok := inputTask["Status"]; ok {
+					task.Status = val.(int)
+				}
+
+				DB.Save(&task)
+
+				return task, nil
+			},
+		},
 
 		// Update or add task by name for a particular day
 		"updateOrAddTaskByName": &graphql.Field{
@@ -306,7 +356,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Day to add or update task on",
 				},
-				"name": &graphql.ArgumentConfig{
+				"Name": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Task name",
 				},
@@ -415,6 +465,18 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 	return result
 }
 
+func executeVarQuery(query string, vars map[string]interface{}, schema graphql.Schema) *graphql.Result {
+	result := graphql.Do(graphql.Params{
+		Schema:         schema,
+		RequestString:  query,
+		VariableValues: vars,
+	})
+	if len(result.Errors) > 0 {
+		fmt.Printf("wrong result, unexpected errors: %v", result.Errors)
+	}
+	return result
+}
+
 // GraphQL schema object
 var schema graphql.Schema
 var graphqlinitialized = false
@@ -434,11 +496,28 @@ func graphqlWebInit(m *macaron.Macaron) {
 	graphqlInitialize()
 
 	type Query struct {
-		Query string `json:"query"`
+		Query     string                 `json:"query"`
+		Variables map[string]interface{} `json:"variables"`
 	}
 
-	m.Post("/graphql", binding.Bind(Query{}), func(c *macaron.Context, q Query) {
-		result := executeQuery(q.Query, schema)
+	m.Post("/graphql", func(c *macaron.Context) {
+
+		var body map[string]interface{}
+
+		bodybytes, _ := c.Req.Body().Bytes()
+		_ = json.Unmarshal(bodybytes, &body)
+
+		var result *graphql.Result
+
+		if vars, ok := body["variables"]; ok {
+			result = executeVarQuery(body["query"].(string), vars.(map[string]interface{}), schema)
+		} else {
+			result = executeQuery(body["query"].(string), schema)
+
+		}
+
+		fmt.Printf("%+v\n", body)
+		// result := executeVarQuery(q.Query, q.Variables, schema)
 
 		c.JSON(http.StatusOK, result)
 	})

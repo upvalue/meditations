@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from '@reach/router';
 import classNames from 'classnames';
-import { tasksByDate, TasksByDateRequest, TaskStatus } from '../api';
+import { tasksByDate, TasksByDateRequest, TaskStatus, cycleTaskStatus } from '../api';
 
 import { MdChevronLeft, MdArrowBack, MdChevronRight, MdArrowForward } from 'react-icons/md';
 import { HeaderIconButton } from '../Header';
@@ -16,6 +16,11 @@ export interface HabitsPageProps extends RouteComponentProps { }
 const Task = (props: any) => {
   let nameString = props.task && props.task.Name;
 
+  // const [task] = useSynchronizedTask(props.task)
+
+  // 
+
+  // const [task] = useSynchronizedTask(props.task)
 
   if (props.task && props.task.CompletedTasks) {
     // tslint:disable-next-line
@@ -23,7 +28,7 @@ const Task = (props: any) => {
   }
 
   const cycleStatus = () => {
-    console.log('cycle ye task status');
+    cycleTaskStatus(props.task);
   }
 
   return (
