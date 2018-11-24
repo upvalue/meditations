@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from '@reach/router';
 import classNames from 'classnames';
+import api, { TasksByDateRequest } from '../api';
 
 import { MdChevronLeft, MdArrowBack, MdChevronRight, MdArrowForward } from 'react-icons/md';
 import { HeaderIconButton } from '../Header';
@@ -10,18 +11,30 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { MdCheckCircle } from 'react-icons/md';
 
-
 export interface HabitsPageProps extends RouteComponentProps { }
 
 const Task = (props: any) => {
+  let nameString = props.task && props.task.Name;
+
+  if (props.task && props.task.CompletedTasks) {
+    // tslint:disable-next-line
+    nameString = `${nameString} ${props.task.CompletedTasks}/${props.task.TotalTasks} (${props.task.CompletionRate}%)`
+  }
+
+
   return (
     <Draggable
       draggableId={props.taskId}
       index={props.index}
       type="TASK"
     >
-      {(provided, snapshot) => (
-        <div className="Task p1 mb1" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+      {(provided, _snapshot) => (
+        <div
+          className="Task p1 mb1"
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+        >
           <div className="flex items-center justify-between">
             {/*<MdCheckCircle color={"green"} />
         <Button className="ml2" style={{ display: 'inline' }}>
@@ -31,6 +44,7 @@ const Task = (props: any) => {
               className="" style={{ display: 'inline' }}
             >
               {props.children}
+              {nameString}
             </Button>
 
             <div className="mr1">
@@ -69,13 +83,29 @@ const Scope = (props: any) => {
         {(provided, snapshot) => (
           <>
             <div ref={provided.innerRef} {...provided.droppableProps}>
-              <Task taskId={`${props.name}-0`} index={0}>Exercise 1/10 (10%)</Task>
-              <Task taskId={`${props.name}-1`} index={1}> Diet 15/18 (83%)</Task>
-              <Task taskId={`${props.name}-2`} index={2} comment={true}>Feed the lawn</Task>
-              <Task taskId={`${props.name}-3`} index={3}>Mow the cat</Task>
-              <Task taskId={`${props.name}-4`} index={4}>Something</Task>
-              <Task taskId={`${props.name}-5`} index={5}>Whatever</Task>
-              <Task taskId={`${props.name}-6`} index={6}>Thing</Task>
+              {!props.tasks &&
+                <>
+                  <Task taskId={`${props.name}-0`} index={0}>Exercise 1/10 (10%)</Task>
+                  <Task taskId={`${props.name}-1`} index={1}> Diet 15/18 (83%)</Task>
+                  <Task taskId={`${props.name}-2`} index={2} comment={true}>Feed the lawn</Task>
+                  <Task taskId={`${props.name}-3`} index={3}>Mow the cat</Task>
+                  <Task taskId={`${props.name}-4`} index={4}>Something</Task>
+                  <Task taskId={`${props.name}-5`} index={5}>Whatever</Task>
+                  <Task taskId={`${props.name}-6`} index={6} comment={true}>Thing</Task>
+                  <Task taskId={`${props.name}-7`} index={7}>Some other type of thing</Task>
+                  <Task taskId={`${props.name}-7`} index={7}>There is both rhyme and reason</Task>
+                </>
+              }
+
+              {props.tasks && props.tasks.map((task: any, i: number) => (
+                <Task
+                  key={task.ID}
+                  taskId={task.ID}
+                  index={i}
+                  task={task}
+                />
+              ))}
+
               {provided.placeholder}
             </div>
           </>
@@ -88,8 +118,35 @@ const Scope = (props: any) => {
         </Button>
       </div>
     </div>
-
   )
+}
+
+const ScopeContainer = (props: any) => {
+  return (
+    <Scope {...props} />
+  );
+}
+
+export const HabitsMain = () => {
+  let [tasks, setTasks] = useState<TasksByDateRequest | null>(null);
+
+  useEffect(() => {
+    const promise = api.tasksByDate('2018-11-23', ['DAYS', 'MONTH', 'YEAR']);
+    promise.then(res => {
+      setTasks(res);
+    });
+  }, []);
+
+  return (
+    <main className="ml3 flex-auto mt3">
+      <View className="higher-scopes" flex={[]}>
+        <ScopeContainer name="Nov 20" className="mr2" />
+        <ScopeContainer className="mr2" style={{ width: '33%' }} tasks={tasks && tasks.tasksByDate.Month} />
+        <ScopeContainer name="2018" className="mr2" style={{ width: '33%' }} />
+        <ScopeContainer name="Project" className="mr2" style={{ width: '33%' }} />
+      </View>
+    </main>
+  );
 }
 
 export const HabitsPage = (props: HabitsPageProps) => {
@@ -126,13 +183,8 @@ export const HabitsPage = (props: HabitsPageProps) => {
           </View>
         </View>
 
-        <main className="ml3 pt3 flex-auto">
-          <View flex="flex-auto">
-            <Scope className="mr2" style={{ width: '33%' }} />
-            <Scope name="2018" className="mr2" style={{ width: '33%' }} />
-            <Scope name="Project" className="mr2" style={{ width: '33%' }} />
-          </View>
-        </main>
+        <HabitsMain />
+
       </DragDropContext>
     </>
   );

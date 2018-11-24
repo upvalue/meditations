@@ -2,37 +2,52 @@ import { GraphQLClient } from 'graphql-request';
 
 const client = new GraphQLClient('/graphql');
 
-type RequestScopeEnum = 'MONTH' | 'DAY' | 'YEAR';
+type RequestScopeEnum = 'MONTH' | 'DAYS' | 'YEAR';
 
-interface Task {
+export interface Task {
+  ID: number;
   Name: string;
+  Minutes: number;
+  Status: number;
+  // Calculated on query
+  CompletionRate?: number;
+  TotalTasks?: number;
+  CompletedTasks?: number;
 }
 
-interface TasksByDateRequest {
+export interface TasksByDateRequest {
   tasksByDate: {
-    Month: Partial<Task>;
+    Days: ReadonlyArray<Partial<Task>>;
+    Month: ReadonlyArray<Partial<Task>>;
+    Year: ReadonlyArray<Partial<Task>>;
   };
 }
 
+const allDayTaskFields = 'ID, Name, Scope, Status';
+const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, CompletedTasks`;
+
 /**
  * Query tasks within a date scope (e.g. all tasks for a given month)
- * @param date Date. YYYY-MM-DD. 
+ * @param date Date. YYYY-MM-DD.
  * @param scopes MONTH, YEAR, DAYS (query all days within month)
  */
 const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum>) =>
   client.request(`{
     tasksByDate(date: "${date}", scopes: [${scopes.join(',')}]) {
+      Days {
+        ${allDayTaskFields}
+      }
       Month {
-        ID, Name
+        ${allTaskFields}
+      }
+      Year {
+        ${allTaskFields}
       }
     }
   }`) as Promise<TasksByDateRequest>;
 
 (window as any).tasksByDate = tasksByDate;
 
-const doSth = () => console.log('api init');
-
 export default ({
   tasksByDate,
-  doSth
 });

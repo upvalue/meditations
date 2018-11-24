@@ -62,6 +62,21 @@ var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewNonNull(commentInterface),
 			Description: "Task comment",
 		},
+
+		"CompletionRate": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Completion rate",
+		},
+
+		"TotalTasks": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Total tasks",
+		},
+
+		"CompletedTasks": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Completed tasks",
+		},
 	},
 })
 
@@ -167,8 +182,14 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 					if scopei == ScopeMonth {
 						tasksInScope(&tasksByDate.Month, ScopeMonth, date)
+						for i := range tasksByDate.Month {
+							tasksByDate.Month[i].CalculateStats()
+						}
 					} else if scopei == ScopeYear {
 						tasksInScope(&tasksByDate.Year, ScopeYear, date)
+						for i := range tasksByDate.Year {
+							tasksByDate.Year[i].CalculateStats()
+						}
 					} else if scopei == ScopeDay {
 						begin, end := _between(date, ScopeMonth)
 

@@ -13,24 +13,31 @@
   box-shadow: 1px 0px 1px 0px  $dark-gray3;
 }
 
+main .scopes {
+  max-height: 100%;
+}
+
+main .scope {
+  overflow-y: auto;
+}
+
 .scope {
   background-color: $white;
   box-shadow: 0px 0px 3px 1px $light-gray1;
   border-radius: 2px;
   max-width: 33%;
-  // background-color: darken($light-gray5, 2%);
-  //border: 1px solid $light-gray5;
 
   .Comment {
     font-family: $font-mono;
     font-size: 0.8rem;
   }
-
 }
 
 .dark .Task {
   // background-color: #395939;
   border-color: $dark-gray4;
+
+  // Zebra striping
 
   &:nth-of-type(odd) {
     background-color: $dark-gray4;
@@ -43,20 +50,13 @@
 
 .dark .scope {
   box-shadow: none;
-  // border-radius: 4px;
-  //border: 1px solid $dark-gray3;
   background-color: $dark-gray5;
-  // box-shadow: 0px 0px 1px 0px $dark-gray3;
+  box-shadow: 0px 0px 1px 0px $dark-gray2;
 }
 
 .Task {
   border-radius: 2px;
-  //border:1px solid $gray5;
   background-color: $white;
-  // background-color: #ecffec;
-  // background-color: $light-gray5;
-  transition: transform 5s ease;
-      //style={{ transform: 'translate3d(0, 100px, 0)', transition: 'transform 5s ease, top 5s ease' }}
 }
 
 
@@ -64,26 +64,18 @@
   background-color: $light-gray5;
 }
 
-
 .Task:nth-of-type(even) {
   background-color: $white;
-  // background-color: $light-gray4;
 }
 
 .Task .button {
   background-color: #449d44;
   border:0;
   border-left: 1px solid #449d44;
-  // border: 0;
-  //width: 50%;
   text-align: left;
   
   border-radius: 0;
-  //border-radius: 2px;
   color: $white;
-  //color: $black;
-  //background-color: $white;
   background-image: none;
   box-shadow: none;
-  // border-radius: 0;
 }
