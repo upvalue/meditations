@@ -30,7 +30,7 @@ export const HeaderIconButton = (props: HeaderIconButtonProps) => {
       <Component size="1.5em" />
     </Button>
   );
-}
+};
 
 /**
  * Page header. Displays navigation, title, global controls.
@@ -42,11 +42,11 @@ export const Header = () => {
     <View
       component="header"
       className="dark"
-      flex="items-center"
+      flex={['flex', 'items-center']}
       style={{ height: '55px' }}
     >
-      <View flex={['flex-auto']}>
-        <View padding="px2" margin="ml2" flex="items-center">
+      <View flex={['flex', 'flex-auto']}>
+        <View padding="px2" margin="ml2" flex={['flex', 'items-center']}>
           <h1 className="m0" style={{ display: 'inline ' }}>meditations</h1>
           <nav>
             <Link to="/" getProps={headerLinkProps}>
@@ -59,7 +59,7 @@ export const Header = () => {
         </View>
       </View>
 
-      <View flex={[]} margin="mr2">
+      <View flex="flex" margin="mr2">
         <HeaderIconButton
           icon={theme === 'dark' ? MdBrightness4 : MdBrightness3}
           title="Toggle dark mode"

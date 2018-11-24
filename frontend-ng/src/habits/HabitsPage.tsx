@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from '@reach/router';
 import classNames from 'classnames';
-import api, { TasksByDateRequest } from '../api';
+import { tasksByDate, TasksByDateRequest, TaskStatus } from '../api';
 
 import { MdChevronLeft, MdArrowBack, MdChevronRight, MdArrowForward } from 'react-icons/md';
 import { HeaderIconButton } from '../Header';
@@ -16,11 +16,15 @@ export interface HabitsPageProps extends RouteComponentProps { }
 const Task = (props: any) => {
   let nameString = props.task && props.task.Name;
 
+
   if (props.task && props.task.CompletedTasks) {
     // tslint:disable-next-line
     nameString = `${nameString} ${props.task.CompletedTasks}/${props.task.TotalTasks} (${props.task.CompletionRate}%)`
   }
 
+  const cycleStatus = () => {
+    console.log('cycle ye task status');
+  }
 
   return (
     <Draggable
@@ -41,7 +45,8 @@ const Task = (props: any) => {
           &nbsp;{props.children}
   </Button>*/}
             <Button
-              className="" style={{ display: 'inline' }}
+              onClick={cycleStatus}
+              className={props.task ? TaskStatus[props.task.Status] : ''}
             >
               {props.children}
               {nameString}
@@ -131,7 +136,7 @@ export const HabitsMain = () => {
   let [tasks, setTasks] = useState<TasksByDateRequest | null>(null);
 
   useEffect(() => {
-    const promise = api.tasksByDate('2018-11-23', ['DAYS', 'MONTH', 'YEAR']);
+    const promise = tasksByDate('2018-11-23', ['DAYS', 'MONTH', 'YEAR']);
     promise.then(res => {
       setTasks(res);
     });
@@ -139,7 +144,7 @@ export const HabitsMain = () => {
 
   return (
     <main className="ml3 flex-auto mt3">
-      <View className="higher-scopes" flex={[]}>
+      <View className="higher-scopes" flex="flex">
         <ScopeContainer name="Nov 20" className="mr2" />
         <ScopeContainer className="mr2" style={{ width: '33%' }} tasks={tasks && tasks.tasksByDate.Month} />
         <ScopeContainer name="2018" className="mr2" style={{ width: '33%' }} />

@@ -2,7 +2,13 @@ import { GraphQLClient } from 'graphql-request';
 
 const client = new GraphQLClient('/graphql');
 
-type RequestScopeEnum = 'MONTH' | 'DAYS' | 'YEAR';
+export enum TaskStatus {
+  STATUS_UNSET = 0,
+  STATUS_COMPLETE = 1,
+  STATUS_INCOMPLETE = 2
+}
+
+export type RequestScopeEnum = 'MONTH' | 'DAYS' | 'YEAR';
 
 export interface Task {
   ID: number;
@@ -31,7 +37,7 @@ const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, Complete
  * @param date Date. YYYY-MM-DD.
  * @param scopes MONTH, YEAR, DAYS (query all days within month)
  */
-const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum>) =>
+export const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum>) =>
   client.request(`{
     tasksByDate(date: "${date}", scopes: [${scopes.join(',')}]) {
       Days {
@@ -47,7 +53,3 @@ const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum>) =>
   }`) as Promise<TasksByDateRequest>;
 
 (window as any).tasksByDate = tasksByDate;
-
-export default ({
-  tasksByDate,
-});

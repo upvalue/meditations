@@ -69,13 +69,18 @@ main .scope {
 }
 
 .Task .button {
-  background-color: #449d44;
+  &.STATUS_UNSET {
+    background-color: $light-gray2;
+    //color: $black;
+  }
+
+  &.STATUS_COMPLETE {
+    background-color: #449d44;
+    color: $white;
+  }
   border:0;
-  border-left: 1px solid #449d44;
   text-align: left;
   
-  border-radius: 0;
-  color: $white;
   background-image: none;
   box-shadow: none;
 }
