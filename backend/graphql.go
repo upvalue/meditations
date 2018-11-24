@@ -454,18 +454,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func executeQuery(query string, schema graphql.Schema) *graphql.Result {
-	result := graphql.Do(graphql.Params{
-		Schema:        schema,
-		RequestString: query,
-	})
-	if len(result.Errors) > 0 {
-		fmt.Printf("wrong result, unexpected errors: %v", result.Errors)
-	}
-	return result
-}
-
-func executeVarQuery(query string, vars map[string]interface{}, schema graphql.Schema) *graphql.Result {
+func executeVarQuery(query string, vars map[string]interface{}) *graphql.Result {
 	result := graphql.Do(graphql.Params{
 		Schema:         schema,
 		RequestString:  query,
@@ -475,6 +464,10 @@ func executeVarQuery(query string, vars map[string]interface{}, schema graphql.S
 		fmt.Printf("wrong result, unexpected errors: %v", result.Errors)
 	}
 	return result
+}
+
+func executeQuery(query string) *graphql.Result {
+	return executeVarQuery(query, nil)
 }
 
 // GraphQL schema object
@@ -510,9 +503,9 @@ func graphqlWebInit(m *macaron.Macaron) {
 		var result *graphql.Result
 
 		if vars, ok := body["variables"]; ok {
-			result = executeVarQuery(body["query"].(string), vars.(map[string]interface{}), schema)
+			result = executeVarQuery(body["query"].(string), vars.(map[string]interface{}))
 		} else {
-			result = executeQuery(body["query"].(string), schema)
+			result = executeVarQuery(body["query"].(string), nil)
 
 		}
 

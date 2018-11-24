@@ -46,7 +46,7 @@ func TestStatistics(t *testing.T) {
 // object for testing purposes in my estimation: convert it to json, then use one of the
 // many json query libraries to interface with it
 func graphqlToJson(t *testing.T, query string) *jsonq.JsonQuery {
-	result := executeQuery(query, schema)
+	result := executeQuery(query)
 
 	if result.HasErrors() {
 		t.FailNow()
