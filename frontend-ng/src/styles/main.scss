@@ -1,8 +1,8 @@
 @import '@upvalueio/third-coast/index.scss';
 
+// Definitions files
+
 @import './colors.scss';
-@import '../Header.scss';
-@import '../habits/HabitsPage.scss';
 
 body {
   // background-color: $background;
@@ -30,3 +30,11 @@ body {
   background-color: $dark-background;
   color: $white;
 }
+
+// Habits
+@import '../Header.scss';
+
+
+@import '../habits/HabitsPage.scss';
+@import "../habits/Scope.scss";
+@import "../habits/Task.scss";
