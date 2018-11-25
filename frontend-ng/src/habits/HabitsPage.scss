@@ -1,5 +1,9 @@
 
-.sidebar {
+.Sidebar-container {
+  width: 22em;
+}
+
+.Sidebar {
   // border-radius: 4px;
   padding: 1rem;
   border-right: 1px solid $light-gray1;
@@ -7,7 +11,7 @@
   box-shadow: 1px 0px 1px 0px $light-gray1;
 }
 
-.dark .sidebar {
+.dark .Sidebar {
   background-color: $dark-gray5;
   border-right: 1px solid $dark-gray5;
   box-shadow: 1px 0px 1px 0px  $dark-gray3;

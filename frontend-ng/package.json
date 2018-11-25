@@ -13,6 +13,7 @@
     "@types/redux-logger": "^3.0.6",
     "@upvalueio/third-coast": "^0.1.17",
     "classnames": "^2.2.6",
+    "date-fns": "^2.0.0-alpha.25",
     "react": "^16.7.0-alpha.2",
     "react-beautiful-dnd": "^10.0.1",
     "react-dev-utils": "^6.0.6-next.c662dfb0",

@@ -18,6 +18,7 @@ const ThemedBody = () => {
     <Router className="ThemedBody flex ">
       <HabitsPage
         default={true}
+        path="/habits"
       />
       <NotesPage
         path="/notes"

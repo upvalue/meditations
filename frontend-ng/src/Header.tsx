@@ -1,36 +1,18 @@
 // Header.tsx - Header
 import React from 'react';
+
 import classNames from 'classnames';
-
 import { MdBrightness3, MdBrightness4 } from 'react-icons/md';
-
 import { View, useTheme, Button } from '@upvalueio/third-coast';
 import { Link, LinkGetProps } from '@reach/router';
+
+import { IconButton } from './components/IconButton';
 
 /**
  * Style active links
  */
 const headerLinkProps = (props: LinkGetProps) =>
   ({ className: classNames('ml3', props.isCurrent && 'active') });
-
-export interface HeaderIconButtonProps {
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  // TODO type this
-  icon: any;
-  title?: string;
-}
-
-/**
- * Minimally styled header icon
- */
-export const HeaderIconButton = (props: HeaderIconButtonProps) => {
-  const Component = props.icon;
-  return (
-    <Button title={props.title} minimal={true} padding="p1" onClick={props.onClick}>
-      <Component size="1.5em" />
-    </Button>
-  );
-};
 
 /**
  * Page header. Displays navigation, title, global controls.
@@ -60,7 +42,7 @@ export const Header = () => {
       </View>
 
       <View flex="flex" margin="mr2">
-        <HeaderIconButton
+        <IconButton
           icon={theme === 'dark' ? MdBrightness4 : MdBrightness3}
           title="Toggle dark mode"
           onClick={() => { setTheme(theme === 'dark' ? undefined : 'dark'); }}

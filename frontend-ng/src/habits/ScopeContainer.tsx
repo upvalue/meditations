@@ -1,8 +1,15 @@
 import React from 'react';
 
 import { Scope } from "./Scope";
+import { Task } from '../api';
 
-export const ScopeContainer = (props: any) => {
+interface ScopeContainerProps {
+  className?: string;
+  date: string;
+  tasks: ReadonlyArray<Partial<Task>>;
+}
+
+export const ScopeContainer = (props: ScopeContainerProps) => {
   return (
     <Scope {...props} />
   );

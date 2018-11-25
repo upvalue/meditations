@@ -1,0 +1,15 @@
+a.IconLink {
+  &:hover, &:active {
+    color: $black;
+  }
+
+  color: $black;
+}
+
+.dark a.IconLink {
+  &:hover, &:active {
+    color: $white;
+  }
+
+  color: $white;
+}

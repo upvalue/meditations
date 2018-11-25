@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { format, parse } from 'date-fns';
 
 const client = new GraphQLClient('/graphql');
 
@@ -64,5 +65,18 @@ export const cycleTaskStatus = (task: Partial<Task>) =>
     ...task,
     Status: ((task.Status || 0) + 1) % (TaskStatus.STATUS_INCOMPLETE + 1)
   });
+
+/**
+ * Format a date in the way the backend expects it, YYYY-MM-DD
+ */
+export const formatDate = (date: Date) => {
+  return format(date, 'YYYY-MM-DD');
+}
+
+const baseDate = new Date();
+
+export const parseDate = (date: string) => {
+  return parse(date, 'YYYY-MM-DD', baseDate);
+}
 
 (window as any).tasksByDate = tasksByDate;

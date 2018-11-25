@@ -45,7 +45,7 @@ func TestStatistics(t *testing.T) {
 // This is positively silly, but the easiest way to deal with this complex result
 // object for testing purposes in my estimation: convert it to json, then use one of the
 // many json query libraries to interface with it
-func graphqlToJson(t *testing.T, query string) *jsonq.JsonQuery {
+func graphqlToJSON(t *testing.T, query string) *jsonq.JsonQuery {
 	result := executeQuery(query)
 
 	if result.HasErrors() {
@@ -69,16 +69,7 @@ func graphqlToJson(t *testing.T, query string) *jsonq.JsonQuery {
 
 // TestGraphQL tests the most basic possible GraphQL query
 func TestBasicGraphQL(t *testing.T) {
-	/*
-			result := executeQuery("{\n\tping\n}", schema)
-			bytes, _ := json.Marshal(result.Data)
-			json := string(bytes)
-
-			if json != "{\"ping\":\"pong\"}" {
-				t.Fail()
-		  }
-	*/
-	json := graphqlToJson(t, "{ ping }")
+	json := graphqlToJSON(t, "{ ping }")
 	str, err := json.String("ping")
 	if err != nil || str != "pong" {
 		t.FailNow()
@@ -86,7 +77,7 @@ func TestBasicGraphQL(t *testing.T) {
 }
 
 func TestTasksByDate(t *testing.T) {
-	jq := graphqlToJson(t, `{ tasksByDate(scopes: [MONTH], date: "2017-07-01") { Month { Name } } }`)
+	jq := graphqlToJSON(t, `{ tasksByDate(scopes: [MONTH], date: "2017-07-01") { Month { Name } } }`)
 	str, _ := jq.String("tasksByDate", "Month", "0", "Name")
 
 	if str != "Diet" {

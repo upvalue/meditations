@@ -31,9 +31,11 @@ body {
   color: $white;
 }
 
+// Common
+@import "../components/IconButton.scss";
+
 // Habits
 @import '../Header.scss';
-
 
 @import '../habits/HabitsPage.scss';
 @import "../habits/Scope.scss";

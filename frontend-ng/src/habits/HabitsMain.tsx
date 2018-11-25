@@ -1,31 +1,79 @@
 import React from 'react';
-import { useState, useEffect } from "react";
-import { View } from "@upvalueio/third-coast";
+import { useState, useEffect } from 'react';
+import { View } from '@upvalueio/third-coast';
 
-import { tasksByDate, TasksByDateRequest } from "../api";
-import { ScopeContainer } from "./ScopeContainer";
+import { tasksByDate, TasksByDateRequest, formatDate, RequestScopeEnum } from '../api';
+import { ScopeContainer } from './ScopeContainer';
+import { parse, differenceInCalendarYears } from 'date-fns';
+import { RouteComponentProps } from '@reach/router';
 
-export const HabitsMain = () => {
-  let [tasks, setTasks] = useState<TasksByDateRequest | null>(null);
+interface HabitsMainProps extends RouteComponentProps {
+  date?: string;
+}
 
+const baseDate = new Date();
+
+/**
+ * Main page, takes care of data loading.
+ */
+export const HabitsMain = (props: HabitsMainProps) => {
+  const [prevDate, setPrevDate] = useState<string | undefined>(props.date);
+  const [tasks, setTasks] = useState<TasksByDateRequest | null>(null);
+
+  // Make TypeScript happy. This will never be mounted without a date
+  const date = props.date || '';
+
+  const prevProps = props;
+
+  // Here. We need to load all data when necessary, and some data on navigation
   useEffect(() => {
-    const promise = tasksByDate('2018-11-23', ['DAYS', 'MONTH', 'YEAR']);
+    // Dispatch appropriate promise based on what has changed
+    let changedYear = false;
+
+    console.log('changedYear', prevDate);
+    if (!prevDate) {
+      changedYear = true;
+      // tslint:disable-next-line
+    } else if (props.date && Math.abs(differenceInCalendarYears(parse(prevDate, 'yyyy-MM', baseDate), parse(props.date, 'yyyy-MM', baseDate))) > 0) {
+      changedYear = true;
+      console.log('calendar year changed, refetching all ye data');
+      // The calendar year changed, refetch
+    }
+
+    const scopes: ReadonlyArray<RequestScopeEnum> =
+      changedYear ? ['DAYS', 'MONTH', 'YEAR'] : ['DAYS', 'MONTH'];
+
+    const promise = tasksByDate(formatDate(parse(date, 'yyyy-MM', baseDate)), scopes);
+
+    setPrevDate(props.date);
     promise.then((res) => {
-      setTasks(res);
+      console.log(res);
+      setTasks(tasks ?
+        {
+          ...tasks,
+          ...res,
+        } : res);
     });
-  }, []);
+  }, [props.date]);
 
   return (
-    <main className="ml3 flex-auto mt3">
+    <main className="m3 flex-auto">
       <View className="higher-scopes" flex="flex">
-        <ScopeContainer name="Nov 20" className="mr2" />
-        <ScopeContainer
-          className="mr2"
-          tasks={tasks && tasks.tasksByDate.Month}
-        />
-        <ScopeContainer name="2018" className="mr2" />
-        <ScopeContainer name="Project" className="mr2" />
+        {tasks &&
+          <>
+
+            <ScopeContainer
+              className="mr2"
+              date={date}
+              tasks={tasks.tasksByDate.Month}
+            />
+            <ScopeContainer
+              date={date}
+              tasks={tasks.tasksByDate.Year}
+            />
+          </>
+        }
       </View>
     </main>
   );
-}
+};
