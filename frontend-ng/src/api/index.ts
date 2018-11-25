@@ -54,7 +54,7 @@ export const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum
 
 export const updateTask = (task: Partial<Task>) =>
   client.request(`mutation updateTask($taskId: Int!, $task: InputTask!) {
-    updateTask(ID: $taskId, task: $task) {
+    updateTask(id: $taskId, task: $task) {
       ID, Status
     }
   }`, { task, taskId: task.ID });

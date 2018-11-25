@@ -322,7 +322,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 		"updateTask": &graphql.Field{
 			Type: taskInterface,
 			Args: graphql.FieldConfigArgument{
-				"ID": &graphql.ArgumentConfig{
+				"id": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.Int),
 					Description: "Task ID",
 				},
@@ -356,7 +356,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Day to add or update task on",
 				},
-				"Name": &graphql.ArgumentConfig{
+				"name": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Task name",
 				},
@@ -509,7 +509,7 @@ func graphqlWebInit(m *macaron.Macaron) {
 
 		}
 
-		fmt.Printf("%+v\n", body)
+		// fmt.Printf("%+v\n", body)
 		// result := executeVarQuery(q.Query, q.Variables, schema)
 
 		c.JSON(http.StatusOK, result)
