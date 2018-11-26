@@ -4,7 +4,6 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import { HabitsMain } from './HabitsMain';
 import { HabitsSidebar } from './HabitsSidebar';
 
-
 export interface HabitsPageProps extends RouteComponentProps { }
 
 export const HabitsPage = (props: HabitsPageProps) => {

@@ -4,7 +4,7 @@ import { View } from '@upvalueio/third-coast';
 
 import { tasksByDate, TasksByDateRequest, formatDate, RequestScopeEnum } from '../api';
 import { ScopeContainer } from './ScopeContainer';
-import { parse, differenceInCalendarYears } from 'date-fns';
+import { parse, differenceInCalendarYears, format } from 'date-fns';
 import { RouteComponentProps } from '@reach/router';
 
 interface HabitsMainProps extends RouteComponentProps {
@@ -17,7 +17,7 @@ const baseDate = new Date();
  * Main page, takes care of data loading.
  */
 export const HabitsMain = (props: HabitsMainProps) => {
-  const [prevDate, setPrevDate] = useState<string | undefined>(props.date);
+  const [prevDate, setPrevDate] = useState<string | undefined>(undefined);
   const [tasks, setTasks] = useState<TasksByDateRequest | null>(null);
 
   // Make TypeScript happy. This will never be mounted without a date
@@ -27,6 +27,7 @@ export const HabitsMain = (props: HabitsMainProps) => {
 
   // Here. We need to load all data when necessary, and some data on navigation
   useEffect(() => {
+    console.log('useEffect');
     // Dispatch appropriate promise based on what has changed
     let changedYear = false;
 
@@ -47,11 +48,10 @@ export const HabitsMain = (props: HabitsMainProps) => {
 
     setPrevDate(props.date);
     promise.then((res) => {
-      console.log(res);
       setTasks(tasks ?
         {
-          ...tasks,
           ...res,
+          ...tasks,
         } : res);
     });
   }, [props.date]);
@@ -63,11 +63,14 @@ export const HabitsMain = (props: HabitsMainProps) => {
           <>
 
             <ScopeContainer
+              title={format(date, 'MMMM')}
               className="mr2"
               date={date}
               tasks={tasks.tasksByDate.Month}
             />
+
             <ScopeContainer
+              title={format(date, 'yyyy')}
               date={date}
               tasks={tasks.tasksByDate.Year}
             />

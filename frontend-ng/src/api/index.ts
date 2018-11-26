@@ -39,6 +39,7 @@ const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, Complete
  * @param scopes MONTH, YEAR, DAYS (query all days within month)
  */
 export const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum>) =>
+  (console.log(scopes), false) ||
   client.request(`{
     tasksByDate(date: "${date}", scopes: [${scopes.join(',')}]) {
       Days {
@@ -47,9 +48,9 @@ export const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum
       Month {
         ${allTaskFields}
       }
-      Year {
-        ${allTaskFields}
-      }
+      ${scopes.find(x => x === 'YEAR') !== undefined ?
+      `Year { ${allTaskFields} }`
+      : ''}
     }
   }`) as Promise<TasksByDateRequest>;
 
@@ -70,13 +71,13 @@ export const cycleTaskStatus = (task: Partial<Task>) =>
  * Format a date in the way the backend expects it, YYYY-MM-DD
  */
 export const formatDate = (date: Date) => {
-  return format(date, 'YYYY-MM-DD');
+  return format(date, 'yyyy-MM-dd');
 }
 
 const baseDate = new Date();
 
 export const parseDate = (date: string) => {
-  return parse(date, 'YYYY-MM-DD', baseDate);
+  return parse(date, 'yyyy-MM-dd', baseDate);
 }
 
 (window as any).tasksByDate = tasksByDate;

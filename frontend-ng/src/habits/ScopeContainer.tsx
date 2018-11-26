@@ -6,6 +6,7 @@ import { Task } from '../api';
 interface ScopeContainerProps {
   className?: string;
   date: string;
+  title: string;
   tasks: ReadonlyArray<Partial<Task>>;
 }
 

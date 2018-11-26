@@ -5,7 +5,7 @@ import { MdCheckCircle } from "react-icons/md";
 
 import { cycleTaskStatus, TaskStatus } from "../api";
 
-export const Task = (props: any) => {
+export const CTask = (props: any) => {
   let nameString = props.task && props.task.Name;
 
   if (props.task && props.task.CompletedTasks) {
