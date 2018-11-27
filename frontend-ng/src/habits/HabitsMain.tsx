@@ -18,41 +18,34 @@ const baseDate = new Date();
  */
 export const HabitsMain = (props: HabitsMainProps) => {
   const [prevDate, setPrevDate] = useState<string | undefined>(undefined);
-  const [tasks, setTasks] = useState<TasksByDateRequest | null>(null);
+  const [tasks, setTasks] = useState<TasksByDateRequest['tasksByDate'] | null>(null);
 
   // Make TypeScript happy. This will never be mounted without a date
   const date = props.date || '';
 
-  const prevProps = props;
-
   // Here. We need to load all data when necessary, and some data on navigation
   useEffect(() => {
-    console.log('useEffect');
     // Dispatch appropriate promise based on what has changed
     let changedYear = false;
 
-    console.log('changedYear', prevDate);
     if (!prevDate) {
       changedYear = true;
       // tslint:disable-next-line
     } else if (props.date && Math.abs(differenceInCalendarYears(parse(prevDate, 'yyyy-MM', baseDate), parse(props.date, 'yyyy-MM', baseDate))) > 0) {
       changedYear = true;
-      console.log('calendar year changed, refetching all ye data');
+      // console.log('calendar year changed, refetching all ye data');
       // The calendar year changed, refetch
     }
 
-    const scopes: ReadonlyArray<RequestScopeEnum> =
-      changedYear ? ['DAYS', 'MONTH', 'YEAR'] : ['DAYS', 'MONTH'];
-
-    const promise = tasksByDate(formatDate(parse(date, 'yyyy-MM', baseDate)), scopes);
+    const promise = tasksByDate(formatDate(parse(date, 'yyyy-MM', baseDate)), changedYear);
 
     setPrevDate(props.date);
     promise.then((res) => {
       setTasks(tasks ?
         {
-          ...res,
           ...tasks,
-        } : res);
+          ...res.tasksByDate,
+        } : res.tasksByDate);
     });
   }, [props.date]);
 
@@ -66,13 +59,13 @@ export const HabitsMain = (props: HabitsMainProps) => {
               title={format(date, 'MMMM')}
               className="mr2"
               date={date}
-              tasks={tasks.tasksByDate.Month}
+              tasks={tasks.Month}
             />
 
             <ScopeContainer
               title={format(date, 'yyyy')}
               date={date}
-              tasks={tasks.tasksByDate.Year}
+              tasks={tasks.Year}
             />
           </>
         }

@@ -4,15 +4,16 @@ import React from 'react';
 import classNames from 'classnames';
 import { MdBrightness3, MdBrightness4 } from 'react-icons/md';
 import { View, useTheme, Button } from '@upvalueio/third-coast';
-import { Link, LinkGetProps } from '@reach/router';
+import { Link, LinkGetProps, Location, LocationContext } from '@reach/router';
 
 import { IconButton } from './components/IconButton';
 
 /**
  * Style active links
  */
-const headerLinkProps = (props: LinkGetProps) =>
-  ({ className: classNames('ml3', props.isCurrent && 'active') });
+const headerLinkProps = (props: LinkGetProps) => {
+  return ({ className: classNames('ml3', props.isPartiallyCurrent && 'active') });
+}
 
 /**
  * Page header. Displays navigation, title, global controls.
@@ -25,7 +26,6 @@ export const Header = () => {
       component="header"
       className="dark"
       flex={['flex', 'items-center']}
-      style={{ height: '55px' }}
     >
       <View flex={['flex', 'flex-auto']}>
         <View padding="px2" margin="ml2" flex={['flex', 'items-center']}>

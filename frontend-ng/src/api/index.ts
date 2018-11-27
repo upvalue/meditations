@@ -36,21 +36,18 @@ const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, Complete
 /**
  * Query tasks within a date scope (e.g. all tasks for a given month)
  * @param date Date. YYYY-MM-DD.
- * @param scopes MONTH, YEAR, DAYS (query all days within month)
+ * @param includeYear If true, will query for year
  */
-export const tasksByDate = (date: string, scopes: ReadonlyArray<RequestScopeEnum>) =>
-  (console.log(scopes), false) ||
+export const tasksByDate = (date: string, includeYear: boolean) =>
   client.request(`{
-    tasksByDate(date: "${date}", scopes: [${scopes.join(',')}]) {
+    tasksByDate(date: "${date}", scopes: [DAYS, MONTH${includeYear ? ', YEAR' : ''}]) {
       Days {
         ${allDayTaskFields}
       }
       Month {
         ${allTaskFields}
       }
-      ${scopes.find(x => x === 'YEAR') !== undefined ?
-      `Year { ${allTaskFields} }`
-      : ''}
+      ${includeYear ? `Year { ${allTaskFields} }` : ''}
     }
   }`) as Promise<TasksByDateRequest>;
 

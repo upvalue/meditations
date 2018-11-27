@@ -3,7 +3,7 @@ import React, { Component, useState } from 'react';
 import { Provider } from 'react-redux';
 import classNames from 'classnames';
 
-import { Router } from '@reach/router';
+import { Router, Redirect } from '@reach/router';
 
 import { ThirdCoast, Button, useTheme } from '@upvalueio/third-coast';
 
@@ -15,13 +15,19 @@ import { HabitsPage } from './habits/HabitsPage';
 
 const ThemedBody = () => {
   return (
-    <Router className="ThemedBody flex ">
+    <Router className="ThemedBody flex" primary={false}>
       <HabitsPage
-        default={true}
-        path="/habits"
+        path="habits/*"
       />
       <NotesPage
         path="/notes"
+      />
+
+      <Redirect
+        noThrow={true}
+        from="/"
+        to="/habits/browse/2018-11"
+
       />
     </Router>
   );
