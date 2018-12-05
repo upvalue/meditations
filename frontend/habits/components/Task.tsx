@@ -293,24 +293,22 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   renderComment() {
-    if (this.props.task.Comment) {
-      let commentClasses = '';
+    let commentClasses = '';
 
-      if (this.props.task.Comment === '') {
-        commentClasses = 'no-display';
-      }
-
-      return (
-        <div className={`ml-2 mr-2`}>
-          <div
-            className={`task-comment border border-gray mt-1 ${commentClasses}`}
-            ref={(body) => { if (body) { this.body = body; } }}
-            onClick={this.editorOpen}
-            dangerouslySetInnerHTML={{ __html: this.props.task.Comment }}
-          />
-        </div>
-      );
+    if (this.props.task.Comment === '' || this.props.task.Comment === null) {
+      commentClasses = 'no-display';
     }
+
+    return (
+      <div className={`ml-2 mr-2`}>
+        <div
+          className={`task-comment border border-gray mt-1 ${commentClasses}`}
+          ref={(body) => { if (body) { this.body = body; } }}
+          onClick={this.editorOpen}
+          dangerouslySetInnerHTML={{ __html: this.props.task.Comment || '' }}
+        />
+      </div>
+    );
   }
 
   render() {
@@ -388,7 +386,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
           </div>
         </div>
 
-        {this.props.task.Comment && this.renderComment()}
+        {this.renderComment()}
       </section>
     );
 
