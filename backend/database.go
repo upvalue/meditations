@@ -16,7 +16,7 @@ import (
 
 const (
 	// SchemaVersion is the current version of the meditations DB schema
-	SchemaVersion = 2
+	SchemaVersion = 3
 )
 
 // DB global database handle
@@ -39,7 +39,7 @@ func DBMigrate() {
 		// app.go
 		&Settings{},
 		// habits.go
-		&Task{}, &Comment{}, &Scope{},
+		&Task{}, &Scope{},
 		// journal.go
 		&Entry{}, &Tag{},
 	)
@@ -48,12 +48,14 @@ func DBMigrate() {
 	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_date ON tasks (date);")
 	DB.Exec("CREATE INDEX IF NOT EXISTS idx_entries_date ON entries (date);")
 	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_date_scope ON tasks (date, scope);")
-	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_order ON tasks (`order`);")
+	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_order ON tasks (position);")
 	DB.Exec("CREATE INDEX IF NOT EXISTS idx_entries_body ON entries (body collate nocase); ")
 
 	// By hand migrations
 	settings := Settings{Name: "settings"}
 	DB.First(&settings)
+
+	log.Printf("Migrating from schema version %d\n", settings.Schema)
 
 	if settings.Schema == SchemaVersion {
 		DB.LogMode(false)
@@ -90,6 +92,25 @@ func DBMigrate() {
 		DB.Save(&settings)
 	}
 
+	if settings.Schema == 2 {
+		log.Printf("!!! Upgrading from Schema 2 to 3")
+		// Collapse comments table into tasks
+		DB.Exec("DELETE FROM comments WHERE comments.deleted_at IS NOT NULL;")
+		DB.Exec("DELETE FROM comments WHERE rowid NOT IN (SELECT MIN(rowid) FROM comments GROUP BY task_id);")
+		DB.Exec("CREATE TABLE tasks_altered(id, created_at, updated_at, deleted_at, name, date, status, scope, position, minutes, comment);")
+		DB.Exec("INSERT INTO tasks_altered SELECT * FROM (SELECT tasks.id, tasks.created_at, tasks.updated_at, tasks.deleted_at, tasks.name, tasks.date, tasks.status, tasks.scope, tasks.`order`, tasks.minutes, comments.body as comment FROM tasks LEFT OUTER JOIN comments ON comments.task_id = tasks.id);")
+
+		DB.Exec("DROP TABLE tasks;")
+		DB.Exec("DROP TABLE comments;")
+		DB.CreateTable(&Task{})
+		DB.Exec("INSERT INTO tasks SELECT * FROM tasks_altered")
+
+		settings.Schema = 3
+		DB.Save(&settings)
+	}
+
+	DB.Exec("VACUUM;")
+
 	DB.LogMode(false)
 }
 
@@ -115,11 +136,7 @@ func seedTask(name string, date time.Time, scope int, status int, comment string
 		Scope:   scope,
 		Status:  status,
 		Minutes: minutes,
-	}
-	if comment != "" {
-		task.Comment = Comment{
-			Body: comment,
-		}
+		Comment: comment,
 	}
 	return &task
 }
@@ -145,7 +162,7 @@ func DBSeed(seedFrom string) {
 		day = day.AddDate(0, 1, -1)
 	}
 
-	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Comment{}, &Tag{})
+	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Tag{})
 	DBMigrate()
 
 	// deterministic random values
@@ -229,17 +246,17 @@ func repairScope(repair bool, scope int, datefmt string, date string) (int, int)
 
 	var tasks []Task
 	if scope < ScopeProject {
-		DB.Where("strftime(?, date) = ? AND scope = ?", datefmt, date, scope).Order("`order` asc").Find(&tasks)
+		DB.Where("strftime(?, date) = ? AND scope = ?", datefmt, date, scope).Order("position asc").Find(&tasks)
 	} else {
-		DB.Where("scope = ?", scope).Order("`order` asc").Find(&tasks)
+		DB.Where("scope = ?", scope).Order("position asc").Find(&tasks)
 	}
 
 	for i, t := range tasks {
-		if t.Order != i {
+		if t.Position != i {
 			outOfOrderTasks++
-			fmt.Printf("Task %v scope %v %v: expected task at position %v but order is %v\n", t.ID, scope, date, i, t.Order)
+			fmt.Printf("Task %v scope %v %v: expected task at position %v but position is %v\n", t.ID, scope, date, i, t.Position)
 			if repair == true {
-				t.Order = i
+				t.Position = i
 				DB.Save(&t)
 			}
 		}

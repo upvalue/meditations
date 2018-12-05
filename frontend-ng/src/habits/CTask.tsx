@@ -3,9 +3,14 @@ import { Draggable } from "react-beautiful-dnd";
 import { Button } from "@upvalueio/third-coast";
 import { MdCheckCircle } from "react-icons/md";
 
-import { cycleTaskStatus, TaskStatus } from "../api";
+import { cycleTaskStatus, TaskStatus, Task } from "../api";
 
-export const CTask = (props: any) => {
+export type CTaskProps = {
+  task: Task;
+  index: number;
+}
+
+export const CTask = (props: CTaskProps) => {
   let nameString = props.task && props.task.Name;
 
   if (props.task && props.task.CompletedTasks) {
@@ -19,7 +24,7 @@ export const CTask = (props: any) => {
 
   return (
     <Draggable
-      draggableId={props.taskId}
+      draggableId={props.task.ID.toString()}
       index={props.index}
       type="TASK"
     >
@@ -27,10 +32,11 @@ export const CTask = (props: any) => {
         <div
           className="Task p1 mb1"
           {...provided.draggableProps}
-          {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between"
+
+          >
             {/*<MdCheckCircle color={"green"} />
         <Button className="ml2" style={{ display: 'inline' }}>
           &nbsp;{props.children}
@@ -39,20 +45,19 @@ export const CTask = (props: any) => {
               onClick={cycleStatus}
               className={props.task ? TaskStatus[props.task.Status] : ''}
             >
-              {props.children}
               {nameString}
             </Button>
 
             <div className="mr1">
-              <MdCheckCircle />
+              <div
+                {...provided.dragHandleProps}
+              >
+                <MdCheckCircle />
+              </div>
             </div>
           </div>
-          {
-            props.comment &&
-            <div className="Comment mt2 ml3 pb2">
-              This is what a comment might look like. If it were really, really, really fwiggin long
-        </div>
-          }
+
+          <div className="Comment mx2" dangerouslySetInnerHTML={{ __html: props.task.Comment || '' }} />
         </div >
       )}
     </Draggable>

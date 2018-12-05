@@ -24,10 +24,6 @@ export const scopeIsTimeBased = (scope: number) => {
   return scope < ScopeType.PROJECT && scope > ScopeType.UNUSED;
 };
 
-export interface Comment extends common.Model {
-  Body: string;
-}
-
 export interface Task extends common.Model {
   ID: number;
   Minutes: number;
@@ -35,7 +31,7 @@ export interface Task extends common.Model {
   Status: number;
   Scope: number;
   Name: string;
-  Comment?: Comment;
+  Comment?: string;
   Date: moment.Moment;
   // Derived statistics
   Streak: number;

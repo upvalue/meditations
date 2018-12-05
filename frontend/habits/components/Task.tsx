@@ -225,17 +225,13 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   editorUpdated() {
-    return !this.props.task.Comment || this.body.innerHTML !== this.props.task.Comment.Body;
+    return !this.props.task.Comment || this.body.innerHTML !== this.props.task.Comment;
   }
 
   editorSave() {
     api.TaskUpdate({
       ...this.props.task,
-      Comment: {
-        ID: this.props.task.Comment ? this.props.task.Comment.ID : 0,
-        Body: this.body.innerHTML,
-        TaskID: this.props.task.ID,
-      },
+      Comment: this.body.innerHTML,
     });
   }
 
@@ -285,7 +281,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   /** Render an octicon button tied to a specific task action */
-  renderControl(tip: string, icon:OcticonData, callback: () => void, danger?: boolean) {
+  renderControl(tip: string, icon: OcticonData, callback: () => void, danger?: boolean) {
     return (
       <OcticonButton
         tooltip={tip}
@@ -300,7 +296,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     if (this.props.task.Comment) {
       let commentClasses = '';
 
-      if (this.props.task.Comment.Body === '') {
+      if (this.props.task.Comment === '') {
         commentClasses = 'no-display';
       }
 
@@ -310,7 +306,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
             className={`task-comment border border-gray mt-1 ${commentClasses}`}
             ref={(body) => { if (body) { this.body = body; } }}
             onClick={this.editorOpen}
-            dangerouslySetInnerHTML={{ __html: this.props.task.Comment.Body }}
+            dangerouslySetInnerHTML={{ __html: this.props.task.Comment }}
           />
         </div>
       );
@@ -346,54 +342,54 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     }
 
     const result = (
-    <section className={`task ${lastModified}`} style={style}>
-      <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
-        <div>
-          {taskButton}
-        </div>
+      <section className={`task ${lastModified}`} style={style}>
+        <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
+          <div>
+            {taskButton}
+          </div>
 
-        <div className="task-controls d-flex flex-items-center">
-          {this.hasTime() && (
-            <span
-              className="pr-1 tooltipped tooltipped-w"
-              aria-label="Total time"
-            >
-              <OcticonSpan icon={OcticonClock} />
-            {this.renderTime()}
-            </span>
-          )}
+          <div className="task-controls d-flex flex-items-center">
+            {this.hasTime() && (
+              <span
+                className="pr-1 tooltipped tooltipped-w"
+                aria-label="Total time"
+              >
+                <OcticonSpan icon={OcticonClock} />
+                {this.renderTime()}
+              </span>
+            )}
 
-          {this.hasStreak() &&
-            <OcticonSpan
+            {this.hasStreak() &&
+              <OcticonSpan
                 icon={OcticonDashboard}
                 className="streak pr-1"
                 tooltip="Streak (current / best)"
-            >
-              {this.props.task.Streak}/{this.props.task.BestStreak}
-            </OcticonSpan>
-          }
-
-          {this.renderControl('Add/edit comment', OcticonComment, () => this.editorOpen())}
-          <modalContext.Consumer>
-            {modal =>
-              <>
-                {this.props.task.Scope === ScopeType.DAY &&
-                  this.renderControl('Set time', OcticonClock, this.setTime(modal))}
-
-                {this.hasCopy() &&
-                  this.renderControl('Copy to the left', OcticonClippy, this.copyLeft)}
-
-                {this.renderControl('Delete task', OcticonTrashcan,
-                  modal.openModalConfirm('Are you sure you want to delete this task?',
-                    'Delete this task!', () => api.TaskDelete(this.props.task)))}
-              </>
+              >
+                {this.props.task.Streak}/{this.props.task.BestStreak}
+              </OcticonSpan>
             }
-          </modalContext.Consumer>
-        </div>
-      </div>
 
-      {this.props.task.Comment && this.renderComment()}
-    </section>
+            {this.renderControl('Add/edit comment', OcticonComment, () => this.editorOpen())}
+            <modalContext.Consumer>
+              {modal =>
+                <>
+                  {this.props.task.Scope === ScopeType.DAY &&
+                    this.renderControl('Set time', OcticonClock, this.setTime(modal))}
+
+                  {this.hasCopy() &&
+                    this.renderControl('Copy to the left', OcticonClippy, this.copyLeft)}
+
+                  {this.renderControl('Delete task', OcticonTrashcan,
+                    modal.openModalConfirm('Are you sure you want to delete this task?',
+                      'Delete this task!', () => api.TaskDelete(this.props.task)))}
+                </>
+              }
+            </modalContext.Consumer>
+          </div>
+        </div>
+
+        {this.props.task.Comment && this.renderComment()}
+      </section>
     );
 
     return connectDropTarget(result);

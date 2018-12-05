@@ -46,9 +46,21 @@ const (
 	TaskIncomplete = iota
 )
 
+// TaskStats tracks statistics for monthly, yearly and project tasks.
+type TaskStats struct {
+	ID             uint `gorm:"primary_key"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      *time.Time `sql:"column:deleted_time"`
+	CompletedTasks int
+	TotalTasks     int
+	BestStreak     int
+	Streak         int
+}
+
 // Task represents a task in the database
 type Task struct {
-	ID   uint
+	gorm.Model
 	Name string
 	// The actual date of the task, regardless of when it was created
 	Date time.Time
@@ -57,19 +69,19 @@ type Task struct {
 	// The scope of the task (monthly, yearly, daily)
 	Scope int
 	// The task's position within that scope
-	Order int
-	// Comment
-	Comment Comment
+	Position int
 	// Time stats (in day-scoped tasks, these are set directly by the user; in monthly/yearly scopes,
 	// they are calculated from daily tasks)
 	Minutes int
+	// Comment
+	Comment string
 	// These statistics are derived at runtime, and not represented in SQL
-	CompletionRate     float64 `gorm:"-"`
-	CompletedTasks     int     `gorm:"-"`
-	TotalTasks         int     `gorm:"-"`
-	TotalTasksWithTime int     `gorm:"-"`
-	BestStreak         int     `gorm:"-"`
-	Streak             int     `gorm:"-"`
+	CompletionRate     float64 `sql:"-"`
+	CompletedTasks     int     `sql:"-"`
+	TotalTasks         int     `sql:"-"`
+	TotalTasksWithTime int     `sql:"-"`
+	BestStreak         int     `sql:"-"`
+	Streak             int     `sql:"-"`
 }
 
 const (
@@ -105,13 +117,6 @@ const (
 	VisibilityPinned = 2
 )
 
-// Comment represents a task comment.
-type Comment struct {
-	gorm.Model
-	Body   string
-	TaskID uint
-}
-
 //
 ///// TASK METHODS
 //
@@ -128,7 +133,7 @@ func (task *Task) CalculateStreak() {
 
 	from, to := between(task.Date, task.Scope)
 
-	DB.Where("date BETWEEN ? and ? and scope = ? and name = ?", from, to, ScopeDay, task.Name).Order("date", true).Find(&tasks)
+	DB.Where("date BETWEEN ? and ? and scope = ? and name = ? and deleted_at is null", from, to, ScopeDay, task.Name).Order("date", true).Find(&tasks)
 
 	for _, t := range tasks {
 		if t.Status == TaskComplete {
@@ -171,7 +176,7 @@ func (task *Task) CalculateTimeAndCompletion() {
 		}
 	}
 
-	rows, err = DB.Table("tasks").Select("count(*)").Where("date between ? and ? and scope = ? and name = ? and (minutes is not null) and deleted_at is null",
+	rows, err = DB.Table("tasks").Select("count(*)").Where("date between ? and ? and scope = ? and name = ? and (minutes is not null) ",
 		from, to, ScopeDay, task.Name).Rows()
 
 	if err == nil {
@@ -215,45 +220,50 @@ func (task *Task) clearCache() {
 // CalculateStats calculates all statistics for monthly and yearly tasks
 func (task *Task) CalculateStats() {
 	if task.Scope == ScopeMonth || task.Scope == ScopeYear {
-		var cacheKey string
-		if task.Scope == ScopeMonth {
-			cacheKey = fmt.Sprintf("%s-%s", task.Date.Format("2006-01"), task.Name)
-		} else if task.Scope == ScopeYear {
-			cacheKey = fmt.Sprintf("%s-%s", task.Date.Format("2006"), task.Name)
-		}
+		/*
+					var cacheKey string
+					if task.Scope == ScopeMonth {
+						cacheKey = fmt.Sprintf("%s-%s", task.Date.Format("2006-01"), task.Name)
+					} else if task.Scope == ScopeYear {
+						cacheKey = fmt.Sprintf("%s-%s", task.Date.Format("2006"), task.Name)
+					}
 
-		cacheEntryI, ok := habitStatGroup.Get(cacheKey)
+					cacheEntryI, ok := habitStatGroup.Get(cacheKey)
 
-		if ok {
-			cacheEntry := cacheEntryI.(habitStatCache)
-			task.Minutes = cacheEntry.Minutes
-			task.CompletedTasks = cacheEntry.CompletedTasks
-			task.TotalTasks = cacheEntry.TotalTasks
-			task.TotalTasksWithTime = cacheEntry.TotalTasksWithTime
-			task.CompletionRate = cacheEntry.CompletionRate
-			task.Streak = cacheEntry.Streak
-			task.BestStreak = cacheEntry.BestStreak
+					if ok {
+						cacheEntry := cacheEntryI.(habitStatCache)
+						task.Minutes = cacheEntry.Minutes
+						task.CompletedTasks = cacheEntry.CompletedTasks
+						task.TotalTasks = cacheEntry.TotalTasks
+						task.TotalTasksWithTime = cacheEntry.TotalTasksWithTime
+						task.CompletionRate = cacheEntry.CompletionRate
+						task.Streak = cacheEntry.Streak
+						task.BestStreak = cacheEntry.BestStreak
 
-			// log.Printf("Found cached calculation for key %s out of %d cached item", cacheKey, habitStatGroup.Len())
-			return
-		}
+						// log.Printf("Found cached calculation for key %s out of %d cached item", cacheKey, habitStatGroup.Len())
+						return
+			    }
+		*/
 
 		task.CalculateTimeAndCompletion()
 		if task.Scope == ScopeYear {
 			task.CalculateStreak()
 		}
 
-		cacheEntry := habitStatCache{
-			Minutes:            task.Minutes,
-			CompletedTasks:     task.CompletedTasks,
-			TotalTasks:         task.TotalTasks,
-			TotalTasksWithTime: task.TotalTasksWithTime,
-			CompletionRate:     task.CompletionRate,
-			Streak:             task.Streak,
-			BestStreak:         task.BestStreak,
-		}
+		/*
 
-		habitStatGroup.Add(cacheKey, cacheEntry)
+					cacheEntry := habitStatCache{
+						Minutes:            task.Minutes,
+						CompletedTasks:     task.CompletedTasks,
+						TotalTasks:         task.TotalTasks,
+						TotalTasksWithTime: task.TotalTasksWithTime,
+						CompletionRate:     task.CompletionRate,
+						Streak:             task.Streak,
+						BestStreak:         task.BestStreak,
+					}
+
+			    habitStatGroup.Add(cacheKey, cacheEntry)
+		*/
 	}
 }
 
@@ -297,7 +307,7 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 	if task.Scope == ScopeDay {
 		var year Task
 		from, to := between(task.Date, ScopeYear)
-		DB.Where("name = ? and date between ? and ? and scope = ?", task.Name, from, to, ScopeYear).Preload("Comment").First(&year)
+		DB.Where("name = ? and date between ? and ? and scope = ?", task.Name, from, to, ScopeYear).First(&year)
 		if year.ID != 0 {
 			year.CalculateStats()
 			tasks = append(tasks, year)
@@ -305,7 +315,7 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 
 		var month Task
 		from, to = between(task.Date, ScopeMonth)
-		DB.Where("name = ? and date between ? and ? and scope = ?", task.Name, from, to, ScopeMonth).Preload("Comment").First(&month)
+		DB.Where("name = ? and date between ? and ? and scope = ?", task.Name, from, to, ScopeMonth).First(&month)
 		if month.ID != 0 {
 			month.CalculateStats()
 			tasks = append(tasks, month)
@@ -423,17 +433,14 @@ var tasksInScopeCalls = 0
 // tasksInScope returns all the tasks in a given scope and timeframe, ordered by order
 func tasksInScope(tasks *[]Task, scope int, start time.Time) {
 	if scope >= ScopeProject {
-		DB.Where("scope = ?", scope).Preload("Comment").Order("`order` asc").Find(tasks)
+		DB.Where("scope = ?", scope).Order("position asc").Find(tasks)
 	} else {
 		from, to := between(start, scope)
 
 		tasksInScopeCalls = tasksInScopeCalls + 1
 
-		//DB.Table("tasks").Joins("left join comments on comments.task_id = tasks.id").
-		//	Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("`order` asc").Find(tasks)
-
-		DB.Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("`order` asc").
-			Preload("Comment").Find(tasks)
+		DB.Where("date BETWEEN ? and ? and scope = ?", from, to, scope).Order("position asc").
+			Find(tasks)
 	}
 }
 
@@ -456,12 +463,12 @@ func (project *Scope) CalculateProjectStats(days int) {
 	}
 
 	var count struct{ Count int }
-	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
+	DB.Table("tasks").Select("count(*) as count").Where("scope = ? and name = ? and date > ? and status = ?",
 		ScopeDay, project.Name, past, TaskComplete).Scan(&count)
 
 	var minutes struct{ Minutes int }
 	DB.Table("tasks").Select("sum(minutes) as minutes").
-		Where("scope = ? and name = ? and date > ? and status = ? and deleted_at is null",
+		Where("scope = ? and name = ? and date > ? and status = ?",
 			ScopeDay, project.Name, past, TaskComplete).
 		Scan(&minutes)
 

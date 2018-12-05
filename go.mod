@@ -2,7 +2,9 @@ module github.com/upvalue/meditations
 
 require (
 	cloud.google.com/go v0.28.0 // indirect
+	github.com/99designs/gqlgen v0.7.1 // indirect
 	github.com/Unknwon/com v0.0.0-20170819223952-7677a1d7c113
+	github.com/agnivade/levenshtein v1.0.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20180901172138-1eb28afdf9b6 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/flosch/pongo2 v0.0.0-20170906222041-1f4be1efe3b3 // indirect
@@ -23,6 +25,7 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c // indirect
 	github.com/gorilla/websocket v0.0.0-20171013020858-71fa72d48423
 	github.com/graphql-go/graphql v0.7.6
+	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/jinzhu/gorm v0.0.0-20171010132839-0a51f6cdc55d
 	github.com/jinzhu/inflection v0.0.0-20170102125226-1c35d901db3d // indirect
 	github.com/jinzhu/now v0.0.0-20170212112655-d939ba741945
@@ -35,11 +38,15 @@ require (
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v0.0.0-20171024025710-615c193e01d8
 	github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2 // indirect
+	github.com/pkg/errors v0.8.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf // indirect
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
 	github.com/tylerb/graceful v1.2.15 // indirect
 	github.com/urfave/cli v0.0.0-20171014202726-7bc6a0acffa5
+	github.com/vektah/gorunpkg v0.0.0-20181021090735-2c603e7a186c // indirect
+	github.com/vektah/gqlparser v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20171023145632-2509b142fb2b // indirect
+	golang.org/x/tools v0.0.0-20181129221141-e015b91f2629 // indirect
 	google.golang.org/appengine v1.2.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/ini.v1 v1.30.0 // indirect

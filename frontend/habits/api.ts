@@ -1,13 +1,12 @@
 // api.ts - Habits API
 
 import * as common from '../common';
-import { Task, Comment, Project } from './state';
+import { Task, Project } from './state';
 
 // This little dance is necessary to make all fields of comment optional
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-type PartialTaskWithPartialComment =
-  Pick<Task, 'ID'> & {Comment?: Partial<Comment>} & Partial<Omit<Task, 'Comment'>>;
+type PartialTaskWithPartialComment = Partial<Task>;
 
 /**
  * Update a task by ID

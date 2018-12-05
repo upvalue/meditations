@@ -30,7 +30,7 @@ func tasksInProject(c *macaron.Context) {
 	}
 
 	var tasks []Task
-	DB.Where("scope = ?", scope.ID).Order("`order` asc").Preload("Comment").Find(&tasks)
+	DB.Where("scope = ?", scope.ID).Order("position asc").Find(&tasks)
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"scope": scope,
 		"tasks": tasks,
@@ -74,8 +74,8 @@ func tasksInDays(c *macaron.Context, results *[]Task) error {
 	fmt.Printf("%v %v\n", begin.Format(DateFormat), end.Format(DateFormat))
 
 	DB.
-		Where("date BETWEEN ? and ? and scope = ?", begin, end, ScopeDay).Order("`order` asc, date asc").
-		Preload("Comment").Find(results)
+		Where("date BETWEEN ? and ? and scope = ?", begin, end, ScopeDay).Order("position asc, date asc").
+		Find(results)
 
 	return nil
 }
@@ -195,31 +195,6 @@ func taskSelect(c *macaron.Context) {
 // taskUpdate updates a task's fields with JSON, and optionally will create
 // or update a comment as well
 func taskUpdate(c *macaron.Context, task Task) {
-	// Extract comment for separate update/insertion
-	comment := task.Comment
-	cid := comment.ID
-	comment.TaskID = task.ID
-	empty := (len(comment.Body) == 0 || comment.Body == "<p><br></p>")
-	//DB.Where("ID = ?", comment.TaskID).Find(&task)
-
-	if cid == 0 && empty == true {
-		// Empty, do not create or update comment
-	} else if cid > 0 && empty == true {
-		// Empty body: delete existing comment
-		task.Comment = Comment{}
-		DB.Delete(&comment)
-	} else {
-		// See if there's an existing comment and use that as a base for this update
-		var test Comment
-		DB.Where("task_id = ?", task.ID).First(&test)
-		if test.ID > 0 {
-			comment.ID = test.ID
-			comment.CreatedAt = test.CreatedAt
-		}
-
-		task.Comment = comment
-	}
-
 	DB.Save(&task)
 
 	// fmt.Printf("%v %v\n", task.Comment, comment)
@@ -233,7 +208,7 @@ func taskNew(c *macaron.Context, task Task) {
 	var tasks []Task
 
 	tasksInScope(&tasks, task.Scope, task.Date)
-	task.Order = len(tasks)
+	task.Position = len(tasks)
 	DB.Save(&task)
 
 	// If this is a project
@@ -253,7 +228,6 @@ func taskNew(c *macaron.Context, task Task) {
 }
 
 func taskDelete(c *macaron.Context) {
-	var comment Comment
 	var tasks []Task
 
 	var task Task
@@ -274,9 +248,6 @@ func taskDelete(c *macaron.Context) {
 	tx := DB.Begin()
 
 	tx.Delete(&task)
-	if task.Comment.ID > 0 {
-		tx.Where("task_id = ?", task.ID).First(&comment).Delete(&comment)
-	}
 
 	// Task deletion necessitates re-ordering every task after this task,
 	// within its scope
@@ -285,8 +256,8 @@ func taskDelete(c *macaron.Context) {
 		if t.ID == task.ID {
 			continue
 		}
-		if t.Order > task.Order {
-			t.Order = t.Order - 1
+		if t.Position > task.Position {
+			t.Position = t.Position - 1
 		}
 		tx.Save(&t)
 	}
@@ -320,8 +291,8 @@ func taskReorder(c *macaron.Context) {
 
 	fmt.Printf("%v %v\n", src.Date, target.Date)
 	fmt.Printf("Re-ordering tasks within scope %v\n", withinScope)
-	srcOrder := src.Order
-	fmt.Printf("SRC ORDER %v TARGET ORDER %v\n", srcOrder, target.Order)
+	srcOrder := src.Position
+	fmt.Printf("SRC ORDER %v TARGET ORDER %v\n", srcOrder, target.Position)
 
 	if src.ID == 0 || target.ID == 0 {
 		serverError(c, fmt.Sprintf("Task re-ordering failed, could not find one of task %s,%s",
@@ -371,12 +342,12 @@ func taskReorder(c *macaron.Context) {
 
 	// Recreate order list
 	for i := range srcTasks {
-		srcTasks[i].Order = i
+		srcTasks[i].Position = i
 	}
 
 	if !withinScope {
 		for i := range targetTasks {
-			targetTasks[i].Order = i
+			targetTasks[i].Position = i
 		}
 	}
 
@@ -385,14 +356,14 @@ func taskReorder(c *macaron.Context) {
 	if !withinScope {
 		fmt.Printf("out of scope: re-ordering target scope\n")
 		for _, t := range targetTasks {
-			fmt.Printf("%d %s\n", t.Order, t.Name)
+			fmt.Printf("%d %s\n", t.Position, t.Name)
 			DB.Save(&t)
 		}
 		syncScopeImpl(targetScope, targetDate)
 	}
 
 	for _, t := range srcTasks {
-		fmt.Printf("%d %s\n", t.Order, t.Name)
+		fmt.Printf("%d %s\n", t.Position, t.Name)
 		DB.Save(&t)
 	}
 
@@ -536,8 +507,7 @@ func export(c *macaron.Context) {
 		Comment string
 	}
 
-	DB.Table("tasks").Select("name, scope, status, date, comments.body as comment").Joins("left join comments on comments.task_id = tasks.id").
-		Where(query, name, scopes, begin, end).Scan(&results)
+	DB.Table("tasks").Select("name, scope, status, date, comment").Where(query, name, scopes, begin, end).Scan(&results)
 
 	for _, t := range results {
 		datefmt := "Monday, January _2, 2006"

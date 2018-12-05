@@ -16,6 +16,7 @@ export interface Task {
   Name: string;
   Minutes: number;
   Status: number;
+  Comment?: string;
   // Calculated on query
   CompletionRate?: number;
   TotalTasks?: number;
@@ -30,7 +31,7 @@ export interface TasksByDateRequest {
   };
 }
 
-const allDayTaskFields = 'ID, Name, Scope, Status';
+const allDayTaskFields = 'ID, Name, Scope, Status, Comment';
 const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, CompletedTasks`;
 
 /**

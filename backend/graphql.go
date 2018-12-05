@@ -11,17 +11,6 @@ import (
 	macaron "gopkg.in/macaron.v1"
 )
 
-var commentInterface = graphql.NewObject(graphql.ObjectConfig{
-	Name:        "Comment",
-	Description: "Comment",
-	Fields: graphql.Fields{
-		"Body": &graphql.Field{
-			Type:        graphql.NewNonNull(graphql.String),
-			Description: "Body",
-		},
-	},
-})
-
 var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Task",
 	Description: "Task",
@@ -58,12 +47,10 @@ var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 			Description: "Task status",
 		},
 
-		/*
-					"Comment": &graphql.Field{
-						Type:        graphql.NewNonNull(commentInterface),
-						Description: "Task comment",
-			    },
-		*/
+		"Comment": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Task comment",
+		},
 
 		"CompletionRate": &graphql.Field{
 			Type:        graphql.Int,
@@ -142,7 +129,9 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				var task Task
-				DB.Where("id = ?", p.Args["id"]).Preload("Comment").First(&task)
+				DB.Where("id = ?", p.Args["id"]).First(&task)
+
+				fmt.Printf("GOT TASK %+v", task)
 
 				return task, nil
 			},
@@ -196,8 +185,8 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 						begin, end := _between(date, ScopeMonth)
 
 						DB.
-							Where("date BETWEEN ? and ? and scope = ?", begin, end, ScopeDay).Order("`order` asc, date asc").
-							Preload("Comment").Find(&tasksByDate.Days)
+							Where("date BETWEEN ? and ? and scope = ?", begin, end, ScopeDay).Order("position asc, date asc").
+							Find(&tasksByDate.Days)
 					}
 				}
 
@@ -437,10 +426,10 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 				for i, n := range names {
 					fmt.Printf("Adding task %s %d\n", n, i)
 					task = Task{
-						Name:  fmt.Sprintf("%s", n),
-						Date:  date,
-						Scope: scope,
-						Order: i,
+						Name:     fmt.Sprintf("%s", n),
+						Date:     date,
+						Scope:    scope,
+						Position: i,
 					}
 					tx.Create(&task)
 					task.Sync(false, true, true)

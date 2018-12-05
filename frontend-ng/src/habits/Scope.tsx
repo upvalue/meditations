@@ -25,7 +25,6 @@ export const Scope = (props: any) => {
               {props.tasks && props.tasks.map((task: any, i: number) => (
                 <CTask
                   key={task.ID}
-                  taskId={task.ID}
                   index={i}
                   task={task}
                 />
