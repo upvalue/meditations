@@ -150,7 +150,11 @@ export class CEntry extends Editable<CEntryProps> {
                       >
                         <a href={`#tag/${t.Name}`}  >#{t.Name}</a>
                         &nbsp;
-                        <OcticonButton className="d-flex" icon={OcticonX} onClick={this.removeTag(modal, t)} />
+                        <OcticonButton
+                          className="d-flex"
+                          icon={OcticonX}
+                          onClick={this.removeTag(modal, t)}
+                        />
                       </button>)}
                   </div>
                 </div>

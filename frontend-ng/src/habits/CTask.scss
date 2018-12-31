@@ -59,4 +59,8 @@
 .Comment {
   font-family: $font-mono;
   font-size: 0.8rem;
+
+  p:last-of-type {
+    margin-bottom: 0;
+  }
 }

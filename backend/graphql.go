@@ -271,6 +271,9 @@ var taskInputObject = graphql.NewInputObject(graphql.InputObjectConfig{
 		"Status": &graphql.InputObjectFieldConfig{
 			Type: graphql.Int,
 		},
+		"Comment": &graphql.InputObjectFieldConfig{
+			Type: graphql.String,
+		},
 		// Completely ignored. Defined here in order to allow pass through
 		// of tasks that result from some queries
 		"CompletedTasks": &graphql.InputObjectFieldConfig{
@@ -284,26 +287,6 @@ var taskInputObject = graphql.NewInputObject(graphql.InputObjectConfig{
 		},
 	},
 })
-
-/*
-var TaskYnterface = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Add tasks",
-	Fields: graphql.Fields{
-		"Scope": &graphql.Field{
-			Type:        graphql.NewNonNull(graphql.Int),
-			Description: "Scope type",
-		},
-		"Date": &graphql.Field{
-			Type:        graphql.NewNonNull(graphql.DateTime),
-			Description: "Scope date",
-		},
-		"TaskNames": &graphql.Field{
-			Type:        graphql.NewList(graphql.String),
-			Description: "Task names",
-		},
-	},
-})
-*/
 
 var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
@@ -323,7 +306,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				var task Task
 
-				DB.Where("id = ?", p.Args["ID"].(int)).Find(&task)
+				DB.Where("id = ?", p.Args["id"].(int)).Find(&task)
 
 				inputTask := p.Args["task"].(map[string]interface{})
 
@@ -450,7 +433,7 @@ func executeVarQuery(query string, vars map[string]interface{}) *graphql.Result 
 		VariableValues: vars,
 	})
 	if len(result.Errors) > 0 {
-		fmt.Printf("wrong result, unexpected errors: %v", result.Errors)
+		fmt.Printf("wrong result, unexpected errors: %v\n", result.Errors)
 	}
 	return result
 }

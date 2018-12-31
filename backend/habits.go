@@ -60,8 +60,11 @@ type TaskStats struct {
 
 // Task represents a task in the database
 type Task struct {
-	gorm.Model
-	Name string
+	ID        uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+	Name      string
 	// The actual date of the task, regardless of when it was created
 	Date time.Time
 	// The status of the task: complete, incomplete, or unset
