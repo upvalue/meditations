@@ -185,13 +185,7 @@ func App() *macaron.Macaron {
 	return m
 }
 
-// Server returns a server that closes gracefully
-func Server() *http.Server {
-	return &http.Server{
-		Addr:    fmt.Sprintf("%s:%v", Config.Host, Config.Port),
-		Handler: App(),
-	}
-}
+var app = App()
 
 // Main is the entry point for meditations; it handles CLI options and starts
 func Main() {
@@ -313,6 +307,8 @@ func Main() {
 
 				DBOpen()
 
+				graphqlInitialize()
+
 				if Config.Demo {
 					// ticker := time.NewTicker(time.Second * 10)
 					ticker := time.NewTicker(time.Hour)
@@ -333,7 +329,12 @@ func Main() {
 				// DBSeed
 				log.Printf("running with configuration %+v\n", Config)
 				log.Printf("starting server")
-				server := Server()
+
+				server := &http.Server{
+					Addr: fmt.Sprintf("%s:%v", Config.Host, Config.Port),
+					// Handler: app,
+				}
+
 				err := server.ListenAndServe()
 				log.Printf("%v", err)
 			},

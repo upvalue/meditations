@@ -3,8 +3,8 @@ import React from 'react';
 
 import classNames from 'classnames';
 import { MdBrightness3, MdBrightness4 } from 'react-icons/md';
-import { View, useTheme, Button } from '@upvalueio/third-coast';
-import { Link, LinkGetProps, Location, LocationContext } from '@reach/router';
+import { View, useTheme } from '@upvalueio/third-coast';
+import { Link, LinkGetProps } from '@reach/router';
 
 import { IconButton } from './components/IconButton';
 
@@ -31,11 +31,15 @@ export const Header = () => {
         <View padding="px2" margin="ml2" flex={['flex', 'items-center']}>
           <h1 className="m0" style={{ display: 'inline ' }}>meditations</h1>
           <nav>
-            <Link to="/" getProps={headerLinkProps}>
+            {/* TODO fix this link */}
+            <Link to="/habits" getProps={headerLinkProps}>
               Habits
             </Link>
             <Link to="/notes" getProps={headerLinkProps}>
               Notes
+            </Link>
+            <Link to="/test" getProps={headerLinkProps}>
+              Test
             </Link>
           </nav>
         </View>

@@ -5,7 +5,6 @@ import { GraphQLClient } from 'graphql-request';
  */
 export const client = new GraphQLClient(`/graphql`);
 
-
 /**
  * Empty GQL tag to get VSCode IDE features
  */

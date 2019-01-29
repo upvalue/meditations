@@ -3,5 +3,5 @@ import logger from 'redux-logger';
 
 export const store = createStore(
   () => ({}),
-  applyMiddleware(logger)
+  applyMiddleware(logger),
 );

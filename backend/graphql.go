@@ -1,15 +1,25 @@
-// graphql.go - GraphQL resolvers
+// gaphql.go - GraphQL resolvers
 package backend
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/functionalfoundry/graphqlws"
+
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 	macaron "gopkg.in/macaron.v1"
 )
+
+type contextKey string
+
+func (c contextKey) String() string {
+	return "meditations.gqlvalue"
+}
 
 var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Task",
@@ -19,9 +29,23 @@ var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewNonNull(graphql.Int),
 			Description: "ID",
 		},
+
 		"Name": &graphql.Field{
 			Type:        graphql.NewNonNull(graphql.String),
 			Description: "Name",
+		},
+
+		"CreatedAt": &graphql.Field{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "CreatedAt",
+		},
+		"UpdatedAt": &graphql.Field{
+			Type:        graphql.NewNonNull(graphql.String),
+			Description: "CreatedAt",
+		},
+		"DeletedAt": &graphql.Field{
+			Type:        graphql.String,
+			Description: "DeletedAt",
 		},
 		"Minutes": &graphql.Field{
 			Type:        graphql.NewNonNull(graphql.Int),
@@ -32,7 +56,7 @@ var taskInterface = graphql.NewObject(graphql.ObjectConfig{
 			Description: "Date of the task, determining its scope",
 		},
 
-		"Order": &graphql.Field{
+		"Position": &graphql.Field{
 			Type:        graphql.NewNonNull(graphql.Int),
 			Description: "Task order within scope",
 		},
@@ -138,6 +162,8 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		// Tasks by date query. Pulls tasks for particular scopes given a YYYY-MM-DD date.
+
+		// tasksByDate(date: String!, scopes: [DateScope!])
 		"tasksByDate": &graphql.Field{
 			Type: graphql.NewNonNull(dateScopeReturn),
 			Args: graphql.FieldConfigArgument{
@@ -250,6 +276,21 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 ///// MUTATIONS
 
+/*
+type TaskInput {
+  ID: Int
+  Name: String
+  Minutes: Int
+  MinutesDelta: Int
+  Scope: Int
+  Status: Int
+  Comment: String
+  CompletedTasks: Int
+  TotalTasks: Int
+  CompletionRate: Int
+}
+*/
+
 var taskInputObject = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "InputTask",
 	Fields: graphql.InputObjectConfigFieldMap{
@@ -315,6 +356,15 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				DB.Save(&task)
+
+				var tasks []Task
+
+				tasks = append(tasks, task)
+
+				graphqlPush("taskEvents", habitSyncMsg{
+					Tasks:     tasks,
+					ProjectID: 0,
+				})
 
 				return task, nil
 			},
@@ -426,6 +476,79 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var thingType1 = graphql.NewObject(graphql.ObjectConfig{
+	Name: "ThingType1",
+	Fields: graphql.Fields{
+		"Message": {
+			Type: graphql.String,
+		},
+	},
+})
+
+var habitSyncMsgType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "habitSyncMessage",
+	Fields: graphql.Fields{
+		"Tasks": {
+			Type: graphql.NewList(taskInterface),
+		},
+		"ProjectID": {
+			Type: graphql.Int,
+		},
+	},
+})
+
+var taskEventDataType = graphql.NewUnion(graphql.UnionConfig{
+	Name: "TaskEventData",
+	Types: []*graphql.Object{
+		habitSyncMsgType,
+	},
+	ResolveType: func(p graphql.ResolveTypeParams) *graphql.Object {
+		return habitSyncMsgType
+	},
+})
+
+var taskEventType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "TaskEvent",
+	Fields: graphql.Fields{
+		"Type": &graphql.Field{
+			Type: graphql.NewNonNull(graphql.String),
+		},
+		"Data": &graphql.Field{
+			Type: taskEventDataType,
+		},
+	},
+})
+
+var n = 0
+
+type TaskEvent struct {
+	Type string
+	Data interface{}
+}
+
+var subscriptionType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Subscription",
+	Fields: graphql.Fields{
+		"taskEvents": &graphql.Field{
+			Type: taskEventType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+
+				iface := p.Context.Value("meditations.gqlvalue")
+
+				taskEvent := TaskEvent{
+					Type: "UPDATE_TASKS_AND_PROJECT",
+					Data: iface,
+				}
+
+				f, _ := json.Marshal(taskEvent)
+				fmt.Printf("%+v\n", string(f))
+
+				return taskEvent, nil
+			},
+		},
+	},
+})
+
 func executeVarQuery(query string, vars map[string]interface{}) *graphql.Result {
 	result := graphql.Do(graphql.Params{
 		Schema:         schema,
@@ -446,14 +569,101 @@ func executeQuery(query string) *graphql.Result {
 var schema graphql.Schema
 var graphqlinitialized = false
 
+var subscriptionManager graphqlws.SubscriptionManager
+
+// graphqlPush pushes subscription updates
+func graphqlPush(name string, data interface{}) {
+	subs := subscriptionManager.Subscriptions()
+
+	fmt.Printf("GraphQL: Pushing %s to %d subscribers\n", name, len(subs))
+
+	for conn, _ := range subs {
+		ctx := context.WithValue(context.TODO(), "meditations.gqlvalue", data)
+
+		for _, sub := range subs[conn] {
+			fmt.Printf("sending data %+v\n", data)
+
+			if sub.Fields[0] == name {
+				params := graphql.Params{
+					Schema:         schema,
+					RequestString:  sub.Query,
+					VariableValues: sub.Variables,
+					OperationName:  sub.OperationName,
+					Context:        ctx,
+				}
+
+				result := graphql.Do(params)
+
+				sub.SendData(&graphqlws.DataMessagePayload{
+					Data:   result.Data,
+					Errors: graphqlws.ErrorsFromGraphQLErrors(result.Errors),
+				})
+
+			}
+		}
+		//result := graphql.Do
+	}
+
+}
+
 func graphqlInitialize() {
 	if graphqlinitialized == false {
 		fmt.Printf("GraphQL Schema initialized\n")
 		schema, _ = graphql.NewSchema(graphql.SchemaConfig{
-			Query:    queryType,
-			Mutation: mutationType,
+			Query:        queryType,
+			Mutation:     mutationType,
+			Subscription: subscriptionType,
 		})
 		graphqlinitialized = true
+
+		subscriptionManager = graphqlws.NewSubscriptionManager(&schema)
+
+		graphqlwsHandler := graphqlws.NewHandler(graphqlws.HandlerConfig{
+			SubscriptionManager: subscriptionManager,
+		})
+
+		h := handler.New(&handler.Config{
+			Schema:   &schema,
+			Pretty:   true,
+			GraphiQL: true,
+		})
+
+		http.Handle("/graphql", h)
+		http.Handle("/subscriptions", graphqlwsHandler)
+
+		/*
+			ticker := time.NewTicker(5 * time.Second)
+						go func() {
+							for {
+								select {
+								case <-ticker.C:
+									n += 1
+									subscriptions := subscriptionManager.Subscriptions()
+									for conn := range subscriptions {
+										for _, sub := range subscriptions[conn] {
+											params := graphql.Params{
+												Schema:         schema,
+												RequestString:  sub.Query,
+												VariableValues: sub.Variables,
+												OperationName:  sub.OperationName,
+				              }
+
+											// fmt.Printf("%+v\n", sub.Fields[0])
+
+											result := graphql.Do(params)
+
+											data := graphqlws.DataMessagePayload{
+												Data:   result.Data,
+												Errors: graphqlws.ErrorsFromGraphQLErrors(result.Errors),
+											}
+
+											sub.SendData(&data)
+										}
+									}
+								}
+							}
+				    }()
+		*/
 	}
 }
 

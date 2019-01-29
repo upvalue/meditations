@@ -336,9 +336,15 @@ func (task *Task) SyncWithStats(includeMainTask bool) {
 		tasks = append(tasks, *task)
 	}
 
+	// It is possible for this to result in zero tasks to send, if a task has been deleted and
+	// no stat recalculations are necessary
 	if len(tasks) != 0 {
-		// It is possible for this to result in zero tasks to send, if a task has been deleted and
-		// no stat recalculations are necessary
+		fmt.Printf("Calling GRAPHQL PUSH!\n")
+		graphqlPush("UPDATE_TASKS_AND_PROJECT", habitSyncMsg{
+			Tasks:     tasks,
+			ProjectID: project.ID,
+		})
+
 		habitSync.Send("UPDATE_TASKS_AND_PROJECT", habitSyncMsg{
 			Tasks:     tasks,
 			ProjectID: project.ID,

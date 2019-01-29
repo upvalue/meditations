@@ -12,6 +12,7 @@ import { Header } from './Header';
 import { ThemeName } from '@upvalueio/third-coast/dist/Theme';
 import { NotesPage } from './notes/NotesPage';
 import { HabitsPage } from './habits/HabitsPage';
+import { TestPage } from './TestPage';
 
 const ThemedBody = () => {
   return (
@@ -19,8 +20,13 @@ const ThemedBody = () => {
       <HabitsPage
         path="habits/*"
       />
+
       <NotesPage
         path="/notes"
+      />
+
+      <TestPage
+        path="/test"
       />
 
       <Redirect
@@ -32,6 +38,8 @@ const ThemedBody = () => {
     </Router>
   );
 }
+
+export type ButtonProps = React.HTMLProps<HTMLButtonElement> & {};
 
 class App extends Component {
   /**
