@@ -200,7 +200,6 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
 
         // Do not update comment
         const task = { ...this.props.task, Minutes: minutes + (hours * 60) };
-        delete task.Comment;
 
         api.TaskUpdate(task);
       });

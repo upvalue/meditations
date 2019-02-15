@@ -185,8 +185,6 @@ func App() *macaron.Macaron {
 	return m
 }
 
-var app = App()
-
 // Main is the entry point for meditations; it handles CLI options and starts
 func Main() {
 	app := cli.NewApp()
@@ -331,8 +329,8 @@ func Main() {
 				log.Printf("starting server")
 
 				server := &http.Server{
-					Addr: fmt.Sprintf("%s:%v", Config.Host, Config.Port),
-					// Handler: app,
+					Addr:    fmt.Sprintf("%s:%v", Config.Host, Config.Port),
+					Handler: App(),
 				}
 
 				err := server.ListenAndServe()
