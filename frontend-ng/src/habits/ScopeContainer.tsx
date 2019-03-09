@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Scope } from "./Scope";
+import { Scope } from './Scope';
 import { Task } from '../api';
 
 interface ScopeContainerProps {

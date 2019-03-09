@@ -12,3 +12,4 @@
 *.sqlite
 /docs/book
 /_book
+node_modules

@@ -1,6 +1,16 @@
 import { GraphQLClient } from 'graphql-request';
 import { format, parse } from 'date-fns';
 
+import * as mock from './mock'; 
+mock.gquery(`{ ping }`).then(result => console.log(result));
+
+import { request as fart } from './request';
+
+const w = window as any;
+
+w.req = fart;
+
+
 const client = new GraphQLClient('/graphql');
 
 export enum TaskStatus {

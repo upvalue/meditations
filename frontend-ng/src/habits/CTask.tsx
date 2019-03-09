@@ -30,7 +30,7 @@ export const CTask = (props: CTaskProps) => {
     >
       {(provided, _snapshot) => (
         <div
-          className="Task p1 mb1"
+          className="Task p2 mb2"
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
@@ -41,12 +41,13 @@ export const CTask = (props: CTaskProps) => {
         <Button className="ml2" style={{ display: 'inline' }}>
           &nbsp;{props.children}
   </Button>*/}
-            <Button
+            {/*<Button
               onClick={cycleStatus}
               className={props.task ? TaskStatus[props.task.Status] : ''}
             >
               {nameString}
-            </Button>
+            </Button>*/}
+            {nameString}
 
             <div className="mr1">
               <div
