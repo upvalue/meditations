@@ -37,7 +37,7 @@ export const typeDefs = `
 
   type Query {
     tasks: [Task]
-    tasksByDate(date: String!, scopes: [TaskScope]): [Task]
+    tasksByDate(date: String!, scopes: [TaskScope]): TasksByDateResponse
   }
 
   type Mutation {

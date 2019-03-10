@@ -8,23 +8,25 @@
     "@types/graphql": "^14.0.7",
     "@types/lodash-es": "^4.17.1",
     "@types/reach__router": "^1.2.2",
-    "@types/react": "^16.7.6",
+    "@types/react": "^16.8.7",
     "@types/react-beautiful-dnd": "^7.1.2",
-    "@types/react-dom": "^16.0.9",
+    "@types/react-dom": "^16.8.2",
     "@types/react-redux": "^6.0.9",
     "@types/redux-logger": "^3.0.6",
-    "@upvalueio/third-coast": "^0.1.17",
+    "@upvalueio/third-coast": "^0.1.22",
     "classnames": "^2.2.6",
     "date-fns": "^2.0.0-alpha.25",
     "graphql": "^14.1.1",
     "graphql-tools": "^4.0.4",
     "lodash-es": "^4.17.11",
-    "react": "^16.7.0-alpha.2",
+    "normalize.css": "^8.0.1",
+    "react": "^16.8.4",
     "react-beautiful-dnd": "^10.0.1",
     "react-dev-utils": "^6.0.6-next.c662dfb0",
-    "react-dom": "^16.7.0-alpha.2",
+    "react-dom": "^16.8.4",
     "react-icons": "^3.2.2",
     "react-redux": "^5.1.1",
+    "react-scripts": "^2.1.8",
     "react-testing-library": "^5.2.3",
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
@@ -32,9 +34,6 @@
     "tslint-config-airbnb": "^5.11.0",
     "tslint-react": "^3.6.0",
     "typescript": "^3.1.6"
-  },
-  "devDependencies": {
-    "react-scripts": "^2.0.6-next.c662dfb0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -52,5 +51,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:4000"
 }

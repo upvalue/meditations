@@ -6,7 +6,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const process_1 = __importDefault(require("process"));
 const sqlite3_1 = __importDefault(require("sqlite3"));
+const Knex = require("knex");
 const lodash_1 = require("lodash");
+const knex = Knex({
+    client: 'sqlite3',
+    connection: {
+        filename: './development.sqlite3',
+    },
+});
 var Scope;
 (function (Scope) {
     Scope[Scope["UNUSED"] = 0] = "UNUSED";

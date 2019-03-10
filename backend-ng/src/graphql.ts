@@ -35,7 +35,6 @@ const resolvers = {
 
     tasksByDate: (param: any, args: TasksByDateArgs, thing: any) => {
       checkDate(args.date);
-      console.log('ye parameter', param);
       return tasksByDate(args.date, false);
     },
 

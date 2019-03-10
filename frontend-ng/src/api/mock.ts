@@ -2,7 +2,8 @@ import {
   makeExecutableSchema,
 } from 'graphql-tools';
 
-import { typeDefs } from '../../../shared/graphql-typedefs';
+import { typeDefs } from './mock/graphql-typedefs';
+//import { typeDefs } from '../../../shared/graphql-typedefs';
 
 import { graphql } from 'graphql';
 import { Task } from '.';

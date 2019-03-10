@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 import { format, parse } from 'date-fns';
 
-import * as mock from './mock'; 
+import * as mock from './mock';
 mock.gquery(`{ ping }`).then(result => console.log(result));
 
 import { request as fart } from './request';
@@ -51,7 +51,7 @@ const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, Complete
  */
 export const tasksByDate = (date: string, includeYear: boolean) =>
   client.request(`{
-    tasksByDate(date: "${date}", scopes: [DAYS, MONTH${includeYear ? ', YEAR' : ''}]) {
+    tasksByDate(date: "${date}", scopes: [DAY, MONTH${includeYear ? ', YEAR' : ''}]) {
       Days {
         ${allDayTaskFields}
       }

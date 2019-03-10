@@ -1,6 +1,7 @@
-import { gql } from 'apollo-server';
-
-export const typeDefs = gql`
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const apollo_server_1 = require("apollo-server");
+exports.typeDefs = apollo_server_1.gql `
   enum TaskScope {
     DAY,
     MONTH,

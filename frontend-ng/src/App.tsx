@@ -14,6 +14,8 @@ import { NotesPage } from './notes/NotesPage';
 import { HabitsPage } from './habits/HabitsPage';
 import { TestPage } from './TestPage';
 
+import 'normalize.css/normalize.css';
+
 const ThemedBody = () => {
   return (
     <Router className="ThemedBody flex" primary={false}>

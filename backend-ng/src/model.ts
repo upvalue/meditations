@@ -3,7 +3,16 @@
 import process from 'process';
 import sqlite from 'sqlite3';
 
+import Knex = require('knex');
+
 import { lowerCase } from 'lodash';
+
+const knex = Knex({
+  client: 'sqlite3',
+  connection: {
+    filename: './development.sqlite3',
+  },
+});
 
 export enum Scope {
   UNUSED = 0,
@@ -160,6 +169,7 @@ export const tasksByDate = ($date: string, includeYear: boolean) => {
       AND strftime('%Y-%m-%d', date) = $date
     `, { $date });
 };
+
 
 export const tasks = () => {
   const $limit = 10;

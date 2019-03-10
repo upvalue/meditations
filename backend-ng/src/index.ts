@@ -1,4 +1,3 @@
-
 import model from './model';
 import server from './graphql';
 
