@@ -6,3 +6,5 @@
 meditations is a [freestyle
 producitvity](http://calnewport.com/blog/2009/10/02/freestyle-productivity-balancing-systems-and-simplicity-when-organizing-your-life/)
 application that handles daily tasks and extensive note-taking based on the princples of habit formation.
+
+# Running from repository
