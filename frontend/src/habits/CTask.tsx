@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { Draggable } from "react-beautiful-dnd";
 import { Button } from "@upvalueio/third-coast";
 import { MdCheckCircle } from "react-icons/md";
+
+type State = {
+  messages: string[],
+};
+
+const Thing = () => {
+  const [state, dispatch] = useReducer((state: State, action) => {
+
+    return state;
+  }, {
+      messages: []
+    })
+}
 
 import { cycleTaskStatus, TaskStatus, Task } from "../api";
 

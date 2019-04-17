@@ -7,12 +7,7 @@ import Knex = require('knex');
 
 import { lowerCase } from 'lodash';
 
-const knex = Knex({
-  client: 'sqlite3',
-  connection: {
-    filename: './development.sqlite3',
-  },
-});
+import { knex } from './database';
 
 export enum Scope {
   UNUSED = 0,

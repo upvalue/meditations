@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { Link, RouteComponentProps } from '@reach/router';
+import { RouteComponentProps } from '@reach/router';
 import { View } from '@upvalueio/third-coast';
 import { MdChevronRight, MdArrowForward, MdChevronLeft, MdArrowBack } from 'react-icons/md';
 
 import { IconLink } from '../components/IconButton';
-import { parseDate } from '../api';
 import { parse, format, subMonths, addMonths, addYears, subYears } from 'date-fns';
 
 export interface HabitsSidebarProps extends RouteComponentProps {

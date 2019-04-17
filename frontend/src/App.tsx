@@ -1,11 +1,11 @@
 /// <reference path="../node_modules/@types/reach__router/index.d.ts" />
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import classNames from 'classnames';
 
 import { Router, Redirect } from '@reach/router';
 
-import { ThirdCoast, Button, useTheme } from '@upvalueio/third-coast';
+import { ThirdCoast } from '@upvalueio/third-coast';
 
 import { store } from './store';
 import { Header } from './Header';
@@ -13,8 +13,6 @@ import { ThemeName } from '@upvalueio/third-coast/dist/Theme';
 import { NotesPage } from './notes/NotesPage';
 import { HabitsPage } from './habits/HabitsPage';
 import { TestPage } from './TestPage';
-
-import thing from '@upvalueio/meditations-shared';
 
 import 'normalize.css/normalize.css';
 
@@ -64,7 +62,7 @@ class App extends Component {
       >
         <Provider store={store}>
           <>
-            <Header />
+            {/*<Header />*/}
             <ThemedBody />
           </>
         </Provider>
