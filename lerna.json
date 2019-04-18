@@ -1,6 +1,6 @@
 {
   "packages": [
-    "frontend", "backend", "shared"
+    "frontend", "backend"
   ],
   "version": "0.0.0"
 }

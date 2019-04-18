@@ -3,6 +3,7 @@ export type Task = {
   name: string;
   minutes: number;
   status: number;
+  scope: number;
   date: string;
   comment?: string;
   // Calculated on query

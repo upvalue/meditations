@@ -22,15 +22,10 @@ type Task {
   completed_tasks: Int
 }
 
-input InputTask {
-  Name: String
-  CreatedAt: String
-  UpdatedAt: String
-  Date: String
-  Status: Int
-  Scope: Int
-  Position: Int
-  Minutes: Int
+input InputTaskMinutes {
+  id: Int!
+  scope: Int
+  minutes: Int
 }
 
 type TasksByDateResponse {
@@ -46,6 +41,14 @@ type Query {
   tasksByDate(date: String!, includeYear: Boolean!): TasksByDateResponse
 }
 
+type TaskEvent {
+  updatedTasks: [Task]
+}
+
 type Mutation {
-  updateTask(taskId: Int!, task: InputTask!): [Task]
+  updateTask(input: InputTaskMinutes!): TaskEvent
+}
+
+type Subscription {
+  taskEvents: TaskEvent
 }`

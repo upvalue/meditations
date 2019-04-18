@@ -24,7 +24,7 @@ export const Scope = (props: any) => {
             <div ref={provided.innerRef} {...provided.droppableProps}>
               {props.tasks && props.tasks.map((task: any, i: number) => (
                 <CTask
-                  key={task.ID}
+                  key={task.id}
                   index={i}
                   task={task}
                 />

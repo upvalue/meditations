@@ -1,10 +1,12 @@
 import { UserInputError, ApolloServer, gql, PubSub } from 'apollo-server';
 import { parse, isValid, format } from 'date-fns';
+import { createServer } from 'http';
 import groupBy from 'lodash/groupBy';
 
-import { Task, tasksInScope } from './model';
+import { tasksInScope, updateTask } from './model';
 
 import { typeDefs } from './graphql-typedefs';
+import { InputTaskMinutes } from './types';
 
 const pubsub = new PubSub();
 
@@ -16,11 +18,6 @@ type TasksByDateArgs = {
   date: string,
   scopes: ReadonlyArray<ScopeName>,
 };
-
-type UpdateTaskArgs = {
-  taskId: number;
-  task: Partial<Task>;
-}
 
 const DATE_FORMAT = 'yyyy-mm-dd';
 
@@ -44,6 +41,10 @@ const SCOPE_NUMBERS: { [key: string]: number } = {
 
 type TasksInMonthArgs = {
   date: string;
+}
+
+type UpdateTaskArgs = {
+  input: InputTaskMinutes;
 }
 
 // Resolvers define the technique for fetching the types in the
@@ -71,20 +72,24 @@ const resolvers = {
         return groupBy(tasks, t => SCOPE_NAMES[t.scope]);
       });
     },
-  }
+  },
 
-  /*
+  Mutation: {
+    updateTask: (_param: any, args: UpdateTaskArgs) => {
+      return updateTask(args.input).then(updatedTasks => {
+        return { updatedTasks };
+      });
+    }
+  },
+
   Subscription: {
     taskEvents: {
       subscribe: () => pubsub.asyncIterator([TASK_EVENTS]),
     }
   }
-  */
 };
 
-// In the most basic sense, the ApolloServer can be started
-// by passing type definitions (typeDefs) and the resolvers
-// responsible for fetching the data for those types.
 const server = new ApolloServer({ typeDefs, resolvers });
+
 
 export default server;

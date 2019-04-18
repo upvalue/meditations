@@ -24,18 +24,10 @@ export type CTaskProps = {
 }
 
 export const CTask = (props: CTaskProps) => {
-  let nameString = props.task && props.task.name;
+  const { task } = props;
+  let nameString = task.name;
 
-  /*
-  if (props.task && props.task.CompletedTasks) {
-    // tslint:disable-next-line
-    //nameString = `${nameString} ${props.task.CompletedTasks}/${props.task.TotalTasks} (${props.task.CompletionRate}%)`
-  }
-  */
-
-  const cycleStatus = () => {
-    // cycleTaskStatus(props.task);
-  }
+  console.log(task);
 
   return (
     <Draggable
@@ -52,20 +44,11 @@ export const CTask = (props: CTaskProps) => {
           <div className="flex items-center justify-between"
 
           >
-            {/*<MdCheckCircle color={"green"} />
-        <Button className="ml2" style={{ display: 'inline' }}>
-          &nbsp;{props.children}
-  </Button>*/}
-            {/*<Button
-              onClick={cycleStatus}
-              className={props.task ? TaskStatus[props.task.Status] : ''}
-            >
-              {nameString}
-            </Button>*/}
             {nameString}
 
             <div>
               <div
+                className="flex items-center"
                 {...provided.dragHandleProps}
               >
                 <MdCheckCircle />
@@ -74,6 +57,9 @@ export const CTask = (props: CTaskProps) => {
           </div>
 
           <div className="Comment mx2" dangerouslySetInnerHTML={{ __html: props.task.comment || '' }} />
+
+          <p>{task.minutes}</p>
+
         </div >
       )}
     </Draggable>

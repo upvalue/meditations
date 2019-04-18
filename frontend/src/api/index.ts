@@ -27,7 +27,7 @@ export interface TasksInMonthRequest {
   tasksInMonth: ReadonlyArray<Partial<Task>>;
 }
 
-const allDayTaskFields = 'id, name, scope, status, comment, date';
+const allDayTaskFields = 'id, name, scope, status, comment, date, minutes';
 const allTaskFields = `${allDayTaskFields}`;
 
 /**
@@ -59,19 +59,6 @@ export const tasksInMonth = (date: string) =>
       ${allTaskFields}
     }
   }`) as Promise<TasksInMonthRequest>;
-
-export const updateTask = (task: Partial<Task>) =>
-  client.request(`mutation updateTask($taskId: Int!, $task: InputTask!) {
-    updateTask(id: $taskId, task: $task) {
-      ID, Status
-    }
-  }`, { task, taskId: task.id });
-
-export const cycleTaskStatus = (task: Partial<Task>) =>
-  updateTask({
-    ...task,
-    status: ((task.status || 0) + 1) % (TaskStatus.STATUS_INCOMPLETE + 1)
-  });
 
 /**
  * Format a date in the way the backend expects it, YYYY-MM-DD
