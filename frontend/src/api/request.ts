@@ -2,6 +2,12 @@ type Fragment = ReadonlyArray<string>;
 
 type Variables = { [key: string]: any };
 
+/**
+ * Make a GraphQL request, optionally including some fragments
+ * @param query 
+ * @param fragmentsOrVariables 
+ * @param variables 
+ */
 export const request = <T extends any>(
   query: string,
   fragmentsOrVariables?: Fragment | Variables,

@@ -5,6 +5,8 @@ import { Task } from './types';
 
 export * from './types';
 
+import { request } from './request';
+
 const client = new GraphQLClient('/graphql');
 
 export enum TaskStatus {

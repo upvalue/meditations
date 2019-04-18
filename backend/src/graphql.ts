@@ -63,7 +63,7 @@ const resolvers = {
     tasksByDate: (_param: any, args: TasksByDateArgs) => {
       checkDate(args.date);
       return Promise.all([
-        tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-MM'), [1]),
+        tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm'), [1]),
         tasksInScope(args.date, [2]),
         tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy'), [3]),
       ]).then(res => {

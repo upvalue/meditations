@@ -60,7 +60,6 @@ export const HabitsSidebar = (props: HabitsSidebarProps) => {
           </div>
 
         </div>
-        <span>some other controls or whatever</span>
       </View>
 
     </View>
