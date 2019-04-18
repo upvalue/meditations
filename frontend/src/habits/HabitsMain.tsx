@@ -2,10 +2,11 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { View } from '@upvalueio/third-coast';
 
-import { tasksByDate, TasksByDateRequest, formatDate, RequestScopeEnum } from '../api';
+import { formatDate, TasksByDateRequest, tasksByDate } from '../api';
 import { ScopeContainer } from './ScopeContainer';
 import { parse, differenceInCalendarYears, format } from 'date-fns';
 import { RouteComponentProps } from '@reach/router';
+import { ScopeDays } from './ScopeDays';
 
 interface HabitsMainProps extends RouteComponentProps {
   date?: string;
@@ -39,7 +40,6 @@ export const HabitsMain = (props: HabitsMainProps) => {
       // The calendar year changed, refetch
     }
 
-
     const promise = tasksByDate(formatDate(dateObj), changedYear);
 
     setPrevDate(props.date);
@@ -57,6 +57,11 @@ export const HabitsMain = (props: HabitsMainProps) => {
       <View className="higher-scopes" flex="flex">
         {tasks &&
           <>
+
+            <ScopeDays
+              className="mr2"
+              tasks={tasks.Days}
+            />
 
             <ScopeContainer
               title={format(dateObj, 'MMMM')}

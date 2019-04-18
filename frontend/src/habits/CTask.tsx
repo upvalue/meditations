@@ -16,7 +16,7 @@ const Thing = () => {
     })
 }
 
-import { cycleTaskStatus, TaskStatus, Task } from "../api";
+import { Task } from "../api";
 
 export type CTaskProps = {
   task: Task;
@@ -24,20 +24,22 @@ export type CTaskProps = {
 }
 
 export const CTask = (props: CTaskProps) => {
-  let nameString = props.task && props.task.Name;
+  let nameString = props.task && props.task.name;
 
+  /*
   if (props.task && props.task.CompletedTasks) {
     // tslint:disable-next-line
-    nameString = `${nameString} ${props.task.CompletedTasks}/${props.task.TotalTasks} (${props.task.CompletionRate}%)`
+    //nameString = `${nameString} ${props.task.CompletedTasks}/${props.task.TotalTasks} (${props.task.CompletionRate}%)`
   }
+  */
 
   const cycleStatus = () => {
-    cycleTaskStatus(props.task);
+    // cycleTaskStatus(props.task);
   }
 
   return (
     <Draggable
-      draggableId={props.task.ID.toString()}
+      draggableId={props.task.id.toString()}
       index={props.index}
       type="TASK"
     >
@@ -62,7 +64,7 @@ export const CTask = (props: CTaskProps) => {
             </Button>*/}
             {nameString}
 
-            <div className="mr1">
+            <div>
               <div
                 {...provided.dragHandleProps}
               >
@@ -71,7 +73,7 @@ export const CTask = (props: CTaskProps) => {
             </div>
           </div>
 
-          <div className="Comment mx2" dangerouslySetInnerHTML={{ __html: props.task.Comment || '' }} />
+          <div className="Comment mx2" dangerouslySetInnerHTML={{ __html: props.task.comment || '' }} />
         </div >
       )}
     </Draggable>

@@ -1,15 +1,9 @@
 import { GraphQLClient } from 'graphql-request';
 import { format, parse } from 'date-fns';
 
-import * as mock from './mock';
-mock.gquery(`{ ping }`).then(result => console.log(result));
+import { Task } from './types';
 
-import { request as fart } from './request';
-
-const w = window as any;
-
-w.req = fart;
-
+export * from './types';
 
 const client = new GraphQLClient('/graphql');
 
@@ -19,30 +13,20 @@ export enum TaskStatus {
   STATUS_INCOMPLETE = 2
 }
 
-export type RequestScopeEnum = 'MONTH' | 'DAYS' | 'YEAR';
-
-export interface Task {
-  ID: number;
-  Name: string;
-  Minutes: number;
-  Status: number;
-  Comment?: string;
-  // Calculated on query
-  CompletionRate?: number;
-  TotalTasks?: number;
-  CompletedTasks?: number;
-}
-
 export interface TasksByDateRequest {
   tasksByDate: {
-    Days: ReadonlyArray<Partial<Task>>;
-    Month: ReadonlyArray<Partial<Task>>;
-    Year: ReadonlyArray<Partial<Task>>;
+    Days: ReadonlyArray<Task>;
+    Month: ReadonlyArray<Task>;
+    Year: ReadonlyArray<Task>;
   };
 }
 
-const allDayTaskFields = 'ID, Name, Scope, Status, Comment';
-const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, CompletedTasks`;
+export interface TasksInMonthRequest {
+  tasksInMonth: ReadonlyArray<Partial<Task>>;
+}
+
+const allDayTaskFields = 'id, name, scope, status, comment, date';
+const allTaskFields = `${allDayTaskFields}`;
 
 /**
  * Query tasks within a date scope (e.g. all tasks for a given month)
@@ -51,7 +35,7 @@ const allTaskFields = `${allDayTaskFields}, CompletionRate, TotalTasks, Complete
  */
 export const tasksByDate = (date: string, includeYear: boolean) =>
   client.request(`{
-    tasksByDate(date: "${date}", scopes: [DAY, MONTH${includeYear ? ', YEAR' : ''}]) {
+    tasksByDate(date: "${date}", includeYear: ${includeYear}) {
       Days {
         ${allDayTaskFields}
       }
@@ -62,17 +46,29 @@ export const tasksByDate = (date: string, includeYear: boolean) =>
     }
   }`) as Promise<TasksByDateRequest>;
 
+/**
+ * Query tasks within a date scope (e.g. all tasks for a given month)
+ * @param date Date. YYYY-MM-DD.
+ * @param includeYear If true, will query for year
+ */
+export const tasksInMonth = (date: string) =>
+  client.request(`{
+    tasksInMonth(date: "${date}") {
+      ${allTaskFields}
+    }
+  }`) as Promise<TasksInMonthRequest>;
+
 export const updateTask = (task: Partial<Task>) =>
   client.request(`mutation updateTask($taskId: Int!, $task: InputTask!) {
     updateTask(id: $taskId, task: $task) {
       ID, Status
     }
-  }`, { task, taskId: task.ID });
+  }`, { task, taskId: task.id });
 
 export const cycleTaskStatus = (task: Partial<Task>) =>
   updateTask({
     ...task,
-    Status: ((task.Status || 0) + 1) % (TaskStatus.STATUS_INCOMPLETE + 1)
+    status: ((task.status || 0) + 1) % (TaskStatus.STATUS_INCOMPLETE + 1)
   });
 
 /**

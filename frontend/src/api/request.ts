@@ -2,9 +2,6 @@ type Fragment = ReadonlyArray<string>;
 
 type Variables = { [key: string]: any };
 
-import { schema } from './mock';
-import { graphql } from 'graphql';
-
 export const request = <T extends any>(
   query: string,
   fragmentsOrVariables?: Fragment | Variables,
@@ -25,19 +22,14 @@ export const request = <T extends any>(
 ${fragments ? fragments.join('\n') : ''}
 ${query}`.trim();
 
-
-  return graphql(schema, queryString, null, null, vars) as Promise<T>;
-
-  // Uncomment for mocks
-
-  fetch(`/api/graphql`, {
+  return fetch(`/api/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      query,
+      queryString,
       variables: vars ? vars : undefined
     })
-  });
+  }).then((res: any) => res.json()) as Promise<T>;
 }
