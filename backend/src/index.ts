@@ -1,6 +1,12 @@
-import server from './graphql';
+import { httpServer } from './graphql';
 
-server.listen().then((thing: any) => {
+/*
+app.listen().then((thing: any) => {
   const { url } = thing;
   console.log(`Server ready at ${url}`);
+});
+*/
+
+httpServer.listen(4000, () => {
+  console.log('Server ready');
 });

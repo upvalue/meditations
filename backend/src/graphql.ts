@@ -1,12 +1,17 @@
-import { UserInputError, ApolloServer, gql, PubSub } from 'apollo-server';
+import fs from 'fs';
+
+import express from 'express';
+import { UserInputError, PubSub } from 'apollo-server';
+import { ApolloServer, gql } from 'apollo-server-express';
 import { parse, isValid, format } from 'date-fns';
-import { createServer } from 'http';
 import groupBy from 'lodash/groupBy';
+import { createServer } from 'http';
 
 import { tasksInScope, updateTask } from './model';
 
-import { typeDefs } from './graphql-typedefs';
 import { InputTaskMinutes } from './types';
+
+const typeDefs = gql(fs.readFileSync(__dirname.concat('/schema.gql'), 'utf8'));
 
 const pubsub = new PubSub();
 
@@ -77,6 +82,7 @@ const resolvers = {
   Mutation: {
     updateTask: (_param: any, args: UpdateTaskArgs) => {
       return updateTask(args.input).then(updatedTasks => {
+        pubsub.publish(TASK_EVENTS, { taskEvents: { updatedTasks } });
         return { updatedTasks };
       });
     }
@@ -91,5 +97,12 @@ const resolvers = {
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
+const app = express();
 
-export default server;
+server.applyMiddleware({ app });
+
+const httpServer = createServer(app);
+
+server.installSubscriptionHandlers(httpServer);
+
+export { httpServer }
