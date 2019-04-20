@@ -28,14 +28,20 @@ export const request = <T extends any>(
 ${fragments ? fragments.join('\n') : ''}
 ${query}`.trim();
 
-  return fetch(`/api/graphql`, {
+  return fetch(`/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      queryString,
+      query: queryString,
       variables: vars ? vars : undefined
     })
-  }).then((res: any) => res.json()) as Promise<T>;
+  })
+    .then((res: any) => res.json())
+    .then((res: any) => {
+      if (res.data) return res.data;
+      console.error(res);
+
+    }) as Promise<T>;
 }

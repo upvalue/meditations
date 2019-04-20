@@ -3,6 +3,7 @@ export type Task = {
   name: string;
   minutes: number;
   status: number;
+  scope: number;
   date: string;
   comment?: string;
   // Calculated on query
@@ -16,3 +17,25 @@ export type InputTaskMinutes = {
   minutes: number;
   scope: number;
 }
+
+export type InputTaskNew = {
+  name: string;
+  date: string;
+  scope: string;
+}
+
+export type UpdatedTasksEvent = {
+  taskEvents: {
+    __typename: 'UpdatedTasksEvent';
+    updatedTasks: ReadonlyArray<Task>;
+  }
+}
+
+export type AddTaskEvent = {
+  taskEvents: {
+    __typename: 'AddTaskEvent';
+    newTask: Task;
+  }
+}
+
+export type TaskEvent = UpdatedTasksEvent | AddTaskEvent;

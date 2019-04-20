@@ -1,20 +1,6 @@
 import React, { useReducer } from 'react';
 import { Draggable } from "react-beautiful-dnd";
-import { Button } from "@upvalueio/third-coast";
 import { MdCheckCircle } from "react-icons/md";
-
-type State = {
-  messages: string[],
-};
-
-const Thing = () => {
-  const [state, dispatch] = useReducer((state: State, action) => {
-
-    return state;
-  }, {
-      messages: []
-    })
-}
 
 import { Task } from "../api";
 
@@ -27,7 +13,7 @@ export const CTask = (props: CTaskProps) => {
   const { task } = props;
   let nameString = task.name;
 
-  console.log(task);
+  // console.log(task);
 
   return (
     <Draggable

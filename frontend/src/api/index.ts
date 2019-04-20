@@ -49,16 +49,13 @@ export const tasksByDate = (date: string, includeYear: boolean) =>
   }`) as Promise<TasksByDateRequest>;
 
 /**
- * Query tasks within a date scope (e.g. all tasks for a given month)
- * @param date Date. YYYY-MM-DD.
- * @param includeYear If true, will query for year
+ * Fragment to retrieve all task fields
  */
-export const tasksInMonth = (date: string) =>
-  client.request(`{
-    tasksInMonth(date: "${date}") {
-      ${allTaskFields}
-    }
-  }`) as Promise<TasksInMonthRequest>;
+export const taskFieldsFragment = `
+fragment taskFields on Task {
+  id, name, scope, status, comment, date, minutes
+}
+`;
 
 /**
  * Format a date in the way the backend expects it, YYYY-MM-DD
@@ -73,4 +70,4 @@ export const parseDate = (date: string) => {
   return parse(date, 'yyyy-MM-dd', baseDate);
 }
 
-(window as any).tasksByDate = tasksByDate;
+

@@ -17,3 +17,21 @@ export type InputTaskMinutes = {
   minutes: number;
   scope: number;
 }
+
+export type InputTaskNew = {
+  name: string;
+  date: string;
+  scope: string;
+}
+
+export type UpdatedTasksEvent = {
+  __typename: 'UpdatedTasksEvent';
+  updatedTasks: ReadonlyArray<Task>;
+}
+
+export type AddTaskEvent = {
+  __typename: 'AddTaskEvent';
+  newTask: Task;
+}
+
+export type TaskEvent = UpdatedTasksEvent | AddTaskEvent;

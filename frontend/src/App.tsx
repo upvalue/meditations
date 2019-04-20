@@ -1,35 +1,27 @@
 /// <reference path="../node_modules/@types/reach__router/index.d.ts" />
 import React, { Component } from 'react';
-import { Provider } from 'react-redux';
 import classNames from 'classnames';
 
 import { Router, Redirect } from '@reach/router';
 
 import { ThirdCoast } from '@upvalueio/third-coast';
 
-import { store } from './store';
-import { Header } from './Header';
 import { ThemeName } from '@upvalueio/third-coast/dist/Theme';
-import { NotesPage } from './notes/NotesPage';
-import { HabitsPage } from './habits/HabitsPage';
-import { TestPage } from './TestPage';
 
 import 'normalize.css/normalize.css';
+import { SocketProvider } from './hooks/useSubscription';
+import { HabitsContainer } from './habits/HabitsContainer';
 
 const ThemedBody = () => {
   return (
     <Router className="ThemedBody flex" primary={false}>
-      <HabitsPage
-        path="habits/*"
+      <HabitsContainer
+        path="habits/browse/:date"
       />
 
-      <NotesPage
+      {/*<NotesPage
         path="/notes"
-      />
-
-      <TestPage
-        path="/test"
-      />
+      />*/}
 
       <Redirect
         noThrow={true}
@@ -60,12 +52,9 @@ class App extends Component {
       <ThirdCoast
         onThemeChange={this.toggleTheme}
       >
-        <Provider store={store}>
-          <>
-            {/*<Header />*/}
-            <ThemedBody />
-          </>
-        </Provider>
+        <SocketProvider>
+          <ThemedBody />
+        </SocketProvider>
       </ThirdCoast>
     );
   }

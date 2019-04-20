@@ -1,21 +1,25 @@
 import fs from 'fs';
 
-import express from 'express';
 import { UserInputError, PubSub } from 'apollo-server';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { gql } from 'apollo-server-express';
 import { parse, isValid, format } from 'date-fns';
 import groupBy from 'lodash/groupBy';
-import { createServer } from 'http';
 
-import { tasksInScope, updateTask } from './model';
+import { tasksInScope, updateTask, addTask } from './model';
 
-import { InputTaskMinutes } from './types';
+import { InputTaskMinutes, InputTaskNew } from './types';
 
 const typeDefs = gql(fs.readFileSync(__dirname.concat('/schema.gql'), 'utf8'));
 
 const pubsub = new PubSub();
 
 const TASK_EVENTS = 'TASK_EVENTS';
+
+/**
+ * Subscription ID. Unique across instances of meditations, doesn't need to be persisted so
+ * simply kept in a variable
+ */
+let subscriptionSessionId = 1;
 
 type ScopeName = 'DAY' | 'MONTH' | 'YEAR';
 
@@ -52,6 +56,11 @@ type UpdateTaskArgs = {
   input: InputTaskMinutes;
 }
 
+type AddTaskArgs = {
+  sessionId: number;
+  input: InputTaskNew;
+}
+
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
@@ -85,6 +94,26 @@ const resolvers = {
         pubsub.publish(TASK_EVENTS, { taskEvents: { updatedTasks } });
         return { updatedTasks };
       });
+    },
+
+    addTask: (_param: any, args: AddTaskArgs) => {
+      return addTask(args.input).then((newTaskList: any) => {
+        const newTask = newTaskList[0];
+
+        pubsub.publish(TASK_EVENTS, {
+          taskEvents: { newTask }
+        });
+
+        return {
+          sessionId: args.sessionId,
+          newTask,
+        };
+      })
+
+    },
+
+    newSubscriptionSession: (_param: any, args: any) => {
+      return subscriptionSessionId++;
     }
   },
 
@@ -92,17 +121,19 @@ const resolvers = {
     taskEvents: {
       subscribe: () => pubsub.asyncIterator([TASK_EVENTS]),
     }
-  }
+  },
+
+  TaskEvent: {
+    __resolveType: (obj: any, context: any, info: any) => {
+      if (obj.updatedTasks) {
+        return 'UpdatedTasksEvent';
+      } else if (obj.newTask) {
+        return 'AddTaskEvent';
+      }
+      console.error('UNABLE TO RESOLVE TYPE FOR TaskEvent ', obj);
+      return 'UpdatedTasksEvent';
+    }
+  },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
-
-const app = express();
-
-server.applyMiddleware({ app });
-
-const httpServer = createServer(app);
-
-server.installSubscriptionHandlers(httpServer);
-
-export { httpServer }
+export { typeDefs, resolvers };

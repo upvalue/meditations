@@ -1,12 +1,19 @@
-import { httpServer } from './graphql';
+import express from 'express';
+import { typeDefs, resolvers } from './graphql';
+import { ApolloServer } from 'apollo-server-express';
+import { createServer } from 'http';
 
-/*
-app.listen().then((thing: any) => {
-  const { url } = thing;
-  console.log(`Server ready at ${url}`);
-});
-*/
+// Set up server
+const server = new ApolloServer({ typeDefs, resolvers });
+
+const app = express();
+
+server.applyMiddleware({ app });
+
+const httpServer = createServer(app);
+
+server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen(4000, () => {
-  console.log('Server ready');
+  console.log('Server ready 4000');
 });

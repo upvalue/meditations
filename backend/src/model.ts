@@ -4,7 +4,7 @@ import process from 'process';
 import sqlite from 'sqlite3';
 
 import { knex } from './database';
-import { Task, InputTaskMinutes } from './types';
+import { Task, InputTaskMinutes, InputTaskNew } from './types';
 
 export enum Scope {
   UNUSED = 0,
@@ -28,7 +28,7 @@ export const tasksInScope = (date: string, scopes: number[]): Promise<ReadonlyAr
 }
 
 /**
- * Select tasks related to a daily-scoped task
+ * Select tasks related to a daily-scoped task (month and year) if they exist
  * @param name 
  */
 export const selectRelatedTasks = (id: number, date: string, name: string) => {
@@ -38,6 +38,20 @@ export const selectRelatedTasks = (id: number, date: string, name: string) => {
     .orWhere('scope', 2)
     .whereRaw(`strftime("%Y-%m", date) = strftime("%Y-%m", ?)`, [date])
     .where({ name });
+}
+
+export const addTask = async (input: InputTaskNew): Promise<Task> => {
+  const { name, date, scope } = input;
+
+  return knex('tasks')
+    .insert({
+      name, date, scope
+    })
+    .then(([id]: [number]) =>
+      knex.from('tasks')
+        .select(...taskFields)
+        .where({ id }));
+
 }
 
 export const updateTask = async (input: InputTaskMinutes): Promise<ReadonlyArray<Task>> => {
