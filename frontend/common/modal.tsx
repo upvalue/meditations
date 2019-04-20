@@ -108,18 +108,6 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
     };
   }
 
-  /*
-  componentWillUpdate(nextProps : ModalProviderProps, nextState: ModalState) {
-    if (this.state.modalOpen && !nextState.modalOpen) {
-      mousetrap.unbind(KEYSEQ_MODAL_EXIT);
-    } else if (!this.state.modalOpen && nextState.modalOpen) {
-      mousetrap.bindGlobal('escape', () => {
-        console.log('quit modal');
-      });
-    }
-  }
-  */
-
   openModalPrompt(body: string, ok: string, callback: (result: string) => void,
     defaultValue?: string, options?: ModalPromptOptions) {
 
@@ -174,7 +162,7 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
   }
 
   dismissModal = () => {
-    this.setState({ modalOpen: false });
+    this.setState({ modalOpen: false, modalError: undefined });
   }
 
   submitModal = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
@@ -208,6 +196,7 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
 
     this.setState({
       modalOpen: false,
+      modalError: undefined,
     });
   }
 
