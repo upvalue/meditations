@@ -18,6 +18,11 @@ export type InputTaskMinutes = {
   scope: number;
 }
 
+export type InputTaskStatus = {
+  id: number;
+  status: number;
+}
+
 export type InputTaskNew = {
   name: string;
   date: string;
@@ -25,17 +30,22 @@ export type InputTaskNew = {
 }
 
 export type UpdatedTasksEvent = {
-  taskEvents: {
-    __typename: 'UpdatedTasksEvent';
-    updatedTasks: ReadonlyArray<Task>;
-  }
+  __typename: 'UpdatedTasksEvent';
+  updatedTasks: ReadonlyArray<Task>;
 }
 
 export type AddTaskEvent = {
-  taskEvents: {
-    __typename: 'AddTaskEvent';
-    newTask: Task;
-  }
+  __typename: 'AddTaskEvent';
+  newTask: Task;
 }
 
-export type TaskEvent = UpdatedTasksEvent | AddTaskEvent;
+export type TaskEvent = AddTaskEvent & {
+  sessionId: string;
+};
+
+// Subscription type, used by useSubscription
+export type AddTaskSubscription = {
+  addTask: AddTaskEvent,
+};
+
+export type TaskSubscription = AddTaskSubscription;

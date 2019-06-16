@@ -6,7 +6,7 @@ import { MdBrightness3, MdBrightness4 } from 'react-icons/md';
 import { View, useTheme } from '@upvalueio/third-coast';
 import { Link, LinkGetProps } from '@reach/router';
 
-import { IconButton } from './components/IconButton';
+import { IconButton } from './base/IconButton';
 
 /**
  * Style active links

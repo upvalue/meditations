@@ -1,65 +1,19 @@
-
-.dark .Task {
-  // background-color: #395939;
-  border-color: $dark-gray4;
-
-  // Zebra striping
-  /*
-  &:nth-of-type(odd) {
-    background-color: $dark-gray4;
-  }
-
-  &:nth-of-type(even) {
-    background-color: $dark-gray5;
-  }
-  */
-  background-color: $dark-gray4;
-}
-
 .Task {
   border-radius: 2px;
   box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px;
-  // border-radius: 2px;
   background-color: $white;
 }
 
-/*
-.Task:nth-of-type(odd) {
-  background-color: $light-gray5;
-}
-
-.Task:nth-of-type(even) {
-  background-color: $white;
-}
-*/
-
-.Task .button {
-  &.STATUS_UNSET {
-    background-color: $light-gray2;
-    //color: $black;
+.Task-name {
+  cursor: pointer;
+  &-unset {
+    border-bottom: 2px solid $primary4;
   }
-
-  &.STATUS_INCOMPLETE {
-    background-color: red;
-    color: white;
+  &-complete {
+    border-bottom: 2px solid $secondary4;
   }
-
-  &.STATUS_COMPLETE {
-    background-color: #449d44;
-    color: $white;
-  }
-
-  border:0;
-  text-align: left;
-  
-  background-image: none;
-  box-shadow: none;
-}
-
-.dark .Task .button {
-  &.STATUS_UNSET {
-    background-color: $light-gray2;
-    color: $black;
+  &-incomplete {
+    border-bottom: 2px solid $danger4;
   }
 }
 

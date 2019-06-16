@@ -1,15 +1,26 @@
-// SocketProvider.tsx - Manages GraphQL subscriptions through websockets
+// useSubscription.tsx - manage store through subscriptions with mutations automatically dispatching
+// updates as though they came from a subscription
 
 // https://github.com/apollographql/subscriptions-transport-ws/blob/maser/PROTOCOL.md
 
 import React, { useEffect, useReducer, useRef, useContext, useCallback } from 'react';
 import { request } from '../api/request';
 
-const w = window as any;
-
+type Variables = { [key: string]: any };
 
 export type SocketProviderProps = {
   children?: React.ReactNode;
+}
+
+/**
+ * Given the result of a GraphQL query, return the resulting object
+ * without the query name
+ * @param result 
+ */
+const stripQueryName = (result: any) => {
+  // Remove query name 
+  const key = Object.keys(result)[0];
+  return result[key];
 }
 
 // Things needed to happen
@@ -79,11 +90,13 @@ const reducer = (
       };
     }
     case 'SUBSCRIBE': {
-      if (state.subscribed === true) {
+      if (state.subscribed !== false) {
         console.warn('Only one subscription may be active at a time. Make sure to unsubscribe in cleanup before mounting another subscription component');
       }
       return {
-        ...state, subscribed: action.query,
+        ...state,
+        subscribed: action.query,
+        onUpdate: action.onUpdate,
       };
     }
     case 'UNSUBSCRIBE':
@@ -96,16 +109,6 @@ const reducer = (
       }
   }
   return state;
-}
-
-const NEW_SUBSCRIPTION_SESSION_QUERY = `
-mutation registerSubscriptionSession {
-  newSubscriptionSession
-}
-`;
-
-type NewSubscriptionSession = {
-  newSubscriptionSession: number;
 }
 
 export const SocketProvider = (props: SocketProviderProps) => {
@@ -126,17 +129,6 @@ export const SocketProvider = (props: SocketProviderProps) => {
   });
 
   useEffect(() => {
-    // Obtain a unique subscription session ID
-    request<NewSubscriptionSession>(NEW_SUBSCRIPTION_SESSION_QUERY)
-      .then(({ newSubscriptionSession: sessionId }) => {
-
-        dispatch({
-          type: 'REGISTER',
-          sessionId
-        })
-      });
-
-    // Open a WebSocket connection
     const ws = new WebSocket(`ws://localhost:4000/graphql`, 'graphql-subscriptions');
 
     const subscribe = (query: string, onUpdateCb: (x: any) => void) => {
@@ -188,7 +180,7 @@ export const SocketProvider = (props: SocketProviderProps) => {
       const msg = JSON.parse(e.data);
 
       if (msg.type === 'data') {
-        onUpdate.current(msg.payload.data);
+        onUpdate.current(stripQueryName(msg.payload.data));
       }
     });
 
@@ -221,8 +213,11 @@ export const useSubscription = <T extends {}>(query: string, onUpdate: (obj: T) 
 export const useMutation = (query: string) => {
   const { onUpdate } = useContext(SocketContext);
 
-  return useCallback(() => {
-    request(query)
-      .then(res => onUpdate(res));
-  }, [onUpdate])
+  return useCallback((variables?: Variables) => {
+    request(query, variables)
+      .then((res: any) => {
+        // Remove query name 
+        onUpdate(stripQueryName(res));
+      });
+  }, [query, onUpdate])
 }

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-
+import React from 'react';
+import { parse, format, subMonths, addMonths, addYears, subYears } from 'date-fns';
 import { RouteComponentProps } from '@reach/router';
 import { View, Input } from '@upvalueio/third-coast';
 import { MdChevronRight, MdArrowForward, MdChevronLeft, MdArrowBack } from 'react-icons/md';
 
-import { IconLink } from '../components/IconButton';
-import { parse, format, subMonths, addMonths, addYears, subYears } from 'date-fns';
-import { useSubscription, useMutation } from '../hooks/useSubscription';
+import { IconLink } from '../base/IconButton';
+import { useMutation } from '../hooks/useSubscription';
+import { taskFieldsFragment, formatDate } from '../api';
 
 export interface HabitsSidebarProps extends RouteComponentProps {
   date?: string;
@@ -15,19 +15,21 @@ export interface HabitsSidebarProps extends RouteComponentProps {
 const baseDate = new Date;
 
 const NEW_TASK_QUERY = `
-mutation {
-  addTask(sessionId: -1, input:{
-    date: "2019-04-01",
-    name: "Meditate",
+${taskFieldsFragment}
+
+mutation newTask($sessionId: String!, $date: String!, $name: String!) {
+  addTask(sessionId: $sessionId, input:{
+    date: $date,
+    name: $name,
     scope: 1
   }) {
+    __typename, 
     newTask {
-      id, name, minutes
+      ...taskFields
     }
   }
 }
 `
-
 
 export const HabitsSidebar = (props: HabitsSidebarProps) => {
   const date = props.date ? parse(props.date, 'yyyy-MM', baseDate) : new Date;
@@ -81,7 +83,10 @@ export const HabitsSidebar = (props: HabitsSidebarProps) => {
 
           <Input width={35} placeholder="Task name" onBlur={(e) => {
             //console.log(e.target.value);
-            addTask();
+            addTask({
+              name: e.target.value,
+              date: formatDate(new Date),
+            });
 
             e.target.value = '';
           }} />

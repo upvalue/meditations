@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { parse, differenceInCalendarYears, format } from 'date-fns';
 import { RouteComponentProps } from '@reach/router';
 
-import { formatDate, tasksByDate, Task, TaskEvent, taskFieldsFragment } from '../api';
+import { formatDate, tasksByDate, taskFieldsFragment, TaskSubscription, TaskEvent, SESSION_ID } from '../api';
 import { HabitsPage } from './HabitsPage';
 import { initialState, habitsReducer, habitsReducerLogged } from './HabitsContainerState';
 import { useSubscription } from '../hooks/useSubscription';
@@ -18,21 +18,16 @@ const TASK_EVENTS_QUERY = `
 ${taskFieldsFragment}
 
 subscription habitsContainer {
-  taskEvents {
+  addTask {
     __typename
-    ...on UpdatedTasksEvent {
-      updatedTasks {
-        ...taskFields
-      }
-    }
-    ...on AddTaskEvent {
-      newTask {
-        ...taskFields
-      }
+    sessionId
+    newTask {
+      ...taskFields
     }
   }
 }
 `;
+
 
 /**
  * Habits state container. Manages changes in route, subscription updates to habits store
@@ -71,8 +66,9 @@ export const HabitsContainer = (props: HabitsContainerProps) => {
   }, [props.date]);
 
   useSubscription(TASK_EVENTS_QUERY, (te: TaskEvent) => {
-    // Figure out if the thing applies.
-    // console.log('received ye task event', te);
+    // Discard events resulting from this session
+    if (te.sessionId === SESSION_ID) return;
+
     dispatch({
       type: 'TASK_EVENT',
       ...te,

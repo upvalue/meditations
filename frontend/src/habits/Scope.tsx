@@ -16,7 +16,7 @@ export const Scope = (props: any) => {
       <h4 className="my0 mt1 mx1 mb2">{props.title || 'no title'}</h4>
 
       <Droppable
-        droppableId={props.title}
+        droppableId={props.date}
         type="LIST"
       >
         {(provided, _snapshot) => (

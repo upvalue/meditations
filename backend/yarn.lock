@@ -2661,6 +2661,11 @@ signal-exit@^3.0.0:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
+simplytyped@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/simplytyped/-/simplytyped-3.2.0.tgz#2ca6246084733c569c9637699d36ad6c783247c6"
+  integrity sha512-gE8iqUvSP45OqHQOWaLS+zKuj2B6xJwin4Hm/fmIwAg9xI4Er/t2cipT48hd6L4lS1cI3fhras+IH2CIphPERA==
+
 snapdragon-node@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/snapdragon-node/-/snapdragon-node-2.1.1.tgz#6c175f86ff14bdb0724563e8f3c1b021a286853b"

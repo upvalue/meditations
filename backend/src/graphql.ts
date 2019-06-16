@@ -5,21 +5,9 @@ import { gql } from 'apollo-server-express';
 import { parse, isValid, format } from 'date-fns';
 import groupBy from 'lodash/groupBy';
 
-import { tasksInScope, updateTask, addTask } from './model';
+import { tasksInScope, updateTaskMinutes, addTask, updateTaskStatus } from './model';
 
-import { InputTaskMinutes, InputTaskNew } from './types';
-
-const typeDefs = gql(fs.readFileSync(__dirname.concat('/schema.gql'), 'utf8'));
-
-const pubsub = new PubSub();
-
-const TASK_EVENTS = 'TASK_EVENTS';
-
-/**
- * Subscription ID. Unique across instances of meditations, doesn't need to be persisted so
- * simply kept in a variable
- */
-let subscriptionSessionId = 1;
+import { InputTaskMinutes, InputTaskNew, InputTaskStatus, Task } from './types';
 
 type ScopeName = 'DAY' | 'MONTH' | 'YEAR';
 
@@ -28,6 +16,29 @@ type TasksByDateArgs = {
   scopes: ReadonlyArray<ScopeName>,
 };
 
+type TasksInMonthArgs = {
+  date: string;
+}
+
+type UpdateTaskArgs = {
+  input: InputTaskMinutes;
+}
+
+type AddTaskArgs = {
+  input: InputTaskNew;
+}
+
+type Context = {
+  sessionId: string;
+}
+
+const typeDefs = gql(fs.readFileSync(__dirname.concat('/schema.gql'), 'utf8'));
+
+const pubsub = new PubSub();
+
+const TASK_EVENTS = 'TASK_EVENTS';
+
+const ADD_TASK = 'ADD_TASK';
 const DATE_FORMAT = 'yyyy-mm-dd';
 
 const checkDate = (date: string) => {
@@ -48,18 +59,23 @@ const SCOPE_NUMBERS: { [key: string]: number } = {
   'YEAR': 3,
 };
 
-type TasksInMonthArgs = {
-  date: string;
+
+/**
+ * Publish task updates and return updated tasks
+ * @param updatedTasks 
+ */
+const updateTasks = (updatedTasks: ReadonlyArray<Task>) => {
+  pubsub.publish(TASK_EVENTS, { taskEvents: { updatedTasks } });
+  return { updatedTasks };
 }
 
-type UpdateTaskArgs = {
-  input: InputTaskMinutes;
-}
+const withSessionId = <T>(ctx: Context, obj: T) => {
+  return {
+    ...obj,
+    sessionId: ctx.sessionId || 'unknown',
+  };
+};
 
-type AddTaskArgs = {
-  sessionId: number;
-  input: InputTaskNew;
-}
 
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
@@ -89,45 +105,51 @@ const resolvers = {
   },
 
   Mutation: {
-    updateTask: (_param: any, args: UpdateTaskArgs) => {
-      return updateTask(args.input).then(updatedTasks => {
+    updateTaskMinutes: (_param: any, args: UpdateTaskArgs) => {
+      return updateTaskMinutes(args.input).then(updatedTasks => {
         pubsub.publish(TASK_EVENTS, { taskEvents: { updatedTasks } });
         return { updatedTasks };
       });
     },
 
-    addTask: (_param: any, args: AddTaskArgs) => {
-      return addTask(args.input).then((newTaskList: any) => {
-        const newTask = newTaskList[0];
+    updateTaskStatus: (_param: any, args: { input: InputTaskStatus }) => {
+      return updateTaskStatus(args.input).then(updateTasks);
+    },
 
-        pubsub.publish(TASK_EVENTS, {
-          taskEvents: { newTask }
+    addTask: (_param: any, args: AddTaskArgs, ctx: Context) => {
+      return addTask(args.input).then((newTaskList: any) => {
+        const res = {
+          newTask: newTaskList[0],
+        };
+
+        pubsub.publish(ADD_TASK, {
+          addTask: {
+            ...res,
+          }
         });
 
-        return {
-          sessionId: args.sessionId,
-          newTask,
-        };
+        return withSessionId(ctx, res);
       })
 
     },
-
-    newSubscriptionSession: (_param: any, args: any) => {
-      return subscriptionSessionId++;
-    }
   },
 
   Subscription: {
     taskEvents: {
       subscribe: () => pubsub.asyncIterator([TASK_EVENTS]),
-    }
+    },
+
+    addTask: {
+      subscribe: () => pubsub.asyncIterator([ADD_TASK]),
+    },
   },
 
   TaskEvent: {
     __resolveType: (obj: any, context: any, info: any) => {
+      console.log(obj);
       if (obj.updatedTasks) {
         return 'UpdatedTasksEvent';
-      } else if (obj.newTask) {
+      } else if (obj.taskEvents.newTask) {
         return 'AddTaskEvent';
       }
       console.error('UNABLE TO RESOLVE TYPE FOR TaskEvent ', obj);

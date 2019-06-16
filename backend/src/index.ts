@@ -4,7 +4,23 @@ import { ApolloServer } from 'apollo-server-express';
 import { createServer } from 'http';
 
 // Set up server
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    const { authorization } = req.headers;
+    if (authorization) {
+      const bits = authorization.split(' ');
+      if (bits.length > 1) {
+        const sessionId = bits[1];
+
+        return { sessionId };
+      }
+    }
+
+    return { sessionId: 'unknown' };
+  },
+});
 
 const app = express();
 

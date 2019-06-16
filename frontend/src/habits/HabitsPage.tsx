@@ -1,20 +1,18 @@
-import { RouteComponentProps, Router } from '@reach/router';
 import React from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
-import { HabitsMain } from './HabitsMain';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { format, parse } from 'date-fns';
 import { View } from '@upvalueio/third-coast';
 
 import { HabitsSidebar } from './HabitsSidebar';
 import { ScopeContainer } from './ScopeContainer';
 import { ScopeDays } from './ScopeDays';
-import { TasksByDateRequest } from '../api';
+import { TasksByDateRequest, taskFieldsFragment } from '../api';
+import { TaskDragDropContext } from './TaskDragDropContext';
 
 
 export interface HabitsPageProps {
   date: string;
   tasks: TasksByDateRequest['tasksByDate'] | null;
-
 }
 
 const baseDate = new Date();
@@ -30,9 +28,7 @@ export const HabitsPage = (props: HabitsPageProps) => {
         date={props.date}
       />
 
-      <DragDropContext
-        onDragEnd={e => console.log('drag end, do something')}
-      >
+      <TaskDragDropContext>
         <main className="m3 flex-auto">
           <View className="higher-scopes" flex="flex">
             {tasks &&
@@ -59,9 +55,7 @@ export const HabitsPage = (props: HabitsPageProps) => {
             }
           </View>
         </main>
-
-
-      </DragDropContext>
+      </TaskDragDropContext>
     </>
   );
 };

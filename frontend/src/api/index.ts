@@ -1,13 +1,10 @@
-import { GraphQLClient } from 'graphql-request';
 import { format, parse } from 'date-fns';
 
 import { Task } from './types';
+import { request } from './request';
+export { SESSION_ID } from './request';
 
 export * from './types';
-
-import { request } from './request';
-
-const client = new GraphQLClient('/graphql');
 
 export enum TaskStatus {
   STATUS_UNSET = 0,
@@ -27,27 +24,6 @@ export interface TasksInMonthRequest {
   tasksInMonth: ReadonlyArray<Partial<Task>>;
 }
 
-const allDayTaskFields = 'id, name, scope, status, comment, date, minutes';
-const allTaskFields = `${allDayTaskFields}`;
-
-/**
- * Query tasks within a date scope (e.g. all tasks for a given month)
- * @param date Date. YYYY-MM-DD.
- * @param includeYear If true, will query for year
- */
-export const tasksByDate = (date: string, includeYear: boolean) =>
-  client.request(`{
-    tasksByDate(date: "${date}", includeYear: ${includeYear}) {
-      Days {
-        ${allDayTaskFields}
-      }
-      Month {
-        ${allTaskFields}
-      }
-      ${includeYear ? `Year { ${allTaskFields} }` : ''}
-    }
-  }`) as Promise<TasksByDateRequest>;
-
 /**
  * Fragment to retrieve all task fields
  */
@@ -58,16 +34,32 @@ fragment taskFields on Task {
 `;
 
 /**
+ * Query tasks within a date scope (e.g. all tasks for a given month)
+ * @param date Date. YYYY-MM-DD.
+ * @param includeYear If true, will query for year
+ */
+export const tasksByDate = (date: string, includeYear: boolean) =>
+  request(`query tasksByDate($date: String!, $includeYear: Boolean!) {
+    tasksByDate(date: $date, includeYear: $includeYear) {
+      Days {
+        ...taskFields
+      }
+      Month {
+        ...taskFields
+      }
+      ${includeYear ? `Year { ...taskFields }` : ''}
+    }
+  }`, [taskFieldsFragment], { date, includeYear }) as Promise<TasksByDateRequest>;
+
+const baseDate = new Date();
+
+/**
  * Format a date in the way the backend expects it, YYYY-MM-DD
  */
 export const formatDate = (date: Date) => {
   return format(date, 'yyyy-MM-dd');
 }
 
-const baseDate = new Date();
-
 export const parseDate = (date: string) => {
   return parse(date, 'yyyy-MM-dd', baseDate);
 }
-
-

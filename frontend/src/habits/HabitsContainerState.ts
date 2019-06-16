@@ -1,4 +1,4 @@
-import { Task, TaskEvent } from "../api";
+import { Task, AddTaskEvent } from "../api";
 
 export type HabitsState = {
   date: string,
@@ -30,7 +30,7 @@ export type LoadTasksAction = {
 
 export type TaskEventAction = {
   type: 'TASK_EVENT';
-} & TaskEvent
+} & (AddTaskEvent);
 
 export type HabitsAction = LoadTasksAction | TaskEventAction;
 
@@ -58,13 +58,13 @@ export const habitsReducer = (state: HabitsState, action: HabitsAction): HabitsS
     }
 
     case 'TASK_EVENT': {
-      switch (action.taskEvents.__typename) {
+      switch (action.__typename) {
         case 'AddTaskEvent': {
           return {
             ...state,
             tasks: {
               ...state.tasks,
-              Days: state.tasks.Days.concat([action.taskEvents.newTask])
+              Days: [...state.tasks.Days, action.newTask],
             }
           }
         }

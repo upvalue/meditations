@@ -18,6 +18,11 @@ export type InputTaskMinutes = {
   scope: number;
 }
 
+export type InputTaskStatus = {
+  id: number;
+  status: number;
+}
+
 export type InputTaskNew = {
   name: string;
   date: string;
@@ -34,4 +39,13 @@ export type AddTaskEvent = {
   newTask: Task;
 }
 
-export type TaskEvent = UpdatedTasksEvent | AddTaskEvent;
+export type TaskEvent = AddTaskEvent & {
+  sessionId: string;
+};
+
+// Subscription type, used by useSubscription
+export type AddTaskSubscription = {
+  addTask: AddTaskEvent,
+};
+
+export type TaskSubscription = AddTaskSubscription;

@@ -4,7 +4,7 @@ import process from 'process';
 import sqlite from 'sqlite3';
 
 import { knex } from './database';
-import { Task, InputTaskMinutes, InputTaskNew } from './types';
+import { Task, InputTaskMinutes, InputTaskNew, InputTaskStatus } from './types';
 
 export enum Scope {
   UNUSED = 0,
@@ -54,7 +54,41 @@ export const addTask = async (input: InputTaskNew): Promise<Task> => {
 
 }
 
-export const updateTask = async (input: InputTaskMinutes): Promise<ReadonlyArray<Task>> => {
+/**
+ * Update arbitrary fields on a task by ID, then return all relevant
+ * updated tasks
+ * @param input Partial task object
+ */
+export const updateTask = async (id: number, fields: any): Promise<ReadonlyArray<Task>> => {
+  const [{ scope, date, name }] = await knex.table('tasks')
+    .select(['scope', 'date', 'name'])
+    .where({ id });
+
+  return knex.table('tasks')
+    .where({ id })
+    .update(fields)
+    .then(res => {
+      // Updates to daily tasks may cause other scopes to update,
+      // return those updated tasks.
+      if (scope === 1) {
+        return selectRelatedTasks(id, date, name);
+      }
+
+      return knex.from('tasks')
+        .select(...taskFields)
+        .where({ id }) as any as Promise<ReadonlyArray<Task>>;
+    }) as any as Promise<ReadonlyArray<Task>>;
+}
+
+export const updateTaskStatus = async (input: InputTaskStatus) => {
+  return updateTask(input.id, { status: input.status });
+}
+
+/**
+ * Update task minutes
+ * @param input 
+ */
+export const updateTaskMinutes = async (input: InputTaskMinutes): Promise<ReadonlyArray<Task>> => {
   const { id, minutes } = input;
 
   const [{ scope, date, name }] = await knex.table('tasks')
@@ -73,6 +107,4 @@ export const updateTask = async (input: InputTaskMinutes): Promise<ReadonlyArray
         .select(...taskFields)
         .where({ id }) as any as Promise<ReadonlyArray<Task>>;
     }) as any as Promise<ReadonlyArray<Task>>;
-  // .from('tasks')
 }
-
