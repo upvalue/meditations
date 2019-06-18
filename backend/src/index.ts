@@ -8,6 +8,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
+    if (!req) return { sessionId: 'unknown' };
     const { authorization } = req.headers;
     if (authorization) {
       const bits = authorization.split(' ');

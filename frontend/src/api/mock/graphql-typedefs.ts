@@ -65,11 +65,19 @@ input InputTaskNew {
   scope: Int!
 }
 
+input InputTaskPosition {
+  id: Int!
+  date: String!
+  scope: Int!
+  position: Int!
+}
+
 type Mutation {
   updateTask(input: InputTaskMinutes!): UpdatedTasksEvent
-  addTask(sessionId: String!, input: InputTaskNew): AddTaskEvent
+  addTask(input: InputTaskNew): AddTaskEvent
   updateTaskMinutes(input: InputTaskMinutes!): UpdatedTasksEvent
   updateTaskStatus(input: InputTaskCycleStatus!): UpdatedTasksEvent
+  updateTaskPosition(sessionId: String!, input: InputTaskPosition!): UpdatedTasksEvent
 }
 
 type Subscription {

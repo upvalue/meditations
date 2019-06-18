@@ -64,7 +64,7 @@ export const habitsReducer = (state: HabitsState, action: HabitsAction): HabitsS
             ...state,
             tasks: {
               ...state.tasks,
-              Days: [...state.tasks.Days, action.newTask],
+              Days: [...(state.tasks.Days || []), action.newTask],
             }
           }
         }

@@ -17,13 +17,14 @@ const baseDate = new Date;
 const NEW_TASK_QUERY = `
 ${taskFieldsFragment}
 
-mutation newTask($sessionId: String!, $date: String!, $name: String!) {
-  addTask(sessionId: $sessionId, input:{
+mutation newTask($date: String!, $name: String!) {
+  addTask(input:{
     date: $date,
     name: $name,
     scope: 1
   }) {
     __typename, 
+    sessionId,
     newTask {
       ...taskFields
     }
@@ -82,7 +83,7 @@ export const HabitsSidebar = (props: HabitsSidebarProps) => {
         <div>
 
           <Input width={35} placeholder="Task name" onBlur={(e) => {
-            //console.log(e.target.value);
+            if (e.target.value === '') return;
             addTask({
               name: e.target.value,
               date: formatDate(new Date),

@@ -122,11 +122,9 @@ const resolvers = {
           newTask: newTaskList[0],
         };
 
-        pubsub.publish(ADD_TASK, {
-          addTask: {
-            ...res,
-          }
-        });
+        pubsub.publish(ADD_TASK, withSessionId(ctx, {
+          addTask: withSessionId(ctx, res),
+        }));
 
         return withSessionId(ctx, res);
       })

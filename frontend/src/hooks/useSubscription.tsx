@@ -4,7 +4,7 @@
 // https://github.com/apollographql/subscriptions-transport-ws/blob/maser/PROTOCOL.md
 
 import React, { useEffect, useReducer, useRef, useContext, useCallback } from 'react';
-import { request } from '../api/request';
+import { request, SESSION_ID, GQLError } from '../api/request';
 
 type Variables = { [key: string]: any };
 
@@ -19,7 +19,7 @@ export type SocketProviderProps = {
  */
 const stripQueryName = (result: any) => {
   // Remove query name 
-  const key = Object.keys(result)[0];
+  const key = Object.keys(result).filter(k => k !== 'sessionId')[0];
   return result[key];
 }
 
@@ -116,8 +116,6 @@ export const SocketProvider = (props: SocketProviderProps) => {
   // before WebSocket even has a chance to connect
   const initialSubscription = useRef<any>(null);
 
-  const subscriptionId = useRef(-1);
-
   // Callback for when subscription update is received
   const onUpdate = useRef((x: any): void => undefined);
 
@@ -180,7 +178,12 @@ export const SocketProvider = (props: SocketProviderProps) => {
       const msg = JSON.parse(e.data);
 
       if (msg.type === 'data') {
-        onUpdate.current(stripQueryName(msg.payload.data));
+        if (msg.payload.errors) {
+          throw new GQLError(null, msg.payload.errors);
+        }
+        const result = stripQueryName(msg.payload.data);
+        if (result.sessionId === SESSION_ID) return;
+        onUpdate.current(result);
       }
     });
 
@@ -216,6 +219,7 @@ export const useMutation = (query: string) => {
   return useCallback((variables?: Variables) => {
     request(query, variables)
       .then((res: any) => {
+        console.log('useMutation result:', stripQueryName(res));
         // Remove query name 
         onUpdate(stripQueryName(res));
       });

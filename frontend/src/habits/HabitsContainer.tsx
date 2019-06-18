@@ -19,8 +19,8 @@ ${taskFieldsFragment}
 
 subscription habitsContainer {
   addTask {
-    __typename
-    sessionId
+    __typename,
+    sessionId,
     newTask {
       ...taskFields
     }
@@ -66,9 +66,6 @@ export const HabitsContainer = (props: HabitsContainerProps) => {
   }, [props.date]);
 
   useSubscription(TASK_EVENTS_QUERY, (te: TaskEvent) => {
-    // Discard events resulting from this session
-    if (te.sessionId === SESSION_ID) return;
-
     dispatch({
       type: 'TASK_EVENT',
       ...te,
