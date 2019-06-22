@@ -1,14 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Droppable } from 'react-beautiful-dnd';
-import { Button } from '@upvalueio/third-coast';
 
-import { Task } from '../api';
 import { CTask } from './CTask';
-
-interface ScopeProps {
-  tasks: Partial<Task>;
-}
 
 export const Scope = (props: any) => {
   return (

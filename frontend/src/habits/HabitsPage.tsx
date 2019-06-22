@@ -1,12 +1,11 @@
 import React from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { format, parse } from 'date-fns';
 import { View } from '@upvalueio/third-coast';
 
 import { HabitsSidebar } from './HabitsSidebar';
 import { ScopeContainer } from './ScopeContainer';
 import { ScopeDays } from './ScopeDays';
-import { TasksByDateRequest, taskFieldsFragment } from '../api';
+import { TasksByDateRequest } from '../api';
 import { TaskDragDropContext } from './TaskDragDropContext';
 
 
@@ -40,15 +39,15 @@ export const HabitsPage = (props: HabitsPageProps) => {
                 />
 
                 <ScopeContainer
-                  title={format(dateObj, 'MMMM')}
                   className="mr2"
-                  date={date}
+                  title={format(dateObj, 'MMMM')}
+                  date={format(dateObj, 'yyyy-MM')}
                   tasks={tasks.Month}
                 />
 
                 <ScopeContainer
                   title={format(dateObj, 'yyyy')}
-                  date={date}
+                  date={format(dateObj, 'yyyy')}
                   tasks={tasks.Year}
                 />
               </>

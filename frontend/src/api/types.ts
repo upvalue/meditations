@@ -6,6 +6,7 @@ export type Task = {
   scope: number;
   date: string;
   comment?: string;
+  position: number;
   // Calculated on query
   completion_rate?: number;
   total_tasks?: number;
@@ -21,6 +22,12 @@ export type InputTaskMinutes = {
 export type InputTaskStatus = {
   id: number;
   status: number;
+}
+
+export type InputTaskPosition = {
+  id: number;
+  date: string;
+  position: number;
 }
 
 export type InputTaskNew = {

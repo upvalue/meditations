@@ -1,6 +1,7 @@
 import React from 'react';
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { taskFieldsFragment } from "../api";
+import { useMutation } from '../hooks/useSubscription';
 
 type TaskDragDropContextProps = {
   children: React.ReactNode;
@@ -17,23 +18,36 @@ mutation updateTaskPosition($sessionId: String!, $id: Int!, $date: String!, $pos
   }) {
     __typename,
     updatedTasks {
+      ...taskFields
 
     }
   }
 }
 `;
 
+/**
+ * Handles creating react-beautiful-dnd context and sending off task movement mutations
+ * @param props 
+ */
 export const TaskDragDropContext = (props: TaskDragDropContextProps) => {
-  const updateTaskPosition = (e: DropResult) => {
+  const updateTaskPosition = useMutation(UPDATE_TASK_POSITION_MUT);
 
-    console.log(e);
+  const onDragEnd = (e: DropResult) => {
+    const { draggableId, destination } = e;
 
+    if (!destination) return;
 
+    updateTaskPosition({
+      id: parseInt(draggableId, 10),
+      date: destination.droppableId,
+      position: destination.index,
+    });
   }
+
 
   return (
     <DragDropContext
-      onDragEnd={updateTaskPosition}
+      onDragEnd={onDragEnd}
     >
       {props.children}
     </DragDropContext>

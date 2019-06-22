@@ -8,6 +8,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
+    // Find session ID from authorization header
     if (!req) return { sessionId: 'unknown' };
     const { authorization } = req.headers;
     if (authorization) {

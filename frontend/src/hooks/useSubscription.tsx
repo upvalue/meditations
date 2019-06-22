@@ -4,6 +4,8 @@
 // https://github.com/apollographql/subscriptions-transport-ws/blob/maser/PROTOCOL.md
 
 import React, { useEffect, useReducer, useRef, useContext, useCallback } from 'react';
+import uuid from 'uuid';
+
 import { request, SESSION_ID, GQLError } from '../api/request';
 
 type Variables = { [key: string]: any };
@@ -34,10 +36,10 @@ const stripQueryName = (result: any) => {
 // values
 
 type SocketProviderState = {
-  subscribe: (query: string, onUpdate: (x: any) => void) => void;
+  subscribe: (queries: string[], onUpdate: (x: any) => void) => void;
   unsubscribe: () => void;
   onUpdate: (x: any) => void;
-  subscribed: string | false,
+  subscribed: string[] | false,
   sessionId: number,
 }
 
@@ -54,14 +56,14 @@ export const SocketContext =
 
 type InitialAction = {
   type: 'INITIALIZE';
-  subscribe: (query: string, onUpdate: (x: any) => void) => undefined;
+  subscribe: (queries: string[], onUpdate: (x: any) => void) => undefined;
   unsubscribe: () => undefined;
 }
 
 type SubscribeAction = {
   type: 'SUBSCRIBE';
   onUpdate: (x: any) => void;
-  query: string;
+  queries: string[];
 }
 
 type UnsubscribeAction = {
@@ -95,7 +97,7 @@ const reducer = (
       }
       return {
         ...state,
-        subscribed: action.query,
+        subscribed: action.queries,
         onUpdate: action.onUpdate,
       };
     }
@@ -121,31 +123,34 @@ export const SocketProvider = (props: SocketProviderProps) => {
 
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
-    subscribe: (query: string, onUpdateCb: (x: any) => void) => {
-      initialSubscription.current = [query, onUpdateCb];
+    subscribe: (queries: string[], onUpdateCb: (x: any) => void) => {
+      initialSubscription.current = [queries, onUpdateCb];
     }
   });
 
   useEffect(() => {
     const ws = new WebSocket(`ws://localhost:4000/graphql`, 'graphql-subscriptions');
 
-    const subscribe = (query: string, onUpdateCb: (x: any) => void) => {
+    const subscribe = (queries: string[], onUpdateCb: (x: any) => void) => {
       dispatch({
         type: 'SUBSCRIBE',
-        query,
+        queries,
         onUpdate: onUpdateCb,
       });
 
       onUpdate.current = onUpdateCb;
 
       if (ws.readyState === ws.OPEN) {
-        ws.send(JSON.stringify({
-          type: 'start',
-          id: 'taskEvents',
-          payload: {
-            query,
-          }
-        }))
+
+        queries.forEach(query => {
+          ws.send(JSON.stringify({
+            type: 'start',
+            id: uuid(),
+            payload: {
+              query,
+            }
+          }))
+        });
       } else {
         console.warn('Failed to SUBSCRIBE because WebSocket is closed');
       }
@@ -168,8 +173,8 @@ export const SocketProvider = (props: SocketProviderProps) => {
       }));
 
       if (initialSubscription.current !== null) {
-        const [query, onUpdateCb] = initialSubscription.current;
-        subscribe(query, onUpdateCb);
+        const [queries, onUpdateCb] = initialSubscription.current;
+        subscribe(queries, onUpdateCb);
         initialSubscription.current = null;
       }
     })
@@ -199,11 +204,11 @@ export const SocketProvider = (props: SocketProviderProps) => {
   );
 }
 
-export const useSubscription = <T extends {}>(query: string, onUpdate: (obj: T) => void) => {
+export const useSubscription = <T extends {}>(queries: string[], onUpdate: (obj: T) => void) => {
   const socketContext = useContext(SocketContext);
 
   useEffect(() => {
-    socketContext.subscribe(query, onUpdate);
+    socketContext.subscribe(queries, onUpdate);
 
     return () => socketContext.unsubscribe();
   }, []);

@@ -11,10 +11,9 @@ import { ThemeName } from '@upvalueio/third-coast/dist/Theme';
 import 'normalize.css/normalize.css';
 import { SocketProvider } from './hooks/useSubscription';
 import { HabitsContainer } from './habits/HabitsContainer';
-import { formatDate } from './api';
 import { format } from 'date-fns';
 
-const currentDate = format(new Date, 'yyyy-MM');
+const currentDate = format(new Date(), 'yyyy-MM');
 
 const ThemedBody = () => {
   return (

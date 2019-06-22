@@ -12,7 +12,7 @@ export interface HabitsSidebarProps extends RouteComponentProps {
   date?: string;
 }
 
-const baseDate = new Date;
+const baseDate = new Date();
 
 const NEW_TASK_QUERY = `
 ${taskFieldsFragment}
@@ -33,7 +33,7 @@ mutation newTask($date: String!, $name: String!) {
 `
 
 export const HabitsSidebar = (props: HabitsSidebarProps) => {
-  const date = props.date ? parse(props.date, 'yyyy-MM', baseDate) : new Date;
+  const date = props.date ? parse(props.date, 'yyyy-MM', baseDate) : new Date();
 
   const prevMonth = format(subMonths(date, 1), 'yyyy-MM');
   const nextMonth = format(addMonths(date, 1), 'yyyy-MM');
@@ -86,7 +86,7 @@ export const HabitsSidebar = (props: HabitsSidebarProps) => {
             if (e.target.value === '') return;
             addTask({
               name: e.target.value,
-              date: formatDate(new Date),
+              date: formatDate(new Date()),
             });
 
             e.target.value = '';

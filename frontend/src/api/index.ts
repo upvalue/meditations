@@ -29,7 +29,7 @@ export interface TasksInMonthRequest {
  */
 export const taskFieldsFragment = `
 fragment taskFields on Task {
-  id, name, scope, status, comment, date, minutes
+  id, name, scope, status, comment, date, minutes, position
 }
 `;
 

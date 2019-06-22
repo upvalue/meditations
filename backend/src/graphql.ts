@@ -3,11 +3,10 @@ import fs from 'fs';
 import { UserInputError, PubSub } from 'apollo-server';
 import { gql } from 'apollo-server-express';
 import { parse, isValid, format } from 'date-fns';
-import groupBy from 'lodash/groupBy';
 
-import { tasksInScope, updateTaskMinutes, addTask, updateTaskStatus } from './model';
+import { tasksInScope, updateTaskMinutes, addTask, updateTaskStatus, tasksInMonth, updateTaskPosition } from './model';
 
-import { InputTaskMinutes, InputTaskNew, InputTaskStatus, Task } from './types';
+import { InputTaskMinutes, InputTaskPosition, InputTaskNew, InputTaskStatus, Task } from './types';
 
 type ScopeName = 'DAY' | 'MONTH' | 'YEAR';
 
@@ -22,6 +21,11 @@ type TasksInMonthArgs = {
 
 type UpdateTaskArgs = {
   input: InputTaskMinutes;
+}
+
+type UpdateTaskPositionArgs = {
+  sessionId: string;
+  input: InputTaskPosition;
 }
 
 type AddTaskArgs = {
@@ -81,25 +85,17 @@ const withSessionId = <T>(ctx: Context, obj: T) => {
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
-    tasksInMonth: (_param: any, args: TasksInMonthArgs) => {
-      checkDate(args.date);
-      return tasksInScope(args.date, [1, 2]);
-    },
-
-    tasksInYear: (_param: any, args: TasksInMonthArgs) => {
-      checkDate(args.date);
-      return tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy'), [3]);
-    },
-
     tasksByDate: (_param: any, args: TasksByDateArgs) => {
       checkDate(args.date);
       return Promise.all([
-        tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm'), [1]),
-        tasksInScope(args.date, [2]),
-        tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy'), [3]),
-      ]).then(res => {
-        const tasks = [...res[0], ...res[1], ...res[2]];
-        return groupBy(tasks, t => SCOPE_NAMES[t.scope]);
+        //tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
+        tasksInMonth(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
+        tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
+        tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy')),
+      ]).then(([Days, Month, Year]) => {
+        return {
+          Days, Month, Year
+        }
       });
     },
   },
@@ -114,6 +110,10 @@ const resolvers = {
 
     updateTaskStatus: (_param: any, args: { input: InputTaskStatus }) => {
       return updateTaskStatus(args.input).then(updateTasks);
+    },
+
+    updateTaskPosition: (param: any, args: UpdateTaskPositionArgs) => {
+      return updateTaskPosition(args.input);
     },
 
     addTask: (_param: any, args: AddTaskArgs, ctx: Context) => {
@@ -140,19 +140,6 @@ const resolvers = {
     addTask: {
       subscribe: () => pubsub.asyncIterator([ADD_TASK]),
     },
-  },
-
-  TaskEvent: {
-    __resolveType: (obj: any, context: any, info: any) => {
-      console.log(obj);
-      if (obj.updatedTasks) {
-        return 'UpdatedTasksEvent';
-      } else if (obj.taskEvents.newTask) {
-        return 'AddTaskEvent';
-      }
-      console.error('UNABLE TO RESOLVE TYPE FOR TaskEvent ', obj);
-      return 'UpdatedTasksEvent';
-    }
   },
 };
 

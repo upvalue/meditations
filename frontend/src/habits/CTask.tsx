@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 import { Draggable } from "react-beautiful-dnd";
 import { MdCheckCircle } from "react-icons/md";
 

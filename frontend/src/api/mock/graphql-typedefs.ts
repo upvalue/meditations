@@ -29,8 +29,6 @@ type TasksByDateResponse {
 
 type Query {
   tasks: [Task]
-  tasksInMonth(date: String!): [Task]
-  tasksInYear(date: String!): [Task]
   tasksByDate(date: String!, includeYear: Boolean!): TasksByDateResponse
 }
 
@@ -41,12 +39,33 @@ type UpdatedTasksEvent {
   updatedTasks: [Task!]
 }
 
+type TaskPositionEvent {
+  sessionId: String!
+  id: Int!
+  # old position
+  oldPosition: Int!
+  oldDate: String!
+  # new position
+  newPosition: Int!
+  newDate: String!
+}
+
 type AddTaskEvent {
   sessionId: String!
   newTask: Task!
 }
 
-union TaskEvent = UpdatedTasksEvent | AddTaskEvent
+# updated task order
+type UpdatedTaskOrder {
+  id: String!
+  date: String!
+  position: Int!
+}
+
+type UpdatedOrderEvent {
+  sessionId: String!
+  updates: [UpdatedTaskOrder]
+}
 
 input InputTaskMinutes {
   id: Int!
@@ -68,7 +87,6 @@ input InputTaskNew {
 input InputTaskPosition {
   id: Int!
   date: String!
-  scope: Int!
   position: Int!
 }
 
@@ -81,6 +99,6 @@ type Mutation {
 }
 
 type Subscription {
-  taskEvents: TaskEvent
+  taskEvents: UpdatedTasksEvent
   addTask: AddTaskEvent
 }`

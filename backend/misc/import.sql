@@ -1,7 +1,11 @@
 -- import.sql - import meditations database from go backend
 
 -- normalize task dates
-update tasks set date = strftime('%Y-%m-01', date) where strftime('%d') != '01' and scope in (2,3);
+UPDATE tasks set date = strftime('%Y-%m-01', date) where strftime('%d') != '01' and scope in (2,3);
+
+UPDATE tasks set date = strftime('%Y', date) where scope = 3;
+UPDATE tasks set date = strftime('%Y-%m', date) where scope = 2;
+UPDATE tasks set date = strftime('%Y-%m-%d', date) where scope = 1;
 
 -- precalculate all task times
 CREATE TABLE task_minutes (id int primary key, name text, minutes int, scope int, date text);
