@@ -13,6 +13,15 @@ export type Task = {
   completed_tasks?: number;
 }
 
+export type TaskPosition = {
+  id: number;
+  task: Task;
+  oldPosition: number;
+  oldDate: string;
+  newPosition: number;
+  newDate: string;
+}
+
 export type InputTaskMinutes = {
   id: number;
   minutes: number;
@@ -44,6 +53,11 @@ export type UpdatedTasksEvent = {
 export type AddTaskEvent = {
   __typename: 'AddTaskEvent';
   newTask: Task;
+}
+
+export type TaskPositionEvent = {
+  __typename: 'TaskPositionEvent';
+  taskPosition: TaskPosition;
 }
 
 export type TaskEvent = AddTaskEvent & {

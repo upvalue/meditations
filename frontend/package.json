@@ -16,7 +16,7 @@
     "@types/uuid": "^3.4.4",
     "@upvalueio/third-coast": "^0.1.26",
     "classnames": "^2.2.6",
-    "date-fns": "^2.0.0-alpha.25",
+    "date-fns": "^2.0.0-alpha.36",
     "graphql": "^14.1.1",
     "graphql-tools": "^4.0.4",
     "lodash-es": "^4.17.11",

@@ -40,9 +40,11 @@ const typeDefs = gql(fs.readFileSync(__dirname.concat('/schema.gql'), 'utf8'));
 
 const pubsub = new PubSub();
 
+// Subscription names
 const TASK_EVENTS = 'TASK_EVENTS';
-
 const ADD_TASK = 'ADD_TASK';
+const TASK_POSITIONS = 'TASK_POSITIONS';
+
 const DATE_FORMAT = 'yyyy-mm-dd';
 
 const checkDate = (date: string) => {
@@ -112,8 +114,19 @@ const resolvers = {
       return updateTaskStatus(args.input).then(updateTasks);
     },
 
-    updateTaskPosition: (param: any, args: UpdateTaskPositionArgs) => {
-      return updateTaskPosition(args.input);
+    updateTaskPosition: (param: any, args: UpdateTaskPositionArgs, ctx: Context) => {
+      // pubsub.publish()
+      return updateTaskPosition(args.input).then((taskPosition: any) => {
+        const res = {
+          taskPosition,
+        };
+
+        pubsub.publish(TASK_POSITIONS, withSessionId(ctx, {
+          taskPosition: withSessionId(ctx, res),
+        }));
+
+        return withSessionId(ctx, res);
+      });
     },
 
     addTask: (_param: any, args: AddTaskArgs, ctx: Context) => {
@@ -140,6 +153,10 @@ const resolvers = {
     addTask: {
       subscribe: () => pubsub.asyncIterator([ADD_TASK]),
     },
+
+    taskPosition: {
+      subscribe: () => pubsub.asyncIterator([TASK_POSITIONS]),
+    }
   },
 };
 

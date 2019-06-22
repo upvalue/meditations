@@ -28,6 +28,28 @@ subscription newTasks {
 }
 `;
 
+const UPDATED_TASKS_POSITION_SUB = `
+${taskFieldsFragment}
+
+subscription taskPositionEvent {
+  taskPosition {
+    __typename,
+    sessionId, 
+    taskPosition {
+      id, 
+      task {
+        ...taskFields
+      },
+      oldPosition,
+      oldDate,
+      newPosition,
+      newDate
+    }
+  }
+}
+`
+
+
 const UPDATED_TASKS_SUB = `
 ${taskFieldsFragment}
 
@@ -42,7 +64,6 @@ subscription taskUpdates {
   }
 }
 `;
-
 
 /**
  * Habits state container. Manages changes in route, subscription updates to habits store
@@ -80,7 +101,7 @@ export const HabitsContainer = (props: HabitsContainerProps) => {
     });
   }, []);
 
-  useSubscription([ADD_TASK_SUB, UPDATED_TASKS_SUB], (te: TaskEvent) => {
+  useSubscription([ADD_TASK_SUB, UPDATED_TASKS_SUB, UPDATED_TASKS_POSITION_SUB], (te: TaskEvent) => {
     dispatch({
       type: 'TASK_EVENT',
       ...te,

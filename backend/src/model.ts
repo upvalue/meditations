@@ -97,47 +97,70 @@ export const updateTaskStatus = async (input: InputTaskStatus) => {
 export const updateTaskPosition = async (input: InputTaskPosition) => {
   const { id, date, position } = input;
 
-  const oldTasks = await knex.table('tasks')
+  console.log('hot diggity dog');
+  // Fetch the record for this tasks
+  const oldTask = await knex.table('tasks')
     .select(['id', 'name', 'date', 'position'])
-    .where({ date })
+    .where({ id })
+    .whereNull('deleted_at')
+    .orderBy('position')
+    .first();
+
+  const oldPosition = oldTask.position;
+  const oldDate = oldTask.date;
+
+  // Fetch the record for the task's current scope
+  let prevScope = await knex.table('tasks')
+    .select(['id', 'name', 'date', 'position'])
+    .where({ date: oldTask.date })
     .whereNull('deleted_at')
     .orderBy('position');
 
-  const oldTask = oldTasks.find((t: Task) => t.id === input.id);
+  const withinSameScope = oldTask.date === date;
 
-  // If task has been ordered within same scope, remove from array and then add
-  if (oldTask.date === date) {
-    let newTasks = oldTasks
-      .filter((t: Task) => t.id !== id);
+  // Fetch the record for the task's new scope, or
+  // just re-use the previous query if it is the same
+  let newScope = withinSameScope ?
+    prevScope : await knex.table('tasks')
+      .select(['id', 'name', 'date', 'position'])
+      .where({ date })
+      .whereNull('deleted_at')
+      .orderBy('position');
 
-    newTasks.splice(position, 0, { id, position });
+  // Remove task from old scope and splice into new scope
+  prevScope = prevScope.filter((t: Task) => t.id !== id);
 
-    newTasks = newTasks.map((t: Task, i: number) => ({ ...t, position: i }));
-
-    // Now update in place
-    await Promise.all(newTasks.map((t: Task) => {
-      console.log({ id: t.id }, { position: t.position });
-      return knex.table('tasks')
-        .where({ id: t.id })
-        .update({ position: t.position });
-    }));
-    // Update task list and return... something
-
+  // Remove task from new scope if this is same scope
+  if (withinSameScope) {
+    newScope = newScope.filter((t: Task) => t.id !== id);
   }
 
+  newScope.splice(position, 0, { id, position, date });
 
-  // To reorder task
+  // Now update everything in place
+  await Promise.all(newScope.map((t: Task, position: number) => {
+    return knex.table('tasks')
+      .where({ id: t.id })
+      .update({ date: t.date, position: position });
+  }));
 
-  // Select all tasks from current scope, remove task by filter
-  // If scope equal, insert and save all, otherwise:
-  // Select all tasks from new scope, remove task by filter, insert new task
-  // Update position of all tasks in scope using ORDER BY
+  if (!withinSameScope) {
+    console.log('update old scope');
+    await Promise.all(prevScope.map((t: Task, position: number) => {
+      console.log(t.id, position);
+      return knex.table('tasks')
+        .where({ id: t.id })
+        .update({ position: position });
+    }));
+  }
 
-  // Returned -- new position only or maybe task data too?
-  // Just positions right
+  const task = await knex.table('tasks')
+    .select(...taskFields)
+    .where({ id })
+    .first();
 
 
-  // console.log('move from', task, 'to', date, position);
+  return { id, task, oldPosition, oldDate, newDate: date, newPosition: position };
 }
 
 /**

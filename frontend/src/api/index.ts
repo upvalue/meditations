@@ -51,7 +51,7 @@ export const tasksByDate = (date: string, includeYear: boolean) =>
     }
   }`, [taskFieldsFragment], { date, includeYear }) as Promise<TasksByDateRequest>;
 
-const baseDate = new Date();
+export const baseDate = new Date();
 
 /**
  * Format a date in the way the backend expects it, YYYY-MM-DD

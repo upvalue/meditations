@@ -21,6 +21,17 @@ type Task {
   completed_tasks: Int
 }
 
+type TaskPosition {
+  id: Int!
+  task: Task!
+  # old position
+  oldPosition: Int!
+  oldDate: String!
+  # new position
+  newPosition: Int!
+  newDate: String!
+}
+
 type TasksByDateResponse {
   Days: [Task]
   Month: [Task]
@@ -41,13 +52,7 @@ type UpdatedTasksEvent {
 
 type TaskPositionEvent {
   sessionId: String!
-  id: Int!
-  # old position
-  oldPosition: Int!
-  oldDate: String!
-  # new position
-  newPosition: Int!
-  newDate: String!
+  taskPosition: TaskPosition!
 }
 
 type AddTaskEvent {
@@ -95,10 +100,11 @@ type Mutation {
   addTask(input: InputTaskNew): AddTaskEvent
   updateTaskMinutes(input: InputTaskMinutes!): UpdatedTasksEvent
   updateTaskStatus(input: InputTaskCycleStatus!): UpdatedTasksEvent
-  updateTaskPosition(sessionId: String!, input: InputTaskPosition!): UpdatedTasksEvent
+  updateTaskPosition(sessionId: String!, input: InputTaskPosition!): TaskPositionEvent
 }
 
 type Subscription {
   taskEvents: UpdatedTasksEvent
   addTask: AddTaskEvent
+  taskPosition: TaskPositionEvent
 }`

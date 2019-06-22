@@ -186,6 +186,7 @@ export const SocketProvider = (props: SocketProviderProps) => {
         if (msg.payload.errors) {
           throw new GQLError(null, msg.payload.errors);
         }
+
         const result = stripQueryName(msg.payload.data);
         if (result.sessionId === SESSION_ID) return;
         onUpdate.current(result);

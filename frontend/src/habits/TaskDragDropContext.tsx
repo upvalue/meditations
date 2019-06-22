@@ -17,9 +17,16 @@ mutation updateTaskPosition($sessionId: String!, $id: Int!, $date: String!, $pos
     position: $position
   }) {
     __typename,
-    updatedTasks {
-      ...taskFields
-
+    sessionId,
+    taskPosition {
+      id,
+      task {
+        ...taskFields
+      },
+      oldPosition,
+      oldDate,
+      newPosition,
+      newDate
     }
   }
 }
