@@ -4,7 +4,7 @@ const sqlite3 = require('sqlite3');
 exports.up = function (knex, Promise) {
   // Required to run multiple statements
   return knex.connection().client.acquireConnection().then(db => {
-    db.exec(readFileSync('./sql/20190406-schema.sql').toString());
+    return db.exec(readFileSync('./sql/20190406-schema.sql').toString());
   });
 };
 

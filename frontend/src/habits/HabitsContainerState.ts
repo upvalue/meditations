@@ -2,7 +2,7 @@ import { Task, AddTaskEvent, TaskPositionEvent, baseDate } from "../api";
 import { isValid, parse } from "date-fns";
 import partition from 'lodash/partition';
 import { format } from "date-fns";
-
+import produce, { Draft } from 'immer';
 
 export type HabitsState = {
   date: string,
@@ -65,33 +65,22 @@ const scopeMounted = (currentDate: string, date: string): ScopeMountedResult => 
   }
   return false;
 }
-// scopeMounted (currentDate, date) => 
-// if its year, year equal
-// if its month, month equal
-// if its day, month equal
 
-
-export const habitsReducer = (state: HabitsState, action: HabitsAction): HabitsState => {
+export const habitsReducer = (state: Draft<HabitsState>, action: HabitsAction): HabitsState => {
   switch (action.type) {
     case 'LOAD_TASKS': {
-      const { Year, Month, Days } = action.tasks;
+      const { Year, Month, Days } = produce(action.tasks, tasks => tasks);
+
+      state.date = action.date;
 
       if (Year !== undefined) {
-        return {
-          ...state,
-          date: action.date,
-          tasks: { Year, Month, Days }
-        }
+        state.tasks.Year = Year;
       }
 
-      return {
-        ...state,
-        date: action.date,
-        tasks: {
-          ...state.tasks,
-          Month, Days
-        }
-      };
+      state.tasks.Month = Month;
+      state.tasks.Days = Days;
+
+      return state;
     }
 
     case 'TASK_EVENT': {
@@ -99,7 +88,7 @@ export const habitsReducer = (state: HabitsState, action: HabitsAction): HabitsS
       switch (action.__typename) {
         case 'TaskPositionEvent': {
           const { taskPosition } = action;
-          const { id, task, oldPosition, newPosition, oldDate, newDate } = taskPosition;
+          const { id, task, oldDate, newDate } = taskPosition;
           // First we need to determine whether this event is relevant to us at all.
 
           // It is relevant to us if the current page contains either the old or new date
@@ -110,53 +99,24 @@ export const habitsReducer = (state: HabitsState, action: HabitsAction): HabitsS
 
           const newMounted = scopeMounted(state.date, newDate);
 
-          let newState = state;
-
-          console.log('removing from ', oldMounted);
-
-          // Remove from old scope
           if (oldMounted) {
-            newState = {
-              ...state,
-              tasks: {
-                ...state.tasks,
-                [oldMounted]: state.tasks[oldMounted].filter(t => t.id !== id),
-              }
-            }
+            state.tasks[oldMounted] = state.tasks[oldMounted].filter(t => t.id !== id);
           }
 
-          // Add to new scope
-          console.log('new task', task);
           if (newMounted) {
-            let [newScope, otherTasks] = partition(newState.tasks[newMounted], t => t.date === task.date);
+            let [newScope, otherTasks] = partition(state.tasks[newMounted], t => t.date === task.date);
 
-            console.log(newScope.length, newScope);
-            let newScopeMut = newScope.slice();
-            newScopeMut.splice(task.position, 0, task);
+            newScope.splice(task.position, 0, task);
 
-            console.log(newScopeMut.length, newScopeMut);
-
-            newScopeMut = newScopeMut.map((task, position) => ({ ...task, position }));
-
-            newState = {
-              ...newState,
-              tasks: {
-                ...newState.tasks,
-                [newMounted]: [...newScopeMut, ...otherTasks],
-              }
-            }
+            state.tasks[newMounted] = [...newScope, ...otherTasks];
           }
 
-          return newState;
+          break;
         }
+
         case 'AddTaskEvent': {
-          return {
-            ...state,
-            tasks: {
-              ...state.tasks,
-              Days: [...(state.tasks.Days || []), action.newTask],
-            }
-          }
+          state.tasks.Days.push(action.newTask);
+          break;
         }
       }
     }
@@ -167,9 +127,7 @@ export const habitsReducer = (state: HabitsState, action: HabitsAction): HabitsS
 export const habitsReducerLogged = (state: HabitsState, action: HabitsAction) => {
   console.log('previous', state);
   console.log('action', action);
-  const newState = habitsReducer(state, action);
+  const newState = produce(state, draftState => habitsReducer(draftState, action));
   console.log('next', newState);
   return newState;
 }
-
-
