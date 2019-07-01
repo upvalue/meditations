@@ -82,15 +82,11 @@ const withSessionId = <T>(ctx: Context, obj: T) => {
   };
 };
 
-
-// Resolvers define the technique for fetching the types in the
-// schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
     tasksByDate: (_param: any, args: TasksByDateArgs) => {
       checkDate(args.date);
       return Promise.all([
-        //tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
         tasksInMonth(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
         tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
         tasksInScope(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy')),

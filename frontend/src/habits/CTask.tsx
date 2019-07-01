@@ -18,6 +18,7 @@ export const CTask = (props: CTaskProps) => {
   const status = STATUS_NAME[task.status];
 
   const cycleTaskStatus = () => {
+    console.log('cycling task status');
 
   }
 

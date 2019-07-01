@@ -94,11 +94,14 @@ export const updateTaskStatus = async (input: InputTaskStatus) => {
   return updateTask(input.id, { status: input.status });
 }
 
+/**
+ * Move a task within a scope or to a position in another scope
+ * @param input 
+ */
 export const updateTaskPosition = async (input: InputTaskPosition) => {
   const { id, date, position } = input;
 
-  console.log('hot diggity dog');
-  // Fetch the record for this tasks
+  // Fetch the record for this task
   const oldTask = await knex.table('tasks')
     .select(['id', 'name', 'date', 'position'])
     .where({ id })
