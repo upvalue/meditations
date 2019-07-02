@@ -41,9 +41,11 @@ const typeDefs = gql(fs.readFileSync(__dirname.concat('/schema.gql'), 'utf8'));
 const pubsub = new PubSub();
 
 // Subscription names
-const TASK_EVENTS = 'TASK_EVENTS';
-const ADD_TASK = 'ADD_TASK';
-const TASK_POSITIONS = 'TASK_POSITIONS';
+
+const TASK_EVENTS = 'taskEvents';
+const ADD_TASK = 'addTask';
+const TASK_POSITIONS = 'taskPosition';
+
 
 const DATE_FORMAT = 'yyyy-mm-dd';
 
@@ -52,19 +54,6 @@ const checkDate = (date: string) => {
     throw new UserInputError(`date "${date}" must match format YYYY-MM-DD`);
   }
 }
-
-const SCOPE_NAMES: { [key: number]: string } = {
-  1: 'Days',
-  2: 'Month',
-  3: 'Year',
-}
-
-const SCOPE_NUMBERS: { [key: string]: number } = {
-  'DAY': 1,
-  'MONTH': 2,
-  'YEAR': 3,
-};
-
 
 /**
  * Publish task updates and return updated tasks
@@ -81,6 +70,18 @@ const withSessionId = <T>(ctx: Context, obj: T) => {
     sessionId: ctx.sessionId || 'unknown',
   };
 };
+
+/**
+ * Publish and return a mutation with sessionId attached
+ * @param ctx 
+ * @param triggerName 
+ * @param subscriptionName 
+ * @param obj 
+ */
+const publishMutation = <T>(ctx: Context, triggerName: string, obj: T) => {
+  pubsub.publish(triggerName, { [triggerName]: withSessionId(ctx, obj) });
+  return obj;
+}
 
 const resolvers = {
   Query: {
@@ -106,38 +107,23 @@ const resolvers = {
       });
     },
 
-    updateTaskStatus: (_param: any, args: { input: InputTaskStatus }) => {
-      return updateTaskStatus(args.input).then(updateTasks);
+    updateTaskStatus: (_param: any, args: { input: InputTaskStatus }, ctx: Context) => {
+      return updateTaskStatus(args.input).then(updatedTasks => {
+        return publishMutation(ctx, TASK_EVENTS, { updatedTasks });
+      });
     },
 
     updateTaskPosition: (param: any, args: UpdateTaskPositionArgs, ctx: Context) => {
       // pubsub.publish()
       return updateTaskPosition(args.input).then((taskPosition: any) => {
-        const res = {
-          taskPosition,
-        };
-
-        pubsub.publish(TASK_POSITIONS, withSessionId(ctx, {
-          taskPosition: withSessionId(ctx, res),
-        }));
-
-        return withSessionId(ctx, res);
+        return publishMutation(ctx, TASK_POSITIONS, { taskPosition });
       });
     },
 
     addTask: (_param: any, args: AddTaskArgs, ctx: Context) => {
       return addTask(args.input).then((newTaskList: any) => {
-        const res = {
-          newTask: newTaskList[0],
-        };
-
-        pubsub.publish(ADD_TASK, withSessionId(ctx, {
-          addTask: withSessionId(ctx, res),
-        }));
-
-        return withSessionId(ctx, res);
+        return publishMutation(ctx, ADD_TASK, { newTask: newTaskList[0] });
       })
-
     },
   },
 

@@ -187,8 +187,14 @@ export const SocketProvider = (props: SocketProviderProps) => {
           throw new GQLError(null, msg.payload.errors);
         }
 
+        // Strip query name so this is treated like the result of a mutation
         const result = stripQueryName(msg.payload.data);
-        if (result.sessionId === SESSION_ID) return;
+
+        // If this update resulted from the given session
+        if (result.sessionId === SESSION_ID) {
+          return;
+        }
+
         onUpdate.current(result);
       }
     });

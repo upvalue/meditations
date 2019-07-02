@@ -22,10 +22,6 @@ const ThemedBody = () => {
         path="habits/browse/:date"
       />
 
-      {/*<NotesPage
-        path="/notes"
-      />*/}
-
       <Redirect
         noThrow={true}
         from="/"

@@ -53,14 +53,11 @@ const scopeMounted = (currentDate: string, date: string): ScopeMountedResult => 
   const monthCheck = parse(date, 'yyyy-MM', baseDate);
   const dayCheck = parse(date, 'yyyy-MM-dd', baseDate);
   if (isValid(yearCheck)) {
-    console.log('within year');
     return format(currentDateObj, 'yyyy') === date && 'Year';
   } else if (isValid(dayCheck)) {
-    console.log('within days');
     return currentDate === format(dayCheck, 'yyyy-MM') && 'Days';
   } else if (isValid(monthCheck)) {
     // Must come after days check
-    console.log('within month');
     return format(currentDateObj, 'yyyy-MM') === date && 'Month';
   }
   return false;
@@ -69,6 +66,7 @@ const scopeMounted = (currentDate: string, date: string): ScopeMountedResult => 
 export const habitsReducer = (state: Draft<HabitsState>, action: HabitsAction): HabitsState => {
   switch (action.type) {
     case 'LOAD_TASKS': {
+      // Use produce to strip readonly types
       const { Year, Month, Days } = produce(action.tasks, tasks => tasks);
 
       state.date = action.date;

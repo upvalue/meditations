@@ -10,14 +10,13 @@ type TaskDragDropContextProps = {
 const UPDATE_TASK_POSITION_MUT = `
 ${taskFieldsFragment}
 
-mutation updateTaskPosition($sessionId: String!, $id: Int!, $date: String!, $position: Int!) {
-  updateTaskPosition(sessionId: $sessionId, input: {
+mutation updateTaskPosition($id: Int!, $date: String!, $position: Int!) {
+  updateTaskPosition(input: {
     id: $id,
     date: $date,
     position: $position
   }) {
     __typename,
-    sessionId,
     taskPosition {
       id,
       task {

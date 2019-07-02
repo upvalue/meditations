@@ -100,7 +100,7 @@ type Mutation {
   addTask(input: InputTaskNew): AddTaskEvent
   updateTaskMinutes(input: InputTaskMinutes!): UpdatedTasksEvent
   updateTaskStatus(input: InputTaskCycleStatus!): UpdatedTasksEvent
-  updateTaskPosition(sessionId: String!, input: InputTaskPosition!): TaskPositionEvent
+  updateTaskPosition(input: InputTaskPosition!): TaskPositionEvent
 }
 
 type Subscription {

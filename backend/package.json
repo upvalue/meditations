@@ -10,12 +10,14 @@
     "watch-node": "nodemon src/index.js",
     "watch-ts": "tsc -w",
     "watch": "concurrently \"npm:watch-*\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-graphql": "graphql-codegen --config codegen.yml"
   },
   "keywords": [],
   "author": "Phil <phil@upvalue.io> (https://upvalue.io)",
   "license": "ISC",
   "dependencies": {
+    "@graphql-codegen/cli": "^1.3.1",
     "@types/date-fns": "^2.6.0",
     "@types/express": "^4.16.1",
     "@types/graphql": "^14.0.5",
@@ -26,7 +28,7 @@
     "core-js": "^3.0.0-beta.11",
     "date-fns": "^2.0.0-alpha.27",
     "express": "^4.16.4",
-    "graphql": "^14.1.1",
+    "graphql": "^14.4.1",
     "knex": "^0.16.3",
     "lodash": "^4.17.11",
     "simplytyped": "^3.2.0",
@@ -34,6 +36,8 @@
     "typescript": "^3.3.1"
   },
   "devDependencies": {
+    "@graphql-codegen/typescript": "1.3.1",
+    "@graphql-codegen/typescript-resolvers": "^1.3.1",
     "concurrently": "^4.1.0"
   }
 }

@@ -2,7 +2,8 @@ import React from 'react';
 import { Draggable } from "react-beautiful-dnd";
 import { MdCheckCircle } from "react-icons/md";
 
-import { Task } from "../api";
+import { Task, taskFieldsFragment } from "../api";
+import { useMutation } from '../hooks/useSubscription';
 
 export type CTaskProps = {
   task: Task;
@@ -11,15 +12,34 @@ export type CTaskProps = {
 
 const STATUS_NAME = ['unset', 'complete', 'incomplete']
 
+const UPDATE_TASK_STATUS_MUT = `
+${taskFieldsFragment}
+
+mutation updateTaskStatus($id: Int!, $status: Int!) {
+  updateTaskStatus(input: {
+    id: $id,
+    status: $status
+  }) {
+    updatedTasks {
+      ...taskFields
+    }
+  }
+}
+`;
+
 export const CTask = (props: CTaskProps) => {
   const { task } = props;
   let nameString = task.name;
 
   const status = STATUS_NAME[task.status];
 
-  const cycleTaskStatus = () => {
-    console.log('cycling task status');
+  const updateTaskStatus = useMutation(UPDATE_TASK_STATUS_MUT);
 
+  const cycleTaskStatus = () => {
+    updateTaskStatus({
+      id: task.id,
+      status: (task.status + 1) % 3,
+    })
   }
 
   return (

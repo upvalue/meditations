@@ -24,7 +24,6 @@ mutation newTask($date: String!, $name: String!) {
     scope: 1
   }) {
     __typename, 
-    sessionId,
     newTask {
       ...taskFields
     }
