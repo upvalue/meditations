@@ -1,6 +1,6 @@
 import React from 'react';
 import { Draggable } from "react-beautiful-dnd";
-import { MdCheckCircle } from "react-icons/md";
+import { MdDragHandle } from "react-icons/md";
 
 import { Task, taskFieldsFragment } from "../api";
 import { useMutation } from '../hooks/useSubscription';
@@ -65,7 +65,7 @@ export const CTask = (props: CTaskProps) => {
                 className="flex items-center"
                 {...provided.dragHandleProps}
               >
-                <MdCheckCircle />
+                <MdDragHandle />
               </div>
             </div>
           </div>

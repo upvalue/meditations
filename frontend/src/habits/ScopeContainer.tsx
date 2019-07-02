@@ -10,8 +10,8 @@ interface ScopeContainerProps {
   tasks: ReadonlyArray<Partial<Task>>;
 }
 
-export const ScopeContainer = React.memo((props: ScopeContainerProps) => {
+export const ScopeContainer = (props: ScopeContainerProps) => {
   return (
     <Scope {...props} />
   );
-});
+};

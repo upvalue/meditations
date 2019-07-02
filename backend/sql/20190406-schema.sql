@@ -49,6 +49,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   FOREIGN KEY (scope) REFERENCES scopes (id)
 );
 
+ALTER TABLE tasks ADD completed_tasks integer;
+ALTER TABLE tasks ADD total_tasks integer;
+
 CREATE INDEX IF NOT EXISTS idx_scopes_deleted_at ON "scopes"("deleted_at");
 CREATE INDEX IF NOT EXISTS idx_tags_deleted_at ON "tags"("deleted_at");
 CREATE INDEX IF NOT EXISTS idx_entries_deleted_at ON "entries"("deleted_at");
@@ -72,7 +75,12 @@ BEGIN
   UPDATE tasks SET minutes = (SELECT sum(minutes) FROM tasks WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 3;
 END;
 
+-- Completion tracking trigger
+
+-- Normalize dates for old-style database
+
 UPDATE tasks SET date = strftime('%Y-%m-%d', date) WHERE scope = 1;
 UPDATE tasks SET date = strftime('%Y-%m', date) WHERE scope = 2;
 UPDATE tasks SET date = strftime('%Y', date) WHERE scope = 3;
+
 

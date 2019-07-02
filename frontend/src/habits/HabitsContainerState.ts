@@ -126,7 +126,10 @@ export const habitsReducer = (state: Draft<HabitsState>, action: HabitsAction): 
         }
 
         case 'AddTaskEvent': {
-          state.tasks.Days.push(action.newTask);
+          const scope = scopeMounted(state.date, action.newTask.date);
+          if (scope) {
+            state.tasks[scope].push(action.newTask);
+          }
           break;
         }
       }
