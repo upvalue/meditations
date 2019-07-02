@@ -20,6 +20,7 @@ mutation updateTaskStatus($id: Int!, $status: Int!) {
     id: $id,
     status: $status
   }) {
+    __typename,
     updatedTasks {
       ...taskFields
     }

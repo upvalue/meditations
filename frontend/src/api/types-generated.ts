@@ -107,7 +107,7 @@ export type Task = {
   status: Scalars["Int"];
   scope: Scalars["Int"];
   position: Scalars["Int"];
-  minutes: Scalars["Int"];
+  minutes?: Maybe<Scalars["Int"]>;
   comment?: Maybe<Scalars["String"]>;
   completion_rate?: Maybe<Scalars["Int"]>;
   total_tasks?: Maybe<Scalars["Int"]>;
@@ -159,7 +159,7 @@ export type UpdatedTaskOrder = {
 export type UpdatedTasksEvent = {
   __typename?: "UpdatedTasksEvent";
   sessionId: Scalars["String"];
-  updatedTasks?: Maybe<Array<Task>>;
+  updatedTasks: Array<Task>;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -389,7 +389,7 @@ export type TaskResolvers<
   status?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   scope?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   position?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  minutes?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  minutes?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
   comment?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   completion_rate?: Resolver<
     Maybe<ResolversTypes["Int"]>,
@@ -476,7 +476,7 @@ export type UpdatedTasksEventResolvers<
 > = {
   sessionId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   updatedTasks?: Resolver<
-    Maybe<Array<ResolversTypes["Task"]>>,
+    Array<ResolversTypes["Task"]>,
     ParentType,
     ContextType
   >;

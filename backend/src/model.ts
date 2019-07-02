@@ -55,7 +55,8 @@ export const addTask = async (input: InputTaskNew): Promise<Task> => {
 
   return knex('tasks')
     .insert({
-      name, date, scope, position
+      name, date, scope, position,
+      status: 0,
     })
     .then(([id]: [number]) =>
       knex.from('tasks')
@@ -139,6 +140,8 @@ export const updateTaskPosition = async (input: InputTaskPosition) => {
   }
 
   newScope.splice(position, 0, { id, position, date });
+
+  console.log(newScope);
 
   // Now update everything in place
   await Promise.all(newScope.map((t: Task, position: number) => {

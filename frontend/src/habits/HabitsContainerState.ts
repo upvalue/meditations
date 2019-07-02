@@ -1,4 +1,4 @@
-import { Task, AddTaskEvent, TaskPositionEvent, baseDate } from "../api";
+import { Task, AddTaskEvent, TaskPositionEvent, baseDate, UpdatedTasksEvent } from "../api";
 import { isValid, parse } from "date-fns";
 import partition from 'lodash/partition';
 import { format } from "date-fns";
@@ -34,7 +34,7 @@ export type LoadTasksAction = {
 
 export type TaskEventAction = {
   type: 'TASK_EVENT';
-} & (AddTaskEvent | TaskPositionEvent);
+} & (AddTaskEvent | TaskPositionEvent | UpdatedTasksEvent);
 
 export type HabitsAction = LoadTasksAction | TaskEventAction;
 
@@ -109,6 +109,19 @@ export const habitsReducer = (state: Draft<HabitsState>, action: HabitsAction): 
             state.tasks[newMounted] = [...newScope, ...otherTasks];
           }
 
+          break;
+        }
+
+        case 'UpdatedTasksEvent': {
+          for (const task of action.updatedTasks) {
+            const scope = scopeMounted(state.date, task.date);
+            if (scope) {
+              state.tasks[scope] = state.tasks[scope].map(check => {
+                if (check.id === task.id) return task;
+                return check;
+              })
+            }
+          }
           break;
         }
 

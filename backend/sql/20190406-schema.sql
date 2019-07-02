@@ -72,3 +72,7 @@ BEGIN
   UPDATE tasks SET minutes = (SELECT sum(minutes) FROM tasks WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 3;
 END;
 
+UPDATE tasks SET date = strftime('%Y-%m-%d', date) WHERE scope = 1;
+UPDATE tasks SET date = strftime('%Y-%m', date) WHERE scope = 2;
+UPDATE tasks SET date = strftime('%Y', date) WHERE scope = 3;
+

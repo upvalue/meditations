@@ -13,7 +13,7 @@ type Task {
   status: Int!
   scope: Int!
   position: Int!
-  minutes: Int!
+  minutes: Int
   comment: String
   completion_rate: Int
   total_tasks: Int
@@ -46,7 +46,7 @@ type Query {
 
 type UpdatedTasksEvent {
   sessionId: String!
-  updatedTasks: [Task!]
+  updatedTasks: [Task!]!
 }
 
 type TaskPositionEvent {
