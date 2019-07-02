@@ -1,7 +1,7 @@
 // model.ts - database interaction code
 
 import { knex } from './database';
-import { Task, InputTaskMinutes, InputTaskNew, InputTaskStatus, InputTaskPosition } from './types';
+import { Task, InputTaskCycleStatus, InputTaskNew, InputTaskMinutes, InputTaskPosition } from './types-generated';
 
 export enum Scope {
   UNUSED = 0,
@@ -90,7 +90,7 @@ export const updateTask = async (id: number, fields: any): Promise<ReadonlyArray
     }) as any as Promise<ReadonlyArray<Task>>;
 }
 
-export const updateTaskStatus = async (input: InputTaskStatus) => {
+export const updateTaskStatus = async (input: InputTaskCycleStatus) => {
   return updateTask(input.id, { status: input.status });
 }
 

@@ -204,6 +204,7 @@ export const SocketProvider = (props: SocketProviderProps) => {
     });
   }, []);
 
+
   return (
     <SocketContext.Provider value={state}>
       {props.children}
@@ -218,7 +219,7 @@ export const useSubscription = <T extends {}>(queries: string[], onUpdate: (obj:
     socketContext.subscribe(queries, onUpdate);
 
     return () => socketContext.unsubscribe();
-  }, []);
+  }, []); // eslint-disable-line
 }
 
 /**

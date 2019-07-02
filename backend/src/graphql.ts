@@ -6,7 +6,7 @@ import { parse, isValid, format } from 'date-fns';
 
 import { tasksInScope, updateTaskMinutes, addTask, updateTaskStatus, tasksInMonth, updateTaskPosition } from './model';
 
-import { InputTaskMinutes, InputTaskPosition, InputTaskNew, InputTaskStatus, Task } from './types';
+import { InputTaskMinutes, InputTaskPosition, InputTaskNew, InputTaskCycleStatus, Task } from './types-generated';
 
 type ScopeName = 'DAY' | 'MONTH' | 'YEAR';
 
@@ -107,7 +107,7 @@ const resolvers = {
       });
     },
 
-    updateTaskStatus: (_param: any, args: { input: InputTaskStatus }, ctx: Context) => {
+    updateTaskStatus: (_param: any, args: { input: InputTaskCycleStatus }, ctx: Context) => {
       return updateTaskStatus(args.input).then(updatedTasks => {
         return publishMutation(ctx, TASK_EVENTS, { updatedTasks });
       });

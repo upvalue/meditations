@@ -9,11 +9,11 @@ type Task {
   name: String!
   created_at: String!
   updated_at: String
-  date: String
-  status: Int
-  scope: Int
-  position: Int
-  minutes: Int
+  date: String!
+  status: Int!
+  scope: Int!
+  position: Int!
+  minutes: Int!
   comment: String
   completion_rate: Int
   total_tasks: Int

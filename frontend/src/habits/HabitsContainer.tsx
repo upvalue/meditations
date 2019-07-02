@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { parse, differenceInCalendarYears } from 'date-fns';
 import { RouteComponentProps } from '@reach/router';
 
-import { formatDate, tasksByDate, taskFieldsFragment, TaskEvent } from '../api';
+import { formatDate, tasksByDate, taskFieldsFragment } from '../api';
 import { HabitsPage } from './HabitsPage';
 import { initialState, habitsReducerLogged } from './HabitsContainerState';
 import { useSubscription } from '../hooks/useSubscription';
@@ -99,9 +99,9 @@ export const HabitsContainer = (props: HabitsContainerProps) => {
         tasks: res.tasksByDate
       });
     });
-  }, []);
+  }, []); // eslint-disable-line
 
-  useSubscription([ADD_TASK_SUB, UPDATED_TASKS_SUB, UPDATED_TASKS_POSITION_SUB], (te: TaskEvent) => {
+  useSubscription([ADD_TASK_SUB, UPDATED_TASKS_SUB, UPDATED_TASKS_POSITION_SUB], (te: any) => {
     dispatch({
       type: 'TASK_EVENT',
       ...te,

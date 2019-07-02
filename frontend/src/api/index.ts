@@ -1,10 +1,10 @@
 import { format, parse } from 'date-fns';
 
-import { Task } from './types';
+import { Task } from './types-generated';
 import { request } from './request';
 export { SESSION_ID } from './request';
 
-export * from './types';
+export * from './types-generated';
 
 export enum TaskStatus {
   STATUS_UNSET = 0,
