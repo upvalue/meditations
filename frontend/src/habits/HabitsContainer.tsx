@@ -99,7 +99,7 @@ export const HabitsContainer = (props: HabitsContainerProps) => {
         tasks: res.tasksByDate
       });
     });
-  }, []); // eslint-disable-line
+  }, [props.date]); // eslint-disable-line
 
   useSubscription([ADD_TASK_SUB, UPDATED_TASKS_SUB, UPDATED_TASKS_POSITION_SUB], (te: any) => {
     dispatch({

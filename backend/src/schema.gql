@@ -15,9 +15,9 @@ type Task {
   position: Int!
   minutes: Int
   comment: String
-  completion_rate: Int
   total_tasks: Int
   completed_tasks: Int
+  total_minutes: Int
 }
 
 type TaskPosition {

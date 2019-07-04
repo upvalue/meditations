@@ -49,9 +49,6 @@ CREATE TABLE IF NOT EXISTS tasks (
   FOREIGN KEY (scope) REFERENCES scopes (id)
 );
 
-ALTER TABLE tasks ADD completed_tasks integer;
-ALTER TABLE tasks ADD total_tasks integer;
-
 CREATE INDEX IF NOT EXISTS idx_scopes_deleted_at ON "scopes"("deleted_at");
 CREATE INDEX IF NOT EXISTS idx_tags_deleted_at ON "tags"("deleted_at");
 CREATE INDEX IF NOT EXISTS idx_entries_deleted_at ON "entries"("deleted_at");
@@ -65,19 +62,59 @@ INSERT INTO scopes (id, name) VALUES
   (3, 'Year')
   ON CONFLICT DO NOTHING;
 
+-- Task statistics view
+
+CREATE VIEW task_stats AS SELECT *, 
+  (SELECT count(*) FROM tasks WHERE name = t.name AND
+    CASE t.scope 
+      WHEN 1 THEN 0
+      WHEN 2 THEN strftime('%Y-%m', date) = t.date
+      WHEN 3 THEN strftime('%Y', date) = t.date
+    END) AS total_tasks,
+
+  (SELECT count(*) FROM tasks WHERE name = t.name AND status = 1 AND
+    CASE t.scope 
+      WHEN 1 THEN 0
+      WHEN 2 THEN strftime('%Y-%m', date) = t.date
+      WHEN 3 THEN strftime('%Y', date) = t.date
+    END) AS completed_tasks,
+
+  (SELECT sum(minutes) FROM tasks WHERE name = t.name AND 
+    CASE t.scope 
+      WHEN 1 THEN 0
+      WHEN 2 THEN strftime('%Y-%m', date) = t.date
+      WHEN 3 THEN strftime('%Y', date) = t.date
+    END) AS total_minutes
+
+        FROM tasks t;
+
 -- Time tracking trigger
 
-CREATE TRIGGER IF NOT EXISTS task_update_track_time AFTER UPDATE ON tasks WHEN new.scope = 1 AND new.minutes != old.minutes
-BEGIN
+-- CREATE TRIGGER IF NOT EXISTS task_update_track_time AFTER UPDATE ON tasks WHEN new.scope = 1 AND new.minutes != old.minutes
+-- BEGIN
   -- update monthly tasks
-  UPDATE tasks SET minutes = (SELECT sum(minutes) FROM tasks WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 2;
+--   UPDATE tasks SET minutes = (SELECT sum(minutes) FROM tasks WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 2;
   -- update yearly tasks
-  UPDATE tasks SET minutes = (SELECT sum(minutes) FROM tasks WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 3;
-END;
+--   UPDATE tasks SET minutes = (SELECT sum(minutes) FROM tasks WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 3;
+-- END;
 
 -- Completion tracking trigger
 
--- Normalize dates for old-style database
+-- Well if you track things this way, you need to run this calculation after name is changed or task is deleted as well.
+-- Alternative would be tracking stats on fetch the way it's done before. Penalizes reads but may be simpler
+
+--CREATE TRIGGER IF NOT EXISTS task_update_track_completion AFTER UPDATE ON tasks WHEN new.scope = 1 AND new.status != old.status
+--BEGIN
+  -- update monthly tasks
+  --UPDATE tasks SET completed_tasks = (SELECT count(*) FROM tasks WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 1 AND status = 1) WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 2;
+  --UPDATE tasks SET total_tasks = (SELECT count(*) FROM tasks WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 1) WHERE name = new.name AND strftime('%Y-%m', date) = strftime('%Y-%m', new.date) AND scope = 2;
+
+  -- update yearly tasks
+  --UPDATE tasks SET completed_tasks = (SELECT count(*) FROM tasks WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 1 AND status = 1) WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 3;
+  --UPDATE tasks SET total_tasks = (SELECT count(*) FROM tasks WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 1 AND status = 1) WHERE name = new.name AND strftime('%Y', date) = strftime('%Y', new.date) AND scope = 3;
+--END;
+
+-- Normalize dates for imported database
 
 UPDATE tasks SET date = strftime('%Y-%m-%d', date) WHERE scope = 1;
 UPDATE tasks SET date = strftime('%Y-%m', date) WHERE scope = 2;
