@@ -4,7 +4,7 @@ import { Droppable } from 'react-beautiful-dnd';
 
 import { CTask } from './CTask';
 import { MdAdd } from 'react-icons/md';
-import { taskFieldsFragment } from '../api';
+import { taskFieldsFragment, Task } from '../api';
 import { useMutation } from '../hooks/useSubscription';
 
 const NEW_TASK_QUERY = `
@@ -24,10 +24,17 @@ mutation newTask($date: String!, $name: String!) {
 }
 `
 
+type ScopeProps = {
+  className?: string;
+  title: string;
+  date: string;
+  tasks: ReadonlyArray<Task>;
+}
+
 /**
  * A scope contains tasks.
  */
-export const Scope = (props: any) => {
+export const Scope = (props: ScopeProps) => {
   const [addingTask, setAddingTask] = useState(false);
   const [taskName, setTaskName] = useState('');
   const taskNameRef = useRef<HTMLInputElement>(null);
@@ -56,7 +63,11 @@ export const Scope = (props: any) => {
       type="LIST"
     >
       {(provided, _snapshot) => (
-        <div ref={provided.innerRef} {...provided.droppableProps} className={classNames('Scope', 'p2', props.className)} style={props.style}>
+        <div
+          className={classNames('Scope', 'p2', props.className)}
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
           <div className="flex justify-between items-center">
             <h4 className="my0 mt1 mx1 mb2">{props.title || 'no title'}</h4>
             <div style={{ cursor: 'pointer' }}>

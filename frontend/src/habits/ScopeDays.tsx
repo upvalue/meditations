@@ -44,9 +44,9 @@ export const ScopeDays = (props: ScopeDaysProps) => {
     }).map(day => {
       const dateObj = parseDate(day.split(' ')[0]);
 
-
       return (
         <Scope
+          className="days"
           key={dateObj.getTime()}
           title={format(dateObj, 'iiii do')}
           date={day}
