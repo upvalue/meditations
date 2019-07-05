@@ -51,31 +51,31 @@ export const Scope = (props: any) => {
   }
 
   return (
-    <div className={classNames('Scope', 'p2', props.className)} style={props.style}>
-      <div className="flex justify-between items-center">
-        <h4 className="my0 mt1 mx1 mb2">{props.title || 'no title'}</h4>
-        <div style={{ cursor: 'pointer' }}>
-          {addingTask &&
-            <input
-              placeholder="task name"
-              size={5}
-              value={taskName}
-              onChange={(e) => setTaskName(e.currentTarget.value)}
-              onBlur={addTask}
-              ref={taskNameRef}
-            />
-          }
-          <MdAdd onClick={() => setAddingTask(true)} />
-        </div>
-      </div>
+    <Droppable
+      droppableId={props.date}
+      type="LIST"
+    >
+      {(provided, _snapshot) => (
+        <div ref={provided.innerRef} {...provided.droppableProps} className={classNames('Scope', 'p2', props.className)} style={props.style}>
+          <div className="flex justify-between items-center">
+            <h4 className="my0 mt1 mx1 mb2">{props.title || 'no title'}</h4>
+            <div style={{ cursor: 'pointer' }}>
+              {addingTask &&
+                <input
+                  placeholder="task name"
+                  size={5}
+                  value={taskName}
+                  onChange={(e) => setTaskName(e.currentTarget.value)}
+                  onBlur={addTask}
+                  ref={taskNameRef}
+                />
+              }
+              <MdAdd onClick={() => setAddingTask(true)} />
+            </div>
+          </div>
 
-      <Droppable
-        droppableId={props.date}
-        type="LIST"
-      >
-        {(provided, _snapshot) => (
           <>
-            <div ref={provided.innerRef} {...provided.droppableProps}>
+            <div >
               {props.tasks && props.tasks.map((task: any, i: number) => (
                 <CTask
                   key={task.id}
@@ -87,8 +87,8 @@ export const Scope = (props: any) => {
               {provided.placeholder}
             </div>
           </>
-        )}
-      </Droppable>
-    </div>
+        </div>
+      )}
+    </Droppable>
   )
 }

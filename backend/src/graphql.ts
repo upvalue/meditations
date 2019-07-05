@@ -5,7 +5,6 @@ import { gql } from 'apollo-server-express';
 import { parse, isValid, format } from 'date-fns';
 
 import { tasksInScope, updateTaskMinutes, addTask, updateTaskStatus, tasksInMonth, updateTaskPosition } from './model';
-
 import { MutationUpdateTaskArgs, MutationUpdateTaskStatusArgs, MutationUpdateTaskPositionArgs, MutationAddTaskArgs, QueryTasksByDateArgs } from './types-generated';
 
 type Context = {

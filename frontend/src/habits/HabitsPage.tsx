@@ -2,11 +2,11 @@ import React from 'react';
 import { format, parse } from 'date-fns';
 import { View } from '@upvalueio/third-coast';
 
-import { ScopeContainer } from './ScopeContainer';
 import { ScopeDays } from './ScopeDays';
 import { TasksByDateRequest } from '../api';
 import { TaskDragDropContext } from './TaskDragDropContext';
 import { TimeNavigator } from './TimeNavigator';
+import { Scope } from './Scope';
 
 
 export interface HabitsPageProps {
@@ -44,17 +44,18 @@ export const HabitsPage = (props: HabitsPageProps) => {
 
                   <ScopeDays
                     className="mr2"
+                    date={dateObj}
                     tasks={tasks.Days}
                   />
 
-                  <ScopeContainer
+                  <Scope
                     className="mr2"
                     title={format(dateObj, 'MMMM')}
                     date={format(dateObj, 'yyyy-MM')}
                     tasks={tasks.Month}
                   />
 
-                  <ScopeContainer
+                  <Scope
                     title={format(dateObj, 'yyyy')}
                     date={format(dateObj, 'yyyy')}
                     tasks={tasks.Year}
