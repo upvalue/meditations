@@ -16,3 +16,13 @@
   border-right: 1px solid $dark-gray5;
   box-shadow: 1px 0px 1px 0px  $dark-gray3;
 }
+
+.ThemedBody {
+  justify-content: space-around;
+}
+
+.HabitsPage {
+  display: flex;
+  max-width: 1440px;
+
+}
