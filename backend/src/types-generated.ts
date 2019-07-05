@@ -109,9 +109,9 @@ export type Task = {
   position: Scalars["Int"];
   minutes?: Maybe<Scalars["Int"]>;
   comment?: Maybe<Scalars["String"]>;
-  completion_rate?: Maybe<Scalars["Int"]>;
   total_tasks?: Maybe<Scalars["Int"]>;
   completed_tasks?: Maybe<Scalars["Int"]>;
+  total_minutes?: Maybe<Scalars["Int"]>;
 };
 
 export type TaskPosition = {
@@ -391,13 +391,13 @@ export type TaskResolvers<
   position?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   minutes?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
   comment?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  completion_rate?: Resolver<
+  total_tasks?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  completed_tasks?: Resolver<
     Maybe<ResolversTypes["Int"]>,
     ParentType,
     ContextType
   >;
-  total_tasks?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
-  completed_tasks?: Resolver<
+  total_minutes?: Resolver<
     Maybe<ResolversTypes["Int"]>,
     ParentType,
     ContextType

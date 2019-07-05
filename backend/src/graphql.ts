@@ -6,31 +6,7 @@ import { parse, isValid, format } from 'date-fns';
 
 import { tasksInScope, updateTaskMinutes, addTask, updateTaskStatus, tasksInMonth, updateTaskPosition } from './model';
 
-import { InputTaskMinutes, InputTaskPosition, InputTaskNew, InputTaskCycleStatus, Task } from './types-generated';
-
-type ScopeName = 'DAY' | 'MONTH' | 'YEAR';
-
-type TasksByDateArgs = {
-  date: string,
-  scopes: ReadonlyArray<ScopeName>,
-};
-
-type TasksInMonthArgs = {
-  date: string;
-}
-
-type UpdateTaskArgs = {
-  input: InputTaskMinutes;
-}
-
-type UpdateTaskPositionArgs = {
-  sessionId: string;
-  input: InputTaskPosition;
-}
-
-type AddTaskArgs = {
-  input: InputTaskNew;
-}
+import { MutationUpdateTaskArgs, MutationUpdateTaskStatusArgs, MutationUpdateTaskPositionArgs, MutationAddTaskArgs, QueryTasksByDateArgs } from './types-generated';
 
 type Context = {
   sessionId: string;
@@ -85,7 +61,7 @@ const publishMutation = <T>(ctx: Context, triggerName: string, obj: T) => {
 
 const resolvers = {
   Query: {
-    tasksByDate: (_param: any, args: TasksByDateArgs) => {
+    tasksByDate: (_param: any, args: QueryTasksByDateArgs) => {
       checkDate(args.date);
       return Promise.all([
         tasksInMonth(format(parse(args.date, DATE_FORMAT, new Date()), 'yyyy-mm')),
@@ -100,27 +76,27 @@ const resolvers = {
   },
 
   Mutation: {
-    updateTaskMinutes: (_param: any, args: UpdateTaskArgs) => {
+    updateTaskMinutes: (_param: any, args: MutationUpdateTaskArgs) => {
       return updateTaskMinutes(args.input).then(updatedTasks => {
         pubsub.publish(TASK_EVENTS, { taskEvents: { updatedTasks } });
         return { updatedTasks };
       });
     },
 
-    updateTaskStatus: (_param: any, args: { input: InputTaskCycleStatus }, ctx: Context) => {
+    updateTaskStatus: (_param: any, args: MutationUpdateTaskStatusArgs, ctx: Context) => {
       return updateTaskStatus(args.input).then(updatedTasks => {
         return publishMutation(ctx, TASK_EVENTS, { updatedTasks });
       });
     },
 
-    updateTaskPosition: (param: any, args: UpdateTaskPositionArgs, ctx: Context) => {
+    updateTaskPosition: (param: any, args: MutationUpdateTaskPositionArgs, ctx: Context) => {
       // pubsub.publish()
       return updateTaskPosition(args.input).then((taskPosition: any) => {
         return publishMutation(ctx, TASK_POSITIONS, { taskPosition });
       });
     },
 
-    addTask: (_param: any, args: AddTaskArgs, ctx: Context) => {
+    addTask: (_param: any, args: MutationAddTaskArgs, ctx: Context) => {
       return addTask(args.input).then((newTaskList: any) => {
         return publishMutation(ctx, ADD_TASK, { newTask: newTaskList[0] });
       })

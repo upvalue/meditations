@@ -2,7 +2,6 @@ import React from 'react';
 import { format, parse } from 'date-fns';
 import { View } from '@upvalueio/third-coast';
 
-import { HabitsSidebar } from './HabitsSidebar';
 import { ScopeContainer } from './ScopeContainer';
 import { ScopeDays } from './ScopeDays';
 import { TasksByDateRequest } from '../api';

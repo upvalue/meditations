@@ -96,7 +96,7 @@ input InputTaskPosition {
 
 type Mutation {
   updateTask(input: InputTaskMinutes!): UpdatedTasksEvent
-  addTask(input: InputTaskNew): AddTaskEvent
+  addTask(input: InputTaskNew!): AddTaskEvent
   updateTaskMinutes(input: InputTaskMinutes!): UpdatedTasksEvent
   updateTaskStatus(input: InputTaskCycleStatus!): UpdatedTasksEvent
   updateTaskPosition(input: InputTaskPosition!): TaskPositionEvent

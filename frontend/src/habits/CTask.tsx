@@ -71,8 +71,6 @@ export const CTask = (props: CTaskProps) => {
           </div>
 
           <div className="Comment mx2" dangerouslySetInnerHTML={{ __html: props.task.comment || '' }} />
-
-          {/*<p>{task.minutes}</p>*/}
         </div >
       )}
     </Draggable>
