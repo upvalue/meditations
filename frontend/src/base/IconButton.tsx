@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@upvalueio/third-coast';
+import { Button } from '@upvalueio/arche';
 import { Link, LinkProps } from '@reach/router';
 import { IconType } from 'react-icons';
 

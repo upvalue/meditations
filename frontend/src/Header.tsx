@@ -3,8 +3,8 @@ import React from 'react';
 
 import classNames from 'classnames';
 import { MdBrightness3, MdBrightness4 } from 'react-icons/md';
-import { View, useTheme } from '@upvalueio/third-coast';
 import { Link, LinkGetProps } from '@reach/router';
+import { View } from '@upvalueio/arche';
 
 import { IconButton } from './base/IconButton';
 
@@ -19,8 +19,6 @@ const headerLinkProps = (props: LinkGetProps) => {
  * Page header. Displays navigation, title, global controls.
  */
 export const Header = () => {
-  const [theme, setTheme] = useTheme();
-
   return (
     <View
       component="header"
@@ -45,13 +43,13 @@ export const Header = () => {
         </View>
       </View>
 
-      <View flex="flex" margin="mr2">
+      {/*<View flex="flex" margin="mr2">
         <IconButton
           icon={theme === 'dark' ? MdBrightness4 : MdBrightness3}
           title="Toggle dark mode"
           onClick={() => { setTheme(theme === 'dark' ? undefined : 'dark'); }}
         />
-      </View>
+  </View>*/}
     </View>
   );
 };
