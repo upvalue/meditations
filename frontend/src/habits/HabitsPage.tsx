@@ -43,13 +43,12 @@ export const HabitsPage = (props: HabitsPageProps) => {
                 <>
 
                   <ScopeDays
-                    className="mr2"
                     date={dateObj}
                     tasks={tasks.Days}
                   />
 
                   <Scope
-                    className="mr2"
+                    className="mx3"
                     title={format(dateObj, 'MMMM')}
                     date={format(dateObj, 'yyyy-MM')}
                     tasks={tasks.Month}

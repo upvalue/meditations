@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Draggable } from "react-beautiful-dnd";
 import { MdDragHandle } from "react-icons/md";
 
@@ -28,9 +28,22 @@ mutation updateTaskStatus($id: Int!, $status: Int!) {
 }
 `;
 
+export type CTaskState = {
+  /**
+   * True if user is hovering over task; means additional
+   * buttons will be displayed.
+   */
+  hovering: boolean;
+}
+
+/**
+ * Component representing a single task
+ */
 export const CTask = (props: CTaskProps) => {
   const { task } = props;
   let nameString = task.name;
+
+  const [state, setState] = useState<CTaskState>({ hovering: false });
 
   const status = STATUS_NAME[task.status];
 
@@ -54,6 +67,8 @@ export const CTask = (props: CTaskProps) => {
           className="Task p2 mb2"
           {...provided.draggableProps}
           ref={provided.innerRef}
+          onMouseEnter={() => setState({ hovering: true })}
+          onMouseLeave={() => setState({ hovering: false })}
         >
           <div className="flex items-center justify-between">
             <span className={`Task-name Task-name-${status}`} onClick={cycleTaskStatus}>
@@ -65,7 +80,9 @@ export const CTask = (props: CTaskProps) => {
                 className="flex items-center"
                 {...provided.dragHandleProps}
               >
-                <MdDragHandle />
+                {state.hovering && <>
+                  <MdDragHandle />
+                </>}
               </div>
             </div>
           </div>

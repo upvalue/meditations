@@ -10,15 +10,15 @@ type Task {
   name: String!
   created_at: String!
   updated_at: String
-  date: String
-  status: Int
-  scope: Int
-  position: Int
+  date: String!
+  status: Int!
+  scope: Int!
+  position: Int!
   minutes: Int
   comment: String
-  completion_rate: Int
   total_tasks: Int
   completed_tasks: Int
+  total_minutes: Int
 }
 
 type TaskPosition {
@@ -47,7 +47,7 @@ type Query {
 
 type UpdatedTasksEvent {
   sessionId: String!
-  updatedTasks: [Task!]
+  updatedTasks: [Task!]!
 }
 
 type TaskPositionEvent {
@@ -97,7 +97,7 @@ input InputTaskPosition {
 
 type Mutation {
   updateTask(input: InputTaskMinutes!): UpdatedTasksEvent
-  addTask(input: InputTaskNew): AddTaskEvent
+  addTask(input: InputTaskNew!): AddTaskEvent
   updateTaskMinutes(input: InputTaskMinutes!): UpdatedTasksEvent
   updateTaskStatus(input: InputTaskCycleStatus!): UpdatedTasksEvent
   updateTaskPosition(input: InputTaskPosition!): TaskPositionEvent
