@@ -2,11 +2,8 @@
 import React from 'react';
 
 import classNames from 'classnames';
-import { MdBrightness3, MdBrightness4 } from 'react-icons/md';
 import { Link, LinkGetProps } from '@reach/router';
 import { View } from '@upvalueio/arche';
-
-import { IconButton } from './base/IconButton';
 
 /**
  * Style active links

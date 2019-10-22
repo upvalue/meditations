@@ -64,12 +64,12 @@ export const Scope = (props: ScopeProps) => {
     >
       {(provided, _snapshot) => (
         <div
-          className={classNames('Scope', 'p2', props.className)}
+          className={classNames('Scope', 'a-p2', props.className)}
           ref={provided.innerRef}
           {...provided.droppableProps}
         >
           <div className="flex justify-between items-center">
-            <h4 className="my0 mt1 mx1 mb2">{props.title || 'no title'}</h4>
+            <h4 className="a-my0 a-mt1 a-mx1 a-mb2">{props.title || 'no title'}</h4>
             <div style={{ cursor: 'pointer' }}>
               {addingTask &&
                 <input

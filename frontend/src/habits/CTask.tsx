@@ -58,13 +58,13 @@ export const CTask = (props: CTaskProps) => {
 
   return (
     <Draggable
-      draggableId={task.id.toString()}
+      draggableId={`${task.id}`}
       index={props.index}
       type="TASK"
     >
       {(provided, _snapshot) => (
         <div
-          className="Task p2 mb2"
+          className="Task a-p2 a-mb2"
           {...provided.draggableProps}
           ref={provided.innerRef}
           onMouseEnter={() => setState({ hovering: true })}
