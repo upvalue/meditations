@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { format, parse } from 'date-fns';
 import { View } from '@upvalueio/arche';
 
@@ -25,20 +25,19 @@ export const HabitsPage = (props: HabitsPageProps) => {
     <>
       <TaskDragDropContext>
         <main className="HabitsPage m3 flex-column flex flex-auto">
-          <View flex={["flex", "flex-column"]}>
-
-            <View flex={["flex", "justify-around"]}>
+          <View direction="column">
+            <View justify="around">
               <h1>Meditations</h1>
             </View>
 
-            <View flex={["flex", "justify-around"]}>
+            <View justify="around">
               <TimeNavigator date={date} />
             </View>
 
           </View>
 
-          <View flex={["flex", "justify-around"]}>
-            <View className="higher-scopes" flex="flex">
+          <View justify="around">
+            <View className="higher-scopes">
               {tasks &&
                 <>
 

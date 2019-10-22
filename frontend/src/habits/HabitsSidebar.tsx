@@ -42,8 +42,8 @@ export const HabitsSidebar = (props: HabitsSidebarProps) => {
   const addTask = useMutation(NEW_TASK_QUERY);
 
   return (
-    <View flex="flex-column" className="Sidebar-container">
-      <View className="Sidebar" flex={['flex-column', 'flex-auto']}>
+    <View direction="column" className="Sidebar-container">
+      <View className="Sidebar" auto direction="column">
         <div className="flex justify-between items-center">
           <div className="flex">
             {/* What this needs is a double arrow like a VHS rewind */}

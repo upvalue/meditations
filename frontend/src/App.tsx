@@ -1,6 +1,5 @@
 /// <reference path="../node_modules/@types/reach__router/index.d.ts" />
 import React, { Component } from 'react';
-import classNames from 'classnames';
 
 import { Router, Redirect } from '@reach/router';
 

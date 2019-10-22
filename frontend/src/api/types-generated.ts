@@ -64,7 +64,7 @@ export type MutationUpdateTaskArgs = {
 };
 
 export type MutationAddTaskArgs = {
-  input?: Maybe<InputTaskNew>;
+  input: InputTaskNew;
 };
 
 export type MutationUpdateTaskMinutesArgs = {

@@ -20,7 +20,7 @@ export const ScopeDays = (props: ScopeDaysProps) => {
   const start = startOfMonth(date);
   let end = endOfMonth(date);
 
-  const now = new Date;
+  const now = new Date();
 
   if (end > now) {
     end = now;

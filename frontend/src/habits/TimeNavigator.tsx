@@ -21,8 +21,8 @@ export const TimeNavigator = (props: TimeNavigatorProps) => {
   const prevYear = format(subYears(date, 1), 'yyyy-MM');
 
   return (
-    <View flex="flex-column">
-      <View flex={['flex-column', 'flex-auto']}>
+    <View direction="column">
+      <View auto direction="column">
         <div className="flex justify-between items-center">
           <div className="flex">
             {/* What this needs is a double arrow like a VHS rewind */}

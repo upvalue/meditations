@@ -22,11 +22,10 @@ export const Header = () => {
   return (
     <View
       component="header"
-      className="dark"
-      flex={['flex', 'items-center']}
+      className="flex-items-center"
     >
-      <View flex={['flex', 'flex-auto']}>
-        <View padding="px2" margin="ml2" flex={['flex', 'items-center']}>
+      <View auto>
+        <View padding="px2" margin="ml2" className="flex-items-center">
           <h1 className="m0" style={{ display: 'inline ' }}>meditations</h1>
           <nav>
             {/* TODO fix this link */}
@@ -42,14 +41,6 @@ export const Header = () => {
           </nav>
         </View>
       </View>
-
-      {/*<View flex="flex" margin="mr2">
-        <IconButton
-          icon={theme === 'dark' ? MdBrightness4 : MdBrightness3}
-          title="Toggle dark mode"
-          onClick={() => { setTheme(theme === 'dark' ? undefined : 'dark'); }}
-        />
-  </View>*/}
     </View>
   );
 };

@@ -26,6 +26,7 @@ export const IconButton = (props: IconButtonProps) => {
 export interface IconLinkProps extends LinkProps<{}> {
   icon?: IconType;
   title?: string;
+  to?: string;
 }
 
 /**

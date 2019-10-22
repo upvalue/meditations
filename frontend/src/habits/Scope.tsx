@@ -22,7 +22,7 @@ mutation newTask($date: String!, $name: String!) {
     }
   }
 }
-`
+`;
 
 type ScopeProps = {
   className?: string;
@@ -55,7 +55,7 @@ export const Scope = (props: ScopeProps) => {
     });
 
     setAddingTask(false);
-  }
+  };
 
   return (
     <Droppable
