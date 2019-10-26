@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { format, parse } from 'date-fns';
-import { View } from '@upvalueio/arche';
+import { View } from '@upvalue/arche';
 
 import { ScopeDays } from './ScopeDays';
 import { TasksByDateRequest } from '../api';
