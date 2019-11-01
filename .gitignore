@@ -1,3 +1,5 @@
+/backend/node_modules
+/frontend/node_modules
 /src/*.js
 /jsdoc
 /bin
@@ -12,4 +14,4 @@
 *.sqlite
 /docs/book
 /_book
-/backend/src
+/backend/src/*.js
