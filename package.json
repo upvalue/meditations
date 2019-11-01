@@ -69,7 +69,7 @@
     "graphql-request": "^1.8.2",
     "jest": "^24.1.0",
     "jest-cli": "^24.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "medium-editor": "^5.23.2",
     "medium-editor-tables": "git+https://github.com/upvalue/medium-editor-tables.git",
     "moment": "^2.18.1",
