@@ -309,16 +309,16 @@ export function installRouter(base: string, first: string,
   console.log('Common.installRouter called');
   route.base(base);
   route(function (this: any) {
-    const action = [].shift.apply(arguments);
+    const action : any = [].shift.apply(arguments);
     console.log(`Common.installRouter: dispatching ${action ? action : 'base'}`);
 
     if (routes[action]) {
-      routes[action].apply(this, arguments);
+      (routes[action] as any).apply(this, arguments);
     } else if (action === '' && routes['no_action']) {
-      routes['no_action'].apply(this, arguments);
+      (routes['no_action'] as any).apply(this, arguments);
     } else {
       if (routes['unknown']) {
-        routes['unknown'].apply(this, arguments);
+        (routes['unknown'] as any).apply(this, arguments);
       } else {
         console.warn(`Common.installRouter: unknown action ${action}`);
       }

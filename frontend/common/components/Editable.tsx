@@ -69,7 +69,7 @@ export class Editable<Props,
         window.removeEventListener('beforeunload', listener);
         // It is possible that blur may have been called because copy-paste causes MediumEditor to
         // create a 'pastebin' element, in which case we do not want to trigger a save.
-        if (document.activeElement.id.startsWith('medium-editor-pastebin')) {
+        if (document.activeElement && document.activeElement.id.startsWith('medium-editor-pastebin')) {
           return;
         }
 
