@@ -16,8 +16,6 @@ In addition, it has a note-taking application that supports tagging and organizi
 
 ![sample usage video](http://i.imgur.com/gmFSRK4.gif)
 
-## [> Live Demo <](https://meditations.upvalue.io)
-
 # Manual
 
 For information on how to use Meditations as well as some documentation of its architecture, see
