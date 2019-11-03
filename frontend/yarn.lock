@@ -1723,10 +1723,10 @@
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
-"@upvalue/arche@^0.1.35":
-  version "0.1.35"
-  resolved "https://npm.pkg.github.com/download/@upvalue/arche/0.1.35/e0ee2003c01431a073733f0dba017c4753244a3cceb8b13b4d30de21f18b97dd#eafcb770b971c801ebc5139a08a30c46d91675e5"
-  integrity sha512-4nSWwZXU5bFeWHeiNeHjhRbc9nsVzxiinz5du5Gw1yzAVTmUGtigTXO4I5xgla7Z1KISMJocfWt1vlUow7AVBg==
+"@upvalueio/arche@^0.1.39":
+  version "0.1.39"
+  resolved "https://registry.npmjs.org/@upvalueio/arche/-/arche-0.1.39.tgz#fb4b6b792f158fd0a72b1c550eee013c8da250f6"
+  integrity sha512-GLTMeaKPaqQ3p1r9jZR/GUgx6qevkwTYzGhq7pEi2I115pQr+j5fgRTOF6Duz0vID1VYpJUjXAdk6B0KhwDGag==
   dependencies:
     "@types/classnames" "^2.2.9"
     classnames "^2.2.6"

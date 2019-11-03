@@ -44,7 +44,7 @@ export const Scope = (props: ScopeProps) => {
     if (!current) return;
 
     current.focus();
-  }, [taskNameRef.current]);
+  }, [taskNameRef]);
 
   const newTask = useMutation(NEW_TASK_QUERY);
 

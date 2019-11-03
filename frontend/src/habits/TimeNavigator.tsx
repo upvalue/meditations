@@ -1,7 +1,7 @@
 import React from 'react';
 import { parse, format, subMonths, addMonths, addYears, subYears } from 'date-fns';
 import { RouteComponentProps } from '@reach/router';
-import { View } from '@upvalue/arche';
+import { View } from '@upvalueio/arche';
 import { MdChevronRight, MdArrowForward, MdChevronLeft, MdArrowBack } from 'react-icons/md';
 
 import { IconLink } from '../base/IconButton';

@@ -3,7 +3,7 @@ import React from 'react';
 
 import classNames from 'classnames';
 import { Link, LinkGetProps } from '@reach/router';
-import { View } from '@upvalue/arche';
+import { View } from '@upvalueio/arche';
 
 /**
  * Style active links
