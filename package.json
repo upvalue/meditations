@@ -7,30 +7,11 @@
     "lint-frontend": "./node_modules/.bin/tslint -c tslint.json frontend/**/*.{ts,tsx} frontend/**/**/*.{ts,tsx} frontend/*.ts",
     "lint-backend": "golint backend/*.go",
     "lint": "yarn run lint-frontend && yarn run lint-backend",
-    "postinstall": "npm rebuild node-sass && webpack -p",
     "cloc": "cloc frontend backend",
     "doc-frontend": "typedoc --out docs",
     "doc-backend": "(godoc -http=:8958 &); xdg-open http://localhost:8958/pkg/github.com/upvalue/meditations/backend",
     "watch-frontend": "./node_modules/.bin/webpack -w",
-    "test-backend": "godep go test -v ./backend --cover",
-    "test-frontend": "./node_modules/.bin/jest",
-    "test": "yarn run test-frontend && yarn run test-backend",
-    "test-frontend-coverage": "./node_modules/.bin/jest --coverage"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "transform": {
-      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "/frontend/tests/.*\\.(ts|tsx|js)$",
-    "collectCoverageFrom": [
-      "frontend/**/*.{js,jsx,ts,tsx}",
-      "!**/*.d.ts"
-    ]
+    "test-backend": "godep go test -v ./backend --cover"
   },
   "repository": {
     "type": "git",
@@ -60,7 +41,6 @@
     "@types/react-redux": "^6.0.2",
     "@types/react-scroll": "^1.5.1",
     "@types/react-tabs": "^1.0.4",
-    "@types/react-test-renderer": "^16.0.1",
     "@types/redux-logger": "^3.0.6",
     "@types/websocket": "^0.0.33",
     "awesome-typescript-loader": "^3.2.3",
@@ -68,8 +48,6 @@
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.10.0",
     "graphql-request": "^1.8.2",
-    "jest": "^24.9.0",
-    "jest-cli": "^24.9.0",
     "lodash": "^4.17.15",
     "medium-editor": "^5.23.2",
     "medium-editor-tables": "git+https://github.com/upvalue/medium-editor-tables.git",
@@ -87,14 +65,12 @@
     "react-redux": "^5.0.7",
     "react-scroll": "^1.6.7",
     "react-tabs": "^2.2.2",
-    "react-test-renderer": "^16.4.1",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "riot-route": "^3.1.1",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.13.1",
-    "ts-jest": "^22.4.6",
     "tslint": "^5.20.0",
     "tslint-config-airbnb": "^5.9.2",
     "tslint-react": "^3.6.0",
