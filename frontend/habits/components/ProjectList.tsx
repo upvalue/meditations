@@ -40,14 +40,14 @@ const ProjectActivityIcon = (props: ProjectActivityIconProps) => {
 
   return (
     <>
-    {times(Math.max(1, flameCount), (i) => {
-      return <OcticonSpan
-        key={i}
-        icon={OcticonFlame}
-        className={`project-activity-${projectActivityClass}`}
-        title={`${p.CompletedTasks} in the last ${days} days`}
-      />;
-    })}
+      {times(Math.max(1, flameCount), (i) => {
+        return <OcticonSpan
+          key={i}
+          icon={OcticonFlame}
+          className={`project-activity-${projectActivityClass}`}
+          title={`${p.CompletedTasks} in the last ${days} days`}
+        />;
+      })}
     </>
   );
 };

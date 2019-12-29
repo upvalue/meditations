@@ -8,7 +8,7 @@ import { reverse, rangeRight } from 'lodash';
 import * as common from '../common';
 
 import {
-  ScopeType,  Project, Task, store, dispatch, HabitsState, Day, dispatchProjectListUpdate,
+  ScopeType, Project, Task, store, dispatch, HabitsState, Day, dispatchProjectListUpdate,
 } from './state';
 import { HabitsRoot } from './containers/HabitsRoot';
 
@@ -41,7 +41,7 @@ export const main = () => {
     no_action: () => {
       route(routeForView(moment(), 0));
     },
-    habits: () => {},
+    habits: () => { },
     view: (datestr: string, scopestr: string) => {
       const state = store.getState() as HabitsState;
       const project = parseInt(scopestr, 10);
@@ -111,17 +111,17 @@ export const main = () => {
                 tasks: response.Month,
               });
             }),
-           );
+          );
         });
       }
 
       if (timeChanged === 'CHANGE_YEAR') {
         dispatch((dispatch) => {
           common.get(`/habits/in-year?date=${date.format(common.DAY_FORMAT)}`,
-          ((tasks: Task[]) => {
-            tasks.forEach(common.processModel);
-            dispatch({ date, tasks, type: 'MOUNT_SCOPE', scope: ScopeType.YEAR });
-          }));
+            ((tasks: Task[]) => {
+              tasks.forEach(common.processModel);
+              dispatch({ date, tasks, type: 'MOUNT_SCOPE', scope: ScopeType.YEAR });
+            }));
         });
       }
 
@@ -173,12 +173,13 @@ export const main = () => {
   };
 
   common.makeSocket('habits/sync', (msg: HabitMessage) => {
-    console.log(`Received WebSocket message`, msg);
+    console.log('Received WebSocket message', msg);
     switch (msg.Type) {
       case 'UPDATE_TASKS_AND_PROJECT':
         msg.Datum.Tasks.forEach(common.processModel);
 
-        dispatch({type: 'UPDATE_TASKS',
+        dispatch({
+          type: 'UPDATE_TASKS',
           tasks: msg.Datum.Tasks,
         });
 
@@ -189,8 +190,10 @@ export const main = () => {
 
       case 'UPDATE_SCOPE':
         msg.Datum.Tasks.forEach(common.processModel);
-        dispatch({type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
-          scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name});
+        dispatch({
+          type: 'MOUNT_SCOPE', date: moment(msg.Datum.Date, common.DAY_FORMAT),
+          scope: msg.Datum.Scope, tasks: msg.Datum.Tasks, name: msg.Datum.Name
+        });
         break;
 
       case 'GET_PROJECT':

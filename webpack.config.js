@@ -8,12 +8,12 @@ const sassExtract = new ExtractTextPlugin('bundle-[name].css');
 const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
 const getEntryList = name =>
-  [`./frontend/entry/${name}.ts`, `./frontend/style/${name}.scss`];
+  [`.//entry/${name}.ts`, `./frontend/style/${name}.scss`];
 
 module.exports = {
   entry: {
-    journal: getEntryList('journal'),
-    habits: getEntryList('habits'),
+    journal: ['./frontend/index.tsx', './frontend/style/index.scss'],
+    habits: ['./frontend/index.tsx', './frontend/style/index.scss'],
   },
 
   output: {
@@ -36,7 +36,8 @@ module.exports = {
   module: {
     rules: [
       { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
-      { test: /\.css$/,
+      {
+        test: /\.css$/,
         use: sassExtract.extract({
           fallback: 'style-loader',
           use: [{
@@ -47,7 +48,8 @@ module.exports = {
           }],
         }),
       },
-      { test: /\.s?css$/,
+      {
+        test: /\.s?css$/,
         loader: sassExtract.extract({
           fallback: 'style-loader',
           use: [
@@ -63,8 +65,10 @@ module.exports = {
         }),
       },
 
-      { test: /\.(woff|png|ttf|svg|eot|woff2)$/,
-        loader: 'file-loader?name=../../assets/copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/' },
+      {
+        test: /\.(woff|png|ttf|svg|eot|woff2)$/,
+        loader: 'file-loader?name=../../assets/copied/[hash].[ext]&context=./assets&publicPath=/assets/copied/'
+      },
     ],
   },
   devtool: 'source-map',
