@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 
-const sassExtract = new ExtractTextPlugin('bundle-[name].css');
+const sassExtract = new ExtractTextPlugin('bundle.css');
 
 const nodeModulesDirectory = path.resolve(__dirname, './node_modules');
 
@@ -11,14 +11,11 @@ const getEntryList = name =>
   [`.//entry/${name}.ts`, `./frontend/style/${name}.scss`];
 
 module.exports = {
-  entry: {
-    journal: ['./frontend/index.tsx', './frontend/style/index.scss'],
-    habits: ['./frontend/index.tsx', './frontend/style/index.scss'],
-  },
+  entry: ['./frontend/index.tsx', './frontend/style/index.scss'],
 
   output: {
     path: path.resolve(__dirname, 'assets', 'webpack'),
-    filename: 'bundle-[name].js',
+    filename: 'bundle.js',
   },
 
   resolve: {

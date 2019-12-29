@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
-    <title>{% block title %}{% endblock %} | {{ Config.SiteTitle }}</title>
-    {% block style %}{% endblock %}
-    <link rel=stylesheet href="/assets/webpack/bundle-{{Page}}.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
-    <script type=text/javascript>window.MeditationsConfig = {{ ConfigJSON | safe}}</script>
-  </head>
-  <body>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
+  <title>{% block title %}{% endblock %} | {{ Config.SiteTitle }}</title>
+  {% block style %}{% endblock %}
+  <link rel=stylesheet href="/assets/webpack/bundle.css">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+  <script type=text/javascript>window.MeditationsConfig={{ ConfigJSON | safe}}</script> </head> <body>
     <header class="masthead ">
       <div class="tabnav pl-2 pt-2">
         <div class="float-right pr-3 d-flex">

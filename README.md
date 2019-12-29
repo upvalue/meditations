@@ -11,6 +11,8 @@ thinking.
 Meditation is under active development (12/28/19) but mostly in the `feature/ng` branch. This code is very old but has
 been hackily upgraded to modern React in order to fix bugs and add minor improvements.
 
+## Intro
+
 Originally a Trello board, meditations simply keeps track of how often you complete tasks, and how much time you spend
 on them (optionally). It's fairly minimalist compared to more complex time management systems, and leave the structure
 of your day entirely up to you. The goal of meditations is to get an objective, long-term view of how you are doing.
