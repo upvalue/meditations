@@ -90,6 +90,12 @@ export class Editable<
 
       editor.subscribe("blur", () => {
         this.onBlur();
+
+        if (this.interval) {
+          console.log('clearing autosave');
+          clearInterval(this.interval);
+
+        }
         window.removeEventListener("beforeunload", listener);
         // It is possible that blur may have been called because copy-paste causes MediumEditor to
         // create a 'pastebin' element, in which case we do not want to trigger a save.
@@ -109,14 +115,9 @@ export class Editable<
 
         this.setState({ editorOpen: false });
       });
-
-
-      this.interval = setInterval(this.onSaveInterval, 10000);
-      this.setState({ editorOpen: true });
-    } else {
-      this.interval = setInterval(this.onSaveInterval, 10000);
-      this.setState({ editorOpen: true });
     }
+    this.interval = setInterval(this.onSaveInterval, 10000);
+    this.setState({ editorOpen: true });
 
     // Empty comments will have the no-display class added
     this.body.classList.remove("no-display");

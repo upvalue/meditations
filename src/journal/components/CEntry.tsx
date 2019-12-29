@@ -108,7 +108,6 @@ export class CEntry extends Editable<CEntryProps> {
 
   onBlur() {
     entryUnlock(this.props.entry.ID);
-    common.post(`/journal/unlock-entry/${this.props.entry.ID}`);
   }
 
   editorSave() {
@@ -122,7 +121,6 @@ export class CEntry extends Editable<CEntryProps> {
     if (!this.locked) {
       this.editorOpen();
     } else {
-      console.log('hello');
       modal.openModalConfirm(
         "Are you sure you want to edit this currently locked entry?",
         "Yes, edit",
