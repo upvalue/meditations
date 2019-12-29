@@ -49,7 +49,6 @@ class ChronoSection extends React.Component<ChronoSectionProps> {
         <hr />
       </>
     );
-    return <h1>{this.props.date.format(common.DAY_FORMAT)}</h1>;
   }
 }
 

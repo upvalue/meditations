@@ -14,7 +14,6 @@ import {
   store,
   dispatch,
   HabitsState,
-  Day,
   dispatchProjectListUpdate
 } from "./state";
 import { HabitsRoot } from "./containers/HabitsRoot";
@@ -27,7 +26,7 @@ export const routeForView = (
   // tslint:disable-next-line
   return `view/${
     date === "current" ? date : date.format(common.MONTH_FORMAT)
-  }/${project ? project : 0}`;
+    }/${project ? project : 0}`;
 };
 
 /** Returns URL to link to a given date and project */
@@ -59,7 +58,7 @@ export const main = () => {
       no_action: () => {
         route(routeForView(moment(), 0));
       },
-      habits: () => {},
+      habits: () => { },
       view: (datestr: string, scopestr: string) => {
         const state = store.getState() as HabitsState;
         const project = parseInt(scopestr, 10);
@@ -191,32 +190,32 @@ export const main = () => {
   ///// INSTALL WEBSOCKET
   type HabitMessage =
     | {
-        Type: "UPDATE_TASKS_AND_PROJECT";
-        Datum: {
-          Tasks: Task[];
-          ProjectID?: number;
-        };
-      }
-    | {
-        Type: "UPDATE_SCOPE";
-        Datum: {
-          Date: string;
-          Scope: number;
-          Tasks: Task[];
-          Name: string;
-        };
-      }
-    | {
-        Type: "GET_PROJECT_LIST";
-        Datum: {
-          Pinned: Project[];
-          Unpinned: Project[];
-        };
-      }
-    | {
-        Type: "GET_PROJECT";
-        Datum: Project;
+      Type: "UPDATE_TASKS_AND_PROJECT";
+      Datum: {
+        Tasks: Task[];
+        ProjectID?: number;
       };
+    }
+    | {
+      Type: "UPDATE_SCOPE";
+      Datum: {
+        Date: string;
+        Scope: number;
+        Tasks: Task[];
+        Name: string;
+      };
+    }
+    | {
+      Type: "GET_PROJECT_LIST";
+      Datum: {
+        Pinned: Project[];
+        Unpinned: Project[];
+      };
+    }
+    | {
+      Type: "GET_PROJECT";
+      Datum: Project;
+    };
 
   common.makeSocket("habits/sync", (msg: HabitMessage) => {
     console.log("Received WebSocket message", msg);

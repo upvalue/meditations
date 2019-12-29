@@ -249,11 +249,6 @@ const mountScopeReducer =
               console.log(s.Date.format(common.DAY_FORMAT), (action.date.format(common.DAY_FORMAT)));
             }
             return s.Date.format(common.DAY_FORMAT) === action.date.format(common.DAY_FORMAT) ? scope : s;
-            // TODO is diff okay here?
-            /*if (s.Date.diff(action.date, 'days') === 0) {
-              console.log('updating day', s.Date.format('YYYY-MM-DD'));
-            }*/
-            return s.Date.diff(action.date, 'days') === 0 ? scope : s;
           })
         };
       case ScopeType.MONTH: return { ...state, mounted: true, month: scope };

@@ -11,14 +11,13 @@ import { BrowseChrono } from "../components/BrowseChrono";
 import { BrowseTag } from "../components/BrowseTag";
 import { CEntry } from "../components/CEntry";
 import { JournalNavigation } from "./JournalNavigation";
-import { formFactorContext } from "../../common/components/FormFactorProvider";
 
 const ViewEntry = (props: { entry: Entry | null }) => {
   return props.entry ? (
     <CEntry context={true} entry={props.entry} />
   ) : (
-    <p>Entry deleted</p>
-  );
+      <p>Entry deleted</p>
+    );
 };
 
 export const JournalRoot = common.connect()(
@@ -36,18 +35,18 @@ export const JournalRoot = common.connect()(
               {(this.props.route === "VIEW_MONTH" ||
                 this.props.route === "VIEW_DAYS" ||
                 this.props.searchResults) && (
-                <BrowseChrono
-                  searchString={this.props.searchString}
-                  daysView={this.props.route === "VIEW_DAYS"}
-                  date={
-                    this.props.route === "VIEW_MONTH" ||
-                    this.props.route === "VIEW_DAYS"
-                      ? this.props.date
-                      : moment()
-                  }
-                  entries={this.props.entries}
-                />
-              )}
+                  <BrowseChrono
+                    searchString={this.props.searchString}
+                    daysView={this.props.route === "VIEW_DAYS"}
+                    date={
+                      this.props.route === "VIEW_MONTH" ||
+                        this.props.route === "VIEW_DAYS"
+                        ? this.props.date
+                        : moment()
+                    }
+                    entries={this.props.entries}
+                  />
+                )}
               {this.props.route === "VIEW_TAG" && (
                 <BrowseTag
                   tagName={this.props.tag}

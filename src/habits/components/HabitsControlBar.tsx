@@ -16,10 +16,6 @@ import { TimeNavigator } from "../../common/components/TimeNavigator";
 export class HabitsControlBar extends React.PureComponent<HabitsState> {
   filterByNameElement!: HTMLInputElement | null;
 
-  constructor(props: HabitsState) {
-    super(props);
-  }
-
   componentDidMount() {
     Mousetrap.bind(KEYSEQ_FILTER_FOCUS, () => {
       if (this.filterByNameElement) {
@@ -67,13 +63,6 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
   }
 
   exportTasks() {
-    const name = this.props.filter.name;
-    const begin =
-      this.props.filter.begin &&
-      this.props.filter.begin.format(common.DAY_FORMAT);
-    const end =
-      this.props.filter.end && this.props.filter.end.format(common.DAY_FORMAT);
-
     const body: any = { day: true };
     // Build up a descriptive filename along with the POST body
     let filename = "";
@@ -128,14 +117,6 @@ export class HabitsControlBar extends React.PureComponent<HabitsState> {
   }
 
   render() {
-    const placeholderBegin = this.props.filter.begin
-      ? this.props.filter.begin.format(common.HUMAN_DAY_FORMAT)
-      : "Filter from...";
-
-    const placeholderEnd = this.props.filter.end
-      ? this.props.filter.end.format(common.HUMAN_DAY_FORMAT)
-      : "...to";
-
     // If any filters have been entered, we'll render a clear button
     const disableButton = !(
       this.props.filter.name ||

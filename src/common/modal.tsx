@@ -8,7 +8,7 @@ export const modalContext = React.createContext<ModalProvider>(
   (undefined as any) as ModalProvider
 );
 
-interface ModalInputData {}
+interface ModalInputData { }
 
 export interface ModalStateCommon {
   modalOpen: boolean;
@@ -98,7 +98,7 @@ export interface ModalProviderProps {
 export class ModalProvider extends React.Component<
   ModalProviderProps,
   ModalState
-> {
+  > {
   modalInput?: HTMLInputElement;
 
   constructor(props: any) {
@@ -192,8 +192,6 @@ export class ModalProvider extends React.Component<
     if (e) {
       e.preventDefault();
     }
-
-    const state = this.state;
 
     if (this.state.modalType === "INPUT" && this.modalInput) {
       const { callback, checker, allowEmpty } = this.state.modalData;

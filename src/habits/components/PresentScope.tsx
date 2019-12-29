@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as mousetrap from "mousetrap";
 
-import * as common from "../../common";
 import * as api from "../api";
 import { modalContext, ModalProvider } from "../../common/modal";
 import { Scope } from "../state";

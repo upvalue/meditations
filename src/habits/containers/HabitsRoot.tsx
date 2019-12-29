@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as ReactDnd from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 import moment from "moment";
 
@@ -119,8 +118,8 @@ export const HabitsRoot = common.connect()(
                   {this.props.pinnedProjects ? (
                     this.renderProjects()
                   ) : (
-                    <Spinner />
-                  )}
+                      <Spinner />
+                    )}
                 </div>
               </div>
             </CommonUI>

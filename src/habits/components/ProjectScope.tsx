@@ -19,10 +19,6 @@ export interface ProjectScopeProps {
  * Display a project with tasks.
  */
 export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
-  constructor(props: ProjectScopeProps) {
-    super(props);
-  }
-
   changeProject(e: React.SyntheticEvent<HTMLSelectElement>) {
     e.persist();
     const projectID = parseInt(e.currentTarget.value, 10);

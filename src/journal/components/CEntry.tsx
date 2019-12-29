@@ -31,10 +31,6 @@ interface CEntryState {
 
 /** A journal entry. */
 export class CEntry extends Editable<CEntryProps> {
-  constructor(props: CEntryProps) {
-    super(props);
-  }
-
   changeName(modal: ModalProvider) {
     return modal.openModalPromptAllowEmpty(
       "What would you like to name this entry? (leave empty to delete)",
@@ -104,9 +100,9 @@ export class CEntry extends Editable<CEntryProps> {
     // name or by tag)
     const ctxLink = this.props.context
       ? // tslint:disable-next-line
-        `#view/${this.props.entry.CreatedAt.local().format(
-          common.MONTH_FORMAT
-        )}/${this.props.entry.ID}`
+      `#view/${this.props.entry.CreatedAt.local().format(
+        common.MONTH_FORMAT
+      )}/${this.props.entry.ID}`
       : false;
 
     // In order, render:
@@ -119,7 +115,7 @@ export class CEntry extends Editable<CEntryProps> {
       // TODO: This highlight needs to be undone during actual editing, otherwise medium-editor
       // just saves the HTML.
       const searchString = this.props.searchString.slice(0);
-      const esc = searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+      const esc = searchString.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
       const reg = new RegExp(esc, "ig");
       body = body.replace(
         reg,

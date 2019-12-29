@@ -50,7 +50,7 @@ export const JournalSidebar = connect()(
             <div
               className={`${
                 selectedTag === l.Name ? "selected" : ""
-              } menu-item pt-0 pb-0`}
+                } menu-item pt-0 pb-0`}
               key={i}
             >
               <a href={`#tag/${l.Name}`}>
@@ -87,14 +87,12 @@ export const JournalSidebar = connect()(
       for (const link of this.props.sidebar.NameLinks) {
         const elts = link.Name.split(":").map(x => x.trim());
         let tableRef: any = table;
-        let last: any = null;
         for (const elt of elts) {
           if (tableRef[elt] === undefined) {
             tableRef[elt] = {};
             tableRef[elt].title = elt;
           }
           tableRef = tableRef[elt];
-          last = elt;
         }
         tableRef.link = link.Name;
       }
@@ -169,7 +167,7 @@ export const JournalSidebar = connect()(
               placeholderText={"View all posts from day"}
               openToDate={
                 this.props.route === "VIEW_DAYS" ||
-                this.props.route === "VIEW_MONTH"
+                  this.props.route === "VIEW_MONTH"
                   ? this.props.date
                   : moment()
               }

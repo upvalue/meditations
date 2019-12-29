@@ -21,7 +21,7 @@ interface LinkTreeItemState {
 class LinkTreeItem extends React.Component<
   LinkTreeItemProps,
   LinkTreeItemState
-> {
+  > {
   constructor(props: { node: LinkTreeNode }) {
     super(props);
 
@@ -57,10 +57,10 @@ class LinkTreeItem extends React.Component<
             {this.props.node.title}
           </a>
         ) : (
-          <a className="link-tree-node-anchor" onClick={e => this.toggleNode()}>
-            {this.props.node.title}
-          </a>
-        )}
+            <a className="link-tree-node-anchor" onClick={e => this.toggleNode()}>
+              {this.props.node.title}
+            </a>
+          )}
 
         {this.state.expanded &&
           this.props.node.children &&
@@ -82,10 +82,6 @@ export interface LinkTreeState {
 
 /** An expandable tree of links */
 export class LinkTree extends React.Component<LinkTreeProps, LinkTreeState> {
-  constructor(props: LinkTreeProps) {
-    super(props);
-  }
-
   render() {
     return (
       <div className="link-tree-top">

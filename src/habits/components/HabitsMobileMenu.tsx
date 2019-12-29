@@ -1,5 +1,4 @@
 import * as React from "react";
-import DatePicker from "react-datepicker";
 import * as Scroll from "react-scroll";
 import { OcticonButton } from "../../common/components/OcticonButton";
 import { OcticonThreeBars } from "../../common/octicons";
@@ -10,7 +9,7 @@ import { OcticonThreeBars } from "../../common/octicons";
 export class HabitsMobileMenu extends React.PureComponent<
   {},
   { opened: boolean }
-> {
+  > {
   constructor(props: {}) {
     super(props);
     this.state = { opened: false };

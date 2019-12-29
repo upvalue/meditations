@@ -1,13 +1,9 @@
 import * as React from "react";
-import moment from "moment";
-
 import { connect } from "react-redux";
 
 import { HabitsState, Scope, ScopeType } from "../state";
 import { PresentScope } from "./PresentScope";
-import { client, gql } from "../../common/graphql";
-import { MOUNT_NEXT_DAY_TIME } from "../../common/constants";
-import { DAY_FORMAT } from "../../common";
+import { client } from "../../common/graphql";
 
 interface Props {
   day: Scope;

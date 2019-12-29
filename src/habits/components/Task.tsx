@@ -64,6 +64,8 @@ const taskSameScope = (left: Task, right: Task) => {
   // one yearly task has been created in January, the other in February, and thus their dates are
   // different.
   let fmt = "";
+  // Intentionally fallthrough
+  /* eslint-disable no-fallthrough */
   switch (left.Scope) {
     case ScopeType.DAY:
       fmt = "YYYY-MM-DD";
@@ -72,67 +74,12 @@ const taskSameScope = (left: Task, right: Task) => {
     case ScopeType.YEAR:
       fmt = "YYYY";
   }
+  /* eslint-enable no-fallthrough */
 
   return left.Date.format(fmt) === right.Date.format(fmt);
 };
 
 const taskTarget: ReactDnd.DropTargetSpec<TaskProps> = {
-  hover(props, monitor, component) {
-    /*
-    if (!monitor) return;
-    if (!component) return;
-
-    const dragIndex = (monitor.getItem() as TaskProps).task.Order;
-    const hoverIndex = props.task.Order;
-
-    if (dragIndex === hoverIndex) return;
-
-    const node = ReactDOM.findDOMNode(component as React.ReactInstance) as Element;
-
-    const n2 = node.querySelector('.task-status') as HTMLElement;
-
-    const hoverBoundingRect = node.getBoundingClientRect();
-
-		// Get vertical middle
-    const hoverMiddleY = hoverBoundingRect.bottom - n2.clientHeight;
-    // (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-		// Determine mouse position
-		const clientOffset = monitor.getClientOffset();
-
-		// Get pixels to the top
-		const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-		// Only perform the move when the mouse has crossed half of the items height
-		// When dragging downwards, only move when the cursor is below 50%
-    // When dragging upwards, only move when the cursor is above 50%
-
-    // console.log((monitor.getItem() as TaskProps).task.Name);
-    */
-    /*
-    const decoratedComponentInstance : any = (component as any).decoratedComponentInstance;
-    decoratedComponentInstance.setState({ style: { transform: `translateY(0)` } });
-    console.log(decoratedComponentInstance)
-    // Perhaps: Go through list, and translate all tasks BEFORE insertion one upwards.
-
-		// Dragging downwards
-		if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-      decoratedComponentInstance.setState({
-        style: { transform: `translateY(-${n2.clientHeight}px)` },
-      });
-			return;
-		}
-
-		// Dragging upwards
-		if (dragIndex < hoverIndex && hoverClientY > hoverMiddleY) {
-      decoratedComponentInstance.setState({
-        style: { transform: `translateY(${n2.clientHeight}px)` },
-      });
-      return;
-    }
-    */
-  },
-
   drop(props, monitor, component) {
     if (component && monitor) {
       const src = (monitor.getItem() as any).task;
@@ -347,13 +294,11 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
   }
 
   render() {
-    const lastModified = this.props.lastModified ? "task-last-modified" : "";
     const {
       isDragging,
       connectDragSource,
       connectDragPreview,
       connectDropTarget,
-      isOver,
       isOverCurrent
     } = this.props;
     // Create a draggable task button.
@@ -365,7 +310,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
         className={`task-status btn btn btn-sm ${klass}`}
         onClick={() => this.cycleStatus()}
       >
-        {this.props.task.Name}
+        <span className={this.props.lastModified ? "task-last-modified" : ""}>{this.props.task.Name}</span>
         {this.hasStats() && this.renderStats()}
       </button>
     );
@@ -384,7 +329,7 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
     }
 
     const result = (
-      <section className={`task ${lastModified}`} style={style}>
+      <section className={`task`} style={style}>
         <div className="task-header d-flex flex-row flex-justify-between pl-1 pr-1">
           <div>{taskButton}</div>
 

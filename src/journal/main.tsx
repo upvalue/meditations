@@ -98,30 +98,30 @@ export const main = () => {
   // WebSocket handling
   type JournalMessage =
     | {
-        Type: "UPDATE_ENTRY";
-        Datum: Entry;
-      }
+      Type: "UPDATE_ENTRY";
+      Datum: Entry;
+    }
     | {
-        Type: "DELETE_ENTRY";
-        Datum: number;
-      }
+      Type: "DELETE_ENTRY";
+      Datum: number;
+    }
     | {
-        Type: "CREATE_ENTRY";
-        Datum: Entry;
-      }
+      Type: "CREATE_ENTRY";
+      Datum: Entry;
+    }
     | {
-        Type: "SIDEBAR";
-        Datum: SidebarState;
-      }
+      Type: "SIDEBAR";
+      Datum: SidebarState;
+    }
     | {
-        Type: "SEARCH";
-        Datum: {
-          String: string;
-          Entries: Entry[];
-        };
+      Type: "SEARCH";
+      Datum: {
+        String: string;
+        Entries: Entry[];
       };
+    };
 
-  const socket = common.makeSocket(
+  common.makeSocket(
     "journal/sync",
     (msg: JournalMessage) => {
       switch (msg.Type) {
