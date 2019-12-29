@@ -1,23 +1,23 @@
-import * as React from 'react';
-import * as ReactDnd from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
-import moment from 'moment';
+import * as React from "react";
+import * as ReactDnd from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
+import moment from "moment";
 
-import * as common from '../../common';
-import { MOUNT_NEXT_DAY_TIME } from '../../common/constants';
-import { HabitsState, Scope } from '../state';
-import { CommonUI } from '../../common/components/CommonUI';
-import { Spinner } from '../../common/components/Spinner';
+import * as common from "../../common";
+import { MOUNT_NEXT_DAY_TIME } from "../../common/constants";
+import { HabitsState, Scope } from "../state";
+import { CommonUI } from "../../common/components/CommonUI";
+import { Spinner } from "../../common/components/Spinner";
 
-import { HabitsControlBar } from '../components/HabitsControlBar';
-import { TimeScope } from '../components/TimeScope';
-import { HabitsMobileMenu } from '../components/HabitsMobileMenu';
-import { ProjectScope } from '../components/ProjectScope';
-import { ProjectList } from '../components/ProjectList';
-import { DndProvider } from 'react-dnd';
+import { HabitsControlBar } from "../components/HabitsControlBar";
+import { TimeScope } from "../components/TimeScope";
+import { HabitsMobileMenu } from "../components/HabitsMobileMenu";
+import { ProjectScope } from "../components/ProjectScope";
+import { ProjectList } from "../components/ProjectList";
+import { DndProvider } from "react-dnd";
 
-export const HabitsRoot = (
-  common.connect()(class extends React.Component<HabitsState> {
+export const HabitsRoot = common.connect()(
+  class extends React.Component<HabitsState> {
     /**
      * Render a time-based scope (daily, monthly, yearly)
      * @param s The scope; if undefined, returns a spinner
@@ -34,7 +34,7 @@ export const HabitsRoot = (
             scope={s}
             filter={this.props.filter}
             lastModifiedTask={this.props.lastModifiedTask}
-            mostRecentDay={(i !== undefined && i === 0) ? true : false}
+            mostRecentDay={i !== undefined && i === 0 ? true : false}
           />
         );
       }
@@ -54,7 +54,10 @@ export const HabitsRoot = (
         );
       }
 
-      if (this.props.project && this.props.currentProject === this.props.project.Scope) {
+      if (
+        this.props.project &&
+        this.props.currentProject === this.props.project.Scope
+      ) {
         return (
           <ProjectScope
             currentDate={this.props.currentDate}
@@ -73,20 +76,23 @@ export const HabitsRoot = (
 
       const today = moment();
 
-      if (this.props.currentDate.month() === today.month()
-        && this.props.currentDate.year() === today.year()) {
-
+      if (
+        this.props.currentDate.month() === today.month() &&
+        this.props.currentDate.year() === today.year()
+      ) {
         // Current month
         // 1) Always display first day of month, in case no tasks have been added to it
         // 2) Display all days up to curent day
         // 3) Display next day if within a certain amount of hours (specified in constants file)
 
-        days = days.filter((d, i) => (
-          i === days.length ||
-          // Present date
-          d.Date.date() <= today.date() ||
-          (d.Date.date() === today.date() + 1 && today.hour() > (24 - MOUNT_NEXT_DAY_TIME))
-        ));
+        days = days.filter(
+          (d, i) =>
+            i === days.length ||
+            // Present date
+            d.Date.date() <= today.date() ||
+            (d.Date.date() === today.date() + 1 &&
+              today.hour() > 24 - MOUNT_NEXT_DAY_TIME)
+        );
       }
 
       return days.map((d, i) => this.renderTimeScope(d, i));
@@ -110,7 +116,11 @@ export const HabitsRoot = (
                   {this.renderTimeScope(this.props.year)}
                 </div>
                 <div id="scope-projects" className="scope-column">
-                  {this.props.pinnedProjects ? this.renderProjects() : <Spinner />}
+                  {this.props.pinnedProjects ? (
+                    this.renderProjects()
+                  ) : (
+                    <Spinner />
+                  )}
                 </div>
               </div>
             </CommonUI>
@@ -118,4 +128,5 @@ export const HabitsRoot = (
         </div>
       );
     }
-  }));
+  }
+);

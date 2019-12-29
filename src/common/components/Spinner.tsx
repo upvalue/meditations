@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** Simple CSS loading spinner */
 export const Spinner = (props: any) => {

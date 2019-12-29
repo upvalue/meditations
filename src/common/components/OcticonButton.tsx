@@ -1,9 +1,7 @@
 // components.tsx - Common components
-import * as React from 'react';
+import * as React from "react";
 
-import {
-  OcticonData,
-} from '../octicons';
+import { OcticonData } from "../octicons";
 
 interface OcticonButtonProps {
   icon: OcticonData;
@@ -28,49 +26,64 @@ interface OcticonButtonProps {
 /**
  * A muted Octicon button. Also used to implement octicon spans.
  */
-export const OcticonButton: React.SFC<OcticonButtonProps> =
-  (props: OcticonButtonProps) => {
-    const { children, icon,
-      onClick, href, tooltip, normalButton,
-      tooltipDirection, className, span, title } = props;
-    let klassName = `${span ? ' ' : 'btn '} ${className} `;
+export const OcticonButton: React.SFC<OcticonButtonProps> = (
+  props: OcticonButtonProps
+) => {
+  const {
+    children,
+    icon,
+    onClick,
+    href,
+    tooltip,
+    normalButton,
+    tooltipDirection,
+    className,
+    span,
+    title
+  } = props;
+  let klassName = `${span ? " " : "btn "} ${className} `;
 
-    if (tooltip) {
-      klassName = `${klassName} tooltipped tooltipped-${tooltipDirection}`;
-    }
+  if (tooltip) {
+    klassName = `${klassName} tooltipped tooltipped-${tooltipDirection}`;
+  }
 
-    if (!normalButton) {
-      klassName = `${klassName} btn-octicon`;
-    }
+  if (!normalButton) {
+    klassName = `${klassName} btn-octicon`;
+  }
 
-    return React.createElement(span ? 'span' : 'a', {
+  return React.createElement(
+    span ? "span" : "a",
+    {
       href,
       title,
       onClick,
       className: klassName,
-      'aria-label': tooltip,
-    }, (
-        <>
-          <svg
-            className="octicon-svg"
-            width={icon.width}
-            height={icon.height}
-            viewBox={icon.viewBox}
-          >
-            {icon.pathRender()}
-          </svg>
-      {children}</>));
-  };
+      "aria-label": tooltip
+    },
+    <>
+      <svg
+        className="octicon-svg"
+        width={icon.width}
+        height={icon.height}
+        viewBox={icon.viewBox}
+      >
+        {icon.pathRender()}
+      </svg>
+      {children}
+    </>
+  );
+};
 
 /**
  * A muted, non-clickable Octicon.
  */
-export const OcticonSpan: React.SFC<OcticonButtonProps> =
-  props => <OcticonButton {...props} span={true} />;
+export const OcticonSpan: React.SFC<OcticonButtonProps> = props => (
+  <OcticonButton {...props} span={true} />
+);
 
 OcticonButton.defaultProps = {
   tooltip: undefined,
-  tooltipDirection: 'w',
-  className: '',
-  normalButton: false,
+  tooltipDirection: "w",
+  className: "",
+  normalButton: false
 };

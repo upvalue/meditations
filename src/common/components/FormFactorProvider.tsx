@@ -1,20 +1,23 @@
-import * as React from 'react';
-import { MOBILE_WIDTH } from '../constants';
+import * as React from "react";
+import { MOBILE_WIDTH } from "../constants";
 
 interface FormFactorProviderState {
   mobile: boolean;
 }
 
-export class FormFactorManager extends React.Component<{}, FormFactorProviderState> {
+export class FormFactorManager extends React.Component<
+  {},
+  FormFactorProviderState
+> {
   state = {
-    mobile: false,
+    mobile: false
   };
 
   handleScreenResize = () => {
     this.setState({
-      mobile: (window.innerWidth) <= MOBILE_WIDTH,
+      mobile: window.innerWidth <= MOBILE_WIDTH
     });
-  }
+  };
 
   componentDidMount() {
     this.handleScreenResize();
@@ -30,4 +33,6 @@ export class FormFactorManager extends React.Component<{}, FormFactorProviderSta
   }
 }
 
-export const formFactorContext = React.createContext(undefined as any as FormFactorProviderState);
+export const formFactorContext = React.createContext(
+  (undefined as any) as FormFactorProviderState
+);

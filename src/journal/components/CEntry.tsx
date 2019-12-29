@@ -1,15 +1,19 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { Entry, Tag } from '../state';
-import { OcticonButton } from '../../common/components/OcticonButton';
+import { Entry, Tag } from "../state";
+import { OcticonButton } from "../../common/components/OcticonButton";
 
-import * as common from '../../common';
+import * as common from "../../common";
 import {
-  OcticonTag, OcticonTextSize, OcticonTrashcan, OcticonLink, OcticonX,
-} from '../../common/octicons';
+  OcticonTag,
+  OcticonTextSize,
+  OcticonTrashcan,
+  OcticonLink,
+  OcticonX
+} from "../../common/octicons";
 
-import { modalContext, ModalProvider } from '../../common/modal';
-import { Editable } from '../../common/components/Editable';
+import { modalContext, ModalProvider } from "../../common/modal";
+import { Editable } from "../../common/components/Editable";
 
 ///// REACT COMPONENTS
 
@@ -29,47 +33,59 @@ interface CEntryState {
 export class CEntry extends Editable<CEntryProps> {
   constructor(props: CEntryProps) {
     super(props);
-
   }
 
   changeName(modal: ModalProvider) {
     return modal.openModalPromptAllowEmpty(
-      'What would you like to name this entry? (leave empty to delete)',
-      'Name entry', this.props.entry.Name,
-      (name) => {
+      "What would you like to name this entry? (leave empty to delete)",
+      "Name entry",
+      this.props.entry.Name,
+      name => {
         if (name !== this.props.entry.Name) {
-          if (name === '') {
+          if (name === "") {
             common.post(`/journal/name-entry/${this.props.entry.ID}`);
           } else {
             common.post(`/journal/name-entry/${this.props.entry.ID}/${name}`);
           }
         }
-      });
+      }
+    );
   }
 
   addTag(modal: ModalProvider) {
     return modal.openModalPrompt(
-      'What tag would you like to add to this entry? (leave empty to cancel)', 'Tag entry',
-      (tname) => {
+      "What tag would you like to add to this entry? (leave empty to cancel)",
+      "Tag entry",
+      tname => {
         // If input was empty or tag already exists, don't do anything
-        if (tname === '' || tname == null ||
-          (this.props.entry.Tags && this.props.entry.Tags.some(t => t.Name === tname))) {
+        if (
+          tname === "" ||
+          tname == null ||
+          (this.props.entry.Tags &&
+            this.props.entry.Tags.some(t => t.Name === tname))
+        ) {
           return;
         }
 
         common.post(`/journal/add-tag/${this.props.entry.ID}/${tname}`);
-      });
+      }
+    );
   }
 
   removeTag(modal: ModalProvider, t: Tag) {
     return modal.openModalConfirm(
-      `Are you sure you want to remove the tag #${t.Name}?`, 'Yes, remove it',
-      () => common.post(`/journal/remove-tag/${this.props.entry.ID}/${t.Name}`));
+      `Are you sure you want to remove the tag #${t.Name}?`,
+      "Yes, remove it",
+      () => common.post(`/journal/remove-tag/${this.props.entry.ID}/${t.Name}`)
+    );
   }
 
   deleteEntry(modal: ModalProvider) {
-    return modal.openModalConfirm('Are you sure you want to remove this entry?', 'Yes, remove it',
-      () => common.post(`/journal/delete-entry/${this.props.entry.ID}`));
+    return modal.openModalConfirm(
+      "Are you sure you want to remove this entry?",
+      "Yes, remove it",
+      () => common.post(`/journal/delete-entry/${this.props.entry.ID}`)
+    );
   }
 
   editorUpdated() {
@@ -77,19 +93,21 @@ export class CEntry extends Editable<CEntryProps> {
   }
 
   editorSave() {
-    common.post('/journal/update', {
+    common.post("/journal/update", {
       ID: this.props.entry.ID,
-      Body: this.body.innerHTML,
+      Body: this.body.innerHTML
     });
   }
 
   render() {
     // A link to the month the entry was written, if viewing in a non time based context (e.g. by
     // name or by tag)
-    const ctxLink = this.props.context ?
-      // tslint:disable-next-line
-      `#view/${this.props.entry.CreatedAt.local().format(common.MONTH_FORMAT)}/${this.props.entry.ID}` :
-      false;
+    const ctxLink = this.props.context
+      ? // tslint:disable-next-line
+        `#view/${this.props.entry.CreatedAt.local().format(
+          common.MONTH_FORMAT
+        )}/${this.props.entry.ID}`
+      : false;
 
     // In order, render:
     // A header with title and title-changing control, then tags
@@ -101,19 +119,24 @@ export class CEntry extends Editable<CEntryProps> {
       // TODO: This highlight needs to be undone during actual editing, otherwise medium-editor
       // just saves the HTML.
       const searchString = this.props.searchString.slice(0);
-      const esc = searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-      const reg = new RegExp(esc, 'ig');
-      body = body.replace(reg,
-        `<span class="entry-highlight">${this.props.searchString}</span>`);
+      const esc = searchString.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+      const reg = new RegExp(esc, "ig");
+      body = body.replace(
+        reg,
+        `<span class="entry-highlight">${this.props.searchString}</span>`
+      );
     }
 
     return (
       <modalContext.Consumer>
-        {modal =>
-          <section className="entry border bg-gray " id={`entry-${this.props.entry.ID}`}>
+        {modal => (
+          <section
+            className="entry border bg-gray "
+            id={`entry-${this.props.entry.ID}`}
+          >
             <div className="entry-header border-bottom">
               <div className="d-flex flex-row flex-justify-between flex-items-center">
-                <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1" >
+                <div className="d-flex flex-row flex-items-center ml-2 mb-1 mt-1">
                   <OcticonButton
                     icon={OcticonTextSize}
                     onClick={this.changeName(modal)}
@@ -122,17 +145,23 @@ export class CEntry extends Editable<CEntryProps> {
                     normalButton={true}
                     className="p-1 mr-2 d-flex flex-items-center"
                   />
-                  <h3 className="ml-1 d-flex flex-column flex-md-row" style={{ display: 'inline' }}>
-
+                  <h3
+                    className="ml-1 d-flex flex-column flex-md-row"
+                    style={{ display: "inline" }}
+                  >
                     <span className="d-flex flex-column flex-md-row">
                       #{this.props.entry.ID}&nbsp;
-                    <span>{this.props.entry.Name && <strong>{this.props.entry.Name}</strong>}</span>
+                      <span>
+                        {this.props.entry.Name && (
+                          <strong>{this.props.entry.Name}</strong>
+                        )}
+                      </span>
                     </span>
                   </h3>
 
                   <div
                     className="ml-2 d-flex flex-md-row flex-column"
-                    style={{ display: 'inline' }}
+                    style={{ display: "inline" }}
                   >
                     <OcticonButton
                       icon={OcticonTag}
@@ -142,31 +171,39 @@ export class CEntry extends Editable<CEntryProps> {
                       normalButton={true}
                       onClick={this.addTag(modal)}
                     />
-                    {this.props.entry.Tags && this.props.entry.Tags.map((t, i) =>
-                      <button
-                        className="mt-4 mt-md-0 ml-md-3 tag d-flex flex-items-center"
-                        key={i}
-                        style={{ borderRadius: '1px' }}
-                      >
-                        <a href={`#tag/${t.Name}`}  >#{t.Name}</a>
-                        &nbsp;
-                        <OcticonButton
-                          className="d-flex"
-                          icon={OcticonX}
-                          onClick={this.removeTag(modal, t)}
-                        />
-                      </button>)}
+                    {this.props.entry.Tags &&
+                      this.props.entry.Tags.map((t, i) => (
+                        <button
+                          className="mt-4 mt-md-0 ml-md-3 tag d-flex flex-items-center"
+                          key={i}
+                          style={{ borderRadius: "1px" }}
+                        >
+                          <a href={`#tag/${t.Name}`}>#{t.Name}</a>
+                          &nbsp;
+                          <OcticonButton
+                            className="d-flex"
+                            icon={OcticonX}
+                            onClick={this.removeTag(modal, t)}
+                          />
+                        </button>
+                      ))}
                   </div>
                 </div>
 
                 <div className="entry-controls mr-2">
                   <strong>
-                    {this.props.entry.CreatedAt.local()
-                      .format(this.props.context ? 'M-D-YY h:mm A' : 'h:mm A')
-                    }</strong>
+                    {this.props.entry.CreatedAt.local().format(
+                      this.props.context ? "M-D-YY h:mm A" : "h:mm A"
+                    )}
+                  </strong>
 
-                  {ctxLink &&
-                    <OcticonButton tooltip="Go to context" icon={OcticonLink} href={ctxLink} />}
+                  {ctxLink && (
+                    <OcticonButton
+                      tooltip="Go to context"
+                      icon={OcticonLink}
+                      href={ctxLink}
+                    />
+                  )}
 
                   <OcticonButton
                     icon={OcticonTrashcan}
@@ -175,20 +212,20 @@ export class CEntry extends Editable<CEntryProps> {
                     className="btn-danger ml-1"
                   />
                 </div>
-
               </div>
             </div>
 
             <div
               className="entry-body p-2 "
               id={`entry-body-${this.props.entry.ID}`}
-              ref={(body) => { if (body) this.body = body; }}
+              ref={body => {
+                if (body) this.body = body;
+              }}
               dangerouslySetInnerHTML={{ __html: body }}
               onClick={this.editorOpen}
             />
-
           </section>
-        }
+        )}
       </modalContext.Consumer>
     );
   }

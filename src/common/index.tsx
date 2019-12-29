@@ -1,14 +1,14 @@
 ///<reference path="../bindings.d.ts" />
 
-import moment from 'moment';
-import * as redux from 'redux';
-import thunk from 'redux-thunk';
-import logger from 'redux-logger';
-import route from 'riot-route';
-import * as React from 'react';
-import * as reactredux from 'react-redux';
-import * as ReactDOM from 'react-dom';
-import { fetchStoredUIState, storeUIState } from './storage';
+import moment from "moment";
+import * as redux from "redux";
+import thunk from "redux-thunk";
+import logger from "redux-logger";
+import route from "riot-route";
+import * as React from "react";
+import * as reactredux from "react-redux";
+import * as ReactDOM from "react-dom";
+import { fetchStoredUIState, storeUIState } from "./storage";
 
 declare global {
   /** Extend window with a meditations object for simple console interaction. */
@@ -39,17 +39,19 @@ export const processModel = (e: Model) => {
 };
 
 ///// REDUX COMMON STATE
-type Notification = { error: boolean, message: string };
+type Notification = { error: boolean; message: string };
 
 /** Action that causes a new notification to be opened */
 export type NotificationOpen = {
-  type: 'NOTIFICATION_OPEN'
+  type: "NOTIFICATION_OPEN";
   notification: Notification;
 };
 
-export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } |
-{ type: 'SOCKET_OPENED', socketReconnect: () => void } |
-{ type: 'SOCKET_CLOSED' };
+export type CommonAction =
+  | NotificationOpen
+  | { type: "NOTIFICATIONS_DISMISS" }
+  | { type: "SOCKET_OPENED"; socketReconnect: () => void }
+  | { type: "SOCKET_CLOSED" };
 
 export type CommonActionDispatcher = (a: CommonAction) => void;
 
@@ -64,25 +66,29 @@ export type CommonState = {
 
 export let dispatch: (action: CommonAction) => void;
 
-export function commonReducer(state: CommonState, action: CommonAction): CommonState {
+export function commonReducer(
+  state: CommonState,
+  action: CommonAction
+): CommonState {
   switch (action.type) {
-    case 'NOTIFICATION_OPEN':
+    case "NOTIFICATION_OPEN":
       // Append to list of notifications, or create it if it doesn't exist.
       if (state.notifications) {
         return {
           ...state,
-          notifications: [...state.notifications, action.notification],
+          notifications: [...state.notifications, action.notification]
         };
       }
       return { ...state, notifications: [action.notification] };
-    case 'SOCKET_CLOSED':
+    case "SOCKET_CLOSED":
       return { ...state, socketClosed: true };
-    case 'SOCKET_OPENED':
+    case "SOCKET_OPENED":
       return {
-        ...state, socketClosed: false,
+        ...state,
+        socketClosed: false,
         socketReconnect: action.socketReconnect
       };
-    case 'NOTIFICATIONS_DISMISS':
+    case "NOTIFICATIONS_DISMISS":
       return { ...state, notifications: undefined };
   }
   return state;
@@ -97,22 +103,35 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
  * @returns a tuple containing the store and a dispatcher that type-checks synchronous and
  * asynchronous actions
  */
-export function createStore<State extends CommonState, Action extends redux.Action>(
-  reducer: (s: State, a: Action) => State, initialState: State):
-  [redux.Store<State>,
-    (action: Action | ((thunk: (action: Action) => void) => void)) => void
-  ] {
-
+export function createStore<
+  State extends CommonState,
+  Action extends redux.Action
+>(
+  reducer: (s: State, a: Action) => State,
+  initialState: State
+): [
+  redux.Store<State>,
+  (action: Action | ((thunk: (action: Action) => void) => void)) => void
+] {
   // Apply common reducer to all actions
-  const combinedReducer = (pstate: State = initialState, action: redux.Action): State => {
-    let state = commonReducer(pstate as CommonState, action as any as CommonAction);
+  const combinedReducer = (
+    pstate: State = initialState,
+    action: redux.Action
+  ): State => {
+    let state = commonReducer(
+      pstate as CommonState,
+      (action as any) as CommonAction
+    );
     state = reducer(state as State, action as Action);
     return state as State;
   };
 
-  const store = redux.createStore(combinedReducer, redux.applyMiddleware(thunk, logger));
+  const store = redux.createStore(
+    combinedReducer,
+    redux.applyMiddleware(thunk, logger)
+  );
 
-  type AsyncAction = ((thunk: (action: Action) => void) => void);
+  type AsyncAction = (thunk: (action: Action) => void) => void;
   const typedDispatch = (action: Action | AsyncAction) => {
     return store.dispatch(action as any);
   };
@@ -132,55 +151,85 @@ export function createStore<State extends CommonState, Action extends redux.Acti
  * @param url URL of the request
  */
 export function request<ResponseType>(
-  method: string, body: any, url: string,
-  then?: (res: ResponseType) => void) {
+  method: string,
+  body: any,
+  url: string,
+  then?: (res: ResponseType) => void
+) {
   const reqinit: any = { method };
   if (body !== undefined) {
-    reqinit.headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
+    reqinit.headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    };
     reqinit.body = JSON.stringify(body);
   }
 
-  return window.fetch(url, reqinit).then((response) => {
-    // The response has failed, put up a notification
-    if (response.status !== 200) {
-      console.warn(`Common.request: ${method} fetch failed with error `);
-      response.text().then((response: any) => {
-        dispatch({
-          type: 'NOTIFICATION_OPEN',
-          notification: { error: true, message: `Fetch failed with message: ${response}` },
+  return window
+    .fetch(url, reqinit)
+    .then(response => {
+      // The response has failed, put up a notification
+      if (response.status !== 200) {
+        console.warn(`Common.request: ${method} fetch failed with error `);
+        response.text().then((response: any) => {
+          dispatch({
+            type: "NOTIFICATION_OPEN",
+            notification: {
+              error: true,
+              message: `Fetch failed with message: ${response}`
+            }
+          });
         });
+        return;
+      }
+
+      if (then) {
+        return response.json().then(then);
+      }
+    })
+    .catch(reason => {
+      // TODO this reports all errors as "fetch" errors
+      dispatch({
+        type: "NOTIFICATION_OPEN",
+        notification: {
+          error: true,
+          message: `Fetch failed with message: ${reason}`
+        }
       });
-      return;
-    }
 
-    if (then) {
-      return response.json().then(then);
-    }
-  }).catch((reason) => {
-    // TODO this reports all errors as "fetch" errors
-    dispatch({
-      type: 'NOTIFICATION_OPEN',
-      notification: { error: true, message: `Fetch failed with message: ${reason}` },
+      console.warn(`Fetch ${url} failed ${reason}`);
     });
-
-    console.warn(`Fetch ${url} failed ${reason}`);
-  });
 }
 
-export function get<ResponseType>(url: string, then: (res: ResponseType) => void) {
-  return request<ResponseType>('GET', undefined, url, then);
+export function get<ResponseType>(
+  url: string,
+  then: (res: ResponseType) => void
+) {
+  return request<ResponseType>("GET", undefined, url, then);
 }
 
-export function post<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
-  return request<ResponseType>('POST', body, url, then);
+export function post<ResponseType>(
+  url: string,
+  body?: any,
+  then?: (res: ResponseType) => void
+) {
+  return request<ResponseType>("POST", body, url, then);
 }
 
-export function put<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
-  return request<ResponseType>('PUT', body, url, then);
+export function put<ResponseType>(
+  url: string,
+  body?: any,
+  then?: (res: ResponseType) => void
+) {
+  return request<ResponseType>("PUT", body, url, then);
 }
 
-export function delete_<ResponseType>(url: string, body?: any, then?: (res: ResponseType) => void) {
-  return request<ResponseType>('DELETE', body, url, then);
+export function delete_<ResponseType>(
+  url: string,
+  body?: any,
+  then?: (res: ResponseType) => void
+) {
+  return request<ResponseType>("DELETE", body, url, then);
 }
 
 export function connect() {
@@ -188,9 +237,9 @@ export function connect() {
     state => state,
     (dispatch: (a: CommonAction) => void) => {
       return {
-        dismissNotifications: () => dispatch({ type: 'NOTIFICATIONS_DISMISS' }),
+        dismissNotifications: () => dispatch({ type: "NOTIFICATIONS_DISMISS" })
       };
-    },
+    }
   );
 }
 
@@ -200,19 +249,25 @@ export function connect() {
  * @param store Redux Store
  * @param elt Element code
  */
-export function render<State>(id: string, store: redux.Store<State>, elt: JSX.Element) {
-  ReactDOM.render(<reactredux.Provider store={store}>{elt}</reactredux.Provider>,
-    document.getElementById(id));
+export function render<State>(
+  id: string,
+  store: redux.Store<State>,
+  elt: JSX.Element
+) {
+  ReactDOM.render(
+    <reactredux.Provider store={store}>{elt}</reactredux.Provider>,
+    document.getElementById(id)
+  );
 }
 
 /**
  * The format used in the URL when browsing journal & habits by months
  */
-export const MONTH_FORMAT = 'YYYY-MM';
+export const MONTH_FORMAT = "YYYY-MM";
 /** Internal format of dates */
-export const DAY_FORMAT = 'YYYY-MM-DD';
+export const DAY_FORMAT = "YYYY-MM-DD";
 /** Nice printing of dates */
-export const HUMAN_DAY_FORMAT = 'MMMM Do, YYYY';
+export const HUMAN_DAY_FORMAT = "MMMM Do, YYYY";
 
 /**
  * makeSocket connects to a websocket
@@ -222,10 +277,11 @@ export const HUMAN_DAY_FORMAT = 'MMMM Do, YYYY';
  * @returns {WebSocket}
  */
 export function makeSocket(
-  location: string, onmessage: (s: any) => void,
+  location: string,
+  onmessage: (s: any) => void,
   onopen?: () => void,
-  reconnect?: boolean) {
-
+  reconnect?: boolean
+) {
   let disconnecting = false;
 
   // Disconnect the websocket before page unloads
@@ -234,32 +290,38 @@ export function makeSocket(
     disconnecting = true;
   };
 
-  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  const url = `${protocol}://${window.location.hostname}:${window.location.port === '3000' ? '8080' : window.location.port}/${location}`;
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  const url = `${protocol}://${window.location.hostname}:${
+    window.location.port === "3000" ? "8080" : window.location.port
+  }/${location}`;
   const socket = new WebSocket(url);
 
   // console harness
   window.meditations = {
     socket,
     notify: (msg: string) => {
-      dispatch({ type: 'NOTIFICATION_OPEN', notification: { error: false, message: msg } });
-    },
+      dispatch({
+        type: "NOTIFICATION_OPEN",
+        notification: { error: false, message: msg }
+      });
+    }
   };
 
-  socket.onopen = (m) => {
+  socket.onopen = m => {
     console.log(`Common.makeSocket: Connected to ${url} WebSocket`);
 
     // Notify user of successfuly reconnetions
     if (reconnect) {
       dispatch({
-        type: 'NOTIFICATION_OPEN',
-        notification: { error: false, message: 'Reconnection successful' },
+        type: "NOTIFICATION_OPEN",
+        notification: { error: false, message: "Reconnection successful" }
       });
     }
 
     dispatch({
-      type: 'SOCKET_OPENED', socketReconnect: () => {
-        console.log('Attempting to reopen socket');
+      type: "SOCKET_OPENED",
+      socketReconnect: () => {
+        console.log("Attempting to reopen socket");
         makeSocket(location, onmessage, onopen, true);
       }
     });
@@ -268,23 +330,25 @@ export function makeSocket(
     }
   };
 
-  socket.onerror = (e) => {
-    if (e.type === 'error') {
+  socket.onerror = e => {
+    if (e.type === "error") {
       dispatch({
-        type: 'NOTIFICATION_OPEN', notification: {
-          error: true, message: 'Failed to reconnect',
-        },
+        type: "NOTIFICATION_OPEN",
+        notification: {
+          error: true,
+          message: "Failed to reconnect"
+        }
       });
     }
   };
 
-  socket.onmessage = (m) => {
+  socket.onmessage = m => {
     onmessage(JSON.parse(m.data));
   };
 
-  socket.onclose = (e) => {
+  socket.onclose = e => {
     if (!disconnecting) {
-      dispatch({ type: 'SOCKET_CLOSED' });
+      dispatch({ type: "SOCKET_CLOSED" });
     }
   };
 
@@ -311,22 +375,26 @@ export function setTitle(page: string, title: string) {
  * Special routes: no_action for when no route is given
  * unknown for when an unknown route is given.
  */
-export function installRouter(base: string, first: string,
-  routes: { [key: string]: (...a: any[]) => void }) {
-
-  console.log('Common.installRouter called');
+export function installRouter(
+  base: string,
+  first: string,
+  routes: { [key: string]: (...a: any[]) => void }
+) {
+  console.log("Common.installRouter called");
   route.base(base);
-  route(function (this: any) {
+  route(function(this: any) {
     const action: any = [].shift.apply(arguments);
-    console.log(`Common.installRouter: dispatching ${action ? action : 'base'}`);
+    console.log(
+      `Common.installRouter: dispatching ${action ? action : "base"}`
+    );
 
     if (routes[action]) {
       (routes[action] as any).apply(this, arguments);
-    } else if (action === '' && routes['no_action']) {
-      (routes['no_action'] as any).apply(this, arguments);
+    } else if (action === "" && routes["no_action"]) {
+      (routes["no_action"] as any).apply(this, arguments);
     } else {
-      if (routes['unknown']) {
-        (routes['unknown'] as any).apply(this, arguments);
+      if (routes["unknown"]) {
+        (routes["unknown"] as any).apply(this, arguments);
       } else {
         console.warn(`Common.installRouter: unknown action ${action}`);
       }
@@ -348,11 +416,11 @@ export function installRouter(base: string, first: string,
 
   if (!introMessageSeen) {
     dispatch({
-      type: 'NOTIFICATION_OPEN',
+      type: "NOTIFICATION_OPEN",
       notification: {
         error: false,
-        message: 'INTRO',
-      },
+        message: "INTRO"
+      }
     });
 
     storeUIState({ introMessageSeen: true });

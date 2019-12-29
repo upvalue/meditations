@@ -1,10 +1,10 @@
-import * as React from 'react';
-import moment from 'moment';
+import * as React from "react";
+import moment from "moment";
 
-import { Scope, FilterState, ScopeType } from '../state';
-import { createCTask } from './Task';
-import { PresentScope } from './PresentScope';
-import { DayScopeEmpty } from './DayScopeEmpty';
+import { Scope, FilterState, ScopeType } from "../state";
+import { createCTask } from "./Task";
+import { PresentScope } from "./PresentScope";
+import { DayScopeEmpty } from "./DayScopeEmpty";
 
 export interface TimeScopeProps {
   currentProject: number;
@@ -29,12 +29,14 @@ export interface TimeScopeProps {
  */
 export class TimeScope extends React.Component<TimeScopeProps> {
   render() {
-    const title =
-      this.props.scope.Date.format(['dddd Do', 'MMMM', 'YYYY'][this.props.scope.Scope - 1]);
+    const title = this.props.scope.Date.format(
+      ["dddd Do", "MMMM", "YYYY"][this.props.scope.Scope - 1]
+    );
 
-    if (this.props.scope.Scope === ScopeType.DAY &&
-      this.props.scope.Tasks.length === 0) {
-
+    if (
+      this.props.scope.Scope === ScopeType.DAY &&
+      this.props.scope.Tasks.length === 0
+    ) {
       return <DayScopeEmpty day={this.props.scope} title={title} />;
     }
 
@@ -53,15 +55,15 @@ export class TimeScope extends React.Component<TimeScopeProps> {
 
     if (filterBegin || filterEnd) {
       if (filterBegin && filterEnd) {
-        filteredTasks = filteredTasks.filter((t, i) =>
-          t.Date >= filterBegin && t.Date <= filterEnd);
+        filteredTasks = filteredTasks.filter(
+          (t, i) => t.Date >= filterBegin && t.Date <= filterEnd
+        );
       } else if (filterBegin) {
         filteredTasks = filteredTasks.filter((t, i) => t.Date >= filterBegin);
       } else if (filterEnd) {
         filteredTasks = filteredTasks.filter((t, i) => t.Date <= filterEnd);
       }
     }
-
 
     return (
       <PresentScope

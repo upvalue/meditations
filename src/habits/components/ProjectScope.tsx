@@ -1,13 +1,13 @@
-import * as React from 'react';
-import moment from 'moment';
-import { ModalProvider, modalContext } from '../../common/modal';
+import * as React from "react";
+import moment from "moment";
+import { ModalProvider, modalContext } from "../../common/modal";
 
-import { TaskNew } from '../api';
-import * as common from '../../common';
-import { Scope } from '../state';
-import { createCTask } from './Task';
-import { OcticonButton } from '../../common/components/OcticonButton';
-import { OcticonPlus } from '../../common/octicons';
+import { TaskNew } from "../api";
+import * as common from "../../common";
+import { Scope } from "../state";
+import { createCTask } from "./Task";
+import { OcticonButton } from "../../common/components/OcticonButton";
+import { OcticonPlus } from "../../common/octicons";
 
 export interface ProjectScopeProps {
   currentDate: moment.Moment;
@@ -29,20 +29,22 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
 
     if (isNaN(projectID)) return;
 
-    route(`view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`);
+    route(
+      `view/${this.props.currentDate.format(common.MONTH_FORMAT)}/${projectID}`
+    );
   }
 
   addTask = (modal: ModalProvider) => {
-    return modal.openModalPrompt('Enter task name', 'New task', (Name) => {
+    return modal.openModalPrompt("Enter task name", "New task", Name => {
       if (Name) {
         TaskNew({
           Name,
           Date: this.props.scope.Date,
-          Scope: this.props.scope.Scope,
+          Scope: this.props.scope.Scope
         });
       }
     });
-  }
+  };
 
   render() {
     const tasks = this.props.scope.Tasks.map(t => createCTask(t));
@@ -51,21 +53,28 @@ export class ProjectScope extends React.PureComponent<ProjectScopeProps> {
       <section className="scope bg-gray">
         <div className="scope-header d-flex flex-row flex-justify-between p-1 ">
           <h3 className="scope-title border-bottom ">
-            <span><a href={`#view/${this.props.currentDate.format(common.MONTH_FORMAT)}/0`}>
-              Projects</a></span>
-            <span> &gt; {this.props.scope.Name}</span></h3>
+            <span>
+              <a
+                href={`#view/${this.props.currentDate.format(
+                  common.MONTH_FORMAT
+                )}/0`}
+              >
+                Projects
+              </a>
+            </span>
+            <span> &gt; {this.props.scope.Name}</span>
+          </h3>
 
           <modalContext.Consumer>
-            {modal =>
+            {modal => (
               <OcticonButton
                 className="flex-self-center"
                 icon={OcticonPlus}
                 tooltip="New task"
                 onClick={this.addTask(modal)}
               />
-            }
+            )}
           </modalContext.Consumer>
-
         </div>
 
         {tasks}

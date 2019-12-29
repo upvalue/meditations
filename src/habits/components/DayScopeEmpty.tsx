@@ -1,13 +1,13 @@
-import * as React from 'react';
-import moment from 'moment';
+import * as React from "react";
+import moment from "moment";
 
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import { HabitsState, Scope, ScopeType } from '../state';
-import { PresentScope } from './PresentScope';
-import { client, gql } from '../../common/graphql';
-import { MOUNT_NEXT_DAY_TIME } from '../../common/constants';
-import { DAY_FORMAT } from '../../common';
+import { HabitsState, Scope, ScopeType } from "../state";
+import { PresentScope } from "./PresentScope";
+import { client, gql } from "../../common/graphql";
+import { MOUNT_NEXT_DAY_TIME } from "../../common/constants";
+import { DAY_FORMAT } from "../../common";
 
 interface Props {
   day: Scope;
@@ -42,7 +42,7 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
     }
 
     this.setState({ checked });
-  }
+  };
 
   /**
    * Check or uncheck a task
@@ -51,10 +51,10 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
     this.setState(prevState => ({
       checked: {
         ...prevState.checked,
-        [ID]: !prevState.checked[ID],
-      },
+        [ID]: !prevState.checked[ID]
+      }
     }));
-  }
+  };
 
   get copyableTasks() {
     return this.props.month.Tasks.filter(t => t.CompletedTasks > 0);
@@ -71,6 +71,8 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
 
     const date = this.props.day.Date.clone();
 
+    console.log(date.format());
+
     client.request(`mutation CopyOverTasks {
         first: addTasks(
           scope: ${ScopeType.DAY},
@@ -79,23 +81,20 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
         )
       }
     `);
-  }
+  };
 
   render() {
     // Only display tasks that are used as actual habits, and not just one-off ones
     const tasks = this.copyableTasks;
 
     return (
-      <PresentScope
-        scope={this.props.day}
-        title={this.props.title}
-      >
+      <PresentScope scope={this.props.day} title={this.props.title}>
         <div className="scope-day-empty">
           <p>
-            Would you like to copy over tasks from the monthly scope to get started? If not,
-            just add a task to dismiss this message.
+            Would you like to copy over tasks from the monthly scope to get
+            started? If not, just add a task to dismiss this message.
           </p>
-          {tasks.map((t) => {
+          {tasks.map(t => {
             return (
               <div key={t.ID} className="scope-day-empty-task">
                 <label>
@@ -112,10 +111,7 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
           })}
 
           <div className="mt-1">
-            <button
-              onClick={this.copyOver}
-              className="btn btn-primary "
-            >
+            <button onClick={this.copyOver} className="btn btn-primary ">
               Copy tasks
             </button>
 
@@ -132,6 +128,6 @@ class CTimeScopeEmpty extends React.Component<Props, State> {
   }
 }
 
-export const DayScopeEmpty = connect(
-  (state: HabitsState) => ({ month: state.month }),
-)(CTimeScopeEmpty);
+export const DayScopeEmpty = connect((state: HabitsState) => ({
+  month: state.month
+}))(CTimeScopeEmpty);

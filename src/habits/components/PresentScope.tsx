@@ -1,13 +1,13 @@
-import * as React from 'react';
-import * as mousetrap from 'mousetrap';
+import * as React from "react";
+import * as mousetrap from "mousetrap";
 
-import * as common from '../../common';
-import * as api from '../api';
-import { modalContext, ModalProvider } from '../../common/modal';
-import { Scope } from '../state';
-import { OcticonPlus } from '../../common/octicons';
-import { OcticonButton } from '../../common/components/OcticonButton';
-import { KEYSEQ_TASK_ADD } from '../../common/constants';
+import * as common from "../../common";
+import * as api from "../api";
+import { modalContext, ModalProvider } from "../../common/modal";
+import { Scope } from "../state";
+import { OcticonPlus } from "../../common/octicons";
+import { OcticonButton } from "../../common/components/OcticonButton";
+import { KEYSEQ_TASK_ADD } from "../../common/constants";
 
 export interface PresentScopeProps {
   title: string;
@@ -39,21 +39,25 @@ export class PresentScope extends React.Component<PresentScopeProps> {
   addTask = (modal: ModalProvider) => {
     const { scope } = this.props;
 
-    return modal.openModalPrompt('Enter name:', 'Add new task', (Name: string) => {
-      api.TaskNew({
-        Name,
-        Date: scope.Date,
-        Scope: scope.Scope,
-      });
-    });
-  }
+    return modal.openModalPrompt(
+      "Enter name:",
+      "Add new task",
+      (Name: string) => {
+        api.TaskNew({
+          Name,
+          Date: scope.Date,
+          Scope: scope.Scope
+        });
+      }
+    );
+  };
 
   render() {
     const { title, children } = this.props;
 
     return (
       <modalContext.Consumer>
-        {modal =>
+        {modal => (
           <section className="scope bg-gray mb-2">
             {this.props.mostRecentDay && this.bindAddTask(modal)}
             <div className="scope-header border-bottom d-flex flex-row flex-justify-between">
@@ -68,11 +72,9 @@ export class PresentScope extends React.Component<PresentScopeProps> {
               </div>
             </div>
 
-            <div className="scope-tasks mt-1">
-              {children}
-            </div>
+            <div className="scope-tasks mt-1">{children}</div>
           </section>
-        }
+        )}
       </modalContext.Consumer>
     );
   }

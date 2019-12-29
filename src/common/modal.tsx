@@ -1,24 +1,24 @@
 // modal.tsx - Modal implementation based on React 16 Contexts
 
-import * as React from 'react';
-import { OcticonButton } from './components/OcticonButton';
-import { OcticonX } from './octicons';
+import * as React from "react";
+import { OcticonButton } from "./components/OcticonButton";
+import { OcticonX } from "./octicons";
 
-export const modalContext = React.createContext<ModalProvider>(undefined as any as ModalProvider);
+export const modalContext = React.createContext<ModalProvider>(
+  (undefined as any) as ModalProvider
+);
 
-interface ModalInputData {
-
-}
+interface ModalInputData {}
 
 export interface ModalStateCommon {
   modalOpen: boolean;
-  modalType: 'CONFIRM' | 'INPUT' | 'EMPTY';
+  modalType: "CONFIRM" | "INPUT" | "EMPTY";
   modalData: null | ModalInputData;
   modalError?: string;
 }
 
 interface ModalInputState extends ModalStateCommon {
-  modalType: 'INPUT';
+  modalType: "INPUT";
   modalData: {
     /**
      * The body text of the modal
@@ -54,7 +54,7 @@ interface ModalInputState extends ModalStateCommon {
 }
 
 interface ModalConfirmState extends ModalStateCommon {
-  modalType: 'CONFIRM';
+  modalType: "CONFIRM";
   modalData: {
     /**
      * The body of the confirmation modal i.e. "Are you sure you want to delete this?"
@@ -73,7 +73,7 @@ interface ModalConfirmState extends ModalStateCommon {
 
 interface ModalEmptyState extends ModalStateCommon {
   modalOpen: false;
-  modalType: 'EMPTY';
+  modalType: "EMPTY";
   modalData: null;
 }
 
@@ -95,7 +95,10 @@ export interface ModalProviderProps {
  * Modal provider handles global modal state. It is also responsible for styling the entire app
  * in the case of error notifications or modals.
  */
-export class ModalProvider extends React.Component<ModalProviderProps, ModalState> {
+export class ModalProvider extends React.Component<
+  ModalProviderProps,
+  ModalState
+> {
   modalInput?: HTMLInputElement;
 
   constructor(props: any) {
@@ -103,23 +106,29 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
 
     this.state = {
       modalOpen: false,
-      modalType: 'EMPTY',
-      modalData: null,
+      modalType: "EMPTY",
+      modalData: null
     };
   }
 
-  openModalPrompt(body: string, ok: string, callback: (result: string) => void,
-    defaultValue?: string, options?: ModalPromptOptions) {
-
+  openModalPrompt(
+    body: string,
+    ok: string,
+    callback: (result: string) => void,
+    defaultValue?: string,
+    options?: ModalPromptOptions
+  ) {
     return () => {
       this.setState({
         modalOpen: true,
-        modalType: 'INPUT',
+        modalType: "INPUT",
         modalData: {
-          body, ok, callback,
+          body,
+          ok,
+          callback,
           defaultValue,
-          ...options,
-        },
+          ...options
+        }
       });
     };
   }
@@ -132,84 +141,97 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
    * @param checker
    * @param callback
    */
-  openModalPromptAllowEmpty(body: string, ok: string, defaultValue: string,
-    callback: (result: string) => void) {
-
+  openModalPromptAllowEmpty(
+    body: string,
+    ok: string,
+    defaultValue: string,
+    callback: (result: string) => void
+  ) {
     return this.openModalPrompt(body, ok, callback, defaultValue, {
-      allowEmpty: true,
+      allowEmpty: true
     });
   }
 
-  openModalPromptChecked(body: string, ok: string, defaultValue: string,
+  openModalPromptChecked(
+    body: string,
+    ok: string,
+    defaultValue: string,
     checker: (chk: string) => string,
-    callback: (result: string) => void) {
-
+    callback: (result: string) => void
+  ) {
     return this.openModalPrompt(body, ok, callback, defaultValue, {
-      checker,
+      checker
     });
   }
 
-  openModalConfirm(bodyText: string, confirmText: string, callback: () => void) {
+  openModalConfirm(
+    bodyText: string,
+    confirmText: string,
+    callback: () => void
+  ) {
     return () => {
       this.setState({
         modalOpen: true,
-        modalType: 'CONFIRM',
+        modalType: "CONFIRM",
         modalData: {
-          bodyText, confirmText, callback,
-        },
+          bodyText,
+          confirmText,
+          callback
+        }
       });
     };
   }
 
   dismissModal = () => {
     this.setState({ modalOpen: false, modalError: undefined });
-  }
+  };
 
-  submitModal = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  submitModal = (
+    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
+  ) => {
     if (e) {
       e.preventDefault();
     }
 
     const state = this.state;
 
-    if (this.state.modalType === 'INPUT' && this.modalInput) {
+    if (this.state.modalType === "INPUT" && this.modalInput) {
       const { callback, checker, allowEmpty } = this.state.modalData;
 
       // Optional error checking
       if (checker) {
         const errmsg = checker(this.modalInput.value);
-        if (errmsg !== '') {
+        if (errmsg !== "") {
           this.setState({
-            modalError: errmsg,
+            modalError: errmsg
           });
           return;
         }
       }
 
-      if (allowEmpty || this.modalInput.value !== '') {
+      if (allowEmpty || this.modalInput.value !== "") {
         callback(this.modalInput.value);
       }
-    } else if (this.state.modalType === 'CONFIRM') {
+    } else if (this.state.modalType === "CONFIRM") {
       this.state.modalData.callback();
-
     }
 
     this.setState({
       modalOpen: false,
-      modalError: undefined,
+      modalError: undefined
     });
-  }
+  };
 
   getGlobalStyleOverride(): React.CSSProperties | undefined {
     if (this.state.modalOpen) {
       return {
         opacity: 0.75,
-        pointerEvents: 'none',
+        pointerEvents: "none"
       };
     } else if (this.props.socketClosed) {
       return {
-        pointerEvents: 'none',
-        filter: 'blur(1px)',
+        pointerEvents: "none",
+        filter: "blur(1px)"
       };
     }
   }
@@ -218,7 +240,7 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
     return (
       <>
         <modalContext.Provider value={this}>
-          {this.state.modalOpen &&
+          {this.state.modalOpen && (
             <div id="modal" className="bg-white border border-gray-dark p-2">
               <div className="float-right pb-1">
                 <OcticonButton
@@ -228,49 +250,67 @@ export class ModalProvider extends React.Component<ModalProviderProps, ModalStat
                 />
               </div>
 
-              {this.state.modalType === 'INPUT' &&
+              {this.state.modalType === "INPUT" && (
                 <form onSubmit={this.submitModal}>
                   <span>{this.state.modalData.body}</span>
-                  {this.state.modalError &&
-                    <div className="flash flash-error mt-1 mb-1">{this.state.modalError}</div>
-                  }
+                  {this.state.modalError && (
+                    <div className="flash flash-error mt-1 mb-1">
+                      {this.state.modalError}
+                    </div>
+                  )}
                   <input
-                    ref={(e) => { if (e) { this.modalInput = e; e.focus(); } }}
+                    ref={e => {
+                      if (e) {
+                        this.modalInput = e;
+                        e.focus();
+                      }
+                    }}
                     className="form-control input-block mb-1"
                     type="text"
                     defaultValue={this.state.modalData.defaultValue}
                   />
-                  <button className="btn btn-primary btn-block mb-1" onClick={this.submitModal}>
+                  <button
+                    className="btn btn-primary btn-block mb-1"
+                    onClick={this.submitModal}
+                  >
                     {this.state.modalData.ok}
                   </button>
 
-                  <button className="btn btn-secondary btn-block" onClick={this.dismissModal}>
+                  <button
+                    className="btn btn-secondary btn-block"
+                    onClick={this.dismissModal}
+                  >
                     Close
-                </button>
+                  </button>
                 </form>
-              }
+              )}
 
-              {this.state.modalType === 'CONFIRM' &&
+              {this.state.modalType === "CONFIRM" && (
                 <div>
                   <span>{this.state.modalData.bodyText}</span>
                   <button
                     className="btn btn-danger btn-block mb-1"
                     onClick={this.submitModal}
-                    ref={(e) => { if (e) { e.focus(); } }}
+                    ref={e => {
+                      if (e) {
+                        e.focus();
+                      }
+                    }}
                   >
                     {this.state.modalData.confirmText}
                   </button>
-                  <button className="btn btn-secondary btn-block mb-1" onClick={this.dismissModal}>
+                  <button
+                    className="btn btn-secondary btn-block mb-1"
+                    onClick={this.dismissModal}
+                  >
                     Cancel
-                </button>
+                  </button>
                 </div>
-              }
+              )}
             </div>
-          }
+          )}
 
-          <div style={this.getGlobalStyleOverride()}>
-            {this.props.children}
-          </div>
+          <div style={this.getGlobalStyleOverride()}>{this.props.children}</div>
         </modalContext.Provider>
       </>
     );
