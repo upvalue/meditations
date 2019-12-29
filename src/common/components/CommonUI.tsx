@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CommonState } from "..";
 import { ModalProvider } from "../modal";
-import { FormFactorManager, formFactorContext } from "./FormFactorProvider";
+import { FormFactorManager } from "./FormFactorProvider";
 
 const IntroMessage = () => {
   return (
@@ -91,8 +91,8 @@ export class CommonUI extends React.Component<CommonState> {
                 {n.message === "INTRO" ? (
                   <IntroMessage />
                 ) : (
-                  <pre style={{ whiteSpace: "pre-wrap" }}>{n.message}</pre>
-                )}
+                    <pre style={{ whiteSpace: "pre-wrap" }}>{n.message}</pre>
+                  )}
               </div>
             );
           })}

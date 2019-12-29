@@ -16,7 +16,7 @@ import (
 
 const (
 	// SchemaVersion is the current version of the meditations DB schema
-	SchemaVersion = 3
+	SchemaVersion = 4
 )
 
 // DB global database handle
@@ -41,8 +41,9 @@ func DBMigrate() {
 		// habits.go
 		&Task{}, &Scope{},
 		// journal.go
-		&Entry{}, &Tag{},
-	)
+    &Entry{}, &Tag{},
+  )
+  DB.AutoMigrate(&EntrySave{})
 	DBCreate()
 
 	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_date ON tasks (date);")
@@ -107,7 +108,14 @@ func DBMigrate() {
 
 		settings.Schema = 3
 		DB.Save(&settings)
-	}
+  }
+
+  if settings.Schema == 3 {
+    log.Printf("!!! Upgrading from Schema 3 to 4")
+    DB.Exec("ALTER TABLE entries ADD lock string;")
+    settings.Schema = 4
+    DB.Save(&settings)
+  }
 
 	DB.Exec("VACUUM;")
 

@@ -1,4 +1,5 @@
 import * as React from "react";
+import classNames from "classnames";
 
 import { Entry, Tag } from "../state";
 import { OcticonButton } from "../../common/components/OcticonButton";
@@ -14,6 +15,7 @@ import {
 
 import { modalContext, ModalProvider } from "../../common/modal";
 import { Editable } from "../../common/components/Editable";
+import { entryLock, entryUnlock, sessionuuid } from "../api";
 
 ///// REACT COMPONENTS
 
@@ -88,11 +90,45 @@ export class CEntry extends Editable<CEntryProps> {
     return this.props.entry.Body !== this.body.innerHTML;
   }
 
+  get locked() {
+    const { entry } = this.props;
+    const { Lock } = entry;
+
+    return Lock !== null && Lock !== '' && Lock !== sessionuuid;
+  }
+
+  onSaveInterval = () => {
+    console.log(`Automatically saving entry ${this.props.entry.ID}`)
+    this.editorSave();
+  }
+
+  onFocus() {
+    entryLock(this.props.entry.ID);
+  }
+
+  onBlur() {
+    entryUnlock(this.props.entry.ID);
+    common.post(`/journal/unlock-entry/${this.props.entry.ID}`);
+  }
+
   editorSave() {
     common.post("/journal/update", {
       ID: this.props.entry.ID,
       Body: this.body.innerHTML
     });
+  }
+
+  editorOpenLockPrompt = (modal: ModalProvider) => {
+    if (!this.locked) {
+      this.editorOpen();
+    } else {
+      console.log('hello');
+      modal.openModalConfirm(
+        "Are you sure you want to edit this currently locked entry?",
+        "Yes, edit",
+        () => common.post(`/journal/unlock-entry/${this.props.entry.ID}`)
+      )();
+    }
   }
 
   render() {
@@ -127,7 +163,7 @@ export class CEntry extends Editable<CEntryProps> {
       <modalContext.Consumer>
         {modal => (
           <section
-            className="entry border bg-gray "
+            className={classNames("entry border bg-gray", this.locked && "entry-locked")}
             id={`entry-${this.props.entry.ID}`}
           >
             <div className="entry-header border-bottom">
@@ -218,7 +254,7 @@ export class CEntry extends Editable<CEntryProps> {
                 if (body) this.body = body;
               }}
               dangerouslySetInnerHTML={{ __html: body }}
-              onClick={this.editorOpen}
+              onClick={() => this.editorOpenLockPrompt(modal)}
             />
           </section>
         )}

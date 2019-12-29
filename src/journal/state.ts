@@ -16,6 +16,7 @@ export interface Entry extends common.Model {
   Body: string;
   LastBody: string;
   Tags: ReadonlyArray<Tag> | undefined;
+  Lock: string;
 }
 
 ///// REDUX

@@ -89,3 +89,10 @@
 .tag a {
   color: $uiColorSlightlyMuted;
 }
+
+.entry-locked {
+  .entry-body {
+    cursor: not-allowed;
+    filter: contrast(0.9);
+  }
+}
