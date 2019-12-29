@@ -131,7 +131,10 @@ func App() *macaron.Macaron {
 		}
 	}
 
-	m := macaron.Classic()
+	m := macaron.New()
+
+	m.Use(macaron.Logger())
+	m.Use(macaron.Recovery())
 
 	DBOpen()
 	if Config.Migrate == true {
@@ -177,19 +180,13 @@ func App() *macaron.Macaron {
 		c.PlainText(200, []byte("User-agent: *\nDisallow: /\n"))
 	})
 
-	m.Get("/", func(c *macaron.Context) {
-		c.Redirect("/habits")
-	})
+	m.Get("/", productionBuildHandler)
 
 	init := func(x string, r func(m *macaron.Macaron)) { m.Group(x, func() { r(m) }) }
 
 	init("/habits", habitsInit)
 	init("/journal", journalInit)
 	graphqlWebInit(m)
-
-	m.Get("/test", func(c *macaron.Context) {
-		c.HTML(200, "test")
-	})
 
 	m.Use(macaron.Static("build/static", macaron.StaticOptions{
 		Prefix: "static",
