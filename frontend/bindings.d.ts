@@ -38,3 +38,4 @@ declare module 'medium-editor-tables' {
   import * as MediumEditor from 'medium-editor';
   export default MediumEditorTable;
 }
+

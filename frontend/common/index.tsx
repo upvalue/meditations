@@ -39,7 +39,7 @@ export const processModel = (e: Model) => {
 };
 
 ///// REDUX COMMON STATE
-type Notification = {error: boolean, message: string};
+type Notification = { error: boolean, message: string };
 
 /** Action that causes a new notification to be opened */
 export type NotificationOpen = {
@@ -48,8 +48,8 @@ export type NotificationOpen = {
 };
 
 export type CommonAction = NotificationOpen | { type: 'NOTIFICATIONS_DISMISS' } |
-  { type: 'SOCKET_OPENED', socketReconnect: () => void } |
-  { type: 'SOCKET_CLOSED' };
+{ type: 'SOCKET_OPENED', socketReconnect: () => void } |
+{ type: 'SOCKET_CLOSED' };
 
 export type CommonActionDispatcher = (a: CommonAction) => void;
 
@@ -64,12 +64,13 @@ export type CommonState = {
 
 export let dispatch: (action: CommonAction) => void;
 
-export function commonReducer(state: CommonState, action: CommonAction): CommonState  {
+export function commonReducer(state: CommonState, action: CommonAction): CommonState {
   switch (action.type) {
     case 'NOTIFICATION_OPEN':
       // Append to list of notifications, or create it if it doesn't exist.
       if (state.notifications) {
-        return {...state,
+        return {
+          ...state,
           notifications: [...state.notifications, action.notification],
         };
       }
@@ -77,8 +78,10 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
     case 'SOCKET_CLOSED':
       return { ...state, socketClosed: true };
     case 'SOCKET_OPENED':
-      return { ...state, socketClosed: false,
-        socketReconnect: action.socketReconnect };
+      return {
+        ...state, socketClosed: false,
+        socketReconnect: action.socketReconnect
+      };
     case 'NOTIFICATIONS_DISMISS':
       return { ...state, notifications: undefined };
   }
@@ -95,14 +98,14 @@ export function commonReducer(state: CommonState, action: CommonAction): CommonS
  * asynchronous actions
  */
 export function createStore<State extends CommonState, Action extends redux.Action>(
-    reducer: (s: State,  a: Action) => State, initialState: State):
-      [redux.Store<State>,
-       (action: Action | ((thunk: (action: Action) => void) => void)) => void
-       ] {
+  reducer: (s: State, a: Action) => State, initialState: State):
+  [redux.Store<State>,
+    (action: Action | ((thunk: (action: Action) => void) => void)) => void
+  ] {
 
   // Apply common reducer to all actions
   const combinedReducer = (pstate: State = initialState, action: redux.Action): State => {
-    let state = commonReducer(pstate as CommonState, action as any as CommonAction) ;
+    let state = commonReducer(pstate as CommonState, action as any as CommonAction);
     state = reducer(state as State, action as Action);
     return state as State;
   };
@@ -129,8 +132,8 @@ export function createStore<State extends CommonState, Action extends redux.Acti
  * @param url URL of the request
  */
 export function request<ResponseType>(
-    method: string, body: any, url: string,
-    then?: (res:ResponseType) => void) {
+  method: string, body: any, url: string,
+  then?: (res: ResponseType) => void) {
   const reqinit: any = { method };
   if (body !== undefined) {
     reqinit.headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
@@ -142,7 +145,8 @@ export function request<ResponseType>(
     if (response.status !== 200) {
       console.warn(`Common.request: ${method} fetch failed with error `);
       response.text().then((response: any) => {
-        dispatch({type: 'NOTIFICATION_OPEN',
+        dispatch({
+          type: 'NOTIFICATION_OPEN',
           notification: { error: true, message: `Fetch failed with message: ${response}` },
         });
       });
@@ -154,7 +158,8 @@ export function request<ResponseType>(
     }
   }).catch((reason) => {
     // TODO this reports all errors as "fetch" errors
-    dispatch({type: 'NOTIFICATION_OPEN',
+    dispatch({
+      type: 'NOTIFICATION_OPEN',
       notification: { error: true, message: `Fetch failed with message: ${reason}` },
     });
 
@@ -197,7 +202,7 @@ export function connect() {
  */
 export function render<State>(id: string, store: redux.Store<State>, elt: JSX.Element) {
   ReactDOM.render(<reactredux.Provider store={store}>{elt}</reactredux.Provider>,
-    document.getElementById(id)) ;
+    document.getElementById(id));
 }
 
 /**
@@ -217,9 +222,9 @@ export const HUMAN_DAY_FORMAT = 'MMMM Do, YYYY';
  * @returns {WebSocket}
  */
 export function makeSocket(
-    location: string, onmessage: (s: any) => void,
-    onopen?: () => void,
-    reconnect?: boolean) {
+  location: string, onmessage: (s: any) => void,
+  onopen?: () => void,
+  reconnect?: boolean) {
 
   let disconnecting = false;
 
@@ -246,15 +251,18 @@ export function makeSocket(
 
     // Notify user of successfuly reconnetions
     if (reconnect) {
-      dispatch({ type: 'NOTIFICATION_OPEN',
+      dispatch({
+        type: 'NOTIFICATION_OPEN',
         notification: { error: false, message: 'Reconnection successful' },
       });
     }
 
-    dispatch({ type: 'SOCKET_OPENED', socketReconnect: () => {
-      console.log('Attempting to reopen socket');
-      makeSocket(location, onmessage, onopen, true);
-    }});
+    dispatch({
+      type: 'SOCKET_OPENED', socketReconnect: () => {
+        console.log('Attempting to reopen socket');
+        makeSocket(location, onmessage, onopen, true);
+      }
+    });
     if (onopen) {
       onopen();
     }
@@ -304,12 +312,12 @@ export function setTitle(page: string, title: string) {
  * unknown for when an unknown route is given.
  */
 export function installRouter(base: string, first: string,
-    routes: { [key: string] : (...a: any[]) => void }) {
+  routes: { [key: string]: (...a: any[]) => void }) {
 
   console.log('Common.installRouter called');
   route.base(base);
   route(function (this: any) {
-    const action : any = [].shift.apply(arguments);
+    const action: any = [].shift.apply(arguments);
     console.log(`Common.installRouter: dispatching ${action ? action : 'base'}`);
 
     if (routes[action]) {

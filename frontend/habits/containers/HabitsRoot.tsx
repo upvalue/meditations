@@ -14,8 +14,9 @@ import { TimeScope } from '../components/TimeScope';
 import { HabitsMobileMenu } from '../components/HabitsMobileMenu';
 import { ProjectScope } from '../components/ProjectScope';
 import { ProjectList } from '../components/ProjectList';
+import { DndProvider } from 'react-dnd';
 
-export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
+export const HabitsRoot = (
   common.connect()(class extends React.Component<HabitsState> {
     /**
      * Render a time-based scope (daily, monthly, yearly)
@@ -94,24 +95,26 @@ export const HabitsRoot = ReactDnd.DragDropContext(HTML5Backend)(
     render() {
       return (
         <div id="habits-root-sub">
-          <CommonUI {...this.props}>
-            <HabitsControlBar {...this.props} />
-            <HabitsMobileMenu />
-            <div className="d-flex flex-column flex-md-row">
-              <div id="scope-days" className="scope-column mr-md-1">
-                {this.props.days ? this.renderDays() : <Spinner />}
+          <DndProvider backend={HTML5Backend}>
+            <CommonUI {...this.props}>
+              <HabitsControlBar {...this.props} />
+              <HabitsMobileMenu />
+              <div className="d-flex flex-column flex-md-row">
+                <div id="scope-days" className="scope-column mr-md-1">
+                  {this.props.days ? this.renderDays() : <Spinner />}
+                </div>
+                <div id="scope-month" className="scope-column mr-md-1">
+                  {this.renderTimeScope(this.props.month)}
+                </div>
+                <div id="scope-year" className="scope-column mr-md-1">
+                  {this.renderTimeScope(this.props.year)}
+                </div>
+                <div id="scope-projects" className="scope-column">
+                  {this.props.pinnedProjects ? this.renderProjects() : <Spinner />}
+                </div>
               </div>
-              <div id="scope-month" className="scope-column mr-md-1">
-                {this.renderTimeScope(this.props.month)}
-              </div>
-              <div id="scope-year" className="scope-column mr-md-1">
-                {this.renderTimeScope(this.props.year)}
-              </div>
-              <div id="scope-projects" className="scope-column">
-                {this.props.pinnedProjects ? this.renderProjects() : <Spinner />}
-              </div>
-            </div>
-          </CommonUI>
+            </CommonUI>
+          </DndProvider>
         </div>
       );
     }
