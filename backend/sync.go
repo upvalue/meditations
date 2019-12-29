@@ -94,12 +94,20 @@ func (page *SyncPage) Server() {
 
 // MakeSyncPage returns a struct that represents a websocket and its connected clients
 func MakeSyncPage(name string) *SyncPage {
+	upgrader := &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
+
+	// Insecure, but required to make CRA work as proxying doesn't work and it needs to
+	// connect directly
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
+
 	page := &SyncPage{
 		connections: make(map[*connection]bool),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
 		broadcast:   make(chan []byte),
-		upgrader:    &websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024},
+		upgrader:    upgrader,
 		name:        name,
 	}
 

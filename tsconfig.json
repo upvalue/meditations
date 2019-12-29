@@ -1,19 +1,25 @@
 {
-    "compilerOptions": {
-        "module": "es2015",
-        "moduleResolution": "node",
-        "target": "es5",
-        "sourceMap": true,
-        "jsx": "react",
-        "lib": ["es6", "dom"],
-        "strict": true
-    },
-    "include": [
-      "frontend/**/*"
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
-    "exclude": [
-        "node_modules",
-        "node_modules/@types/react-dnd/index.d.ts",
-        "frontend/tests"
-    ]
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react"
+  },
+  "include": [
+    "src"
+  ]
 }

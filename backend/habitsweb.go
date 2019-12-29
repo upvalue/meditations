@@ -545,7 +545,6 @@ func habitsIndex(c *macaron.Context) {
 }
 
 func habitsInit(m *macaron.Macaron) {
-	fmt.Printf("HELLO WORLD\n")
 	m.Get("/", habitsIndex)
 
 	m.Get("/in-year", tasksInYear)
