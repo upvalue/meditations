@@ -441,11 +441,6 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				datestr, _ := p.Args["date"].(string)
-				fmt.Printf("DATE %s\n", datestr)
-				date, _ := time.Parse("2006-01-02T15:04:05-07:00", datestr)
-				// date := graphql.DateTime.ParseValue(datestr)
-
 				scope, _ := p.Args["scope"].(int)
 
 				names, _ := p.Args["names"].([]interface{})
@@ -457,10 +452,10 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 				var task Task
 
 				for i, n := range names {
-					fmt.Printf("Adding task %s %d\n", n, i)
+					fmt.Printf("Adding task %s date: %s %d\n", n, i)
 					task = Task{
 						Name:     fmt.Sprintf("%s", n),
-						Date:     date,
+						Date:     p.Args["date"].(time.Time),
 						Scope:    scope,
 						Position: i,
 					}
