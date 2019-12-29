@@ -74,6 +74,15 @@ func loadConfig(c *cli.Context) {
 	Config.Demo = c.Bool("demo")
 }
 
+func productionBuildHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./build/index.html")
+}
+
+func isProductionBuild() bool {
+	_, err := os.Stat("./build/index.html")
+	return err == nil
+}
+
 // GetAppPath retrieves the application path.  Some care is taken to make this work outside of the go path
 func GetAppPath() string {
 	ex, err := os.Executable()
@@ -181,6 +190,10 @@ func App() *macaron.Macaron {
 	m.Get("/test", func(c *macaron.Context) {
 		c.HTML(200, "test")
 	})
+
+	m.Use(macaron.Static("build/static", macaron.StaticOptions{
+		Prefix: "static",
+	}))
 
 	return m
 }

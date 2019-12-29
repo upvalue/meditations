@@ -1,6 +1,5 @@
 /backend/node_modules
-/frontend/node_modules
-/src/*.js
+/build
 /jsdoc
 /bin
 /assets

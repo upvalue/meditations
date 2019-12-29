@@ -235,7 +235,7 @@ export function makeSocket(
   };
 
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  const url = `${protocol}://${window.location.hostname}:${window.location.port === '3000' ? '8080' : '3000'}/${location}`;
+  const url = `${protocol}://${window.location.hostname}:${window.location.port === '3000' ? '8080' : window.location.port}/${location}`;
   const socket = new WebSocket(url);
 
   // console harness

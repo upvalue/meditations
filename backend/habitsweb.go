@@ -545,7 +545,7 @@ func habitsIndex(c *macaron.Context) {
 }
 
 func habitsInit(m *macaron.Macaron) {
-	m.Get("/", habitsIndex)
+	m.Get("/", productionBuildHandler)
 
 	m.Get("/in-year", tasksInYear)
 	m.Get("/in-month-and-days", tasksInMonthAndDays)

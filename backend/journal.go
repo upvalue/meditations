@@ -249,7 +249,8 @@ func journalIndex(c *macaron.Context) {
 }
 
 func journalInit(m *macaron.Macaron) {
-	m.Get("/", journalIndex)
+	m.Get("/", productionBuildHandler)
+	// m.Get("/", journalIndex)
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/by-day", journalEntriesByDay)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
