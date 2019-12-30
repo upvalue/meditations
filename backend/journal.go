@@ -167,7 +167,12 @@ func journalUpdate(c *macaron.Context, entryUpdate Entry) {
 		// TODO: Why is this here?
 		if entry.Name == "" {
 			DB.Exec("update entries set name = null where id = ?", entry.ID)
-		}
+    }
+    
+    // Just don't sync locked entries
+    if entry.Lock != "" {
+      return
+    }
 		syncEntry(entry)
 	}
 }
