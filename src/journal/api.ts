@@ -1,5 +1,4 @@
 import * as common from '../common';
-import { Entry } from "./state";
 
 import uuid4 from 'uuid/v4';
 

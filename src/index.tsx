@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     habitsMain();
   } else if (pathname === '/journal') {
     journalMain();
+  } else if (pathname === '/') {
+    // eslint-disable-next-line
+    location.href = '/habits';
   } else {
     console.error('path not found');
   }
