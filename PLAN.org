@@ -1,0 +1,17 @@
+* TODO Move editor over
+* TODO Make editor capable of autocompletion
+* TODO Figure out how to lift nodes out of the editor
+* TODO Nodes
+
+* Basic design
+
+  Left sidebar: calendar and controls
+  Main page: search @ top, freeform entry 
+  Right sidebar: visualization
+  
+  Basic concepts:
+
+  a day is visualized as a collection of nodes and notes
+  nodes are created by the user via freeform text entry
+  nodes associate data with collections; collections determine what kind of interface nodes present
+  so if i open the page, and start typing

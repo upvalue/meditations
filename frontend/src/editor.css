@@ -1,0 +1,50 @@
+.rf-editor {
+  color: #182026;
+  outline: none;
+  width: 800px;
+  line-height: 1.8em;
+}
+
+.rf-editor hr {
+  border-top: 1px solid #8a9ba8;
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+.rf-editor .rf-editor-line:first-child h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
+  margin-top: 0;
+}
+
+.rf-inline-code {
+  background-color: #f5f8fa;
+  border: 1px solid #bfccd6;
+  font-size: .93em;
+  font-family:
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    "Courier New",
+    monospace;
+}
+
+.rf-editor ul.blockquote {
+  border-left: 2px solid #293742;
+  list-style-type: none;
+  padding-left: 6px;
+  margin-left: 0;
+}
+
+.rf-editor ol > ol {
+  list-style-type: lower-alpha;
+}
+
+.rf-editor ol > ol > ol {
+  list-style-type: upper-roman;
+}
+
+.rf-editor ol > ol > ol > ol{
+  list-style-type: decimal;
+}
