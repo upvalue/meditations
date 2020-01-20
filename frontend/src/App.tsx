@@ -1,11 +1,16 @@
 import React from 'react';
-import { Editor } from './editor/Editor';
+import { Page } from './editor/Editor';
 
 const App = () => {
   return (
     <div className="App flex justify-center pt3">
       <div className="flex">
-        <Editor />
+        <div className="mr2">
+          <button>
+            reset
+          </button>
+        </div>
+        <Page />
       </div>
     </div>
   );

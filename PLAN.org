@@ -15,3 +15,12 @@
   nodes are created by the user via freeform text entry
   nodes associate data with collections; collections determine what kind of interface nodes present
   so if i open the page, and start typing
+
+* Builtin collections
+
+  completion
+  timer
+  timer completion
+  window (fasting, etc)
+  GPS
+  pomodoro?

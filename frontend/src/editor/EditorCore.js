@@ -99,6 +99,18 @@ const insertAfter = (parent, node, newNode) => {
 }
 
 /**
+ * Find a node's ancestor line
+ */
+const nodeAncestorLine = (node) => {
+  let next = node;
+  while (next) {
+    if (next.classList && next.classList.contains('rf-editor-line')) return next;
+    next = next.parentNode;
+  }
+  return next;
+}
+
+/**
  * Check if a node is or has an ancestor with a particular nodeName (DIV, LI, etc)
  * @param {*} node 
  * @param {*} nodeNames Can be a string or an array of strings
@@ -233,6 +245,13 @@ export class EditorCore {
      * Used to avoid redundant observer dispatches
      */
     disableObserver: false,
+
+    /**
+     * If the user is currently engaged in an action e.g. typing @ collection or # hashtag
+     */
+    actionActive: false,
+
+    actionKeydown: false,
   };
 
   processLastTextNode(node) {
@@ -250,7 +269,7 @@ export class EditorCore {
     // TODO: Why did I add this? does this ever happen? :thonk:
     if (!parent) return;
 
-    const isToplevel = textNode.parentElement.parentElement === this.editor &&
+    const isToplevel = textNode.parentElement.parentElement === this.editorElt &&
       (textNode.previousSibling === null || ['BR', 'HR'].includes(textNode.previousSibling.nodeName));
 
     // Check for actions that may trigger popover behavior
@@ -274,8 +293,10 @@ export class EditorCore {
           range.setStart(anchorNode, i);
 
           if (lastWord.startsWith('@') && lastWord.length > 1) {
+            this.state.actionActive = true;
             this.callbacks.onAction('collection', range, lastWord.slice(1));
           } else {
+            this.state.actionActive = false;
             this.callbacks.onClear();
           }
         }
@@ -337,20 +358,30 @@ export class EditorCore {
     }
   }
 
-  mount(editor, callbacks) {
-    this.editor = editor;
+  unmount() {
+    this.observer.disconnect();
+  }
+
+  mount(nodeId, editorElt, callbacks) {
+    this.nodeId = nodeId;
+    this.editorElt = editorElt;
     this.callbacks = callbacks;
     this.tmp = document.createElement('span');
 
-    editor.classList.add('rf-editor');
+    editorElt.classList.add('rf-editor');
 
-    editor.addEventListener('keydown', e => {
+    editorElt.addEventListener('keydown', e => {
       if (e.isComposing || e.keyCode === 229) return;
 
       const activeElement = getActiveElement();
 
       // Trap tabs, allow them to indent an active list (but only when within the list)
       if (e.keyCode === 9) {
+        if (this.state.actionActive === true) {
+          e.preventDefault();
+          this.callbacks.onActionKeydown(this, e.key);
+          return;
+        }
         const listItem = nodeAncestorOfNames(activeElement, 'LI');
         if (listItem) {
           e.preventDefault();
@@ -358,6 +389,11 @@ export class EditorCore {
           const ul = listItem.parentElement;
           if (ul.classList.contains('blockquote')) return;
           document.execCommand('indent');
+        }
+      } else if (e.keyCode === 13) {
+        if (this.state.actionActive === true) {
+          e.preventDefault();
+          this.callbacks.onActionKeydown(this, e.key);
         }
       }
     })
@@ -381,7 +417,6 @@ export class EditorCore {
             this.processTextNode(mutation.previousSibling, eolRegexen);
             return;
           }
-
 
           if (node.nodeName === 'HR') {
             // Horizontal rules are added at the toplevel for some reason, but we don't want
@@ -417,7 +452,7 @@ export class EditorCore {
           // conditions and perhaps they should be converted to assertions within the body
           // and logs monitored to see if they ever actually happen
 
-          if (mutation.target === editor && mutation.addedNodes.length === 1) {
+          if (mutation.target === editorElt && mutation.addedNodes.length === 1) {
             if (node.nodeName === 'DIV') {
               // If the user has created a new line, try to process the final piece of text
               // they entered in case it is some markdown
@@ -458,7 +493,7 @@ export class EditorCore {
               if (lastTextNode) {
                 this.processLastTextNode(lastTextNode);
               }
-            } else if (node.nodeName === 'DIV' && node.parentElement !== editor) {
+            } else if (node.nodeName === 'DIV' && node.parentElement !== editorElt) {
               // Detect if a single div has been inserted, at non-toplevel
               // If it has, splice it up to a toplevel .rf-editor-line
               const parent = node.parentElement;
@@ -484,20 +519,46 @@ export class EditorCore {
             }
           }
 
-          // Also, if user spaces out of a code bo
-
           // Don't carry over formatting to new lines
-          if (mutation.target === editor && mutation.addedNodes.length === 1 && mutation.addedNodes[0].nodeType !== Node.TEXT_NODE && mutation.addedNodes[0].classList.contains('rf-editor-line')) {
+          if (mutation.target === editorElt && mutation.addedNodes.length === 1 && mutation.addedNodes[0].nodeType !== Node.TEXT_NODE && mutation.addedNodes[0].classList.contains('rf-editor-line')) {
             disableCommandStates('bold', 'italic', 'underline', 'strikethrough');
           }
         }
       }
     });
 
-    observer.observe(editor, {
+    observer.observe(editorElt, {
       attributes: true, childList: true, subtree: true, characterData: true
     });
 
     this.observer = observer;
   };
+
+  splitOnAction(action, callback) {
+    const sel = document.getSelection();
+    if (sel) {
+      const anchorNode = sel.anchorNode;
+      const line = nodeAncestorLine(anchorNode);
+
+      const tmp = document.createElement('div');
+
+      // Now what.
+      const list = line.parentElement.childNodes;
+      while (list.length) {
+        const child = list[0];
+        if (child === line) break;
+        tmp.appendChild(list[0]);
+      }
+
+      const before = tmp.innerHTML;
+
+      tmp.innerHTML = '';
+
+      tmp.appendChild(line);
+
+      const lineHTML = tmp.innerHTML;
+
+      callback(this.nodeId, before, lineHTML)
+    }
+  }
 }
