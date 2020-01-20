@@ -79,6 +79,16 @@ export const CLog = (props: LogProps) => {
   )
 }
 
+const initalNodes: Node[] = [
+  {
+    type: 'note',
+    id: gensym('note'),
+    body: '<div class="rf-editor-line">Click to edit</div>',
+  }
+];
+
+// is each of these persisted?
+
 export const Page = () => {
   const popperElementRef = useRef<HTMLDivElement | null>(null);
   const popperInstance = useRef<Instance | null>(null);
@@ -87,32 +97,51 @@ export const Page = () => {
   const [completion, setCompletion] = useState('');
   const completionRef = useRef<string>('');
 
-  const [nodes, setNodes] = useState<Node[]>([
-    {
-      type: 'note',
-      id: gensym('note'),
-      body: '<div class="rf-editor-line">Click to edit</div>',
-    }
-  ]);
+  const [nodes, setNodes] = useState<Node[]>(initalNodes);
+  const nodesRef = useRef<Node[]>(nodes);
 
   const onActionKeydown = useCallback((editorCore: EditorCore, key: EditorActionKey) => {
     editorCore.splitOnAction(completionRef.current, (nodeId, before, line, after) => {
-      setNodes(produce(nodes, draft => {
+      nodesRef.current = (produce(nodesRef.current, draft => {
         const nodeIdx = draft.findIndex(n => n.id === nodeId);
 
-        const newNodes: Node[] = [{
-          type: 'note',
-          id: gensym('note'),
-          body: before,
-        }, {
-          type: 'log',
-          id: gensym('log'),
-          name: 'ACTION',
-        }];
+        const newNodes: Node[] = [];
 
-        draft.splice(nodeIdx, 1, ...newNodes);
+        if (before) {
+          newNodes.push({
+            type: 'note',
+            id: gensym('note'),
+            body: before,
+          });
+        }
+
+        const logId = gensym('log');
+
+        newNodes.push({
+          type: 'log',
+          id: logId,
+          name: logId,
+        })
+
+        if (after) {
+          newNodes.push({
+            type: 'note',
+            id: gensym('note'),
+            body: after,
+          });
+        } else if (nodeIdx === nodes.length - 1) {
+          newNodes.push({
+            type: 'note',
+            id: gensym('note'),
+            body: '<div class="rf-editor-line">&#8203;</div>',
+          });
+        }
+
+        draft.splice(nodeIdx, before ? 1 : 0, ...newNodes);
+
         onClear();
-      }))
+      }));
+      setNodes(nodesRef.current);
     });
   }, []);
 
@@ -146,7 +175,7 @@ export const Page = () => {
   console.log(nodes);
 
   return (
-    <section>
+    <section >
       <div className="rf-popup p1" ref={popperElementRef} style={popperActive ? {} : { display: 'none' }}>
         {completion}
       </div>

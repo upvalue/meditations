@@ -540,7 +540,25 @@ export class EditorCore {
       const anchorNode = sel.anchorNode;
       const line = nodeAncestorLine(anchorNode);
 
+      // parent.insertBefore(newNode, node.nextSibling);
+      const n = document.createElement('div');
+      // n.setAttribute('contenteditable', 'true')
+      n.innerHTML = '<button contenteditable="false">butan</button>'
+      this.editorElt.insertBefore(n, line);
+      const divAfter = document.createElement('div');
+      divAfter.classList.add('rf-editor-line');
+      divAfter.innerHTML = '&#8203';
+      this.state.disableObserver = true;
+      insertAfter(this.editorElt, line, divAfter);
+
+      this.editorElt.removeChild(line);
+
+
+
+      /*
       const tmp = document.createElement('div');
+
+      let before = null;
 
       // Now what.
       const list = line.parentElement.childNodes;
@@ -548,9 +566,8 @@ export class EditorCore {
         const child = list[0];
         if (child === line) break;
         tmp.appendChild(list[0]);
+        before = tmp.innerHTML;
       }
-
-      const before = tmp.innerHTML;
 
       tmp.innerHTML = '';
 
@@ -559,6 +576,7 @@ export class EditorCore {
       const lineHTML = tmp.innerHTML;
 
       callback(this.nodeId, before, lineHTML)
+      */
     }
   }
 }
