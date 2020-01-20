@@ -221,7 +221,7 @@ const assert = (desc, expr) => {
   }
 }
 
-export default class Editor {
+export class EditorCore {
   state = {
     /**
      * When inserting a markdown list, contains the 
@@ -252,6 +252,35 @@ export default class Editor {
 
     const isToplevel = textNode.parentElement.parentElement === this.editor &&
       (textNode.previousSibling === null || ['BR', 'HR'].includes(textNode.previousSibling.nodeName));
+
+    // Check for actions that may trigger popover behavior
+    const sel = document.getSelection();
+    if (sel) {
+      const { anchorNode, anchorOffset } = sel;
+      if (anchorOffset > 0 && !anchorNode.wholeText[anchorOffset - 1].match(/\s/)) {
+
+        // Find most recent sigil before whitespace break
+        if (anchorNode.nodeName === '#text') {
+          let i = anchorOffset;
+          for (; i !== 0; i -= 1) {
+            if (anchorNode.wholeText[i] === ' ') {
+              i += 1; break;
+            }
+          }
+
+          const lastWord = anchorNode.wholeText.slice(i, anchorOffset);
+
+          const range = document.createRange();
+          range.setStart(anchorNode, i);
+
+          if (lastWord.startsWith('@') && lastWord.length > 1) {
+            this.callbacks.onAction('collection', range, lastWord.slice(1));
+          } else {
+            this.callbacks.onClear();
+          }
+        }
+      }
+    }
 
     const [type, result] = transformText(isToplevel, textNode.wholeText, regexen);
 
@@ -308,12 +337,9 @@ export default class Editor {
     }
   }
 
-  save() {
-    return this.editor.innerHTML;
-  }
-
-  mount(editor) {
+  mount(editor, callbacks) {
     this.editor = editor;
+    this.callbacks = callbacks;
     this.tmp = document.createElement('span');
 
     editor.classList.add('rf-editor');
