@@ -43,6 +43,7 @@ export class Editable<
   editorOpen = (e?: React.MouseEvent<HTMLElement>) => {
     console.log("!!! editorOpen Called");
     if (!this.editor) {
+      console.log('making new editor');
       const options = {
         autoLink: true,
         placeholder: true,
@@ -89,13 +90,9 @@ export class Editable<
       });
 
       editor.subscribe("blur", () => {
+        console.log('blur called');
         this.onBlur();
 
-        if (this.interval) {
-          console.log('clearing autosave');
-          clearInterval(this.interval);
-
-        }
         window.removeEventListener("beforeunload", listener);
         // It is possible that blur may have been called because copy-paste causes MediumEditor to
         // create a 'pastebin' element, in which case we do not want to trigger a save.
@@ -104,6 +101,11 @@ export class Editable<
           document.activeElement.id.startsWith("medium-editor-pastebin")
         ) {
           return;
+        }
+
+        if (this.interval) {
+          console.log('clearing autosave');
+          clearInterval(this.interval);
         }
 
         // Do not update if nothing has changed
@@ -115,6 +117,7 @@ export class Editable<
 
         this.setState({ editorOpen: false });
       });
+      this.editor = editor;
     }
     this.interval = setInterval(this.onSaveInterval, 10000);
     this.setState({ editorOpen: true });
