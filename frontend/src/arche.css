@@ -4,12 +4,18 @@
  */
 
 :root {
-  --var-a-space-1: 2px;
-  --var-a-space-2: 4px;
-  --var-a-space-3: 8px;
+  --var-a-space-1: 4px;
+  --var-a-space-2: 8px;
+  --var-a-space-3: 12px;
   --var-a-space-4: 16px;
   --var-a-space-5: 32px;
 }
+
+/*****
+ * TYPOGRAPHY
+ *****/
+
+.a-bold { font-weight: bold; }
 
 /*****
  * FLEXBOX

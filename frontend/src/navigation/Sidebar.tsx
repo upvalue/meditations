@@ -14,12 +14,12 @@ export const Sidebar = () => {
   const [confirm, setConfirm] = useState(false);
 
   return (
-    <div className="sidebar mr4">
-      <div className="p2">
+    <div className="sidebar a-mr4">
+      <div className="a-p4">
         <h3>Refractory</h3>
 
-        <div className="mt2">
-          <div className="bold">Documents</div>
+        <div className="a-mt4">
+          <div className="a-bold">Documents</div>
           {documents.map(d => {
             return <div key={d.id}><Link to={`/document/${d.id}`}>{d.id}</Link></div>
           })}
@@ -29,12 +29,12 @@ export const Sidebar = () => {
 
         </div>
 
-        <div className="mt2">
-          <div className="bold">Collections</div>
+        <div className="a-mt4">
+          <div className="a-bold">Collections</div>
           {Object.entries(collections).map(([k, collection]) => <div key={k}><Link to={`/collections/${k}`}>@{collection.name}</Link></div>)}
         </div>
 
-        <div className="mt2">
+        <div className="a-mt4">
           <button onClick={() => {
             if (confirm) {
               saveState(initialState);
