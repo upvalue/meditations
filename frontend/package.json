@@ -1,0 +1,51 @@
+{
+  "name": "refractory",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@popperjs/core": "^2.4.0",
+    "@reduxjs/toolkit": "^1.3.6",
+    "@types/jest": "^25.2.3",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-redux": "^7.1.9",
+    "@types/react-router": "^5.1.7",
+    "@types/react-router-dom": "^5.1.5",
+    "@types/redux-logger": "^3.0.7",
+    "basscss": "^8.1.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "redux-logger": "^3.0.6",
+    "short-uuid": "^3.1.1",
+    "slate": "^0.58.1",
+    "slate-react": "^0.58.1",
+    "ts-jest": "^26.0.0",
+    "typescript": "^3.9.3"
+  },
+  "devDependencies": {
+    "react-scripts": "^3.4.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "rules": {
+      "react-hooks/exhaustive-deps": "off"
+    }
+  },
+  "browserslist": {
+    "production": [
+      "last 1 chrome version"
+    ],
+    "development": [
+      "last 1 chrome version"
+    ]
+  }
+}
