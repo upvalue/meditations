@@ -5,11 +5,9 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import './reset.css';
 import './index.css';
-import './basscss.css';
 import { store } from './store/store';
-
+import './arche.css';
 
 ReactDOM.render(
   <Provider store={store} >

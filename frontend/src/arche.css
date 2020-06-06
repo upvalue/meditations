@@ -1,1 +1,107 @@
-/home/me/Sync/web/arche/arche.css
+/*
+ * arche is a two-file React component library. It is intended to be copied (or symlinked)
+ * directly into projects.
+ */
+
+:root {
+  --var-a-space-1: 2px;
+  --var-a-space-2: 4px;
+  --var-a-space-3: 8px;
+  --var-a-space-4: 16px;
+  --var-a-space-5: 32px;
+}
+
+/*****
+ * FLEXBOX
+ *****/
+
+.a-flex { display: flex; }
+.a-justify-center { justify-content: center; }
+
+/*****
+ * PADDING 
+ *****/
+
+.a-p1 { padding: var(--var-a-space-1); }
+.a-p2 { padding: var(--var-a-space-2); }
+.a-p3 { padding: var(--var-a-space-3); }
+.a-p4 { padding: var(--var-a-space-4); }
+.a-p5 { padding: var(--var-a-space-5); }
+
+.a-pt1 { padding-top: var(--var-a-space-1); }
+.a-pt2 { padding-top: var(--var-a-space-2); }
+.a-pt3 { padding-top: var(--var-a-space-3); }
+.a-pt4 { padding-top: var(--var-a-space-4); }
+.a-pt5 { padding-top: var(--var-a-space-5); }
+
+.a-pb1 { padding-bottom: var(--var-a-space-1); }
+.a-pb2 { padding-bottom: var(--var-a-space-2); }
+.a-pb3 { padding-bottom: var(--var-a-space-3); }
+.a-pb4 { padding-bottom: var(--var-a-space-4); }
+.a-pb5 { padding-bottom: var(--var-a-space-5); }
+
+.a-pl1 { padding-left: var(--var-a-space-1); }
+.a-pl2 { padding-left: var(--var-a-space-2); }
+.a-pl3 { padding-left: var(--var-a-space-3); }
+.a-pl4 { padding-left: var(--var-a-space-4); }
+.a-pl5 { padding-left: var(--var-a-space-5); }
+
+.a-pr1 { padding-right: var(--var-a-space-1); }
+.a-pr2 { padding-right: var(--var-a-space-2); }
+.a-pr3 { padding-right: var(--var-a-space-3); }
+.a-pr4 { padding-right: var(--var-a-space-4); }
+.a-pr5 { padding-right: var(--var-a-space-5); }
+
+.a-px1 { padding-left: var(--a-space-1); padding-right: var(--var-a-space-1); }
+.a-px2 { padding-left: var(--a-space-2); padding-right: var(--var-a-space-2); }
+.a-px3 { padding-left: var(--a-space-3); padding-right: var(--var-a-space-3); }
+.a-px4 { padding-left: var(--a-space-4); padding-right: var(--var-a-space-4); }
+.a-px5 { padding-left: var(--a-space-5); padding-right: var(--var-a-space-5); }
+
+.a-py1 { padding-top: var(--a-space-1); padding-bottom: var(--var-a-space-1); }
+.a-py2 { padding-top: var(--a-space-2); padding-bottom: var(--var-a-space-2); }
+.a-py3 { padding-top: var(--a-space-3); padding-bottom: var(--var-a-space-3); }
+.a-py4 { padding-top: var(--a-space-4); padding-bottom: var(--var-a-space-4); }
+.a-py5 { padding-top: var(--a-space-5); padding-bottom: var(--var-a-space-5); }
+
+.a-m1 { padding: var(--var-a-space-1); }
+.a-m2 { padding: var(--var-a-space-2); }
+.a-m3 { padding: var(--var-a-space-3); }
+.a-m4 { padding: var(--var-a-space-4); }
+.a-m5 { padding: var(--var-a-space-5); }
+
+.a-mt1 { margin-top: var(--var-a-space-1); }
+.a-mt2 { margin-top: var(--var-a-space-2); }
+.a-mt3 { margin-top: var(--var-a-space-3); }
+.a-mt4 { margin-top: var(--var-a-space-4); }
+.a-mt5 { margin-top: var(--var-a-space-5); }
+
+.a-mb1 { margin-bottom: var(--var-a-space-1); }
+.a-mb2 { margin-bottom: var(--var-a-space-2); }
+.a-mb3 { margin-bottom: var(--var-a-space-3); }
+.a-mb4 { margin-bottom: var(--var-a-space-4); }
+.a-mb5 { margin-bottom: var(--var-a-space-5); }
+
+.a-ml1 { margin-left: var(--var-a-space-1); }
+.a-ml2 { margin-left: var(--var-a-space-2); }
+.a-ml3 { margin-left: var(--var-a-space-3); }
+.a-ml4 { margin-left: var(--var-a-space-4); }
+.a-ml5 { margin-left: var(--var-a-space-5); }
+
+.a-mr1 { margin-right: var(--var-a-space-1); }
+.a-mr2 { margin-right: var(--var-a-space-2); }
+.a-mr3 { margin-right: var(--var-a-space-3); }
+.a-mr4 { margin-right: var(--var-a-space-4); }
+.a-mr5 { margin-right: var(--var-a-space-5); }
+
+.a-mx1 { margin-left: var(--a-space-1); margin-right: var(--var-a-space-1); }
+.a-mx2 { margin-left: var(--a-space-2); margin-right: var(--var-a-space-2); }
+.a-mx3 { margin-left: var(--a-space-3); margin-right: var(--var-a-space-3); }
+.a-mx4 { margin-left: var(--a-space-4); margin-right: var(--var-a-space-4); }
+.a-mx5 { margin-left: var(--a-space-5); margin-right: var(--var-a-space-5); }
+
+.a-my1 { margin-top: var(--a-space-1); margin-bottom: var(--var-a-space-1); }
+.a-my2 { margin-top: var(--a-space-2); margin-bottom: var(--var-a-space-2); }
+.a-my3 { margin-top: var(--a-space-3); margin-bottom: var(--var-a-space-3); }
+.a-my4 { margin-top: var(--a-space-4); margin-bottom: var(--var-a-space-4); }
+.a-my5 { margin-top: var(--a-space-5); margin-bottom: var(--var-a-space-5); }

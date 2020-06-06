@@ -4,10 +4,11 @@ import { Sidebar } from './navigation/Sidebar';
 import { Switch, Route } from 'react-router';
 import { DocumentRoute } from './routes/DocumentRoute';
 
+
 const App = () => {
   return (
-    <div className="App flex justify-center pt3">
-      <div className="flex">
+    <div className="App a-flex a-justify-center a-pt3">
+      <div className="a-flex">
         <Sidebar />
 
         <Switch>
