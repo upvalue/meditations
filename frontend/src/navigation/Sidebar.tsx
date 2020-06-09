@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createDocument } from '../store/store';
 import { saveState, initialState } from '../store/storage';
+import { Button } from '../arche';
 
 export const Sidebar = () => {
   const { documents, collections } = useSelector((state: TState) => state);
@@ -18,15 +19,13 @@ export const Sidebar = () => {
       <div className="a-p4">
         <h3>Refractory</h3>
 
-        <div className="a-mt4">
+        <div className="a-mt4" style={{ lineHeight: '32px' }}>
           <div className="a-bold">Documents</div>
           {documents.map(d => {
             return <div key={d.id}><Link to={`/document/${d.id}`}>{d.id}</Link></div>
           })}
 
-          <button onClick={createDoc}>+ New document</button>
-
-
+          <Button onClick={createDoc}>+ New document</Button>
         </div>
 
         <div className="a-mt4">
@@ -35,7 +34,7 @@ export const Sidebar = () => {
         </div>
 
         <div className="a-mt4">
-          <button onClick={() => {
+          <Button onClick={() => {
             if (confirm) {
               saveState(initialState);
               window.location.reload();
@@ -45,9 +44,7 @@ export const Sidebar = () => {
           }}>
             {confirm && "Are you sure?"}
             {!confirm && "Delete state"}
-
-
-          </button>
+          </Button>
         </div>
 
       </div>

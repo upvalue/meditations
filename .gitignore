@@ -1,16 +1,1 @@
-/backend/node_modules
-/build
-/jsdoc
-/bin
-/assets
 /node_modules
-*.sqlite3
-/assets/vendor
-*.map
-/meditations
-/typings
-/coverage
-*.sqlite
-/docs/book
-/_book
-/backend/src/*.js

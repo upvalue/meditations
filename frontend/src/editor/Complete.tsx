@@ -5,7 +5,7 @@ import { EditorInstance } from './lib/editor';
 import { TDocument } from '../store/types';
 import { createPopper } from '@popperjs/core/lib/popper-lite';
 import { generateId } from '../lib/utilities';
-import { useSelector } from 'react-redux';
+import { usePopper } from 'react-popper';
 
 type Props = {
   body: TDocument;
@@ -56,6 +56,8 @@ export const Complete = (props: Props) => {
 
   const popperInstance = useRef<any>(null);
   const [completionState, completionDispatch] = useReducer(completionReducer, initialCompletionState);
+
+
   const [popperId] = useState(generateId('popper'));
   const virtualElement = useRef<any>(null);
 

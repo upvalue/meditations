@@ -97,7 +97,7 @@ export const TEditor = (props: Props) => {
         }
         */
       }}>
-        <div className="editor p2" ref={ref}>
+        <div className="editor a-p4" ref={ref}>
           <Editable decorate={decorate} renderElement={RenderElement} renderLeaf={RenderLeaf} />
         </div>
         <Complete
