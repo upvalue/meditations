@@ -1,0 +1,11 @@
+{
+  "name": "techne",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:upvalue/meditations.git",
+  "author": "Phil <phil@upvalue.io>",
+  "license": "MIT",
+  "scripts": {
+    "build": "cd frontend && yarn build"
+  }
+}
