@@ -6,6 +6,6 @@
   "author": "Phil <phil@upvalue.io>",
   "license": "MIT",
   "scripts": {
-    "build": "cd frontend && yarn build"
+    "build": "cd frontend && yarn && yarn build"
   }
 }
