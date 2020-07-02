@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/go-macaron/pongo2"
 	"github.com/jinzhu/gorm"
@@ -25,6 +24,8 @@ type Configuration struct {
 	Host string
 	// HTTP port
 	Port int
+	// Database type "postgres" or "sqlite3"
+	DBType string
 	// Database path
 	DBPath string
 	// If true, all SQL queries will be logged
@@ -54,6 +55,7 @@ type Settings struct {
 var Config = Configuration{
 	Host:        "",
 	Port:        8080,
+	DBType:      "sqlite3",
 	DBPath:      "development.sqlite3",
 	DBLog:       false,
 	SiteTitle:   "meditations",
@@ -67,6 +69,7 @@ var Config = Configuration{
 func loadConfig(c *cli.Context) {
 	Config.DBLog = c.Bool("db-log")
 	Config.Development = c.BoolT("development")
+	Config.DBType = c.String("database-type")
 	Config.DBPath = c.String("database")
 	Config.Port = c.Int("port")
 	Config.Migrate = c.Bool("migrate")
@@ -206,6 +209,11 @@ func Main() {
 			Usage: "log SQL queries (note some commands will verbosely log SQL anyway)",
 		},
 		cli.StringFlag{
+			Name:  "database-type",
+			Usage: "database type (postgres or sqlite3)",
+			Value: "sqlite3",
+		},
+		cli.StringFlag{
 			Name:  "database",
 			Usage: "database path",
 			Value: "development.sqlite3",
@@ -250,15 +258,6 @@ func Main() {
 		},
 
 		{
-			Name:  "electron",
-			Usage: "To be invoked from Electron; allows Electron instances to configure DB path and other things before starting the server",
-			Flags: commonflags,
-			Action: func(c *cli.Context) {
-
-			},
-		},
-
-		{
 			Name:  "check",
 			Usage: "check database for errors",
 			Flags: commonflags,
@@ -267,27 +266,6 @@ func Main() {
 				Config.DBLog = true
 				DBOpen()
 				DBRepair(false)
-				DBClose()
-			},
-		},
-
-		{
-			Name:  "seed",
-			Usage: "WILL ERASE DATABASE! Seed database with example data beginning from July 2017; for tutorial/demo",
-			Flags: append(commonflags, cli.StringFlag{
-				Name:  "date",
-				Usage: "MMMM-YY date to seed from",
-			}),
-			Action: func(c *cli.Context) {
-				loadConfig(c)
-				Config.DBLog = true
-				DBOpen()
-
-				if Config.Migrate == true {
-					DBMigrate()
-				}
-
-				DBSeed(c.String("date"))
 				DBClose()
 			},
 		},
@@ -317,24 +295,6 @@ func Main() {
 
 				graphqlInitialize()
 
-				if Config.Demo {
-					// ticker := time.NewTicker(time.Second * 10)
-					ticker := time.NewTicker(time.Hour)
-					today := time.Now()
-
-					DBSeed(today.AddDate(0, 1, 0).Format("2006-01-02"))
-
-					go func() {
-						for t := range ticker.C {
-							day := time.Now()
-							fmt.Printf("Seeding database at %v!\n", t)
-							DBSeed(day.Format("2006-01-02"))
-						}
-					}()
-
-				}
-
-				// DBSeed
 				log.Printf("running with configuration %+v\n", Config)
 				log.Printf("starting server")
 

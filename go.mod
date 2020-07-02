@@ -16,6 +16,7 @@ require (
 	github.com/jinzhu/now v0.0.0-20181116074157-8ec929ed50c3
 	github.com/jmoiron/jsonq v0.0.0-20150511023944-e874b168d07e
 	github.com/juju/errors v0.0.0-20190930114154-d42613fe1ab9 // indirect
+	github.com/lib/pq v1.7.0 // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0

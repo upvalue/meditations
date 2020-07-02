@@ -30,6 +30,10 @@ export class Editable<
     return false;
   }
 
+  componentWillUnmount() {
+    if (this.interval) clearInterval(this.interval);
+  }
+
   /** Abstract method; dispatch an asynchronous update of the Editable in question */
   editorSave() {
     console.error("editorSave not implemented");
@@ -90,7 +94,6 @@ export class Editable<
       });
 
       editor.subscribe("blur", () => {
-        console.log('blur called');
         this.onBlur();
 
         window.removeEventListener("beforeunload", listener);

@@ -15,18 +15,18 @@ import (
 type Entry struct {
 	gorm.Model
 	Date     time.Time
-	Name     string 
+	Name     string
 	Body     string
 	LastBody string
-  Tags     []Tag `gorm:"many2many:entry_tags"`
-  Lock     string
+	Tags     []Tag `gorm:"many2many:entry_tags"`
+	Lock     string
 }
 
 // EntrySave is an emergency append-only save table
 type EntrySave struct {
-  gorm.Model
-  EntryID uint
-  Body string
+	gorm.Model
+	EntryID uint
+	Body    string
 }
 
 // Tag represents a journal tag; many-to-many relationship with ntries
@@ -155,24 +155,24 @@ func journalUpdate(c *macaron.Context, entryUpdate Entry) {
 	} else {
 		entry.LastBody = entry.Body
 		entry.Body = entryUpdate.Body
-    DB.Save(&entry)
+		DB.Save(&entry)
 
-    entrySave := EntrySave{
-      EntryID: entry.ID,
-      Body: entryUpdate.Body,
-    }
+		entrySave := EntrySave{
+			EntryID: entry.ID,
+			Body:    entryUpdate.Body,
+		}
 
-    DB.Save(&entrySave)
+		DB.Save(&entrySave)
 
 		// TODO: Why is this here?
 		if entry.Name == "" {
 			DB.Exec("update entries set name = null where id = ?", entry.ID)
-    }
-    
-    // Just don't sync locked entries
-    if entry.Lock != "" {
-      return
-    }
+		}
+
+		// Just don't sync locked entries
+		if entry.Lock != "" {
+			return
+		}
 		syncEntry(entry)
 	}
 }
@@ -245,27 +245,27 @@ func journalNameEntry(c *macaron.Context) {
 	serverOK(c)
 }
 
-func journalLock (c *macaron.Context) {
-  var entry Entry
-  DB.Where("id = ?", c.ParamsInt("id")).Preload("Tags").First(&entry)
+func journalLock(c *macaron.Context) {
+	var entry Entry
+	DB.Where("id = ?", c.ParamsInt("id")).Preload("Tags").First(&entry)
 
-  entry.Lock = c.Params("session")
-  DB.Save(&entry)
+	entry.Lock = c.Params("session")
+	DB.Save(&entry)
 
-  syncEntry(entry)
+	syncEntry(entry)
 
-  serverOK(c)
+	serverOK(c)
 }
 
-func journalUnlock (c *macaron.Context) {
-  DB.Exec("update entries set lock = null where id = ?", c.ParamsInt("id"))
+func journalUnlock(c *macaron.Context) {
+	DB.Exec("update entries set lock = null where id = ?", c.ParamsInt("id"))
 
-  var entry Entry
-  DB.Where("id = ?", c.ParamsInt("id")).Preload("Tags").First(&entry)
+	var entry Entry
+	DB.Where("id = ?", c.ParamsInt("id")).Preload("Tags").First(&entry)
 
-  syncEntry(entry)
+	syncEntry(entry)
 
-  serverOK(c)
+	serverOK(c)
 }
 
 type searchResult struct {
@@ -282,6 +282,7 @@ func journalSearch(c *macaron.Context) {
 		String:  c.Query("string"),
 		Entries: entries,
 	})
+
 	serverOK(c)
 }
 
@@ -295,14 +296,14 @@ func journalInit(m *macaron.Macaron) {
 	m.Get("/entries/date", journalEntries)
 	m.Get("/entries/by-day", journalEntriesByDay)
 	m.Get("/entries/tag/:name", journalEntriesByTag)
-  m.Get("/entries/name/:name", journalNamedEntry)
+	m.Get("/entries/name/:name", journalNamedEntry)
 	m.Get("/tags/autocomplete", journalTagAutocomplete)
 
 	m.Post("/sidebar", journalSidebarInfo)
 	m.Post("/new", journalNew)
-  m.Post("/update", binding.Bind(Entry{}), journalUpdate)
-  m.Post("/lock-entry/:id/:session", journalLock)
-  m.Post("/unlock-entry/:id", journalUnlock)
+	m.Post("/update", binding.Bind(Entry{}), journalUpdate)
+	m.Post("/lock-entry/:id/:session", journalLock)
+	m.Post("/unlock-entry/:id", journalUnlock)
 	m.Post("/add-tag/:id/:tag", journalAddTag)
 	m.Post("/remove-tag/:id/:tag", journalRemoveTag)
 	m.Post("/delete-entry/:id", journalDeleteEntry)

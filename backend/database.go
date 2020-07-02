@@ -6,12 +6,12 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3" // load sqlite3 driver
+	_ "github.com/jinzhu/gorm/dialects/postgres" // load postgres dialect
+	_ "github.com/jinzhu/gorm/dialects/sqlite"   // load sqlite3 dialect
+	_ "github.com/mattn/go-sqlite3"              // load sqlite3 driver
 )
 
 const (
@@ -24,7 +24,14 @@ var DB *gorm.DB
 
 // DBOpen open database
 func DBOpen() {
-	db, err := gorm.Open("sqlite3", Config.DBPath)
+	var db *gorm.DB
+	var err error
+	if Config.DBType == "postgres" {
+		fmt.Printf("%s\n", Config.DBPath)
+		db, err = gorm.Open("postgres", Config.DBPath)
+	} else {
+		db, err = gorm.Open("sqlite3", Config.DBPath)
+	}
 	checkErr(err)
 	DB = db
 	DB.LogMode(Config.DBLog)
@@ -41,9 +48,9 @@ func DBMigrate() {
 		// habits.go
 		&Task{}, &Scope{},
 		// journal.go
-    &Entry{}, &Tag{},
-  )
-  DB.AutoMigrate(&EntrySave{})
+		&Entry{}, &Tag{},
+	)
+	DB.AutoMigrate(&EntrySave{})
 	DBCreate()
 
 	DB.Exec("CREATE INDEX IF NOT EXISTS idx_tasks_date ON tasks (date);")
@@ -108,14 +115,14 @@ func DBMigrate() {
 
 		settings.Schema = 3
 		DB.Save(&settings)
-  }
+	}
 
-  if settings.Schema == 3 {
-    log.Printf("!!! Upgrading from Schema 3 to 4")
-    DB.Exec("ALTER TABLE entries ADD lock string;")
-    settings.Schema = 4
-    DB.Save(&settings)
-  }
+	if settings.Schema == 3 {
+		log.Printf("!!! Upgrading from Schema 3 to 4")
+		DB.Exec("ALTER TABLE entries ADD lock string;")
+		settings.Schema = 4
+		DB.Save(&settings)
+	}
 
 	DB.Exec("VACUUM;")
 
@@ -135,117 +142,6 @@ func DBCreate() {
 	settings := Settings{Name: "settings", Schema: SchemaVersion}
 
 	DB.FirstOrCreate(&settings)
-}
-
-func seedTask(name string, date time.Time, scope int, status int, comment string, minutes int) *Task {
-	task := Task{
-		Name:    name,
-		Date:    date,
-		Scope:   scope,
-		Status:  status,
-		Minutes: minutes,
-		Comment: comment,
-	}
-	return &task
-}
-
-// DBSeed seeds the database with example data, suitable for testing or the demo/tutorial
-// application. Accepts an optional date argument to start from (for reproducible tests), if empty
-// string is provided, seeds from the current day
-func DBSeed(seedFrom string) {
-	if seedFrom == "" {
-		seedFrom = "2017-07"
-	}
-
-	log.Printf("Seeding database from %s\n", seedFrom)
-
-	day, err := time.Parse("2006-01-02", seedFrom)
-
-	if err != nil {
-		day, err = time.Parse("2006-01", seedFrom)
-		if err != nil {
-			log.Fatalf("Expected date of format 2006-01 or 2006-01-02 but got %s: %v", seedFrom, err)
-
-		}
-		day = day.AddDate(0, 1, -1)
-	}
-
-	DB.DropTableIfExists(&Task{}, &Entry{}, &Scope{}, &Tag{})
-	DBMigrate()
-
-	// deterministic random values
-	rand.Seed(12345)
-
-	DB.LogMode(false)
-	tx := DB.Begin()
-
-	// Generate 2 years of tasks with some random functions
-	dayi := day
-	for i := 0; i < 365*2; i++ {
-		// Diet will have some calories logged as a comment, and success based on that random number
-		calories := rand.Intn(500) + 2350
-		minutes := rand.Intn(20) + 20
-
-		status := TaskComplete
-		if calories > 2500 {
-			status = TaskIncomplete
-		}
-
-		tx.Save(seedTask("Diet", dayi, ScopeDay, status, fmt.Sprintf("%d calories\n", calories), 0))
-		tx.Save(seedTask("Exercise", dayi, ScopeDay, TaskComplete, fmt.Sprintf("ran %d minutes\n", minutes), minutes))
-
-		// Project tasks
-		if dayi.Format("Monday") == "Monday" {
-			tx.Save(seedTask("Drawing practice", dayi, ScopeDay, TaskComplete, "Monday drawing practice", 60))
-		}
-
-		if dayi.Day() == 1 {
-			// Add month tasks on first of day
-			tx.Save(seedTask("Diet", dayi, ScopeMonth, status, "Eat less than 2500 calories a day", 0))
-			tx.Save(seedTask("Exercise", dayi, ScopeMonth, TaskComplete, "Run every day", 0))
-		}
-
-		if dayi.AddDate(0, 0, -1).Year() != dayi.Year() {
-			tx.Save(seedTask("Diet", dayi, ScopeYear, status, "Eat less than 2500 calories a day", 0))
-			tx.Save(seedTask("Exercise", dayi, ScopeYear, TaskComplete, "Run every day", 0))
-		}
-
-		dayi = dayi.AddDate(0, 0, -1)
-	}
-
-	// Generate example project
-	tx.Save(&Scope{
-		Name:       "Drawing practice",
-		Visibility: VisibilityPinned,
-	})
-
-	// Generate example entries from built-in strings
-	tag := &Tag{
-		Name: "enchiridion",
-	}
-
-	tx.Save(tag)
-
-	dayi = day
-	for i, text := range dbseedentries {
-		tx.Save(&Entry{
-			Name:     fmt.Sprintf("Enchiridion: Paragraph %d", len(dbseedentries)+1-i),
-			Date:     dayi,
-			Body:     text.Text,
-			LastBody: "",
-			Tags:     []Tag{*tag},
-		})
-		dayi = dayi.AddDate(0, 0, -1)
-	}
-
-	tx.Save(&Entry{
-		Name: "Welcome to the Meditations Journal",
-		Date: day,
-		Body: `<p>This is an example instance of meditations, seeded with text from the Enchiridion.
-			Try selecting some text to use the medium-editor functionality.</p>`,
-	})
-
-	tx.Commit()
 }
 
 // repairScope repairs a specific scope
