@@ -24,7 +24,7 @@
     "file-loader": "^0.10.0",
     "graphql-request": "^1.8.2",
     "http-proxy-middleware": "^0.20.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "medium-editor": "^5.23.2",
     "medium-editor-tables": "git+https://github.com/upvalue/medium-editor-tables.git",
     "moment": "^2.18.1",
