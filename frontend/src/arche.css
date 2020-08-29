@@ -7,6 +7,7 @@
   /** TYPOGRAPHY **/
   --a-font: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Ubuntu,sans-serif;
   --a-font-mono: monospace;
+
   /** SPACING **/
 
   --a-space-1: 4px;
@@ -16,6 +17,9 @@
   --a-space-5: 32px;
 
   /** COLORS **/
+
+  --a-black: 0,0,0;
+  --a-white: 255,255,255;
 
   --a-dark-gray-1: 16,22,26;
   --a-dark-gray-2: 32,43,51;
@@ -48,6 +52,7 @@
 
 .a-flex { display: flex; }
 .a-justify-center { justify-content: center; }
+.a-column { flex-direction: column; }
 
 /*****
  * PADDING 
@@ -167,4 +172,27 @@
 
 .a-Button:focus {
   outline: 0;
+}
+
+/*****
+ * RAISED
+ *****/
+
+.a-Raised {
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(var(--a-black), 0.1),
+    0 2px 4px rgba(var(--a-black), 0.2),
+    0 4px 8px rgba(var(--a-black), 0.2);
+  z-index: 10;
+}
+
+/*****
+ * CALLOUT
+ *****/
+
+.a-Raised {
+  border-radius: 3px;
+  background-color: rgba(var(--a-gray-3), .15);
+  
 }

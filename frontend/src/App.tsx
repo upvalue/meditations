@@ -7,13 +7,16 @@ import { DocumentRoute } from './routes/DocumentRoute';
 
 const App = () => {
   return (
-    <div className="App a-flex a-justify-center a-pt5">
+    <div className="App a-flex a-justify-center">
       <div className="a-flex">
         <Sidebar />
 
         <Switch>
           <Route path={"/document/:documentId"}>
             <DocumentRoute />
+          </Route>
+          <Route path="/collections/:collectionName">
+            <p>hiya</p>
           </Route>
         </Switch>
 

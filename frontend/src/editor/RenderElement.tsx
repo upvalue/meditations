@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { TElement } from '../store/types';
+import { CollectionEntry } from './elements/CollectionEntry';
 
 export const RenderElement = (args: RenderElementProps) => {
   const { attributes, children } = args;
@@ -12,6 +12,8 @@ export const RenderElement = (args: RenderElementProps) => {
       return <h1 {...attributes}>{children}</h1>
     case 'line':
       return <div {...attributes}>{children}</div>
+    case 'collectionEntry':
+      return <CollectionEntry data={element.data} attributes={attributes} children={children} />
     default:
       return <div>this should never happen</div>
   }

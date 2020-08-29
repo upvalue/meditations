@@ -8,7 +8,7 @@ import { markdownRanges } from './lib/markdown';
 import { TDocument, TDocumentRecord } from '../store/types';
 import { RenderLeaf } from './RenderLeaf';
 import { RenderElement } from './RenderElement';
-import { Complete } from './Complete';
+import { useCompletion, Complete } from './hooks/useCompletion';
 
 export type Props = {
   document: TDocumentRecord;
@@ -38,7 +38,7 @@ const decorate = ([node, path]: NodeEntry<Node>) => {
 export const TEditor = (props: Props) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const completionPopup = useRef<any>(null);
+  const { onUpdate, completionProps, onKeyDown } = useCompletion();
 
   const selectedDocument = props.document;
   const editor = useMemo(() => makeEditor(), [])
@@ -59,53 +59,21 @@ export const TEditor = (props: Props) => {
   return (
     <>
       <Slate editor={editor} value={body} onChange={newValue => {
+        onUpdate(editor);
+
         setBody(newValue as any);
-
-        // Check for any completions that may be necessary
-        /*
-        const { selection } = editor;
-
-        // TODO: Space should clear selection
-        if (selection && Range.isCollapsed(selection)) {
-          const [start] = Range.edges(selection);
-          const wordBefore = Editor.before(editor, start, { unit: 'word' });
-          const before = wordBefore && Editor.before(editor, wordBefore);
-          const beforeRange = before && Editor.range(editor, before, start);
-          const beforeText = beforeRange && Editor.string(editor, beforeRange);
-
-          // Determine if this is the beginning of a line
-          // (at a depth of exactly two, word offset is zero)
-          if (before && beforeText && before.path.length === 2 && before.offset === 0) {
-            if (beforeText[0] === '@') {
-              completionDispatch({
-                type: 'update',
-                state: {
-                  target: beforeRange,
-                  search: beforeText.slice(1),
-                  index: 0,
-                }
-              });
-              return;
-            }
-          }
-        }
-
-        if (completionState.target) {
-          completionDispatch({
-            type: 'clear',
-          });
-        }
-        */
       }}>
-        <div className="editor a-p4" ref={ref}>
-          <Editable decorate={decorate} renderElement={RenderElement} renderLeaf={RenderLeaf} />
+        <div className="editor a-p4 a-ml4" ref={ref}>
+          <Editable
+            decorate={decorate}
+            renderElement={RenderElement}
+            renderLeaf={RenderLeaf}
+            onKeyDown={onKeyDown}
+          />
         </div>
-        <Complete
-          body={body}
-          editor={editor}
-        />
+        <Complete {...completionProps} />
       </Slate>
-      <div className="doc">
+      <div className="doc a-ml5">
         <pre>
           {JSON.stringify(body, null, 2)}
         </pre>

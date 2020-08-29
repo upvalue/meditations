@@ -15,12 +15,10 @@ export const Sidebar = () => {
   const [confirm, setConfirm] = useState(false);
 
   return (
-    <div className="sidebar a-mr4">
+    <div className="sidebar">
       <div className="a-p4">
-        <h3>Refractory</h3>
-
-        <div className="a-mt4" style={{ lineHeight: '32px' }}>
-          <div className="a-bold">Documents</div>
+        <div style={{ lineHeight: '32px' }}>
+          <h4>Documents</h4>
           {documents.map(d => {
             return <div key={d.id}><Link to={`/document/${d.id}`}>{d.id}</Link></div>
           })}
@@ -29,7 +27,7 @@ export const Sidebar = () => {
         </div>
 
         <div className="a-mt4">
-          <div className="a-bold">Collections</div>
+          <h4>Collections</h4>
           {Object.entries(collections).map(([k, collection]) => <div key={k}><Link to={`/collections/${k}`}>@{collection.name}</Link></div>)}
         </div>
 

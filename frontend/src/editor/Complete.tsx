@@ -123,7 +123,7 @@ export const Complete = (props: Props) => {
   return (
     <div className="Complete" id={popperId} style={completionState.target ? {} : { display: 'none' }}>
       <div>
-        completionatrix
+        You should never see this.
       </div>
     </div>
   );

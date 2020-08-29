@@ -9,13 +9,21 @@ const softAssert = (exp: boolean, message: string) => {
 }
 
 const withShortcuts = (editor: Editor) => {
-  const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment } = editor;
+  const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment, isVoid } = editor;
 
   editor.deleteBackward = unit => {
     return deleteBackward(unit);
   }
 
-  editor.insertBreak = () => {
+  editor.isVoid = elt => {
+    return elt.type === 'collectionEntry' ? true : isVoid(elt);
+  }
+
+  // TODO: I'm not sure what the best behavior is here. 
+  // Should it carry forward formatting?
+  // Also, this is where you might escape from lists/blockquotes if applicable.
+  // Need to check for an empty entry and then insert a text node afterwards
+  const insertBrk = () => {
     // Allow user to exit lists and blockquotes by entering through an empty node
     const { selection } = editor;
 
@@ -38,6 +46,7 @@ const withShortcuts = (editor: Editor) => {
       // formatting from the previous line which is behavior that we don't want. Maybe it uses
       // splitNodes because it doesn't require understanding the schema? But we understand 
       // it, so it's okay to do this instead.
+      /*
       insertNode({
         "type": "line",
         "children": [
@@ -46,6 +55,10 @@ const withShortcuts = (editor: Editor) => {
           }
         ]
       })
+      */
+
+      console.log(selection);
+      // insertBreak();
       return;
     }
 
@@ -92,6 +105,25 @@ const withShortcuts = (editor: Editor) => {
   }
 
   return editor;
+}
+
+export const insertCollectionEntry = (editor: EditorInstance, collection: string) => {
+  const entry = {
+    type: 'collectionEntry',
+    data: {
+      collection,
+    },
+    children: [{ text: '' }],
+  }
+  // Remove the entered text
+  Transforms.removeNodes(editor);
+  // Insert the entry
+  Transforms.insertNodes(editor, entry);
+  Transforms.insertNodes(editor, {
+    type: 'line',
+    children: [{ text: '' }]
+  })
+  Transforms.move(editor);
 }
 
 /**

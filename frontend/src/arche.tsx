@@ -16,8 +16,9 @@ export const arrayToString = (x: ReadonlyArray<string> | string | undefined, pre
 const buildClassNames = (className: string, props: any) => {
   const classNames = [
     className,
-    props.flex && arrayToString(props.flex),
-    props.margin && arrayToString(props.margin),
+    props.flex && arrayToString(props.flex, 'a'),
+    props.margin && arrayToString(props.margin, 'a'),
+    props.padding && arrayToString(props.padding, 'a'),
   ];
 
   return classNames.join(' ');
@@ -50,7 +51,7 @@ const createAtom = (elementType: string, className: string, props: any) => {
   }, props.children);
 }
 
-type FlexConstants = 'justify-center';
+type FlexConstants = 'justify-center' | 'column';
 type PaddingConstants = 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'pl1' | 'pl2' | 'pl3' | 'pl4' | 'pl5' | 'pr1' | 'pr2' | 'pr3' | 'pr4' | 'pr5' | 'pt1' | 'pt2' | 'pt3' | 'pt4' | 'pt5' | 'pb1' | 'pb2' | 'pb3' | 'pb4' | 'pb5' | 'px1' | 'px2' | 'px3' | 'px4' | 'px5' | 'py1' | 'py2' | 'py3' | 'py4' | 'py5';
 type MarginConstants = 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'ml1' | 'ml2' | 'ml3' | 'ml4' | 'ml5' | 'mr1' | 'mr2' | 'mr3' | 'mr4' | 'mr5' | 'mt1' | 'mt2' | 'mt3' | 'mt4' | 'mt5' | 'mb1' | 'mb2' | 'mb3' | 'mb4' | 'mb5' | 'mx1' | 'mx2' | 'mx3' | 'mx4' | 'mx5' | 'my1' | 'my2' | 'my3' | 'my4' | 'my5';
 
@@ -74,3 +75,14 @@ export const Button = (props: ButtonProps) => {
   return createAtom('button', 'a-Button a-flex a-py1 a-px2', props);
 }
 
+type RaisedProps = AtomProps & React.HTMLProps<HTMLDivElement>;
+
+export const Raised = (props: RaisedProps) => {
+  return createAtom('div', 'a-Raised a-flex', props);
+}
+
+type CalloutProps = AtomProps & React.HTMLProps<HTMLDivElement>;
+
+export const Callout = (props: CalloutProps) => {
+  return createAtom('div', 'a-Callout', props);
+}
