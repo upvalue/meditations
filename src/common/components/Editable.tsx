@@ -41,7 +41,10 @@ export class Editable<
 
   onFocus(e: any) { }
   onBlur() { }
-  onSaveInterval() { }
+  onSaveInterval(interval: NodeJS.Timeout) {
+    console.log('onSaveInterval called with interval:', interval);
+
+  }
 
   /** Lazily create an editor; if it already exists, focus on it */
   editorOpen = (e?: React.MouseEvent<HTMLElement>) => {
@@ -89,22 +92,13 @@ export class Editable<
       };
 
       editor.subscribe("focus", (e) => {
+        console.log('editor focus');
         window.addEventListener("beforeunload", listener);
         this.onFocus(e);
       });
 
       editor.subscribe("blur", () => {
-        this.onBlur();
-
         window.removeEventListener("beforeunload", listener);
-        // It is possible that blur may have been called because copy-paste causes MediumEditor to
-        // create a 'pastebin' element, in which case we do not want to trigger a save.
-        if (
-          document.activeElement &&
-          document.activeElement.id.startsWith("medium-editor-pastebin")
-        ) {
-          return;
-        }
 
         if (this.interval) {
           console.log('clearing autosave');
@@ -118,11 +112,26 @@ export class Editable<
 
         this.editorSave();
 
+        // It is possible that blur may have been called because copy-paste causes MediumEditor to
+        // create a 'pastebin' element, in which case we do not want to trigger a save.
+        if (
+          document.activeElement &&
+          document.activeElement.id.startsWith("medium-editor-pastebin")
+        ) {
+          return;
+        }
+
         this.setState({ editorOpen: false });
       });
       this.editor = editor;
     }
-    this.interval = setInterval(this.onSaveInterval, 10000);
+
+    // Capture this save interval and send it to the function so we can understand where saves are
+    // coming from
+    let saveInterval: NodeJS.Timeout = setInterval(() => this.onSaveInterval(saveInterval), 10000);
+
+    this.interval = saveInterval;
+
     this.setState({ editorOpen: true });
 
     // Empty comments will have the no-display class added

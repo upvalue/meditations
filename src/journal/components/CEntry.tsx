@@ -97,7 +97,8 @@ export class CEntry extends Editable<CEntryProps> {
     return Lock !== null && Lock !== '' && Lock !== sessionuuid;
   }
 
-  onSaveInterval = () => {
+  onSaveInterval = (interval: NodeJS.Timeout) => {
+    console.log('onSaveInterval called with interval: ', interval);
     console.log(`Automatically saving entry ${this.props.entry.ID}`)
     this.editorSave();
   }
