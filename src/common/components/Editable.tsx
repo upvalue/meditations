@@ -31,7 +31,10 @@ export class Editable<
   }
 
   componentWillUnmount() {
+    console.log('Editor unmounting: saving and clearing locks');
     if (this.interval) clearInterval(this.interval);
+    this.editorSave();
+    this.onBlur();
   }
 
   /** Abstract method; dispatch an asynchronous update of the Editable in question */
@@ -40,7 +43,9 @@ export class Editable<
   }
 
   onFocus(e: any) { }
-  onBlur() { }
+  onBlur() {
+    console.log('base onblur called');
+  }
   onSaveInterval(interval: NodeJS.Timeout) {
     console.log('onSaveInterval called with interval:', interval);
 
@@ -105,9 +110,11 @@ export class Editable<
           clearInterval(this.interval);
         }
 
+        this.onBlur();
+
         // Do not update if nothing has changed
         if (!this.editorUpdated()) {
-          return;
+          console.log('nothing has changed, not saving');
         }
 
         this.editorSave();
@@ -118,6 +125,7 @@ export class Editable<
           document.activeElement &&
           document.activeElement.id.startsWith("medium-editor-pastebin")
         ) {
+          console.log('do not trigger a save on copy and paste');
           return;
         }
 
