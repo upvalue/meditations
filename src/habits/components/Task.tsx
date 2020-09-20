@@ -190,7 +190,6 @@ export class CTaskImpl extends Editable<TaskProps, TaskState> {
 
   editorUpdated() {
     return (
-      !this.props.task.Comment ||
       this.body.innerHTML !== this.props.task.Comment
     );
   }

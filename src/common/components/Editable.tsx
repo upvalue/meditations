@@ -31,8 +31,10 @@ export class Editable<
   }
 
   componentWillUnmount() {
-    console.log('Editor unmounting: saving and clearing locks');
     if (this.interval) clearInterval(this.interval);
+    if (!this.editorUpdated()) {
+      return;
+    }
     this.editorSave();
     this.onBlur();
   }
@@ -44,7 +46,7 @@ export class Editable<
 
   onFocus(e: any) { }
   onBlur() {
-    console.log('base onblur called');
+    // console.log('base onblur called');
   }
   onSaveInterval(interval: NodeJS.Timeout) {
     console.log('onSaveInterval called with interval:', interval);
@@ -114,7 +116,7 @@ export class Editable<
 
         // Do not update if nothing has changed
         if (!this.editorUpdated()) {
-          console.log('nothing has changed, not saving');
+          return;
         }
 
         this.editorSave();
