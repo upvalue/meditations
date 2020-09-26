@@ -191,8 +191,7 @@
  * CALLOUT
  *****/
 
-.a-Raised {
+.a-Callout {
   border-radius: 3px;
   background-color: rgba(var(--a-gray-3), .15);
-  
 }

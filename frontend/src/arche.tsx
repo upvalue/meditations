@@ -84,5 +84,5 @@ export const Raised = (props: RaisedProps) => {
 type CalloutProps = AtomProps & React.HTMLProps<HTMLDivElement>;
 
 export const Callout = (props: CalloutProps) => {
-  return createAtom('div', 'a-Callout', props);
+  return createAtom('div', 'a-Callout a-p2', props);
 }
