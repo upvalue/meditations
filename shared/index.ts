@@ -26,7 +26,7 @@ export type NoteBody = TNode[];
  * document as well as information about it
  */
 export type NoteRecord = {
-  id: string;
+  note_id: string;
   document: NoteBody;
 };
 

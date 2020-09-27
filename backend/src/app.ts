@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import { ApolloServer, gql } from 'apollo-server-express';
 
 import knex, { config } from './knex';
+import { typeDefs, resolvers } from './graphql';
 
 const app = express();
 
@@ -14,16 +15,7 @@ app.use(morgan('combined'));
 const { user, host, password, database } = config.connection;
 
 const server = new ApolloServer({
-  typeDefs: `
-  type Query {
-    healthcheck: String
-  }
-  `,
-  resolvers: {
-    Query: {
-      healthcheck: () => 'channel open',
-    },
-  }
+  typeDefs, resolvers
 });
 
 server.applyMiddleware({ app });

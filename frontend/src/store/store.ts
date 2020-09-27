@@ -7,7 +7,7 @@ import { loadState, saveState } from './storage';
 
 
 const initialDocument: NoteRecord = {
-  id: generateId('doc'),
+  noteId: generateId('doc'),
   document: [{
     type: 'line',
     children: [{ text: 'click to edit' }]
@@ -39,16 +39,16 @@ const docs = createSlice({
   reducers: {
     updateDocument(state, action: UpdateDocumentAction) {
       state.documents = state.documents.map(doc => {
-        if (doc.id !== action.payload.id) return doc;
+        if (doc.noteId !== action.payload.id) return doc;
         return {
-          id: doc.id,
+          noteId: doc.noteId,
           document: action.payload.document,
         };
       })
     },
     createDocument(state, _action: CreateDocumentAction) {
       state.documents.push({
-        id: generateId('doc'),
+        noteId: generateId('doc'),
         document: initialDocument.document
       });
     }

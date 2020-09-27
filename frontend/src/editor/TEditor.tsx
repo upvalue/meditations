@@ -54,7 +54,7 @@ export const TEditor = (props: Props) => {
   // If the route changes, update the editor content with the new document
   useEffect(() => {
     setBody(selectedDocument.document);
-  }, [selectedDocument.id]);
+  }, [selectedDocument.noteId]);
 
   return (
     <>

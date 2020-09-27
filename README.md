@@ -1,1 +1,1 @@
-an editor of sorts
+A freestyle productivity application.

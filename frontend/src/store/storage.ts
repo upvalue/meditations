@@ -6,7 +6,7 @@ import { NoteRecord, TCollection } from '../../../shared';
 
 // Initial state
 const initialDocument: NoteRecord = {
-  id: generateId('doc'),
+  noteId: generateId('doc'),
   document: [{
     type: 'line',
     children: [{ text: 'click to edit' }]

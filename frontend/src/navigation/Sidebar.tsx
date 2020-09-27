@@ -20,7 +20,7 @@ export const Sidebar = () => {
         <div style={{ lineHeight: '32px' }}>
           <h4>Documents</h4>
           {documents.map(d => {
-            return <div key={d.id}><Link to={`/document/${d.id}`}>{d.id}</Link></div>
+            return <div key={d.noteId}><Link to={`/document/${d.noteId}`}>{d.noteId}</Link></div>
           })}
 
           <Button onClick={createDoc}>+ New document</Button>

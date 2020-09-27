@@ -13,7 +13,7 @@ export const DocumentRoute = (props: {}) => {
 
   const { documentId } = match.params;
 
-  const selectedDocument = useSelector((state: TState) => state.documents.find(doc => doc.id === documentId));
+  const selectedDocument = useSelector((state: TState) => state.documents.find(doc => doc.noteId === documentId));
 
   return (
     <>
