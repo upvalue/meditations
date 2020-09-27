@@ -1,7 +1,8 @@
 // storage.ts - load and save from local storage
 
 import { generateId } from "../lib/utilities";
-import { TState, TDocumentRecord, TCollection } from "./types";
+import { TState } from "./types";
+import { TDocumentRecord, TCollection } from '../../../shared';
 
 // Initial state
 const initialDocument: TDocumentRecord = {

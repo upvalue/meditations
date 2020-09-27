@@ -5,12 +5,10 @@ import { NodeEntry, Node, Range, Text, Editor } from 'slate';
 
 import { makeEditor } from './lib/editor';
 import { markdownRanges } from './lib/markdown';
-import { TDocument, TDocumentRecord } from '../store/types';
+import { TDocument, TDocumentRecord } from '../../../shared';
 import { RenderLeaf } from './RenderLeaf';
 import { RenderElement } from './RenderElement';
 import { useCompletion, Complete } from './hooks/useCompletion';
-
-import { SomeType } from '../../../shared';
 
 export type Props = {
   document: TDocumentRecord;

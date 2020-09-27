@@ -1,7 +1,7 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 
-import { TDocument, TDocumentRecord } from './types';
+import { TDocument, TDocumentRecord } from '../../../shared';
 import { generateId } from '../lib/utilities';
 import { loadState, saveState } from './storage';
 

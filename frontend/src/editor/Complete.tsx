@@ -2,7 +2,7 @@ import React, { useEffect, useReducer, useState, useRef } from 'react';
 import { Editor, Range } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { EditorInstance } from './lib/editor';
-import { TDocument } from '../store/types';
+import { TDocument } from '../../../shared';
 import { createPopper } from '@popperjs/core/lib/popper-lite';
 import { generateId } from '../lib/utilities';
 import { usePopper } from 'react-popper';
