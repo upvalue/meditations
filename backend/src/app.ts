@@ -3,8 +3,7 @@
 import express from 'express';
 // import Knex from 'knex';
 import morgan from 'morgan';
-import ConnectionPluginFilter from 'postgraphile-plugin-connection-filter';
-import postgraphile from 'postgraphile';
+import { ApolloServer, gql } from 'apollo-server-express';
 
 import knex, { config } from './knex';
 
@@ -14,19 +13,20 @@ app.use(morgan('combined'));
 
 const { user, host, password, database } = config.connection;
 
-app.use(
-  postgraphile(
-    `postgres://${user}:${password}@${host}/${database}`,
-    ['public'],
-    {
-      appendPlugins: [ConnectionPluginFilter],
-      watchPg: true,
-      graphiql: true,
-      graphiqlRoute: `/api/graphiql`,
-      graphqlRoute: `/api/graphql`,
-    }
-  )
-)
+const server = new ApolloServer({
+  typeDefs: `
+  type Query {
+    healthcheck: String
+  }
+  `,
+  resolvers: {
+    Query: {
+      healthcheck: () => 'channel open',
+    },
+  }
+});
+
+server.applyMiddleware({ app });
 
 
 app.get('/healthcheck/database', (req, res) => {
