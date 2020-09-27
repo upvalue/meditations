@@ -11,7 +11,8 @@
     "nodemon": "^2.0.4",
     "pg": "^8.3.3",
     "postgraphile": "^4.9.0",
-    "postgraphile-plugin-connection-filter": "^2.0.0"
+    "postgraphile-plugin-connection-filter": "^2.0.0",
+    "wa-core": "^1.0.4"
   },
   "scripts": {
     "build": "tsc",

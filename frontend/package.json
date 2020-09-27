@@ -24,7 +24,8 @@
     "slate": "^0.58.1",
     "slate-react": "^0.58.1",
     "ts-jest": "^26.0.0",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.3",
+    "wa-core": "^1.0.4"
   },
   "devDependencies": {
     "react-scripts": "^3.4.1"

@@ -21,5 +21,10 @@
   },
   "include": [
     "src"
+  ],
+  "references": [
+    {
+      "path": "../shared/tsconfig.json"
+    }
   ]
 }

@@ -10,6 +10,8 @@ import { RenderLeaf } from './RenderLeaf';
 import { RenderElement } from './RenderElement';
 import { useCompletion, Complete } from './hooks/useCompletion';
 
+import { SomeType } from '../../../shared';
+
 export type Props = {
   document: TDocumentRecord;
 }
