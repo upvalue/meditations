@@ -2,10 +2,10 @@
 
 import { generateId } from "../lib/utilities";
 import { TState } from "./types";
-import { TDocumentRecord, TCollection } from '../../../shared';
+import { NoteRecord, TCollection } from '../../../shared';
 
 // Initial state
-const initialDocument: TDocumentRecord = {
+const initialDocument: NoteRecord = {
   id: generateId('doc'),
   document: [{
     type: 'line',

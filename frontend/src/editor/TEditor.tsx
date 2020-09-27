@@ -5,13 +5,13 @@ import { NodeEntry, Node, Range, Text, Editor } from 'slate';
 
 import { makeEditor } from './lib/editor';
 import { markdownRanges } from './lib/markdown';
-import { TDocument, TDocumentRecord } from '../../../shared';
+import { NoteBody, NoteRecord } from '../../../shared';
 import { RenderLeaf } from './RenderLeaf';
 import { RenderElement } from './RenderElement';
 import { useCompletion, Complete } from './hooks/useCompletion';
 
 export type Props = {
-  document: TDocumentRecord;
+  document: NoteRecord;
 }
 
 /**
@@ -44,7 +44,7 @@ export const TEditor = (props: Props) => {
   const editor = useMemo(() => makeEditor(), [])
 
   // This is the actual content of the editor
-  const [body, setBody] = useState<TDocument>([
+  const [body, setBody] = useState<NoteBody>([
     {
       type: 'line',
       children: [{ text: 'should not be shown' }]

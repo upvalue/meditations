@@ -1,6 +1,6 @@
-import { TDocumentRecord, TCollection } from '../../../shared';
+import { NoteRecord, TCollection } from '../../../shared';
 
 export type TState = {
-  documents: TDocumentRecord[];
+  documents: NoteRecord[];
   collections: { [key: string]: TCollection };
 }

@@ -2,13 +2,13 @@ import React, { useEffect, useReducer, useState, useRef } from 'react';
 import { Editor, Range } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { EditorInstance } from './lib/editor';
-import { TDocument } from '../../../shared';
+import { NoteBody } from '../../../shared';
 import { createPopper } from '@popperjs/core/lib/popper-lite';
 import { generateId } from '../lib/utilities';
 import { usePopper } from 'react-popper';
 
 type Props = {
-  body: TDocument;
+  body: NoteBody;
   editor: EditorInstance;
 }
 

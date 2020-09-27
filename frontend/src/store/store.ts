@@ -1,12 +1,12 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 
-import { TDocument, TDocumentRecord } from '../../../shared';
+import { NoteBody, NoteRecord } from '../../../shared';
 import { generateId } from '../lib/utilities';
 import { loadState, saveState } from './storage';
 
 
-const initialDocument: TDocumentRecord = {
+const initialDocument: NoteRecord = {
   id: generateId('doc'),
   document: [{
     type: 'line',
@@ -24,7 +24,7 @@ export type UpdateDocumentAction = {
   type: string;
   payload: {
     id: string;
-    document: TDocument;
+    document: NoteBody;
   }
 };
 

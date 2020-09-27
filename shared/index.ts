@@ -19,15 +19,15 @@ export type TElement = {
 
 export type TNode = TText | TElement;
 
-export type TDocument = TNode[];
+export type NoteBody = TNode[];
 
 /**
  * A document record; would be a toplevel database record containing an actual
  * document as well as information about it
  */
-export type TDocumentRecord = {
+export type NoteRecord = {
   id: string;
-  document: TDocument;
+  document: NoteBody;
 };
 
 export type TCollection = {
