@@ -1,4 +1,4 @@
-// Package backend contains the backend code for meditations
+// This package backend contains the backend code for meditations
 package backend
 
 import (
