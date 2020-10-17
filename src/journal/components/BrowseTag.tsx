@@ -5,12 +5,12 @@ import { CEntry } from "./CEntry";
 export class BrowseTag extends React.PureComponent<
   { tagName: string; entries: Entry[] },
   {}
-> {
+  > {
   render() {
     const entries: React.ReactElement<undefined>[] = [];
     let key = 0;
     this.props.entries.forEach(e => {
-      entries.push(<CEntry context={true} key={key} entry={e} />);
+      entries.push(<CEntry editableID={`entry-${e.ID}`} context={true} key={key} entry={e} />);
       key += 1;
       entries.push(<hr key={key} />);
       key += 1;

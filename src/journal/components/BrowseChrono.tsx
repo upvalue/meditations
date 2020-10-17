@@ -39,6 +39,7 @@ class ChronoSection extends React.Component<ChronoSectionProps> {
 
         {this.props.entries.map(e => (
           <CEntry
+            editableID={`entry-${e.ID}`}
             key={e.ID}
             entry={e}
             context={false}

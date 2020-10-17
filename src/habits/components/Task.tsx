@@ -434,6 +434,7 @@ export const CTaskFactory = React.createFactory(CTask);
 export const createCTask = (task: Task, lastModifiedTask?: string) => {
   return CTaskFactory({
     task,
+    editableID: `task-${task.ID}`,
     key: task.ID,
     lastModified: task.Name === lastModifiedTask
   } as any);

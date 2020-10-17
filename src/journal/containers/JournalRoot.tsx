@@ -14,7 +14,7 @@ import { JournalNavigation } from "./JournalNavigation";
 
 const ViewEntry = (props: { entry: Entry | null }) => {
   return props.entry ? (
-    <CEntry context={true} entry={props.entry} />
+    <CEntry editableID={`entry-${props.entry.ID}`} context={true} entry={props.entry} />
   ) : (
       <p>Entry deleted</p>
     );

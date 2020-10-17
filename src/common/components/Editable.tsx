@@ -7,11 +7,35 @@ export interface EditableState {
   editorOpen: boolean;
 }
 
+// Quick and dirty interval management for this component.
+
+// Managing this on an individual editor basis was extremely error-prone since focusing and
+// unfocusing happen often. Instead this tracks active editors using a key and ensures there is only
+// one active 5-second interval for any instance of meditations
+
+const activeCallbacks: { [key: string]: (t: NodeJS.Timeout) => void } = {};
+
+setInterval((interval) => {
+  // console.log(`5s tick, calling ${Object.keys(activeCallbacks).length} save callbacks`);
+  Object.keys(activeCallbacks).forEach(ac => {
+    activeCallbacks[ac](interval);
+  });
+}, 3000);
+
+const interval = () => {
+
+
+}
+
+type EditableProps = {
+  editableID: string,
+};
+
 /** An item that has an editable body. Used for task comments and journal entries */
 export class Editable<
   Props,
   State extends EditableState = EditableState
-  > extends React.Component<Props, State> {
+  > extends React.Component<Props & EditableProps, State> {
   /**
    * Reference to the HTML element that the MediumEditor will be installed on; should be set in
    * subclass's render method
@@ -50,7 +74,6 @@ export class Editable<
   }
   onSaveInterval(interval: NodeJS.Timeout) {
     console.log('onSaveInterval called with interval:', interval);
-
   }
 
   /** Lazily create an editor; if it already exists, focus on it */
@@ -107,10 +130,8 @@ export class Editable<
       editor.subscribe("blur", () => {
         window.removeEventListener("beforeunload", listener);
 
-        if (this.interval) {
-          console.log('clearing autosave');
-          clearInterval(this.interval);
-        }
+        console.log('clearing autosave');
+        delete activeCallbacks[this.props.editableID];
 
         this.onBlur();
 
@@ -138,9 +159,11 @@ export class Editable<
 
     // Capture this save interval and send it to the function so we can understand where saves are
     // coming from
-    let saveInterval: NodeJS.Timeout = setInterval(() => this.onSaveInterval(saveInterval), 10000);
+    // let saveInterval: NodeJS.Timeout = setInterval(() => this.onSaveInterval(saveInterval), 10000);
 
-    this.interval = saveInterval;
+    // this.interval = saveInterval;
+
+    activeCallbacks[this.props.editableID] = this.onSaveInterval;
 
     this.setState({ editorOpen: true });
 
