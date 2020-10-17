@@ -22,11 +22,6 @@ setInterval((interval) => {
   });
 }, 3000);
 
-const interval = () => {
-
-
-}
-
 type EditableProps = {
   editableID: string,
 };
