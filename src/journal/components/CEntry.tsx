@@ -149,13 +149,13 @@ export class CEntry extends Editable<CEntryProps> {
     if (!this.state.editorOpen && this.props.searchString) {
       // TODO: This highlight needs to be undone during actual editing, otherwise medium-editor
       // just saves the HTML.
-      const searchString = this.props.searchString.slice(0);
+      /*const searchString = this.props.searchString.slice(0);
       const esc = searchString.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
       const reg = new RegExp(esc, "ig");
       body = body.replace(
         reg,
         `<span class="entry-highlight">${this.props.searchString}</span>`
-      );
+      );*/
     }
 
     return (

@@ -69,10 +69,13 @@ const taskSameScope = (left: Task, right: Task) => {
   switch (left.Scope) {
     case ScopeType.DAY:
       fmt = "YYYY-MM-DD";
+      break;
     case ScopeType.MONTH:
       fmt = "YYYY-MM";
+      break;
     case ScopeType.YEAR:
       fmt = "YYYY";
+      break;
   }
   /* eslint-enable no-fallthrough */
 
