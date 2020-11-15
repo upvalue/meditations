@@ -13,7 +13,7 @@ import { Spinner } from "../../common/components/Spinner";
 class JournalNavigation1 extends React.Component<
   JournalState,
   { searching: boolean }
-> {
+  > {
   searchText!: HTMLInputElement;
 
   constructor(props: any) {
@@ -110,8 +110,8 @@ class JournalNavigation1 extends React.Component<
               <OcticonSpan icon={OcticonX} className="ml-1" />
             </button>
           ) : (
-            ""
-          )}
+              ""
+            )}
         </div>
       </div>
     );
