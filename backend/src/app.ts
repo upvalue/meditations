@@ -22,7 +22,7 @@ server.applyMiddleware({ app });
 
 
 app.get('/healthcheck/database', (req, res) => {
-  knex.raw(`SELECT 'hello world';`).then(hello => res.json(hello.rows[0]['?column?']));
+  // knex.raw(`SELECT 'hello world';`).then(hello => res.json(hello.rows[0]['?column?']));
 });
 
 app.listen(process.env.PORT || 5000);

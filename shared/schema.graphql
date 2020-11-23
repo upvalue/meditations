@@ -1,0 +1,12 @@
+type NoteRecord {
+  noteId: String!
+}
+
+type Note {
+  noteId: String!
+  body: String!
+}
+
+type Query {
+  allNotes: [NoteRecord!]!
+}

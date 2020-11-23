@@ -1,0 +1,46 @@
+* Application
+** Development
+*** TODO Run all scripts concurrently
+** Editor functionality
+*** TODO hide formatting on bolding/italics
+*** TODO allow escaping from headings
+*** TODO List editing
+*** TODO Allow creating collections on the fly
+*** TODO Backlinks
+** Search
+*** TODO Searchbar allows you to search for text, tags and collections
+** Application functionality
+*** TODO Create entries on a schedule
+*** TODO Create entries from a template
+*** TODO Navigation of some kind
+** API
+*** TODO Type / function generation for frontend
+** Freeform notes
+** 2020-11-22 Picking up
+   Starting to tackle this again. Left off with a partially constructed backend. Immediate goal is to get to a point
+   where it's usable for day to day editing. The bare minimum for that would be a persistent backend and some more
+   basic editing functionality. Functionality like collections / tags can come later. 
+   
+   I guess an interesting thing to do would be -- use this application to recreate this orgmode document. It should
+   be well within its purview. 
+
+   But in any case, for today, let's work on hooking up the backend.
+
+   That being said, it might be worthwhile to continue to have an ephemeral editor instance untethered from the
+   backend. For experimentation, but also just for quick note taking.
+
+   Scratch.
+   
+   ---
+   
+   Ok. Have it generating some queries from my schema. Now I need to set up an urql client probably, then query my
+   actual backend. The other thing is I have some type duplication now between backend/frontend/shared. Question is,
+   are GraphQL types expressive and appropriate enough for my editor? No -- I'll probably have to translate at some
+   points between the loosely typed GraphQL / database stuff and the well-typed document format. The main two components
+   that will interact with well-typed documents will be the thing on the backend that parses documents into relations
+   e.g. backlinks, collection entries, and the editor itself. Otherwise it probably will just be passing them around?
+   
+   So, get the graphql stuff to shared as well.
+   
+** 2020-11-23 DX + database hookup
+   Today working on improving development a little bit and hooking things up so we're actually talking to the database.

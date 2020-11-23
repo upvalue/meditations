@@ -8,10 +8,10 @@ import { loadState, saveState } from './storage';
 
 const initialDocument: NoteRecord = {
   noteId: generateId('doc'),
-  document: [{
+  /*document: [{
     type: 'line',
     children: [{ text: 'click to edit' }]
-  }]
+  }]*/
 };
 
 const initialCollection = {
@@ -49,7 +49,7 @@ const docs = createSlice({
     createDocument(state, _action: CreateDocumentAction) {
       state.documents.push({
         noteId: generateId('doc'),
-        document: initialDocument.document
+        // document: initialDocument.document
       });
     }
   },

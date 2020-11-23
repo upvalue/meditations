@@ -7,6 +7,7 @@
     "apollo-server-express": "^2.18.1",
     "express": "^4.17.1",
     "knex": "^0.21.5",
+    "knex-stringcase": "^1.4.3",
     "lodash": "^4.17.20",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.4",

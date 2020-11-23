@@ -13,17 +13,11 @@ export const DocumentRoute = (props: {}) => {
 
   const { documentId } = match.params;
 
-  const selectedDocument = useSelector((state: TState) => state.documents.find(doc => doc.noteId === documentId));
+  // const selectedDocument = useSelector((state: TState) => state.documents.find(doc => doc.noteId === documentId));
 
   return (
     <>
-      {selectedDocument &&
-        <TEditor document={selectedDocument} />
-      }
-
-      {!selectedDocument &&
-        <p>Document not found :/ did you just refresh?</p>
-      }
+      hot diggity dog
     </>
   );
 }

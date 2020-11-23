@@ -2,3 +2,4 @@
 *.d.ts
 *.js
 *.d.ts.map
+/types-generated.ts

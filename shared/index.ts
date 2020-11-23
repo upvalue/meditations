@@ -21,15 +21,6 @@ export type TNode = TText | TElement;
 
 export type NoteBody = TNode[];
 
-/**
- * A document record; would be a toplevel database record containing an actual
- * document as well as information about it
- */
-export type NoteRecord = {
-  note_id: string;
-  document: NoteBody;
-};
-
 export type TCollection = {
   collectionType: 'simple';
   name: string;
@@ -40,3 +31,6 @@ export type TCollectionEntry = {
   entryStatus: 'unset' | 'complete' | 'incomplete';
   entryValue: any;
 };
+
+// Re-export GraphQL generated types
+export * from './types-generated';

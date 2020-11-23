@@ -1,0 +1,8 @@
+# operations.graphql - operations, for generating query
+
+# Retrieve all notes
+query GetAllNotes {
+  allNotes {
+    noteId
+  }
+}

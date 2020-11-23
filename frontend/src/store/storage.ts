@@ -7,10 +7,12 @@ import { NoteRecord, TCollection } from '../../../shared';
 // Initial state
 const initialDocument: NoteRecord = {
   noteId: generateId('doc'),
+  /*
   document: [{
     type: 'line',
     children: [{ text: 'click to edit' }]
   }]
+  */
 };
 
 const initialCollection: TCollection = {

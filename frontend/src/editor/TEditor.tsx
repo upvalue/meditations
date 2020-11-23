@@ -1,7 +1,7 @@
-import React, { useRef, useMemo, useState, useEffect, useCallback, useReducer } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 
-import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
-import { NodeEntry, Node, Range, Text, Editor } from 'slate';
+import { Slate, Editable } from 'slate-react'
+import { NodeEntry, Node, Range, Text } from 'slate';
 
 import { makeEditor } from './lib/editor';
 import { markdownRanges } from './lib/markdown';
@@ -40,8 +40,8 @@ export const TEditor = (props: Props) => {
 
   const { onUpdate, completionProps, onKeyDown } = useCompletion();
 
-  const selectedDocument = props.document;
-  const editor = useMemo(() => makeEditor(), [])
+  const selectedDocument = props.document as any;
+  const editor = useMemo(() => makeEditor(), []);
 
   // This is the actual content of the editor
   const [body, setBody] = useState<NoteBody>([
