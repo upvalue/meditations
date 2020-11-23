@@ -7,6 +7,9 @@
   "license": "MIT",
   "scripts": {
     "build": "cd frontend && yarn && yarn build",
+    "start:frontend": "cd frontend && yarn start",
+    "start:backend-compile": "cd backend && yarn watch",
+    "start:backend": "cd backend && yarn start",
     "start:docker": "docker-compose -f docker-compose.yml up",
     "start:graphql": "cd shared && yarn generate",
     "start": "npm-run-all -l -p start:*"
