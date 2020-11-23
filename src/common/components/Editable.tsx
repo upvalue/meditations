@@ -38,6 +38,7 @@ export class Editable<
   body!: HTMLElement;
   editor?: MediumEditor.MediumEditor;
   interval?: NodeJS.Timeout;
+  pasting: boolean = false;
 
   componentWillMount() {
     this.setState({ editorOpen: false })
@@ -50,6 +51,7 @@ export class Editable<
   }
 
   componentWillUnmount() {
+    console.log('ha ha ha i know what im doing');
     if (this.interval) clearInterval(this.interval);
     if (!this.editorUpdated()) {
       return;
@@ -102,7 +104,7 @@ export class Editable<
 
         keyboardCommands: false,
 
-        paste: { cleanPastedHTML: true, forcePlainText: false },
+        paste: { cleanPastedHTML: true, forcePlainText: true },
         extensions: {
           table: new MediumEditorTable()
         }
@@ -117,12 +119,32 @@ export class Editable<
       };
 
       editor.subscribe("focus", (e) => {
+        if (
+          (document.activeElement &&
+            document.activeElement.id.startsWith("medium-editor-pastebin")) || this.pasting
+        ) {
+          console.log('ignoring focus on paste');
+          this.pasting = false;
+          return;
+        }
+
         console.log('editor focus');
         window.addEventListener("beforeunload", listener);
         this.onFocus(e);
       });
 
       editor.subscribe("blur", () => {
+        // It is possible that blur may have been called because copy-paste causes MediumEditor to
+        // create a 'pastebin' element, in which case we do not want to trigger a save.
+        if (
+          document.activeElement &&
+          document.activeElement.id.startsWith("medium-editor-pastebin")
+        ) {
+          this.pasting = true;
+          console.log('ignoring save on copy and paste');
+          return;
+        }
+
         window.removeEventListener("beforeunload", listener);
 
         console.log('clearing autosave');
@@ -137,26 +159,10 @@ export class Editable<
 
         this.editorSave();
 
-        // It is possible that blur may have been called because copy-paste causes MediumEditor to
-        // create a 'pastebin' element, in which case we do not want to trigger a save.
-        if (
-          document.activeElement &&
-          document.activeElement.id.startsWith("medium-editor-pastebin")
-        ) {
-          console.log('do not trigger a save on copy and paste');
-          return;
-        }
-
         this.setState({ editorOpen: false });
       });
       this.editor = editor;
     }
-
-    // Capture this save interval and send it to the function so we can understand where saves are
-    // coming from
-    // let saveInterval: NodeJS.Timeout = setInterval(() => this.onSaveInterval(saveInterval), 10000);
-
-    // this.interval = saveInterval;
 
     activeCallbacks[this.props.editableID] = this.onSaveInterval;
 
