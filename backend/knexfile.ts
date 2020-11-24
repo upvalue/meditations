@@ -13,7 +13,8 @@ export default {
     },
     migrations: {
       tableName: 'knex_migrations'
-    }
+    },
+    searchPath: ['techne', 'public'],
   },
   production: {
     client: 'postgresql',
@@ -29,6 +30,7 @@ export default {
     },
     migrations: {
       tableName: 'knex_migrations'
-    }
+    },
+    searchPath: ['techne', 'public'],
   },
 };

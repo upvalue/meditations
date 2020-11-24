@@ -218,7 +218,7 @@ export type CompleteProps = {
   attributes: {
     [key: string]: {
       [key: string]: string;
-    }
+    } | undefined
   }
 }
 

@@ -10,3 +10,7 @@ type Note {
 type Query {
   allNotes: [NoteRecord!]!
 }
+
+type Mutation {
+  createNote(noteId: String!, createdAt: String!): NoteRecord!
+}

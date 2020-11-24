@@ -8,3 +8,8 @@ declare module 'knex-stringcase' {
   export default noTypesYet;
 }
 
+
+declare module 'graphql-constraint-directive' {
+  const noTypesYet: any;
+  export default noTypesYet;
+}

@@ -6,3 +6,9 @@ query GetAllNotes {
     noteId
   }
 }
+
+mutation CreateNote($noteId: String!, $createdAt: String!) {
+  createNote(noteId: $noteId, createdAt: $createdAt) {
+    noteId
+  }
+}

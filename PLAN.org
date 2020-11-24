@@ -1,6 +1,8 @@
 * Application
 ** Development
-*** TODO Run all scripts concurrently
+*** DONE Run all scripts concurrently
+    CLOSED: [2020-11-23 Mon 14:34]
+*** TODO Consider collapsing packages into a single mega-package
 ** Editor functionality
 *** TODO hide formatting on bolding/italics
 *** TODO allow escaping from headings
@@ -15,6 +17,11 @@
 *** TODO Navigation of some kind
 ** API
 *** TODO Type / function generation for frontend
+*** TODO Load documents from and save to database
+*** TODO Error handling
+*** TODO graphql-constraint or some other easy validation for GraphQL
+*** TODO Locking / multiple open session safety
+*** TODO Subscribe to updates
 ** Freeform notes
 ** 2020-11-22 Picking up
    Starting to tackle this again. Left off with a partially constructed backend. Immediate goal is to get to a point
@@ -44,3 +51,6 @@
    
 ** 2020-11-23 DX + database hookup
    Today working on improving development a little bit and hooking things up so we're actually talking to the database.
+   
+   Working on loading documents. How do you handle reloading a big toplevel query? Probably only want to show loading
+   states once. After that you load-in with animations. Do you pass around the re-execute thing you got? Maybe.

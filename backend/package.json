@@ -5,8 +5,9 @@
   "license": "MIT",
   "dependencies": {
     "apollo-server-express": "^2.18.1",
+    "date-fns": "^2.16.1",
     "express": "^4.17.1",
-    "knex": "^0.21.5",
+    "knex": "^0.21.12",
     "knex-stringcase": "^1.4.3",
     "lodash": "^4.17.20",
     "morgan": "^1.10.0",

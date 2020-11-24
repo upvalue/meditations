@@ -14,5 +14,8 @@
   "scripts": {
     "start": "graphql-codegen --watch",
     "generate": "graphql-codegen"
+  },
+  "dependencies": {
+    "date-fns": "^2.16.1"
   }
 }

@@ -32,5 +32,8 @@ export type TCollectionEntry = {
   entryValue: any;
 };
 
+// Export date functionality
+export * from './dates';
+
 // Re-export GraphQL generated types
 export * from './types-generated';

@@ -1,5 +1,5 @@
 {
-  "name": "refractory",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,6 +12,9 @@
     "@types/react-router": "^5.1.7",
     "@types/react-router-dom": "^5.1.5",
     "@types/redux-logger": "^3.0.7",
+    "date-fns": "^2.16.1",
+    "graphql": "^15.4.0",
+    "graphql-tag": "^2.11.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-popper": "^2.2.3",
