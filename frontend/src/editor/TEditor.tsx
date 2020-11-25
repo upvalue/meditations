@@ -5,14 +5,18 @@ import { NodeEntry, Node, Range, Text } from 'slate';
 
 import { makeEditor } from './lib/editor';
 import { markdownRanges } from './lib/markdown';
-import { NoteBody, NoteRecord } from '../../../shared';
+import { NoteBody } from '../../../shared';
 import { RenderLeaf } from './RenderLeaf';
 import { RenderElement } from './RenderElement';
 import { useCompletion, Complete } from './hooks/useCompletion';
+import { Note } from '../api/client';
+import { useAutosave } from './hooks/useAutosave';
 
 export type Props = {
-  document: NoteRecord;
-}
+  note: Note;
+  body: NoteBody;
+  onSave: (noteId: string, body: NoteBody) => void
+};
 
 /**
  * This function handles decorating SlateJS text
@@ -38,10 +42,13 @@ const decorate = ([node, path]: NodeEntry<Node>) => {
 export const TEditor = (props: Props) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const { onUpdate, completionProps, onKeyDown } = useCompletion();
+  const { note } = props;
+  const editor = useMemo(() => makeEditor(), [note.noteId]);
 
-  const selectedDocument = props.document as any;
-  const editor = useMemo(() => makeEditor(), []);
+  // Initialize editor component hooks
+  const { onUpdate: onUpdateCompletion, completionProps, onKeyDown } = useCompletion();
+  const { onUpdate: onUpdateAutosave } = useAutosave(note.noteId);
+
 
   // This is the actual content of the editor
   const [body, setBody] = useState<NoteBody>([
@@ -53,13 +60,19 @@ export const TEditor = (props: Props) => {
 
   // If the route changes, update the editor content with the new document
   useEffect(() => {
-    setBody(selectedDocument.document);
-  }, [selectedDocument.noteId]);
+    setBody(props.body.length === 0 ? [{
+      type: 'line',
+      children: [{ text: 'Hello world' }]
+    }] : props.body);
+  }, [note.noteId]);
+
+  console.log({ body });
 
   return (
     <>
       <Slate editor={editor} value={body} onChange={newValue => {
-        onUpdate(editor);
+        onUpdateCompletion(editor);
+        onUpdateAutosave(newValue as NoteBody)
 
         setBody(newValue as any);
       }}>

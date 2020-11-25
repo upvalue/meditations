@@ -27,15 +27,13 @@ export const Sidebar = (props: SidebarProps) => {
     });
   }, [createNoteMutation]);
 
-  const [confirm, setConfirm] = useState(false);
-
   return (
     <div className="sidebar">
       <div className="a-p4">
         <div style={{ lineHeight: '32px' }}>
           <h4>Notes</h4>
           {notes.map(d => {
-            return <div key={d.noteId}><Link to={`/document/${d.noteId}`}>{d.noteId}</Link></div>
+            return <div key={d.noteId}><Link to={`/note/${d.noteId}`}>{d.noteId}</Link></div>
           })}
 
           {<Button onClick={createNote}>+ New document</Button>}

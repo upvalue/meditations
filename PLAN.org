@@ -2,19 +2,31 @@
 ** Development
 *** DONE Run all scripts concurrently
     CLOSED: [2020-11-23 Mon 14:34]
-*** TODO Consider collapsing packages into a single mega-package
+*** DONE Consider collapsing packages into a single mega-package
+    CLOSED: [2020-11-24 Tue 16:37]
 ** Editor functionality
 *** TODO hide formatting on bolding/italics
 *** TODO allow escaping from headings
 *** TODO List editing
 *** TODO Allow creating collections on the fly
 *** TODO Backlinks
+*** TODO webpack-dev-server refreshing causes NoteRoute to fail with editor error
+    This seems to be a bug in Slate itself -- I've tried stripping out all of my various extensions to a bare minimum component, but it is
+    still not capable of hot refresh.
+
+    https://github.com/ianstormtaylor/slate/issues/3621
+    
+    Disabling refresh via // @refresh reset fixes this.
+
+
 ** Search
 *** TODO Searchbar allows you to search for text, tags and collections
 ** Application functionality
 *** TODO Create entries on a schedule
 *** TODO Create entries from a template
 *** TODO Navigation of some kind
+** Frontend
+*** TODO Route 404s
 ** API
 *** TODO Type / function generation for frontend
 *** TODO Load documents from and save to database
@@ -54,3 +66,37 @@
    
    Working on loading documents. How do you handle reloading a big toplevel query? Probably only want to show loading
    states once. After that you load-in with animations. Do you pass around the re-execute thing you got? Maybe.
+   
+   ---
+   
+   Got to the point where you can create backend docs from the sidebar. Next step should probably be actually saving
+   documents automatically. Then from there you can start to make the actual backend functionality (collection linking,
+   search etc).
+   
+   Another backend problem, how do you / can you rename things? @Run can be stored as an entry pointing at collection
+   @Run, but if we ever want to rename Run the only option is to parse all docs and rename. Another option is to store
+   the collection id, but then rendering docs requires a join. Do you basically send back some kind of lookup table
+   along with docs? e.g. {"collections": {"collection-12345": "Run"}}
+
+   That actually doesn't sound profoundly painful. When sending back a document initially, you do these joins
+   (collections, backlinks, tags) etc. Then from there updates only need to be made when changing a link of some kind.
+
+   What can I get done this week?
+   - Saving and updating documents
+   - Creating collections on the fly and making entries in them
+   - Basic search -- search for a collection, pin a note to a collection search
+   - Basic navigation (beyond giant folder of all documents ever)
+   - Improve document editing
+
+** 2020-11-24 Database hookup continues
+
+   Alright so I can create documents from the sidebar. Now I need to load & render them, then figure out an
+   update/auto-save scheme. Also need a scratch editor exempted from saving and loading (or just into memory).
+   
+   Once I have basic saving hooked up, what's interesting? Search maybe.
+  
+   So when saving, let's save every X seconds when there is input. Flush when user leaves the page or route.
+
+** 2020-11-25 Database hookup continues
+
+   Working on a useAutosave hook that handles managing the interval and making the actual call to save things.

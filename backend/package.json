@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "nodemon src/app.js",
+    "start": "DEBUG=knex:query nodemon src/app.js",
     "watch": "tsc --watch",
     "knex": "knex"
   },

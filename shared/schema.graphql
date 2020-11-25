@@ -9,8 +9,10 @@ type Note {
 
 type Query {
   allNotes: [NoteRecord!]!
+  getNote(noteId: String!): Note!
 }
 
 type Mutation {
   createNote(noteId: String!, createdAt: String!): NoteRecord!
+  updateNote(noteId: String!, updatedAt: String!, body: String!): Note!
 }

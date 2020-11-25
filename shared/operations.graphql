@@ -7,8 +7,22 @@ query GetAllNotes {
   }
 }
 
+query GetNote($noteId: String!) {
+  getNote(noteId: $noteId) {
+    noteId
+    body
+  }
+}
+
 mutation CreateNote($noteId: String!, $createdAt: String!) {
   createNote(noteId: $noteId, createdAt: $createdAt) {
     noteId
+  }
+}
+
+mutation UpdateNote($noteId: String!, $updatedAt: String!, body: String!) {
+  updateNote(noteId: $noteId, updatedAt: $updatedAt, body: $body) {
+    noteId
+    body
   }
 }

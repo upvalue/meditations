@@ -7,6 +7,7 @@ import * as Urql from 'urql';
 export type ReloadFunction = (opts?: Partial<Urql.OperationContext> | undefined) => void;
 
 export type LoadProps<Query, QueryVariables> = {
+  options?: Omit<Urql.UseQueryArgs<QueryVariables>, 'query'>;
   hook: (options?: Omit<Urql.UseQueryArgs<QueryVariables>, 'query'>) => Urql.UseQueryResponse<Query, object>;
   render: React.FC<{ data: Query, reload: ReloadFunction }>;
   // const reload: (opts?: Partial<Urql.OperationContext> | undefined) => void
@@ -17,9 +18,9 @@ export type LoadProps<Query, QueryVariables> = {
  * Load an urql query with support for content states
  */
 export const Load = <Query extends {}, QueryVariables>(props: LoadProps<Query, QueryVariables>) => {
-  const { hook } = props;
+  const { hook, options } = props;
 
-  const [result, reload] = hook();
+  const [result, reload] = hook(options);
 
   const { data, fetching, error } = result;
 
@@ -28,7 +29,8 @@ export const Load = <Query extends {}, QueryVariables>(props: LoadProps<Query, Q
   }
 
   if (error) {
-    return <div>error</div>
+    console.log(error);
+    return <div>error {JSON.stringify(error)}</div>
   }
 
   // Should not happen, but need to assert non-nullability 
