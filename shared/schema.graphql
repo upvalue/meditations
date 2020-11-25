@@ -1,9 +1,11 @@
 type NoteRecord {
   noteId: String!
+  revision: Int
 }
 
 type Note {
   noteId: String!
+  revision: Int
   body: String!
 }
 
@@ -14,5 +16,5 @@ type Query {
 
 type Mutation {
   createNote(noteId: String!, createdAt: String!): NoteRecord!
-  updateNote(noteId: String!, updatedAt: String!, body: String!): Note!
+  updateNote(noteId: String!, noteRevisionId: Int, updatedAt: String!, body: String!): NoteRecord
 }

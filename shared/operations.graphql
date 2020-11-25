@@ -20,9 +20,9 @@ mutation CreateNote($noteId: String!, $createdAt: String!) {
   }
 }
 
-mutation UpdateNote($noteId: String!, $updatedAt: String!, body: String!) {
-  updateNote(noteId: $noteId, updatedAt: $updatedAt, body: $body) {
+mutation UpdateNote($noteId: String!, $noteRevisionId: Int!, $updatedAt: String!, $body: String!) {
+  updateNote(noteId: $noteId, noteRevisionId: $noteRevisionId, updatedAt: $updatedAt, body: $body) {
     noteId
-    body
+    revision
   }
 }

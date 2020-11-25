@@ -10,7 +10,7 @@ import { NoteBody } from "../../shared";
 const log = (noteId: string, ...args: any[]) => {
   // const args2 = Array.prototype.slice.call(args);
   args.unshift(`[autosave] ${noteId}`);
-  /// console.log.apply(console, args as any);
+  console.log.apply(console, args as any);
 }
 
 
@@ -26,6 +26,7 @@ export const useAutosave = (noteId: string) => {
     }
 
     log('body has changed, dispatching save');
+    savedBody.current = noteBody.current;
   }
 
 

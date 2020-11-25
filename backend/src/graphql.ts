@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs';
 import knex from './knex';
 
-import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, Note } from '../../shared';
+import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, Note, MutationUpdateNoteArgs } from '../../shared';
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { getNote } from './queries';
+import { getNote, updateNote } from './queries';
+import { InvariantError } from './errors';
 
 export const typeDefs = readFileSync('../shared/schema.graphql').toString();
 
@@ -17,11 +18,12 @@ export const resolvers = {
     },
 
     getNote: async (_parent: any, { noteId }: QueryGetNoteArgs) => {
-      return getNote(noteId).then(note => {
+      return getNote(noteId).then(r => {
         return {
-          ...note,
+          noteId: r.noteId,
+          noteRevisionId: r.noteRevisionId,
           // If no revision exists, provide an empty body
-          body: note.body || '[]',
+          body: r.body || '[]',
         };
       });
     }
@@ -37,7 +39,34 @@ export const resolvers = {
         console.log(rows);
         return rows[0];
       })
-    }
+    },
+
+    updateNote: async (_parent: any, { noteId, noteRevisionId, updatedAt, body }: MutationUpdateNoteArgs) => {
+      // Require that this update specifies the correct revision (corny way of preventing multiple
+      // open tabs from writing results)
+
+      return getNote(noteId).then(r => {
+        console.log('check note', r);
+        // Latest revision not found, this must be first write
+        if (typeof r.noteRevisionId !== 'number') {
+          if (noteRevisionId !== 0) {
+            throw new InvariantError(`Note ${noteId} has no revisions but attempted to write revision ${noteRevisionId}`);
+          }
+        } else {
+          if (noteRevisionId !== r.noteRevisionId + 1) {
+            throw new InvariantError(`Note ${noteId} is at revision ${r.noteRevisionId} so next revision should be ${r.noteRevisionId + 1} but attmepted to write ${noteRevisionId}`);
+          }
+        }
+
+        // Revision invariants are OK, write update
+        return updateNote(noteId, noteRevisionId, updatedAt, body).then(upd => ({
+          noteId: noteId,
+          revision: noteRevisionId,
+        }));
+      }).catch(e => {
+        throw e;
+      });
+    },
   }
 }
 

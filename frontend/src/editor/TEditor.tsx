@@ -66,8 +66,6 @@ export const TEditor = (props: Props) => {
     }] : props.body);
   }, [note.noteId]);
 
-  console.log({ body });
-
   return (
     <>
       <Slate editor={editor} value={body} onChange={newValue => {
