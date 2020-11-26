@@ -10,6 +10,7 @@ query GetAllNotes {
 query GetNote($noteId: String!) {
   getNote(noteId: $noteId) {
     noteId
+    revision
     body
   }
 }

@@ -1,4 +1,6 @@
 * Application
+** Arche
+*** TODO Toasts
 ** Development
 *** DONE Run all scripts concurrently
     CLOSED: [2020-11-23 Mon 14:34]
@@ -17,6 +19,9 @@
     https://github.com/ianstormtaylor/slate/issues/3621
     
     Disabling refresh via // @refresh reset fixes this.
+    
+    Or doesn't -- it also doesn't seem to behave well when being updated live in-place. Maybe I can do something to
+    force remounting the component.
 
 
 ** Search
@@ -25,6 +30,7 @@
 *** TODO Create entries on a schedule
 *** TODO Create entries from a template
 *** TODO Navigation of some kind
+*** TODO Error handling for recoverable and unrecoverable errors
 ** Frontend
 *** TODO Route 404s
 ** API

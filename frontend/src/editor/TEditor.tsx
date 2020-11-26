@@ -45,11 +45,6 @@ export const TEditor = (props: Props) => {
   const { note } = props;
   const editor = useMemo(() => makeEditor(), [note.noteId]);
 
-  // Initialize editor component hooks
-  const { onUpdate: onUpdateCompletion, completionProps, onKeyDown } = useCompletion();
-  const { onUpdate: onUpdateAutosave } = useAutosave(note.noteId);
-
-
   // This is the actual content of the editor
   const [body, setBody] = useState<NoteBody>([
     {
@@ -65,6 +60,10 @@ export const TEditor = (props: Props) => {
       children: [{ text: 'Hello world' }]
     }] : props.body);
   }, [note.noteId]);
+
+  // Initialize editor component hooks
+  const { onUpdate: onUpdateCompletion, completionProps, onKeyDown } = useCompletion();
+  const { onUpdate: onUpdateAutosave } = useAutosave(note.noteId, body, note.revision);
 
   return (
     <>

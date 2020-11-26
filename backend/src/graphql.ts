@@ -19,11 +19,12 @@ export const resolvers = {
 
     getNote: async (_parent: any, { noteId }: QueryGetNoteArgs) => {
       return getNote(noteId).then(r => {
+        console.log(r);
         return {
           noteId: r.noteId,
-          noteRevisionId: r.noteRevisionId,
+          revision: r.noteRevisionId,
           // If no revision exists, provide an empty body
-          body: r.body || '[]',
+          body: r.body ? JSON.stringify(r.body) : '[]',
         };
       });
     }
@@ -54,7 +55,7 @@ export const resolvers = {
           }
         } else {
           if (noteRevisionId !== r.noteRevisionId + 1) {
-            throw new InvariantError(`Note ${noteId} is at revision ${r.noteRevisionId} so next revision should be ${r.noteRevisionId + 1} but attmepted to write ${noteRevisionId}`);
+            throw new InvariantError(`Note ${noteId} is at revision ${r.noteRevisionId} so next revision should be ${r.noteRevisionId + 1} but attempted to write ${noteRevisionId}`);
           }
         }
 
