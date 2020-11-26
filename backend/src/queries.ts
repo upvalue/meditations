@@ -27,7 +27,10 @@ export const getNote = (noteId: string) => {
   return knex.from('notes')
     .where({ 'notes.noteId': noteId })
     .select('notes.noteId', 'note_revisions.body', 'note_revisions.note_revision_id')
-    .leftJoin('note_revisions', 'notes.revision', 'note_revisions.note_revision_id')
+    .leftJoin('note_revisions', function () {
+      this.on('notes.revision', '=', 'note_revisions.note_revision_id').andOn('notes.noteId', '=', 'note_revisions.noteId');
+
+    })// 'notes.revision', 'note_revisions.note_revision_id')
     .then((rows: GetNote[]) => {
       assertFoundOne(noteId, rows);
 

@@ -1,5 +1,5 @@
 // useAutosave.ts - automatic save functionality. handles saving on intervals / flushing
-import { useCallback, useEffect, useRef, MutableRefObject } from "react";
+import { useEffect, useRef, MutableRefObject } from "react";
 import { useUpdateNoteMutation } from "../../api/client";
 import { List } from 'ts-toolbelt';
 import { formatWireDate, Maybe, NoteBody } from "../../shared";
@@ -31,7 +31,7 @@ const autosave = async (stateRef: MutableRefObject<AutosaveState>, update: Updat
   // No need to mutate anything if nothing has changed
   if (body === savedBody) return;
 
-  log('dispatching autosave')
+  log('dispatching autosave');
 
   try {
     state.saving = true;
@@ -91,9 +91,9 @@ export const useAutosave = (noteId: string, body: NoteBody, revision?: Maybe<num
     }
   }, []);
 
-  const onUpdate = useCallback((body: NoteBody) => {
+  const onUpdate = (body: NoteBody) => {
     state.current.body = body;
-  }, []);
+  };
 
   return {
     onUpdate,

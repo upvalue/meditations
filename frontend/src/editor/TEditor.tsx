@@ -12,6 +12,8 @@ import { useCompletion, Complete } from './hooks/useCompletion';
 import { Note } from '../api/client';
 import { useAutosave } from './hooks/useAutosave';
 
+// @refresh reset
+
 export type Props = {
   note: Note;
   body: NoteBody;
@@ -49,7 +51,7 @@ export const TEditor = (props: Props) => {
   const [body, setBody] = useState<NoteBody>([
     {
       type: 'line',
-      children: [{ text: 'should not be shown' }]
+      children: [{ type: 'text', text: 'should not be shown' }]
     }
   ]);
 
@@ -57,7 +59,7 @@ export const TEditor = (props: Props) => {
   useEffect(() => {
     setBody(props.body.length === 0 ? [{
       type: 'line',
-      children: [{ text: 'Hello world' }]
+      children: [{ type: 'text', text: 'Hello world' }]
     }] : props.body);
   }, [note.noteId]);
 

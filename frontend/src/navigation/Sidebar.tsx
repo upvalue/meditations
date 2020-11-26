@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../arche';
 import { formatWireDate, NoteRecord } from '../shared';
@@ -11,12 +11,10 @@ export type SidebarProps = {
   reload: ReloadFunction;
 }
 
-console.log(formatWireDate(new Date()));
-
 export const Sidebar = (props: SidebarProps) => {
   const { notes, reload } = props;
 
-  const [createNoteResult, createNoteMutation] = useCreateNoteMutation();
+  const [, createNoteMutation] = useCreateNoteMutation();
 
   const createNote = useCallback(() => {
     const noteId = generateId('note');
@@ -33,7 +31,7 @@ export const Sidebar = (props: SidebarProps) => {
         <div style={{ lineHeight: '32px' }}>
           <h4>Notes</h4>
           {notes.map(d => {
-            return <div key={d.noteId}><Link to={`/note/${d.noteId}`}>{d.noteId}</Link></div>
+            return <div key={d.noteId}><Link to={`/note-remount/${d.noteId}`}>{d.noteId}</Link></div>
           })}
 
           {<Button onClick={createNote}>+ New document</Button>}

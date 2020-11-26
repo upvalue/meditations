@@ -8,7 +8,27 @@ const softAssert = (exp: boolean, message: string) => {
   }
 }
 
-const withShortcuts = (editor: Editor) => {
+type Shortcut = {
+  type: 'heading',
+  level: number,
+};
+
+const shortcuts: { [key: string]: Shortcut | undefined } = {
+  '#': {
+    type: 'heading',
+    level: 1,
+  },
+  '##': {
+    type: 'heading',
+    level: 2,
+  },
+  '###': {
+    type: 'heading',
+    level: 3,
+  },
+}
+
+const withTechne = (editor: Editor) => {
   const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment, isVoid } = editor;
 
   editor.deleteBackward = unit => {
@@ -46,24 +66,25 @@ const withShortcuts = (editor: Editor) => {
       // formatting from the previous line which is behavior that we don't want. Maybe it uses
       // splitNodes because it doesn't require understanding the schema? But we understand 
       // it, so it's okay to do this instead.
-      /*
       insertNode({
-        "type": "line",
-        "children": [
+        type: "line",
+        children: [
           {
-            "text": "",
+            type: "text",
+            text: "",
           }
         ]
       })
-      */
 
-      console.log(selection);
+      // console.log(selection);
       // insertBreak();
       return;
     }
 
     insertBreak();
   }
+
+  editor.insertBreak = insertBrk
 
   editor.deleteFragment = () => {
     console.log('deleteFragment');
@@ -88,12 +109,14 @@ const withShortcuts = (editor: Editor) => {
       const range = { anchor, focus: start }
       const beforeText = Editor.string(editor, range)
 
-      if (beforeText === '#') {
+      const shortcut = shortcuts[beforeText];
+
+      if (shortcut) {
         Transforms.select(editor, range);
         Transforms.delete(editor);
         Transforms.setNodes(
           editor,
-          { type: 'heading' },
+          shortcut,
           { match: n => Editor.isBlock(editor, n) }
         )
 
@@ -113,7 +136,7 @@ export const insertCollectionEntry = (editor: EditorInstance, collection: string
     data: {
       collection,
     },
-    children: [{ text: '' }],
+    children: [{ type: 'text', text: '' }],
   }
   // Remove the entered text
   Transforms.removeNodes(editor);
@@ -121,7 +144,7 @@ export const insertCollectionEntry = (editor: EditorInstance, collection: string
   Transforms.insertNodes(editor, entry);
   Transforms.insertNodes(editor, {
     type: 'line',
-    children: [{ text: '' }]
+    children: [{ type: 'text', text: '' }]
   })
   Transforms.move(editor);
 }
@@ -135,5 +158,5 @@ export type EditorInstance = Editor & ReactEditor;
  * Instantiate a SlateJS editor instance with custom modifications
  */
 export const makeEditor = (): EditorInstance => {
-  return withReact(withShortcuts(createEditor()));
+  return withReact(withTechne(createEditor()));
 }

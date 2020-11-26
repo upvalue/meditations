@@ -9,13 +9,22 @@
  */
 
 export type TText = {
+  type: 'text',
   text: string;
 };
 
-export type TElement = {
-  type: 'line' | 'heading';
+export type TLine = {
+  type: 'line';
   children: TNode[];
 };
+
+export type THeader = {
+  type: 'heading';
+  level: number;
+  children: TNode[];
+}
+
+export type TElement = TLine | THeader;
 
 export type TNode = TText | TElement;
 

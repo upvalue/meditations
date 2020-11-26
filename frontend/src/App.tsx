@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Sidebar } from './navigation/Sidebar';
-import { Switch, Route } from 'react-router';
+import { Switch, Route, Redirect } from 'react-router';
 import { NoteRoute } from './routes/NoteRoute';
 import { useGetAllNotesQuery } from './api/client';
 import { Load } from './common/Load';
@@ -10,6 +10,7 @@ import { makeEditor } from './editor/lib/editor';
 import { Editable, Slate, withReact } from 'slate-react';
 import { createEditor } from 'slate';
 
+// @refresh reset
 
 /**
  * Route for developing on the editor with no backend calls
@@ -18,7 +19,6 @@ import { createEditor } from 'slate';
 export const DebugRoute = (props: {}) => {
   const editor = useMemo(() => withReact(createEditor()), []);
 
-  // bless
   const [body, setBody] = useState([{
     type: 'line',
     children: [{ text: 'hello world' }],
@@ -52,6 +52,8 @@ const App = () => {
           <Route path={"/note/:noteId"}>
             <NoteRoute />
           </Route>
+          {/* Slate or my modifications doesn't seem to handle being updated in-place well, this is a simple hack to force the component to remount */}
+          <Redirect from="/note-remount/:noteId" to="/note/:noteId" />
           <Route path="/collections/:collectionName">
             <p>hiya</p>
           </Route>

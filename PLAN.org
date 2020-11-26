@@ -106,3 +106,43 @@
 ** 2020-11-25 Database hookup continues
 
    Working on a useAutosave hook that handles managing the interval and making the actual call to save things.
+   
+   --- 
+
+   Finished up useAutosave. What's next? Editor improvements? Actual search? Searching for collections? Making collections work?
+
+   Probably in a day I could make up some actual search-like functionality.
+
+   So maybe:
+   Make collections that are backed by an actual database object, and can be created on the fly.
+   Think of a better name than collections, it reminds me of MongoDB.
+   Search for collections.
+   
+   Buckets, bins, chunks, globs, tags, ats? Ats actually doesn't seem bad, in that it doesn't really have any baggage,
+   tells you exactly how to initiate them (@), is less cumbersome to type. 
+   
+   What's the database look like?
+   
+   Does an "at" have a type? Or do its entries simply have types and an "at" has a default type? (Allowing you to change
+   types without losing data)
+   
+   Are types more complex than just an enum?
+
+   Does everything have a Y/N button on it? Or do just some of them? (For some of them, the mere act of filling it out
+   would seem to be enough to register a "yes"). Is there a binary or yes/no version of each type of at?
+
+   So an "at" has a type which is a composite of an enum as well as whether or not it requires yes/no? Does that seem good enough?
+   
+   Hmm. I'll start with this and see how it goes.
+
+   What's an entry in an at called? An at node? I suppose that makes enough sense, considering that also lines up with
+   where they actually come from.
+   
+   Finally, how do we store data? Is it denormalized? A JSONB column?
+
+   Alright so how do I query the table? Clicking on "@Run" causes a SELECT * FROM at_notes WHERE at_id = 'x';
+   
+   What do you do here? One option would just be to return it and do all the analysis on the frontend for now.
+
+   For example, click on an @Run queries @Run nodes from the last X days. You get all the at-nodes back and then you can
+   render graphs out of the individual entries as well as stuff like SUM, MAX etc.

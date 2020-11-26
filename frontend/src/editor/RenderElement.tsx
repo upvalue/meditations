@@ -1,19 +1,19 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { TElement } from '../../../shared';
+import { TElement, TNode } from '../../../shared';
 import { CollectionEntry } from './elements/CollectionEntry';
 
 export const RenderElement = (args: RenderElementProps) => {
   const { attributes, children } = args;
-  const element: any = args.element;
+  const element: TNode = args.element as any;
 
   switch (element.type) {
-    case 'heading':
-      return <h1 {...attributes}>{children}</h1>
+    case 'heading': {
+      let elt = `h${element.level}`;
+      return React.createElement(elt, attributes, children);
+    }
     case 'line':
       return <div {...attributes}>{children}</div>
-    case 'collectionEntry':
-      return <CollectionEntry data={element.data} attributes={attributes} children={children} />
     default:
       return <div>this should never happen</div>
   }
