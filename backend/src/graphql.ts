@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import knex from './knex';
 
 import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, Note, MutationUpdateNoteArgs } from '../../shared';
-import { ApolloError, UserInputError } from 'apollo-server-express';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
 

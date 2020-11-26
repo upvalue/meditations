@@ -75,13 +75,20 @@ export const useAutosave = (noteId: string, body: NoteBody, revision?: Maybe<num
     saving: false,
   });
 
+  let windowSave = () => {
+    autosave(state, updateNoteMutation);
+  }
+
   useEffect(() => {
     log('creating interval');
+    window.addEventListener('beforeunload', windowSave);
+
     state.current.interval = window.setInterval(() => {
       autosave(state, updateNoteMutation);
     }, 3000);
 
     return () => {
+      window.removeEventListener('beforeunload', windowSave);
       autosave(state, updateNoteMutation);
       if (state.current.interval) {
         log('clearing interval');
