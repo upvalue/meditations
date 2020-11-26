@@ -89,7 +89,6 @@ export const useAutosave = (noteId: string, body: NoteBody, revision?: Maybe<num
         state.current.interval = undefined;
       }
     }
-
   }, []);
 
   const onUpdate = useCallback((body: NoteBody) => {
