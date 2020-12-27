@@ -9,9 +9,15 @@ type Note {
   body: String!
 }
 
+type Tag {
+  tagId: String!
+  tagName: String!
+}
+
 type Query {
   allNotes: [NoteRecord!]!
   getNote(noteId: String!): Note!
+  getTags: [Tag!]!
 }
 
 type Mutation {

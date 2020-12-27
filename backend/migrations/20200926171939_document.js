@@ -19,6 +19,8 @@ exports.up = function (knex) {
     PRIMARY KEY(note_id, note_revision_id)
   );
 
+  ALTER TABLE techne.notes ADD CONSTRAINT fk_note_rev FOREIGN KEY (note_id, revision) REFERENCES techne.note_revisions(note_id, note_revision_id);
+
   CREATE TYPE techne.at_type AS ENUM ('yesno', 'timer', 'yesno_timer');
 
   CREATE TABLE techne.ats(
@@ -42,7 +44,21 @@ exports.up = function (knex) {
     PRIMARY KEY(at_id, note_id)
   );
 
-  ALTER TABLE techne.notes ADD CONSTRAINT fk_note_rev FOREIGN KEY (note_id, revision) REFERENCES techne.note_revisions(note_id, note_revision_id);
+  CREATE TABLE techne.tags(
+    tag_id TEXT NOT NULL,
+    tag_name TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    PRIMARY KEY(tag_id),
+    UNIQUE(tag_name)
+  );
+
+  CREATE TABLE techne.tag_notes(
+    note_id TEXT NOT NULL,
+    tag_id TEXT NOT NULL,
+    path JSONB,
+    PRIMARY KEY(note_id, tag_id, path)
+  );
+
   `);
 };
 

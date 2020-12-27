@@ -18,13 +18,19 @@ export type TLine = {
   children: TNode[];
 };
 
+export type TTag = {
+  type: 'tag',
+  tagId: string,
+  children: TNode[];
+};
+
 export type THeader = {
   type: 'heading';
   level: number;
   children: TNode[];
 }
 
-export type TElement = TLine | THeader;
+export type TElement = TLine | THeader | TTag;
 
 export type TNode = TText | TElement;
 

@@ -29,14 +29,19 @@ const shortcuts: { [key: string]: Shortcut | undefined } = {
 }
 
 const withTechne = (editor: Editor) => {
-  const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment, isVoid } = editor;
+  const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment, isVoid, isInline } = editor;
 
   editor.deleteBackward = unit => {
     return deleteBackward(unit);
   }
 
+  // Teach Slate about our custom types
+  editor.isInline = elt => {
+    return elt.type === 'tag' ? true : isInline(elt);
+  }
+
   editor.isVoid = elt => {
-    return elt.type === 'collectionEntry' ? true : isVoid(elt);
+    return elt.type === 'tag' ? true : isVoid(elt);
   }
 
   // TODO: I'm not sure what the best behavior is here. 
@@ -76,8 +81,6 @@ const withTechne = (editor: Editor) => {
         ]
       })
 
-      // console.log(selection);
-      // insertBreak();
       return;
     }
 
@@ -130,22 +133,21 @@ const withTechne = (editor: Editor) => {
   return editor;
 }
 
-export const insertCollectionEntry = (editor: EditorInstance, collection: string) => {
+export const insertTag = (editor: EditorInstance, tag: string) => {
   const entry = {
-    type: 'collectionEntry',
-    data: {
-      collection,
-    },
+    type: 'tag',
+    tagId: tag,
     children: [{ type: 'text', text: '' }],
   }
   // Remove the entered text
-  Transforms.removeNodes(editor);
+  // Commented out lines are for toplevel-only voids (ats)
+  // Transforms.removeNodes(editor);
   // Insert the entry
   Transforms.insertNodes(editor, entry);
-  Transforms.insertNodes(editor, {
+  /*Transforms.insertNodes(editor, {
     type: 'line',
     children: [{ type: 'text', text: '' }]
-  })
+  });*/
   Transforms.move(editor);
 }
 

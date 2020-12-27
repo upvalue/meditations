@@ -1,24 +1,13 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 
-import { NoteBody, NoteRecord } from '../../../shared';
-import { generateId } from '../lib/utilities';
-import { loadState, saveState } from './storage';
+import { NoteBody, Tag } from '../../../shared';
+import { TState } from './types';
 
 
-const initialDocument: NoteRecord = {
-  noteId: generateId('doc'),
-  /*document: [{
-    type: 'line',
-    children: [{ text: 'click to edit' }]
-  }]*/
-};
-
-const initialCollection = {
-  collectionType: 'simple',
-  name: 'Run',
-};
-
+export const initialState: TState = {
+  tags: {}
+}
 
 export type UpdateDocumentAction = {
   type: string;
@@ -35,38 +24,18 @@ export type CreateDocumentAction = {
 
 const docs = createSlice({
   name: "docs",
-  initialState: loadState(),
-  reducers: {
-    updateDocument(state, action: UpdateDocumentAction) {
-      state.documents = state.documents.map(doc => {
-        if (doc.noteId !== action.payload.id) return doc;
-        return {
-          noteId: doc.noteId,
-          document: action.payload.document,
-        };
-      })
-    },
-    createDocument(state, _action: CreateDocumentAction) {
-      state.documents.push({
-        noteId: generateId('doc'),
-        // document: initialDocument.document
-      });
-    }
-  },
+  initialState: initialState,
+  reducers: {},
 });
 
-const persistMiddleware: any = (store: any) => (next: any) => (action: any) => {
-  let result = next(action);
-  saveState(store.getState());
-  return result;
-}
-
-export const { createDocument, updateDocument } = docs.actions;
+export type CreateTagAction = {
+  type: string;
+  tag: Tag;
+};
 
 export const store = configureStore({
   reducer: docs.reducer,
   middleware: [
-    persistMiddleware,
     logger,
   ],
 })

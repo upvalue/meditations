@@ -1,6 +1,10 @@
+/* arche rev: fd7e6aa21b96ab43b5aec28dd0c0c71396e0af99 (modified) */
 /*
  * arche is a two-file React component library. It is intended to be copied (or symlinked)
  * directly into projects.
+ *
+ * Its styling is derived heavily from BlueprintJS and it is a derivative work.
+ * See: https://github.com/palantir/blueprint/blob/develop/LICENSE
  */
 
 :root {
@@ -51,7 +55,11 @@
  *****/
 
 .a-flex { display: flex; }
+.a-inline-flex  { display: inline-flex; }
+.a-inline { display: inline; }
 .a-justify-center { justify-content: center; }
+.a-justify-around { justify-content: space-around;}
+.a-items-center { align-items: center; }
 .a-column { flex-direction: column; }
 
 /*****
@@ -159,7 +167,7 @@
   cursor: pointer;
   color: rgb(var(--a-dark-gray-1));
   font-size: inherit;
-  font-family: var(--a-font);
+  font-family: inherit;
 }
 
 .a-Button:hover {
@@ -172,6 +180,34 @@
 
 .a-Button:focus {
   outline: 0;
+}
+
+.a-Button-minimal {
+  background-image: none;
+  box-shadow: none;
+  background-color: inherit;
+}
+
+.a-Button-minimal:hover {
+  background-color: rgb(var(--a-light-gray-2));
+}
+
+.a-Button-minimal:active {
+  background-color: rgb(var(--a-gray-5));
+}
+
+.a-Button-outline {
+  box-shadow: none;
+  background: none;
+  border: 1px solid rgba(var(--a-gray-5));
+}
+
+/*****
+ * LINK
+ *****/
+
+.a-Link {
+  display: inline-flex;
 }
 
 /*****
@@ -194,4 +230,61 @@
 .a-Callout {
   border-radius: 3px;
   background-color: rgba(var(--a-gray-3), .15);
+}
+
+/*****
+ * GROUP
+ *****/
+
+.a-Group-spacing-1 {
+  padding-right: var(--a-space-1);
+}
+
+.a-Group-spacing-1 > * {
+  margin-left: var(--a-space-1);
+  margin-right: var(--a-space-1);
+}
+
+.a-Group-spacing-2 {
+  padding-right: var(--a-space-1);
+}
+
+.a-Group-spacing-2 > * {
+  margin-left: var(--a-space-2);
+  margin-right: var(--a-space-2);
+}
+
+.a-Group-spacing-3 {
+  padding-right: var(--a-space-1);
+}
+
+.a-Group-spacing-3 > * {
+  margin-left: var(--a-space-3);
+  margin-right: var(--a-space-3);
+}
+
+.a-Group-spacing-4 {
+  padding-right: var(--a-space-1);
+}
+
+.a-Group-spacing-4 > * {
+  margin-left: var(--a-space-4);
+  margin-right: var(--a-space-4);
+}
+
+.a-Group-spacing-5 {
+  padding-right: var(--a-space-1);
+}
+
+.a-Group-spacing-5 > * {
+  margin-left: var(--a-space-5);
+  margin-right: var(--a-space-5);
+}
+
+.a-Group:first-child {
+  margin-left: 0;
+}
+
+.a-Group:last-child {
+  margin-right: 0;
 }

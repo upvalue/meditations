@@ -1,6 +1,10 @@
+/* arche rev: fd7e6aa21b96ab43b5aec28dd0c0c71396e0af99 (modified) */
 /*
- * arche is a single-file React component library. It is intended to be copied (or symlinked)
+ * arche is a two-file React component library. It is intended to be copied (or symlinked)
  * directly into projects.
+ * 
+ * Its styling is derived heavily from BlueprintJS and it is a derivative work.
+ * See: https://github.com/palantir/blueprint/blob/develop/LICENSE
  */
 
 import { createElement } from 'react';
@@ -13,9 +17,13 @@ export const arrayToString = (x: ReadonlyArray<string> | string | undefined, pre
   Array.isArray(x) ?
     (prepend ? x.map(x => `${prepend}-${x}`) : x).join(' ') : ((prepend && x) ? `${prepend}-${x}` : x);
 
-const buildClassNames = (className: string, props: any) => {
+/**
+ * Handle props common to most components
+ */
+const commonClassProps = (className: string, props: any) => {
   const classNames = [
     className,
+    props.className && props.className,
     props.flex && arrayToString(props.flex, 'a'),
     props.margin && arrayToString(props.margin, 'a'),
     props.padding && arrayToString(props.padding, 'a'),
@@ -24,9 +32,16 @@ const buildClassNames = (className: string, props: any) => {
   return classNames.join(' ');
 }
 
+const classNames = (...args: ReadonlyArray<string | false | undefined | null>) => args.reduce((a, b) => `${a}${b ? ` ${b}` : ''}`) || '';
+
+/**
+ * List of props to not pass through to HTML elements, to avoid warnings
+ */
 const excludeProps: { [key: string]: true } = {
   children: true,
   flex: true,
+  minimal: true,
+  outline: true,
 }
 
 /**
@@ -47,11 +62,11 @@ const createAtom = (elementType: string, className: string, props: any) => {
 
   return createElement(elementType, {
     ...nonStyleProps,
-    className: buildClassNames(className, props),
+    className: commonClassProps(className, props).trim(),
   }, props.children);
 }
 
-type FlexConstants = 'justify-center' | 'column';
+type FlexConstants = 'justify-center' | 'column' | 'items-center' | 'row';
 type PaddingConstants = 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'pl1' | 'pl2' | 'pl3' | 'pl4' | 'pl5' | 'pr1' | 'pr2' | 'pr3' | 'pr4' | 'pr5' | 'pt1' | 'pt2' | 'pt3' | 'pt4' | 'pt5' | 'pb1' | 'pb2' | 'pb3' | 'pb4' | 'pb5' | 'px1' | 'px2' | 'px3' | 'px4' | 'px5' | 'py1' | 'py2' | 'py3' | 'py4' | 'py5';
 type MarginConstants = 'm1' | 'm2' | 'm3' | 'm4' | 'm5' | 'ml1' | 'ml2' | 'ml3' | 'ml4' | 'ml5' | 'mr1' | 'mr2' | 'mr3' | 'mr4' | 'mr5' | 'mt1' | 'mt2' | 'mt3' | 'mt4' | 'mt5' | 'mb1' | 'mb2' | 'mb3' | 'mb4' | 'mb5' | 'mx1' | 'mx2' | 'mx3' | 'mx4' | 'mx5' | 'my1' | 'my2' | 'my3' | 'my4' | 'my5';
 
@@ -65,14 +80,25 @@ type AtomProps = {
   margin?: MarginProps;
 }
 
-type ButtonProps = AtomProps & React.HTMLProps<HTMLButtonElement>;
+type _ButtonProps = {
+  minimal?: boolean;
+  outline?: boolean;
+}
+
+export type ButtonProps = AtomProps & React.HTMLProps<HTMLButtonElement> & _ButtonProps;
 
 /**
  * A button
  * @param props 
  */
 export const Button = (props: ButtonProps) => {
-  return createAtom('button', 'a-Button a-flex a-py1 a-px2', props);
+  return createAtom('button', classNames('a-Button a-py1 a-px2', props.minimal && `a-Button-minimal`, props.outline && `a-Button-outline`), props);
+}
+
+type ButtonLinkProps = AtomProps & React.HTMLProps<HTMLAnchorElement> & _ButtonProps;
+
+export const ButtonLink = (props: ButtonLinkProps) => {
+  return createAtom('a', classNames('a-Link a-Button a-py1 a-px2', props.minimal && `a-Button-minimal`, props.outline && `a-Button-outline`), props);
 }
 
 type RaisedProps = AtomProps & React.HTMLProps<HTMLDivElement>;
@@ -86,3 +112,26 @@ type CalloutProps = AtomProps & React.HTMLProps<HTMLDivElement>;
 export const Callout = (props: CalloutProps) => {
   return createAtom('div', 'a-Callout a-p2', props);
 }
+
+type BoxProps = AtomProps & React.HTMLProps<HTMLDivElement>;
+
+export const Box = (props: BoxProps) => {
+  return createAtom('div', 'a-Box', props);
+}
+
+type GroupProps = AtomProps & React.HTMLProps<HTMLDivElement> & {
+  spacing?: 1 | 2 | 3 | 4 | 5;
+};
+
+/**
+ * Group with spacing
+ * @param props 
+ */
+export const Group = ({ spacing = 1, ...props }: GroupProps) => {
+  return createAtom('div', classNames(`a-flex a-Group a-Group-spacing-${spacing}`), props);
+}
+
+
+// TODO: Spinner
+// TODO: Toast
+// TODO: Loading

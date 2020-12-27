@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import knex from './knex';
 
-import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, Note, MutationUpdateNoteArgs } from '../../shared';
+import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, Note, MutationUpdateNoteArgs, Tag } from '../../shared';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
 
@@ -25,6 +25,12 @@ export const resolvers = {
           // If no revision exists, provide an empty body
           body: r.body ? JSON.stringify(r.body) : '[]',
         };
+      });
+    },
+
+    getTags: async (_parent: any) => {
+      return knex.from('tags').select<Tag[]>('*').then(rows => {
+        return rows;
       });
     }
   },

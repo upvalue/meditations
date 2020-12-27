@@ -7,6 +7,8 @@
 *** DONE Consider collapsing packages into a single mega-package
     CLOSED: [2020-11-24 Tue 16:37]
 ** Editor functionality
+*** TODO Undo
+*** TODO Bug: Removing voids doesn't work quite as expected if they're not inline
 *** TODO hide formatting on bolding/italics
 *** TODO allow escaping from headings
 *** TODO List editing
@@ -31,6 +33,7 @@
 *** TODO Create entries from a template
 *** TODO Navigation of some kind
 *** TODO Error handling for recoverable and unrecoverable errors
+*** TODO Archival / soft deletion
 ** Frontend
 *** TODO Route 404s
 ** API
@@ -146,3 +149,35 @@
 
    For example, click on an @Run queries @Run nodes from the last X days. You get all the at-nodes back and then you can
    render graphs out of the individual entries as well as stuff like SUM, MAX etc.
+
+   That seems good enough to start with anyway and easier to reason about than translating it to SQL. Can always make
+   it good later.
+   
+   Good stopping point. Tomorrow: Figure out @s and #s
+   
+   One thought is to load them all upfront into Redux. That makes querying relatively easy at the cost of: multiple
+   clients could get out of sync, there could be a lot of them eventually (although based on my current 7 year history
+   in meditations, there's probably only going to be a couple hundred).
+   
+   Update: Actually, I'll start with tags since they will be simpler and should establish the same code paths.
+
+   - Load tags on startup
+   - When saving a document, auto create any tags and tag relations that need to exist. (We could also create on
+     insertion into document? But auto creation on document save seems possible and simplifies frontend. You keep a
+     mapping of (tag_id, tag_name) in Redux, and the completion component has the ability to add something to this
+     immediately on creation, ensuring that tag_id will be used later in that document or elsewhere.
+
+** 2020-11-26 Working on adding tag support
+
+   Decided to go with tags because they're simpler to start with. Added a getTags endpoint that retrieves all tags -- do
+   this on startup and keep it in Redux. Once it's there, users should be able to add a new tag by typing.
+   
+   Turns out Slate doesn't like me inserting freeform text. (Makes sense) Question though is how do I do it?
+   
+   Oh I just have to make them a void. That's kind of annoying if you want to inline edit tags, but it's also probably
+   easier to reason about and not too hard to just...re-type tags.
+
+** 2020-12-23 Working on tags
+
+   If I recall where I left off correctly, I need to: preload a mapping of tags to actual tag IDs, then add the ability
+   to 1) map that to actual names and 2) add tags on the fly.

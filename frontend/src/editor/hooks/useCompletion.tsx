@@ -3,7 +3,7 @@ import { useState, useRef, useReducer, useEffect } from "react";
 import { usePopper } from "react-popper";
 import { VirtualElement } from "@popperjs/core";
 
-import { EditorInstance, insertCollectionEntry } from "../lib/editor";
+import { EditorInstance, insertTag } from "../lib/editor";
 import { Editor, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { TState } from '../../store/types';
@@ -13,7 +13,7 @@ import { Raised } from '../../arche';
 export type CompletionState = {
   // Completion state
   editor?: EditorInstance;
-  completionType: 'collection';
+  completionType: 'at' | 'tag';
   target?: Range;
   search: string;
   selectedIndex: number;
@@ -28,7 +28,7 @@ export type CompletionAction = {
 
 const initialCompletionState: CompletionState = {
   editor: undefined,
-  completionType: 'collection',
+  completionType: 'tag',
   target: undefined,
   search: '',
   selectedIndex: 0,
@@ -66,7 +66,7 @@ export const useCompletion = () => {
     getBoundingClientRect: () => new DOMRect(0, 0, 0, 0)
   });
 
-  const { styles, attributes, update, forceUpdate, state } = usePopper(virtualElement.current, popperElement, {
+  const { styles, attributes, update } = usePopper(virtualElement.current, popperElement, {
     placement: 'bottom-start',
   });
 
@@ -83,13 +83,14 @@ export const useCompletion = () => {
 
         // Determine if this is the beginning of a line
         // (at a depth of exactly two, word offset is zero)
-        if (before && beforeRange && beforeText && before.path.length === 2 && before.offset === 0) {
-          if (beforeText[0] === '@') {
+        // if (before && beforeRange && beforeText && before.path.length === 2 && before.offset === 0) {
+        if (before && beforeRange && beforeText) {
+          if (beforeText[0] === '#') {
             completionDispatch({
               type: 'update',
               state: {
                 editor,
-                completionType: 'collection',
+                completionType: 'tag',
                 target: beforeRange,
                 search: beforeText.slice(1),
                 selectedIndex: 0,
@@ -132,9 +133,15 @@ export const useCompletion = () => {
   const searchPresent = completionState.search !== '';
 
   // Find relevant collections
-  const searchItems = useSelector((s: TState) => {
-    return Object.keys(s.collections).filter(c => c.toLowerCase().startsWith(completionState.search.toLowerCase())).map(k => s.collections[k]);
+  const tagMap = useSelector((state: TState) => {
+    return state.tags;
   });
+
+  let searchItems: string[] = [];
+
+  if (completionState.completionType === 'tag') {
+    searchItems = Object.keys(tagMap);
+  }
 
   const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     const { target } = completionState;
@@ -170,9 +177,18 @@ export const useCompletion = () => {
           if (!completionState.editor || !completionState.target) return;
           Transforms.select(completionState.editor, target);
 
-          const collectionName = (completionState.selectedIndex >= searchItems.length) ? completionState.search : searchItems[completionState.selectedIndex].name;
+          // Pull the completion name from the selection if there is one; if not, user has
+          // indicated that they want to add another
+          const completionName = (completionState.selectedIndex >= searchItems.length) ? completionState.search : searchItems[completionState.selectedIndex];
 
-          insertCollectionEntry(completionState.editor, collectionName);
+          // Generate tagId if not found in map
+
+          // Dispatch new tag addition to backend
+
+          // Insert tag with tag id
+
+          insertTag(completionState.editor, completionName);
+
           break;
       }
     }
@@ -182,7 +198,7 @@ export const useCompletion = () => {
   return {
     completionProps: {
       selectedIndex: completionState.selectedIndex,
-      searchItems: searchItems.map(c => c.name),
+      searchItems,
       setPopperElement,
       styles,
       attributes,
@@ -235,7 +251,7 @@ export const Complete = (props: CompleteProps) => {
           <CompleteItem item={s} selected={i === selectedIndex} key={s} />
         ))}
         <hr />
-        <CompleteItem item="+ Add a new thing" selected={selectedIndex === searchItems.length} />
+        <CompleteItem item="+ Add new" selected={selectedIndex === searchItems.length} />
       </Raised>
     </div>
   );

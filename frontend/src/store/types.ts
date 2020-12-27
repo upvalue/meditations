@@ -1,6 +1,8 @@
-import { NoteRecord, TCollection } from '../../../shared';
+import { NoteRecord, Tag, TCollection } from '../../../shared';
 
 export type TState = {
-  documents: NoteRecord[];
-  collections: { [key: string]: TCollection };
+  /**
+   * Maps tag ids to tag names
+   */
+  tags: { [tagId: string]: Tag },
 }

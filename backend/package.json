@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "start": "DEBUG=knex:query nodemon src/app.js",
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --preserveWatchOutput",
     "knex": "knex"
   },
   "devDependencies": {
