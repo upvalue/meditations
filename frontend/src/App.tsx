@@ -3,12 +3,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Sidebar } from './navigation/Sidebar';
 import { Switch, Route, Redirect } from 'react-router';
 import { NoteRoute } from './routes/NoteRoute';
-import { useGetAllNotesQuery } from './api/client';
+import { useGetAllNotesQuery, useGetAllTagsQuery } from './api/client';
 import { Load } from './common/Load';
 import { ScratchRoute } from './routes/ScratchRoute';
-import { makeEditor } from './editor/lib/editor';
 import { Editable, Slate, withReact } from 'slate-react';
 import { createEditor } from 'slate';
+import { useDispatch } from 'react-redux';
+
+import { tagSlice } from './store/store';
 
 // @refresh reset
 
@@ -37,7 +39,40 @@ export const DebugRoute = (props: {}) => {
   );
 }
 
+/**
+ * Hook to load initial data and block while doing so
+ */
+const useInitialData = () => {
+  const [tagsResult,] = useGetAllTagsQuery();
+
+  const { data: tagsData, fetching: tagsFetching, error: tagsError, } = tagsResult;
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (tagsFetching === false && tagsData) {
+      dispatch(tagSlice.actions.loadTags({ tags: tagsData.allTags }));
+    }
+  }, [tagsFetching]);
+
+  return {
+    loading: tagsFetching,
+    errors: [tagsError].filter(n => !!n),
+  }
+}
+
 const App = () => {
+  const { loading, errors } = useInitialData();
+
+  // TODO Improve this a lot
+  if (loading) {
+    return <>loading initial data</>;
+  }
+
+  if (errors.length > 0) {
+    return <>errors loading initial data</>
+  }
+
   return (
     <div className="App a-flex a-justify-center">
       <div className="a-flex">
@@ -54,9 +89,6 @@ const App = () => {
           </Route>
           {/* Slate or my modifications doesn't seem to handle being updated in-place well, this is a simple hack to force the component to remount */}
           <Redirect from="/note-remount/:noteId" to="/note/:noteId" />
-          <Route path="/collections/:collectionName">
-            <p>hiya</p>
-          </Route>
           <Route path="/scratch">
             <ScratchRoute />
           </Route>

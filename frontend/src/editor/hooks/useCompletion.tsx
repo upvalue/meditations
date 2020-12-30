@@ -6,9 +6,17 @@ import { VirtualElement } from "@popperjs/core";
 import { EditorInstance, insertTag } from "../lib/editor";
 import { Editor, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
-import { TState } from '../../store/types';
-import { useSelector } from 'react-redux';
+import { tagSlice, TState } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
 import { Raised } from '../../arche';
+import { useScratchContext } from '../../routes/ScratchRoute';
+import { generateId } from '../../lib/utilities';
+import { useCreateTagMutation } from '../../api/client';
+
+const log = (...args: any[]) => {
+  args.unshift(`[complete]`);
+  console.log.apply(console, args as any);
+}
 
 export type CompletionState = {
   // Completion state
@@ -35,7 +43,7 @@ const initialCompletionState: CompletionState = {
 };
 
 const completionReducer = (state: CompletionState, action: CompletionAction) => {
-  console.log(state, action);
+  // console.log(state, action);
   switch (action.type) {
     case 'update':
       return action.state;
@@ -60,6 +68,12 @@ const completionReducer = (state: CompletionState, action: CompletionAction) => 
  */
 export const useCompletion = () => {
   const [completionState, completionDispatch] = useReducer(completionReducer, initialCompletionState);
+
+  const [scratch,] = useScratchContext();
+
+  const [, createTagMutation] = useCreateTagMutation();
+
+  const dispatch = useDispatch();
 
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
   const virtualElement = useRef<VirtualElement>({
@@ -129,18 +143,15 @@ export const useCompletion = () => {
 
   // If autocomplete state is present, search for potential autocompletions and provide them for
   // rendering
-
   const searchPresent = completionState.search !== '';
 
   // Find relevant collections
-  const tagMap = useSelector((state: TState) => {
-    return state.tags;
-  });
+  const tagsByName = useSelector((state: TState) => state.tags.tagsByName);
 
   let searchItems: string[] = [];
 
   if (completionState.completionType === 'tag') {
-    searchItems = Object.keys(tagMap);
+    searchItems = Object.values(tagsByName).map(t => t.tagName).filter(tagName => tagName.toLowerCase().startsWith(completionState.search.toLowerCase()));
   }
 
   const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -182,22 +193,37 @@ export const useCompletion = () => {
           const completionName = (completionState.selectedIndex >= searchItems.length) ? completionState.search : searchItems[completionState.selectedIndex];
 
           // Generate tagId if not found in map
+          const tag = tagsByName[completionName];
+          if (!tag) {
+            log(`tag ${completionName} not found, generating new tag`);
+            const newTagId = generateId('tag');
 
-          // Dispatch new tag addition to backend
-
-          // Insert tag with tag id
-
-          insertTag(completionState.editor, completionName);
+            if (scratch) {
+              insertTag(completionState.editor, newTagId);
+            } else {
+              createTagMutation({ tagId: newTagId, tagName: completionName }).then(result => {
+                // TODO: Handle errors
+                if (result.data && completionState.editor) {
+                  const tag = result.data.createTag;
+                  dispatch(tagSlice.actions.addTag(tag))
+                  insertTag(completionState.editor, tag.tagId);
+                }
+              })
+            }
+          } else {
+            log(`tag ${completionName} found!`);
+            insertTag(completionState.editor, tag.tagId);
+          }
 
           break;
       }
     }
   }, [completionState.editor, completionState.search, completionState.target, completionState.selectedIndex, searchItems]);
 
-
   return {
     completionProps: {
       selectedIndex: completionState.selectedIndex,
+      search: completionState.search,
       searchItems,
       setPopperElement,
       styles,
@@ -226,6 +252,7 @@ export const CompleteItem = (props: CompleteItemProps) => {
 export type CompleteProps = {
   searchItems: ReadonlyArray<string>,
   selectedIndex: number,
+  search: string,
   active: boolean,
   setPopperElement: (elt: HTMLDivElement | null) => void,
   styles: {
@@ -239,10 +266,10 @@ export type CompleteProps = {
 }
 
 /**
- * Complete component. Handles actually rendering completion info from useCompletion
+ * Complete component. Handles actually rendering completion info and user selection from useCompletion
  */
 export const Complete = (props: CompleteProps) => {
-  const { searchItems, selectedIndex } = props;
+  const { searchItems, search, selectedIndex } = props;
 
   return (
     <div ref={props.setPopperElement} style={{ ...props.styles.popper, display: props.active ? '' : 'none' }} {...props.attributes.popper}>
@@ -251,7 +278,7 @@ export const Complete = (props: CompleteProps) => {
           <CompleteItem item={s} selected={i === selectedIndex} key={s} />
         ))}
         <hr />
-        <CompleteItem item="+ Add new" selected={selectedIndex === searchItems.length} />
+        <CompleteItem item={`+ Add #${search}`} selected={selectedIndex === searchItems.length} />
       </Raised>
     </div>
   );

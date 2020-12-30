@@ -17,10 +17,12 @@ type Tag {
 type Query {
   allNotes: [NoteRecord!]!
   getNote(noteId: String!): Note!
-  getTags: [Tag!]!
+  allTags: [Tag!]!
 }
 
 type Mutation {
   createNote(noteId: String!, createdAt: String!): NoteRecord!
   updateNote(noteId: String!, noteRevisionId: Int, updatedAt: String!, body: String!): NoteRecord
+
+  createTag(tagId: String!, tagName: String!): Tag!
 }

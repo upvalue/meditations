@@ -181,3 +181,15 @@
 
    If I recall where I left off correctly, I need to: preload a mapping of tags to actual tag IDs, then add the ability
    to 1) map that to actual names and 2) add tags on the fly.
+
+** 2020-12-30 Working on tags
+   
+   I'm gonna really do it this time! I'm going to add tags that you can search for.
+   
+   So first thing we do is load a mapping of tags into Redux, on app start
+
+   When you add a tag, it'll grab a tag from the store or create a tag in the backend.
+   
+   Alright so I'm now loading all tags at startup into the Redux store. When a user references a tag, we check the tag
+   map, add a new tag if not found, and save. When we save the document, it will parse the tags into a series of
+   relations.

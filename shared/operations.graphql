@@ -7,6 +7,13 @@ query GetAllNotes {
   }
 }
 
+query GetAllTags {
+  allTags {
+    tagId
+    tagName
+  }
+}
+
 query GetNote($noteId: String!) {
   getNote(noteId: $noteId) {
     noteId
@@ -25,5 +32,12 @@ mutation UpdateNote($noteId: String!, $noteRevisionId: Int!, $updatedAt: String!
   updateNote(noteId: $noteId, noteRevisionId: $noteRevisionId, updatedAt: $updatedAt, body: $body) {
     noteId
     revision
+  }
+}
+
+mutation CreateTag($tagId: String!, $tagName: String!) {
+  createTag(tagId: $tagId, tagName: $tagName) {
+    tagId,
+    tagName
   }
 }

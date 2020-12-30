@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { ScratchProvider } from './routes/ScratchRoute';
 
 import { store } from './store/store';
 import './arche.css';
@@ -22,12 +23,14 @@ const urqlClient = createClient({
 })
 
 ReactDOM.render(
-  <ReduxProvider store={store} >
-    <UrqlProvider value={urqlClient}>
+  <UrqlProvider value={urqlClient}>
+    <ReduxProvider store={store} >
       <BrowserRouter>
-        <App />
+        <ScratchProvider scratch={false}>
+          <App />
+        </ScratchProvider>
       </BrowserRouter>
-    </UrqlProvider>
-  </ReduxProvider >,
+    </ReduxProvider >
+  </UrqlProvider>,
   document.getElementById('root')
 );

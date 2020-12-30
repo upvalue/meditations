@@ -6,7 +6,7 @@ import { formatWireDate, Maybe, NoteBody } from "../../shared";
 
 const log = (...args: any[]) => {
   args.unshift(`[autosave]`);
-  console.log.apply(console, args as any);
+  // console.log.apply(console, args as any);
 }
 
 type AutosaveState = {

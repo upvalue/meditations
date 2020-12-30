@@ -36,26 +36,6 @@ export const Sidebar = (props: SidebarProps) => {
 
           {<Button onClick={createNote}>+ New document</Button>}
         </div>
-
-        <div className="a-mt4">
-          <h4>Collections</h4>
-          {/*Object.entries(collections).map(([k, collection]) => <div key={k}><Link to={`/collections/${k}`}>@{collection.name}</Link></div>)}*/}
-        </div>
-
-        <div className="a-mt4">
-          {/*<Button onClick={() => {
-            if (confirm) {
-              saveState(initialState);
-              window.location.reload();
-            } else {
-              setConfirm(true);
-            }
-          }}>
-            {confirm && "Are you sure?"}
-            {!confirm && "Delete state"}
-        </Button>*/}
-        </div>
-
       </div>
     </div>
   );
