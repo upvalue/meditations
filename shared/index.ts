@@ -52,3 +52,6 @@ export * from './dates';
 
 // Re-export GraphQL generated types
 export * from './types-generated';
+
+// Export SQL types
+export * from './sql';

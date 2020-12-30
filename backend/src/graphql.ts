@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import knex from './knex';
 
-import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, Note, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs } from '../../shared';
+import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs } from '../../shared';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
 

@@ -36,6 +36,9 @@
 *** TODO Archival / soft deletion
 ** Frontend
 *** TODO Route 404s
+*** TODO Shared error handling
+** Bugs
+*** TODO Tags and other voids break markdown
 ** API
 *** TODO Type / function generation for frontend
 *** TODO Load documents from and save to database

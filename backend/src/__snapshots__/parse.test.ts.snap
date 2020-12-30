@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`discoverRelations successfully discovers basic relations 1`] = `
+Array [
+  Object {
+    "path": Array [
+      0,
+      1,
+    ],
+    "tagId": "tag-3nntmoG2zhqHwt8EZamMiK",
+    "type": "tag",
+  },
+]
+`;
