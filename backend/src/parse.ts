@@ -2,19 +2,20 @@
 
 import { NoteBody, TagNote } from "../../shared"
 import { DocumentParseError } from "./errors";
-import knex from "./knex"
 
-type RelationTag = {
+interface RelationTag {
   type: 'tag',
   tagId: string,
   path: number[],
 };
 
+type Relation = RelationTag;
+
 /**
  * Discover all relations that should exist as a result of a document
  */
-export const discoverRelations = (noteBody: NoteBody, path: number[] = []): RelationTag[] => {
-  let relations: RelationTag[] = [];
+export const discoverRelations = (noteBody: NoteBody, path: number[] = []): Relation[] => {
+  let relations: Relation[] = [];
 
   console.log(noteBody);
 

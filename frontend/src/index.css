@@ -120,8 +120,9 @@ a:visited {
   font-family: var(--a-font);
   display: flex;
   border: 0;
-  font-size: 1rem;
+  font-size: 1em;
   align-items: center;
+  /* font-variation-settings: --*/
 }
 
 .search-input:focus {

@@ -67,11 +67,8 @@ export const resolvers = {
 
         const noteBody = JSON.parse(body);
 
-        console.log(noteBody);
-
         const relations = discoverRelations(noteBody);
 
-        // console.log(`!!! document relations`, relations);
 
         // Revision invariants are OK, write update
         return updateNote(noteId, noteRevisionId, updatedAt, body).then(upd => ({

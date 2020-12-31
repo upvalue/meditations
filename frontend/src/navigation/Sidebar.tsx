@@ -28,6 +28,7 @@ export const Sidebar = (props: SidebarProps) => {
   }, [createNoteMutation]);
 
   const errors = useSelector((state: StoreState) => state.errors.errors);
+  const tagsByName = useSelector((state: StoreState) => state.tags.tagsByName);
 
   return (
     <nav className="sidebar">
@@ -40,8 +41,17 @@ export const Sidebar = (props: SidebarProps) => {
 
           {<Button onClick={createNote}>+ New document</Button>}
         </div>
-
       </div>
+
+      <div className="a-p4">
+        <div style={{ lineHeight: '32px' }}>
+          <h4>Tags</h4>
+          {Object.values(tagsByName).map(tag => (
+            <div key={tag.tagId}>{tag.tagName}</div>
+          ))}
+        </div>
+      </div>
+
       {errors.length > 0 &&
         <Group direction="column" className="a-px4" spacing={2}>
           {errors.map((e, idx) => (

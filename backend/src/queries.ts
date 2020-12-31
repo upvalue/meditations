@@ -4,6 +4,7 @@ import { DatabaseError, NotFoundError } from './errors';
 // queries.ts - database queries, utilities, intermediary database types
 
 import knex from './knex';
+import { discoverRelations } from './parse';
 
 const assertFoundOne = <T>(objectId: string, rows: ReadonlyArray<T>) => {
   const [tipe] = objectId.split('-');
@@ -47,6 +48,26 @@ export const updateNote = async (noteId: string, noteRevisionId: number, updated
 
   try {
     await knex.table('note_revisions').transacting(trx).insert({ createdAt: updatedAt, noteId, noteRevisionId, body });
+
+    // Drop existing relations
+    // Doing this not as a diff feels gross, but it's probably fine?
+    await knex.table('tag_notes').transacting(trx).where({ noteId }).delete();
+
+    const relations = discoverRelations(JSON.parse(body));
+
+    for (const relation of relations) {
+      switch (relation.type) {
+        case 'tag': {
+          console.log('add relation', relation);
+          await knex.table('tag_notes').transacting(trx).insert({
+            noteId,
+            tagId: relation.tagId,
+            path: JSON.stringify(relation.path),
+          })
+        }
+      }
+    }
+
 
     await knex.table('notes').transacting(trx).where({ noteId }).update({
       noteId,

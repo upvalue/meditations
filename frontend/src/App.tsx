@@ -60,7 +60,7 @@ const App = () => {
         <div className="a-flex a-column a-flex-auto">
           <SearchBar />
 
-          <main className="a-flex">
+          <main className="a-flex a-my1 a-flex-auto">
             <Switch>
               <Route path={"/note/:noteId"}>
                 <NoteRoute />
