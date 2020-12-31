@@ -31,7 +31,7 @@ export const discoverRelations = (noteBody: NoteBody, path: number[] = []): Rela
         relations.push({ type: 'tag', tagId: node.tagId, path: [...path, i] });
         break;
       }
-      case 'line': {
+      case 'line': case 'heading': {
         relations = relations.concat(discoverRelations(node.children, [...path, i]));
         break;
       }

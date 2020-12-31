@@ -12,7 +12,7 @@ export const Tag = (props: RenderElementProps) => {
 
   const tagName = tagsById[elt.tagId]?.tagName || elt.tagId;
 
-  return <span {...attributes} style={{ color: 'blue' }}>
+  return <span className="t-tag" {...attributes}>
     #{tagName}{props.children}
   </span>
 }

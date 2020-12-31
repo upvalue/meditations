@@ -43,7 +43,6 @@
   --a-light-gray-4: 235,241,245;
   --a-light-gray-5: 248,245,250;
 
-  /** bless */
   --a-blue-1: 14,90,138;
   --a-blue-2: 16,107,163;
   --a-blue-3: 19,124,189;
@@ -86,6 +85,7 @@
 .a-justify-around { justify-content: space-around;}
 .a-items-center { align-items: center; }
 .a-column { flex-direction: column; }
+.a-flex-auto { flex: 1 1 auto; }
 
 /*****
  * PADDING 

@@ -30,7 +30,7 @@ export const Sidebar = (props: SidebarProps) => {
   const errors = useSelector((state: StoreState) => state.errors.errors);
 
   return (
-    <div className="sidebar">
+    <nav className="sidebar">
       <div className="a-p4">
         <div style={{ lineHeight: '32px' }}>
           <h4>Notes</h4>
@@ -54,6 +54,6 @@ export const Sidebar = (props: SidebarProps) => {
 
         </Group>
       }
-    </div>
+    </nav>
   );
 }

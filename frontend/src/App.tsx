@@ -6,38 +6,12 @@ import { NoteRoute } from './routes/NoteRoute';
 import { useGetAllNotesQuery, useGetAllTagsQuery } from './api/client';
 import { Load } from './common/Load';
 import { ScratchRoute } from './routes/ScratchRoute';
-import { Editable, Slate, withReact } from 'slate-react';
-import { createEditor } from 'slate';
 import { useDispatch } from 'react-redux';
 
 import { tagSlice } from './store/store';
+import { SearchBar } from './search/SearchBar';
 
 // @refresh reset
-
-/**
- * Route for developing on the editor with no backend calls
- * @param props 
- */
-export const DebugRoute = (props: {}) => {
-  const editor = useMemo(() => withReact(createEditor()), []);
-
-  const [body, setBody] = useState([{
-    type: 'line',
-    children: [{ text: 'hello world' }],
-  }]);
-
-  return (
-    <>
-      <Slate editor={editor} value={body} onChange={newValue => {
-        setBody(newValue as any);
-      }}>
-        <div className="editor a-p4 a-ml4" >
-          <Editable />
-        </div>
-      </Slate >
-    </>
-  );
-}
 
 /**
  * Hook to load initial data and block while doing so
@@ -83,19 +57,23 @@ const App = () => {
           }}
         />
 
-        <Switch>
-          <Route path={"/note/:noteId"}>
-            <NoteRoute />
-          </Route>
-          {/* Slate or my modifications doesn't seem to handle being updated in-place well, this is a simple hack to force the component to remount */}
-          <Redirect from="/note-remount/:noteId" to="/note/:noteId" />
-          <Route path="/scratch">
-            <ScratchRoute />
-          </Route>
-          <Route path="/debug">
-            <DebugRoute />
-          </Route>
-        </Switch>
+        <div className="a-flex a-column a-flex-auto">
+          <SearchBar />
+
+          <main className="a-flex">
+            <Switch>
+              <Route path={"/note/:noteId"}>
+                <NoteRoute />
+              </Route>
+              {/* Slate or my modifications doesn't seem to handle being updated in-place well, this is a simple hack to force the component to remount */}
+              <Redirect from="/note-remount/:noteId" to="/note/:noteId" />
+              <Route path="/scratch">
+                <ScratchRoute />
+              </Route>
+            </Switch>
+          </main>
+
+        </div>
 
       </div>
     </div>

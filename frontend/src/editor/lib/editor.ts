@@ -75,7 +75,6 @@ const withTechne = (editor: Editor) => {
         type: "line",
         children: [
           {
-            type: "text",
             text: "",
           }
         ]

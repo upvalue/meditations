@@ -1,7 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { TElement, TNode } from '../../../shared';
-import { CollectionEntry } from './elements/CollectionEntry';
+import { TNode } from '../../../shared';
 import { Tag } from './elements/Tag';
 
 export const RenderElement = (args: RenderElementProps) => {
@@ -18,9 +17,7 @@ export const RenderElement = (args: RenderElementProps) => {
     case 'line':
       return <div {...attributes}>{children}</div>
     case 'tag':
-      // 
       return <Tag {...args} />
-    // return <div {...attributes}>{children}</div>
     default:
       return <div>this should never happen</div>
   }
