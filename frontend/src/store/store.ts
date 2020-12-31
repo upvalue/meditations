@@ -1,7 +1,8 @@
 import { combineReducers, configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
+import { CombinedError } from 'urql';
 
-import { NoteBody, Tag } from '../../../shared';
+import { NoteBody, Tag, ErrorCode } from '../../../shared';
 
 
 export type UpdateDocumentAction = {
@@ -17,11 +18,48 @@ export type CreateDocumentAction = {
   payload: {},
 };
 
-const docs = createSlice({
-  name: "docs",
-  initialState: {},
-  reducers: {},
-});
+export type ErrorDetails = {
+  code?: ErrorCode;
+  message: string;
+};
+
+
+export type ErrorState = {
+  errors: ErrorDetails[],
+};
+
+const initialErrorState: ErrorState = {
+  errors: []
+};
+
+export const errorSlice = createSlice({
+  name: "errors",
+  initialState: initialErrorState,
+  reducers: {
+    reportError: (state, action: PayloadAction<string | CombinedError>) => {
+      if (typeof action.payload === 'string') {
+        state.errors.push({ message: action.payload });
+      } else {
+        const combinedErr = action.payload;
+
+        // Try to find a detailed error message
+        for (const err of combinedErr.graphQLErrors) {
+          console.log(err);
+          if (err.extensions && err.extensions.code) {
+            state.errors.push({
+              code: err.extensions.code,
+              message: err.message,
+            });
+          } else {
+            state.errors.push({
+              message: err.message
+            });
+          }
+        }
+      }
+    },
+  }
+})
 
 export type CreateTagAction = {
   type: string;
@@ -31,7 +69,6 @@ export type CreateTagAction = {
 export type TagState = {
   tagsByName: { [tagName: string]: Tag },
   tagsById: { [tagId: string]: Tag },
-
 }
 
 const initialTagState: TagState = {
@@ -58,12 +95,14 @@ export const tagSlice = createSlice({
 });
 
 
-export type TState = {
+export type StoreState = {
+  errors: ErrorState,
   tags: TagState,
 };
 
 export const store = configureStore({
   reducer: combineReducers({
+    errors: errorSlice.reducer,
     tags: tagSlice.reducer,
   }),
   middleware: [

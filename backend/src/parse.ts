@@ -1,15 +1,8 @@
 // parse.ts - document parsing
 
 import { NoteBody, TagNote } from "../../shared"
+import { DocumentParseError } from "./errors";
 import knex from "./knex"
-
-/**
- * Return all relations that already exist in the database
- */
-const getExistingRelations = (noteId: string) => {
-  return knex.from('tag_notes').select<TagNote[]>('noteId, tagId').where({ 'noteId': noteId }).then(rows => rows);
-}
-// const discoverRelations = ()
 
 type RelationTag = {
   type: 'tag',
@@ -30,9 +23,14 @@ export const discoverRelations = (noteBody: NoteBody, path: number[] = []): Rela
       case 'text': continue;
       case 'tag': {
         relations.push({ type: 'tag', tagId: node.tagId, path: [...path, i] });
+        break;
       }
       case 'line': {
         relations = relations.concat(discoverRelations(node.children, [...path, i]));
+        break;
+      }
+      default: {
+        throw new DocumentParseError(`Unknown document node type ${node.type}`);
       }
     }
   }

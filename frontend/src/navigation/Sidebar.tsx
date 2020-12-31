@@ -1,10 +1,12 @@
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '../arche';
+import { Button, Callout, Group } from '../arche';
 import { formatWireDate, NoteRecord } from '../shared';
 import { useCreateNoteMutation } from '../api/client';
 import { generateId } from '../lib/utilities';
 import { ReloadFunction } from '../common/Load'
+import { StoreState } from '../store/store';
+import { useSelector } from 'react-redux';
 
 export type SidebarProps = {
   notes: NoteRecord[];
@@ -25,6 +27,8 @@ export const Sidebar = (props: SidebarProps) => {
     });
   }, [createNoteMutation]);
 
+  const errors = useSelector((state: StoreState) => state.errors.errors);
+
   return (
     <div className="sidebar">
       <div className="a-p4">
@@ -36,7 +40,20 @@ export const Sidebar = (props: SidebarProps) => {
 
           {<Button onClick={createNote}>+ New document</Button>}
         </div>
+
       </div>
+      {errors.length > 0 &&
+        <Group direction="column" className="a-px4" spacing={2}>
+          {errors.map((e, idx) => (
+            <div key={idx}>
+              <Callout intent="danger">
+                {e.message}
+              </Callout>
+            </div>
+          ))}
+
+        </Group>
+      }
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { VirtualElement } from "@popperjs/core";
 import { EditorInstance, insertTag } from "../lib/editor";
 import { Editor, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
-import { tagSlice, TState } from '../../store/store';
+import { tagSlice, StoreState } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Raised } from '../../arche';
 import { useScratchContext } from '../../routes/ScratchRoute';
@@ -146,7 +146,7 @@ export const useCompletion = () => {
   const searchPresent = completionState.search !== '';
 
   // Find relevant collections
-  const tagsByName = useSelector((state: TState) => state.tags.tagsByName);
+  const tagsByName = useSelector((state: StoreState) => state.tags.tagsByName);
 
   let searchItems: string[] = [];
 

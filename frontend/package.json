@@ -19,6 +19,7 @@
     "immer": "^8.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-icons": "^4.1.0",
     "react-popper": "^2.2.3",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
@@ -33,6 +34,7 @@
     "wa-core": "^1.0.4"
   },
   "devDependencies": {
+    "@types/react-icons": "^3.0.0",
     "react-scripts": "^4.0.0",
     "ts-toolbelt": "^8.0.7"
   },

@@ -55,3 +55,6 @@ export * from './types-generated';
 
 // Export SQL types
 export * from './sql';
+
+// Export error codes
+export * from './errorcodes';

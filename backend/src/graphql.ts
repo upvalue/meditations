@@ -4,6 +4,7 @@ import knex from './knex';
 import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs } from '../../shared';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
+import { discoverRelations } from './parse';
 
 export const typeDefs = readFileSync('../shared/schema.graphql').toString();
 
@@ -63,6 +64,12 @@ export const resolvers = {
             throw new InvariantError(`Note ${noteId} is at revision ${r.noteRevisionId} so next revision should be ${r.noteRevisionId + 1} but attempted to write ${noteRevisionId}`);
           }
         }
+
+        const noteBody = JSON.parse(body);
+
+        const relations = discoverRelations(noteBody);
+
+        // console.log(`!!! document relations`, relations);
 
         // Revision invariants are OK, write update
         return updateNote(noteId, noteRevisionId, updatedAt, body).then(upd => ({
