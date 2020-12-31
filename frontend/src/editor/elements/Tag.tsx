@@ -1,13 +1,16 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { RenderElementProps } from 'slate-react';
+import { RenderElementProps, useFocused, useSelected } from 'slate-react';
 import { joinClassNames } from '../../arche';
 import { TTag } from '../../shared';
 import { StoreState } from '../../store/store';
 
-export const Tag = (props: RenderElementProps & { selected: boolean, focused: boolean }) => {
+export const Tag = (props: RenderElementProps) => {
   const elt = props.element as any as TTag;
-  const { attributes, focused, selected } = props;
+  const { attributes } = props;
+
+  const focused = useFocused();
+  const selected = useSelected();
 
   const tagsById = useSelector((state: StoreState) => state.tags.tagsById);
 
@@ -15,7 +18,7 @@ export const Tag = (props: RenderElementProps & { selected: boolean, focused: bo
 
   console.log({ selected, focused });
 
-  return <span className={joinClassNames('t-tag', selected && focused && 'outline')} {...attributes}>
+  return <span contentEditable={false} className={joinClassNames('t-tag', selected && focused && 'outline')} {...attributes}>
     #{tagName}{props.children}
   </span>
 }

@@ -7,9 +7,6 @@ export const RenderElement = (args: RenderElementProps) => {
   const { attributes, children } = args;
   const element: TNode = args.element as any;
 
-  const selected = useSelected();
-  const focused = useFocused();
-
   if (!('type' in element)) return <div>this should never happen</div>;
 
   switch (element.type) {
@@ -20,7 +17,7 @@ export const RenderElement = (args: RenderElementProps) => {
     case 'line':
       return <div {...attributes}>{children}</div>
     case 'tag':
-      return <Tag selected={selected} focused={focused} {...args} />
+      return <Tag {...args} />
     default:
       return <div>this should never happen</div>
   }
