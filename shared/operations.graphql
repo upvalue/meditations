@@ -22,6 +22,15 @@ query GetNote($noteId: String!) {
   }
 }
 
+query Search($tagIds: [String!]) {
+  search(tagIds: $tagIds) {
+    noteId
+    revision
+    body
+  }
+
+}
+
 mutation CreateNote($noteId: String!, $createdAt: String!) {
   createNote(noteId: $noteId, createdAt: $createdAt) {
     noteId

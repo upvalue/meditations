@@ -149,6 +149,10 @@ a:visited {
   color: var(--a-link);
 }
 
+.t-tag.outline {
+  border: 1px solid blue;
+}
+
 /** doc - document source viewing */
 
 .doc {

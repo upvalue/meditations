@@ -18,6 +18,7 @@ type Query {
   allNotes: [NoteRecord!]!
   getNote(noteId: String!): Note!
   allTags: [Tag!]!
+  search(tagIds: [String!]): [Note!]! 
 }
 
 type Mutation {

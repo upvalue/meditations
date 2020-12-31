@@ -47,7 +47,7 @@ export const Sidebar = (props: SidebarProps) => {
         <div style={{ lineHeight: '32px' }}>
           <h4>Tags</h4>
           {Object.values(tagsByName).map(tag => (
-            <div key={tag.tagId}>{tag.tagName}</div>
+            <div key={tag.tagId}>#{tag.tagName}</div>
           ))}
         </div>
       </div>

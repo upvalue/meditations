@@ -202,4 +202,27 @@
    Getting there! I can create tags on the fly and am now going to parse and create relations off of them. I also did
    some side quests to improve error reporting and make it look a little nicer. I think I'd like to finish up by
    creating actual database relations based off the latest revision, in a transaction.
+   
+   -->
 
+   Surprisingly first attempt at creating relations Just Worked, so now I'm going to try to get search going in some format.
+   
+   Alright so I have search pulling up some records based on tags. Next step is to figure out how to actually display
+   some search results. Like if you search for #asdf, does it give you the entirety of everything containing #asdf? does
+   it show you the sections containing #asdf? 
+
+   What's most valuable to do next? I think ats are the thing I actually care about, the thing that differentiates this
+   from anything else.
+
+   How does tagging ats work by the way? I want to be able to put them in a section like
+
+   ## #project/techne
+   @Work (30min)
+   
+   Then be able to search for work against a particular project.
+
+   (This is something I can do while parsing as well)
+   
+   Alright for tomorrow, let's get ats working.
+   
+   

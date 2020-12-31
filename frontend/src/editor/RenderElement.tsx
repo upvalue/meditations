@@ -1,11 +1,14 @@
 import React from 'react';
-import { RenderElementProps } from 'slate-react';
+import { RenderElementProps, useFocused, useSelected } from 'slate-react';
 import { TNode } from '../../../shared';
 import { Tag } from './elements/Tag';
 
 export const RenderElement = (args: RenderElementProps) => {
   const { attributes, children } = args;
   const element: TNode = args.element as any;
+
+  const selected = useSelected();
+  const focused = useFocused();
 
   if (!('type' in element)) return <div>this should never happen</div>;
 
@@ -17,7 +20,7 @@ export const RenderElement = (args: RenderElementProps) => {
     case 'line':
       return <div {...attributes}>{children}</div>
     case 'tag':
-      return <Tag {...args} />
+      return <Tag selected={selected} focused={focused} {...args} />
     default:
       return <div>this should never happen</div>
   }

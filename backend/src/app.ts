@@ -1,18 +1,14 @@
 // <reference path="types.d.ts" />
 
 import express from 'express';
-// import Knex from 'knex';
 import morgan from 'morgan';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 
-import knex, { config } from './knex';
 import { typeDefs, resolvers } from './graphql';
 
 const app = express();
 
 app.use(morgan('combined'));
-
-const { user, host, password, database } = config.connection;
 
 const server = new ApolloServer({
   typeDefs, resolvers

@@ -6,7 +6,6 @@ const sampleDoc1: NoteBody = [
     type: 'line',
     children: [
       {
-        type: 'text',
         text: 'This is a tagged document'
       },
       {
@@ -14,7 +13,6 @@ const sampleDoc1: NoteBody = [
         tagId: 'tag-3nntmoG2zhqHwt8EZamMiK',
         children: [
           {
-            'type': 'text',
             'text': '',
           },
         ]

@@ -1,10 +1,9 @@
 import { readFileSync } from 'fs';
 import knex from './knex';
 
-import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs } from '../../shared';
+import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs, QuerySearchArgs } from '../../shared';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
-import { discoverRelations } from './parse';
 
 export const typeDefs = readFileSync('../shared/schema.graphql').toString();
 
@@ -33,6 +32,24 @@ export const resolvers = {
       return knex.from('tags').select<Tag[]>('*').then(rows => {
         return rows;
       });
+    },
+
+    search: async (_parent: any, { tagIds }: QuerySearchArgs) => {
+      let searchTagIds: string[] = tagIds ? tagIds : [];
+      knex.from('tag_notes')
+        .where('tag_notes.tag_id', 'in', searchTagIds)
+        .innerJoin('notes', function () {
+          this.on('notes.note_id', '=', 'tag_notes.note_id');
+        })
+        .innerJoin('note_revisions', function () {
+          this.on('notes.revision', '=', 'note_revisions.note_revision_id').andOn('notes.noteId', '=', 'note_revisions.noteId');
+        })
+        .select('notes.*', 'note_revisions.body')
+        .then((rows: any) => {
+          console.log(rows);
+        });
+
+      return [];
     }
   },
 
@@ -64,11 +81,6 @@ export const resolvers = {
             throw new InvariantError(`Note ${noteId} is at revision ${r.noteRevisionId} so next revision should be ${r.noteRevisionId + 1} but attempted to write ${noteRevisionId}`);
           }
         }
-
-        const noteBody = JSON.parse(body);
-
-        const relations = discoverRelations(noteBody);
-
 
         // Revision invariants are OK, write update
         return updateNote(noteId, noteRevisionId, updatedAt, body).then(upd => ({

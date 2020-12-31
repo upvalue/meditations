@@ -37,7 +37,7 @@ export const discoverRelations = (noteBody: NoteBody, path: number[] = []): Rela
         break;
       }
       default: {
-        throw new DocumentParseError(`Unknown document node type ${node.type}`);
+        throw new DocumentParseError(`Unknown document node type ${(node as any).type}`);
       }
     }
   }

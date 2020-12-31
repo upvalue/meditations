@@ -33,7 +33,7 @@ const commonClassProps = (className: string, props: any) => {
   return classNames.join(' ');
 }
 
-const classNames = (...args: ReadonlyArray<string | false | undefined | null>) => args.reduce((a, b) => `${a}${b ? ` ${b}` : ''}`) || '';
+export const joinClassNames = (...args: ReadonlyArray<string | false | undefined | null>) => args.reduce((a, b) => `${a}${b ? ` ${b}` : ''}`) || '';
 
 /**
  * List of props to not pass through to HTML elements, to avoid warnings
@@ -98,13 +98,13 @@ export type ButtonProps = AtomProps & React.HTMLProps<HTMLButtonElement> & _Butt
  * @param props 
  */
 export const Button = (props: ButtonProps) => {
-  return createAtom('button', classNames('a-Button a-py1 a-px2', props.minimal && `a-Button-minimal`, props.outline && `a-Button-outline`), props);
+  return createAtom('button', joinClassNames('a-Button a-py1 a-px2', props.minimal && `a-Button-minimal`, props.outline && `a-Button-outline`), props);
 }
 
 type ButtonLinkProps = AtomProps & React.HTMLProps<HTMLAnchorElement> & _ButtonProps;
 
 export const ButtonLink = (props: ButtonLinkProps) => {
-  return createAtom('a', classNames('a-Link a-Button a-py1 a-px2', props.minimal && `a-Button-minimal`, props.outline && `a-Button-outline`), props);
+  return createAtom('a', joinClassNames('a-Link a-Button a-py1 a-px2', props.minimal && `a-Button-minimal`, props.outline && `a-Button-outline`), props);
 }
 
 type RaisedProps = AtomProps & React.HTMLProps<HTMLDivElement>;
@@ -135,7 +135,7 @@ type GroupProps = AtomProps & React.HTMLProps<HTMLDivElement> & {
  * @param props 
  */
 export const Group = ({ spacing = 1, direction, ...props }: GroupProps) => {
-  return createAtom('div', classNames(`a-flex a-Group a-Group-${direction || 'row'} a-Group-spacing-${spacing}`), props);
+  return createAtom('div', joinClassNames(`a-flex a-Group a-Group-${direction || 'row'} a-Group-spacing-${spacing}`), props);
 }
 
 

@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-express";
 
-import { SERVER_DOCUMENT_PARSE_ERROR, SERVER_REVISION_INVARIANT_BROKEN_ERROR } from '../../shared';
+import { SERVER_DOCUMENT_PARSE_ERROR, SERVER_REVISION_INVARIANT_BROKEN_ERROR, SERVER_DATABASE_ERROR } from '../../shared';
 
 export class DocumentParseError extends ApolloError {
   constructor(message: string, properties?: { [key: string]: any }) {
