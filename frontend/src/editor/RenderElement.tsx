@@ -8,6 +8,8 @@ export const RenderElement = (args: RenderElementProps) => {
   const { attributes, children } = args;
   const element: TNode = args.element as any;
 
+  if (!('type' in element)) return <div>this should never happen</div>;
+
   switch (element.type) {
     case 'heading': {
       let elt = `h${element.level}`;

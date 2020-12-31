@@ -1,6 +1,6 @@
 // editor.ts - slatejs extensions
 import { withReact, ReactEditor } from 'slate-react'
-import { Editor, createEditor, Transforms, Range } from 'slate';
+import { Editor, createEditor, Transforms, Range, Element } from 'slate';
 
 const softAssert = (exp: boolean, message: string) => {
   if (!exp) {
@@ -29,7 +29,7 @@ const shortcuts: { [key: string]: Shortcut | undefined } = {
 }
 
 const withTechne = (editor: Editor) => {
-  const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment, isVoid, isInline } = editor;
+  const { insertText, deleteBackward, insertNode, insertBreak, deleteFragment, isVoid, isInline, normalizeNode } = editor;
 
   editor.deleteBackward = unit => {
     return deleteBackward(unit);
@@ -137,17 +137,13 @@ export const insertTag = (editor: EditorInstance, tag: string) => {
   const entry = {
     type: 'tag',
     tagId: tag,
-    children: [{ type: 'text', text: '' }],
+    children: [{ text: '' }],
   }
   // Remove the entered text
   // Commented out lines are for toplevel-only voids (ats)
   // Transforms.removeNodes(editor);
   // Insert the entry
   Transforms.insertNodes(editor, entry);
-  /*Transforms.insertNodes(editor, {
-    type: 'line',
-    children: [{ type: 'text', text: '' }]
-  });*/
   Transforms.move(editor);
 }
 

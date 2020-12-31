@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-express";
 
-import { SERVER_DOCUMENT_PARSE_ERROR } from '../../shared';
+import { SERVER_DOCUMENT_PARSE_ERROR, SERVER_REVISION_INVARIANT_BROKEN_ERROR } from '../../shared';
 
 export class DocumentParseError extends ApolloError {
   constructor(message: string, properties?: { [key: string]: any }) {
@@ -18,7 +18,7 @@ export class NotFoundError extends ApolloError {
 
 export class DatabaseError extends ApolloError {
   constructor(message: string, properties?: { [key: string]: any }) {
-    super(message, "DATABASE", properties);
+    super(message, SERVER_DATABASE_ERROR, properties);
     Object.defineProperty(this, "name", { value: 'Database' });
   }
 }
@@ -28,7 +28,7 @@ export class DatabaseError extends ApolloError {
  */
 export class InvariantError extends ApolloError {
   constructor(message: string, properties?: { [key: string]: any }) {
-    super(message, "INVARIANT", properties);
+    super(message, SERVER_REVISION_INVARIANT_BROKEN_ERROR, properties);
     Object.defineProperty(this, "name", { value: 'Invariant' });
   }
 }

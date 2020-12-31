@@ -138,7 +138,6 @@ export const Group = ({ spacing = 1, direction, ...props }: GroupProps) => {
   return createAtom('div', classNames(`a-flex a-Group a-Group-${direction || 'row'} a-Group-spacing-${spacing}`), props);
 }
 
-
 // TODO: Spinner
 // TODO: Toast
 // TODO: Loading

@@ -51,7 +51,7 @@ export const TEditor = (props: Props) => {
   const [body, setBody] = useState<NoteBody>([
     {
       type: 'line',
-      children: [{ type: 'text', text: 'should not be shown' }]
+      children: [{ text: 'should not be shown' }]
     }
   ]);
 
@@ -59,7 +59,7 @@ export const TEditor = (props: Props) => {
   useEffect(() => {
     setBody(props.body.length === 0 ? [{
       type: 'line',
-      children: [{ type: 'text', text: 'Hello world' }]
+      children: [{ text: 'Hello world' }]
     }] : props.body);
   }, [note.noteId]);
 

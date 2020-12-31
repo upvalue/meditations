@@ -9,8 +9,7 @@
  */
 
 export type TText = {
-  type: 'text',
-  text: string;
+  text: string,
 };
 
 export type TLine = {

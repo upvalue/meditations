@@ -36,6 +36,11 @@ export const errorSlice = createSlice({
   name: "errors",
   initialState: initialErrorState,
   reducers: {
+    /**
+     * Report errors, attempting to intelligently parse some information about them where possible
+     * @param state 
+     * @param action 
+     */
     reportError: (state, action: PayloadAction<string | CombinedError>) => {
       if (typeof action.payload === 'string') {
         state.errors.push({ message: action.payload });

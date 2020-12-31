@@ -259,7 +259,7 @@
 
 .a-Callout.a-intent-danger {
   background-color: rgba(var(--a-red-3), 0.15);
-  color: rgb(var(--a-red-2));
+  /*color: rgb(var(--a-red-2));*/
 }
 
 
@@ -314,11 +314,11 @@
   margin-right: var(--a-space-5);
 }
 
-.a-Group-row.a-Group:first-child {
+.a-Group-row > *:first-child {
   margin-left: 0;
 }
 
-.a-Group-row.a-Group:last-child {
+.a-Group-row > *:last-child {
   margin-right: 0;
 }
 
@@ -374,10 +374,10 @@
   margin-bottom: var(--a-space-5);
 }
 
-.a-Group-column.a-Group:first-child {
+.a-Group-column > *:first-child {
   margin-top: 0;
 }
 
-.a-Group-column.a-Group:last-child {
+.a-Group-column > *:last-child {
   margin-bottom: 0;
 }

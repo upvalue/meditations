@@ -16,11 +16,17 @@ type RelationTag = {
 export const discoverRelations = (noteBody: NoteBody, path: number[] = []): RelationTag[] => {
   let relations: RelationTag[] = [];
 
+  console.log(noteBody);
+
   for (let i = 0; i !== noteBody.length; i += 1) {
     const node = noteBody[i];
 
+    // Leaf node, continue
+    if (!('type' in node)) {
+      continue;
+    }
+
     switch (node.type) {
-      case 'text': continue;
       case 'tag': {
         relations.push({ type: 'tag', tagId: node.tagId, path: [...path, i] });
         break;

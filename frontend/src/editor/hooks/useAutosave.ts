@@ -3,6 +3,7 @@ import { useEffect, useRef, MutableRefObject } from "react";
 import { useUpdateNoteMutation } from "../../api/client";
 import { List } from 'ts-toolbelt';
 import { formatWireDate, Maybe, NoteBody } from "../../shared";
+import { useScratchContext } from "../../routes/ScratchRoute";
 
 const log = (...args: any[]) => {
   args.unshift(`[autosave]`);
@@ -20,7 +21,7 @@ type AutosaveState = {
 
 type UpdateNoteMutation = List.At<ReturnType<typeof useUpdateNoteMutation>, 1>;
 
-const autosave = async (stateRef: MutableRefObject<AutosaveState>, update: UpdateNoteMutation) => {
+const autosave = async (stateRef: MutableRefObject<AutosaveState>, update: UpdateNoteMutation, scratch: boolean) => {
   const state = stateRef.current;
 
   const { body, savedBody, saving, noteId, revision } = state;
@@ -35,12 +36,14 @@ const autosave = async (stateRef: MutableRefObject<AutosaveState>, update: Updat
 
   try {
     state.saving = true;
-    await update({
-      noteId,
-      noteRevisionId: revision + 1,
-      updatedAt: formatWireDate(new Date()),
-      body: JSON.stringify(body),
-    })
+    if (!scratch) {
+      await update({
+        noteId,
+        noteRevisionId: revision + 1,
+        updatedAt: formatWireDate(new Date()),
+        body: JSON.stringify(body),
+      });
+    }
     state.savedBody = state.body;
     state.revision = revision + 1;
   } catch (e) {
@@ -63,6 +66,7 @@ const autosave = async (stateRef: MutableRefObject<AutosaveState>, update: Updat
  */
 export const useAutosave = (noteId: string, body: NoteBody, revision?: Maybe<number>) => {
   const [, updateNoteMutation] = useUpdateNoteMutation();
+  const [scratch] = useScratchContext();
 
   // Apologia: I tried rewriting this into a reducer that fired after every update and saved every
   // 3s, but ultimately it is so side-effecty and stateful that it ended up being more confusing
@@ -76,7 +80,7 @@ export const useAutosave = (noteId: string, body: NoteBody, revision?: Maybe<num
   });
 
   let windowSave = () => {
-    autosave(state, updateNoteMutation);
+    autosave(state, updateNoteMutation, scratch);
   }
 
   useEffect(() => {
@@ -84,12 +88,12 @@ export const useAutosave = (noteId: string, body: NoteBody, revision?: Maybe<num
     window.addEventListener('beforeunload', windowSave);
 
     state.current.interval = window.setInterval(() => {
-      autosave(state, updateNoteMutation);
+      autosave(state, updateNoteMutation, scratch);
     }, 3000);
 
     return () => {
       window.removeEventListener('beforeunload', windowSave);
-      autosave(state, updateNoteMutation);
+      autosave(state, updateNoteMutation, scratch);
       if (state.current.interval) {
         log('clearing interval');
         clearInterval(state.current.interval);
