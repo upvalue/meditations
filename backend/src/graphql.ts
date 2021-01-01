@@ -10,7 +10,7 @@ export const typeDefs = readFileSync('../shared/schema.graphql').toString();
 export const resolvers = {
   Query: {
     allNotes: async () => {
-      return knex.from('notes').select<NoteRecord[]>('noteId').orderBy('createdAt').then(rows => {
+      return knex.from('notes').select<NoteRecord[]>('noteId', 'title').orderBy('createdAt').then(rows => {
         console.log(rows);
         return rows;
       })

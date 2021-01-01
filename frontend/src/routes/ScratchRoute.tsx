@@ -23,6 +23,7 @@ export const ScratchRoute = (props: {}) => {
       <TEditor
         note={{
           noteId: 'note-scratch',
+          title: '',
           body: '[]',
         }}
         body={[]}

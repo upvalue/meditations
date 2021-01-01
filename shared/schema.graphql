@@ -1,10 +1,12 @@
 type NoteRecord {
   noteId: String!
+  title: String
   revision: Int
 }
 
 type Note {
   noteId: String!
+  title: String
   revision: Int
   body: String!
 }

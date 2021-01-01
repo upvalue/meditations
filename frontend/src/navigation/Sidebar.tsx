@@ -29,6 +29,7 @@ export const Sidebar = (props: SidebarProps) => {
 
   const errors = useSelector((state: StoreState) => state.errors.errors);
   const tagsByName = useSelector((state: StoreState) => state.tags.tagsByName);
+  const atsByName = useSelector((state: StoreState) => state.ats.atsByName);
 
   return (
     <nav className="sidebar">
@@ -50,8 +51,8 @@ export const Sidebar = (props: SidebarProps) => {
 
       <div className="sidebar-panel a-p4">
         <h4>Ats</h4>
-        {Object.values(tagsByName).map(tag => (
-          <div key={tag.tagId}>#{tag.tagName}</div>
+        {Object.values(atsByName).map(at => (
+          <div key={at.atId}>@{at.atName}</div>
         ))}
       </div>
 

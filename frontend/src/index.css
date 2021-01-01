@@ -58,9 +58,7 @@ a:visited {
   box-shadow: 1px 0 0 rgba(var(--a-light-gray-1,.15));
 }
 
-.sidebar-panel {
-  line-height: 32px;
-}
+.sidebar-panel { }
 
 .sidebar h3:first-of-type {
   margin:0;

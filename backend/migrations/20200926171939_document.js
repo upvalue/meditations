@@ -5,9 +5,11 @@ exports.up = function (knex) {
 
   CREATE TABLE techne.notes(
     note_id TEXT PRIMARY KEY,
+    title TEXT,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    revision INT
+    revision INT,
+    UNIQUE(title)
   );
 
   CREATE TABLE techne.note_revisions(

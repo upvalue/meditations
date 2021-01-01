@@ -47,3 +47,24 @@ export const discoverRelations = (noteBody: NoteBody, path: number[] = []): Rela
 
   return relations;
 }
+
+/**
+ * Discovers document title, if it has one
+ * @param noteBody 
+ */
+export const discoverTitle = (noteBody: NoteBody): string | null => {
+  if (noteBody.length === 0) return null;
+
+  const firstNode = noteBody[0];
+
+  if (!('type' in firstNode)) return null;
+
+  if (firstNode.type === 'heading' && firstNode.level === 1) {
+    const textNode = firstNode.children[0];
+    if ('type' in textNode) return null;
+
+    return textNode.text;
+  }
+
+  return null;
+}

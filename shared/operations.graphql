@@ -4,6 +4,7 @@
 query GetAllNotes {
   allNotes {
     noteId
+    title
   }
 }
 
@@ -30,6 +31,7 @@ query GetInitialData {
 query GetNote($noteId: String!) {
   getNote(noteId: $noteId) {
     noteId
+    title
     revision
     body
   }

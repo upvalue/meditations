@@ -4,7 +4,7 @@ import { DatabaseError, NotFoundError } from './errors';
 // queries.ts - database queries, utilities, intermediary database types
 
 import knex from './knex';
-import { discoverRelations } from './parse';
+import { discoverRelations, discoverTitle } from './parse';
 
 const assertFoundOne = <T>(objectId: string, rows: ReadonlyArray<T>) => {
   const [tipe] = objectId.split('-');
@@ -53,12 +53,14 @@ export const updateNote = async (noteId: string, noteRevisionId: number, updated
     // Doing this not as a diff feels gross, but it's probably fine?
     await knex.table('tag_notes').transacting(trx).where({ noteId }).delete();
 
-    const relations = discoverRelations(JSON.parse(body));
+    const noteBody = JSON.parse(body);
+
+    const title = discoverTitle(noteBody);
+    const relations = discoverRelations(noteBody);
 
     for (const relation of relations) {
       switch (relation.type) {
         case 'tag': {
-          console.log('add relation', relation);
           await knex.table('tag_notes').transacting(trx).insert({
             noteId,
             tagId: relation.tagId,
@@ -68,9 +70,9 @@ export const updateNote = async (noteId: string, noteRevisionId: number, updated
       }
     }
 
-
     await knex.table('notes').transacting(trx).where({ noteId }).update({
       noteId,
+      title,
       revision: noteRevisionId,
       updatedAt: updatedAt,
     });
