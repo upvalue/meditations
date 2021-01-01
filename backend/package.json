@@ -19,7 +19,8 @@
     "start": "DEBUG=knex:query nodemon src/app.js",
     "watch": "tsc --watch --preserveWatchOutput",
     "jest": "jest",
-    "knex": "knex"
+    "knex": "knex",
+    "dbreset": "PGPASSWORD=postgres psql -U postgres -h localhost -d techne -c \"drop schema techne cascade; delete from knex_migrations\""
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

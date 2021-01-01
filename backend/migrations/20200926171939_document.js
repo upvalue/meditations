@@ -1,5 +1,6 @@
 
 exports.up = function (knex) {
+  console.log('document up');
   return knex.raw(`
   CREATE SCHEMA techne;
 
@@ -65,6 +66,7 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
+  console.log('document down');
   return knex.raw(`
     DROP SCHEMA techne CASCADE;
   `);
