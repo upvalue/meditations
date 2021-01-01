@@ -20,7 +20,19 @@ export type TLine = {
 export type TTag = {
   type: 'tag',
   tagId: string,
-  children: TNode[];
+  children: [TText],
+};
+
+export type TAt = {
+  type: 'at',
+  atId: string,
+  children: [TText],
+}
+
+export type TAtTypeSelect = {
+  type: 'at_type_select',
+  atId: string,
+  children: [TText],
 };
 
 export type THeader = {
@@ -29,7 +41,7 @@ export type THeader = {
   children: TNode[];
 }
 
-export type TElement = TLine | THeader | TTag;
+export type TElement = TLine | THeader | TTag | TAt | TAtTypeSelect;
 
 export type TNode = TText | TElement;
 

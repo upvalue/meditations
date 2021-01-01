@@ -3,12 +3,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Sidebar } from './navigation/Sidebar';
 import { Switch, Route, Redirect } from 'react-router';
 import { NoteRoute } from './routes/NoteRoute';
-import { useGetAllNotesQuery, useGetAllTagsQuery } from './api/client';
+import { useGetAllNotesQuery, useGetInitialDataQuery } from './api/client';
 import { Load } from './common/Load';
 import { ScratchRoute } from './routes/ScratchRoute';
 import { useDispatch } from 'react-redux';
 
-import { tagSlice } from './store/store';
+import { atSlice, tagSlice } from './store/store';
 import { SearchBar } from './search/SearchBar';
 
 // @refresh reset
@@ -17,21 +17,22 @@ import { SearchBar } from './search/SearchBar';
  * Hook to load initial data and block while doing so
  */
 const useInitialData = () => {
-  const [tagsResult,] = useGetAllTagsQuery();
+  const [initialDataResult,] = useGetInitialDataQuery();
 
-  const { data: tagsData, fetching: tagsFetching, error: tagsError, } = tagsResult;
+  const { data, fetching, error } = initialDataResult;
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (tagsFetching === false && tagsData) {
-      dispatch(tagSlice.actions.loadTags({ tags: tagsData.allTags }));
+    if (fetching === false && data) {
+      dispatch(tagSlice.actions.loadTags(data.allTags));
+      dispatch(atSlice.actions.loadAts(data.allAts));
     }
-  }, [tagsFetching]);
+  }, [fetching]);
 
   return {
-    loading: tagsFetching,
-    errors: [tagsError].filter(n => !!n),
+    loading: fetching,
+    errors: [error].filter(n => !!n),
   }
 }
 

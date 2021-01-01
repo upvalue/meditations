@@ -10,11 +10,15 @@
 *** TODO Undo
 *** TODO Bug: Removing voids doesn't work quite as expected if they're not inline
 *** TODO hide formatting on bolding/italics
-*** TODO allow escaping from headings
+*** DONE allow escaping from headings
+    CLOSED: [2020-12-31 Thu 21:15]
 *** TODO List editing
 *** TODO Allow creating collections on the fly
 *** TODO Backlinks
-*** TODO webpack-dev-server refreshing causes NoteRoute to fail with editor error
+*** TODO Improve markdown editing
+*** TODO Timestamping of document nodes
+*** DONE webpack-dev-server refreshing causes NoteRoute to fail with editor error
+    CLOSED: [2020-12-31 Thu 00:55]
     This seems to be a bug in Slate itself -- I've tried stripping out all of my various extensions to a bare minimum component, but it is
     still not capable of hot refresh.
 
@@ -24,29 +28,38 @@
     
     Or doesn't -- it also doesn't seem to behave well when being updated live in-place. Maybe I can do something to
     force remounting the component.
-
+    
+    (Closed: I hacked around this by force remounting always)
 
 ** Search
 *** TODO Searchbar allows you to search for text, tags and collections
+*** TODO Pinning allows you to specify that entries should always appear at the top of search results
 ** Application functionality
 *** TODO Create entries on a schedule
 *** TODO Create entries from a template
+*** TODO Title entries (derive from first header)
 *** TODO Navigation of some kind
 *** TODO Error handling for recoverable and unrecoverable errors
 *** TODO Archival / soft deletion
 ** Frontend
 *** TODO Route 404s
-*** TODO Shared error handling
+*** DONE Shared error handling
+    CLOSED: [2020-12-31 Thu 00:54]
 ** Bugs
 *** TODO Tags and other voids break markdown
 ** API
-*** TODO Type / function generation for frontend
-*** TODO Load documents from and save to database
-*** TODO Error handling
+*** DONE Type / function generation for frontend
+    CLOSED: [2020-12-31 Thu 00:54]
+*** DONE Load documents from and save to database
+    CLOSED: [2020-12-31 Thu 00:54]
+*** DONE Error handling
+    CLOSED: [2020-12-31 Thu 00:54]
 *** TODO graphql-constraint or some other easy validation for GraphQL
 *** TODO Locking / multiple open session safety
 *** TODO Subscribe to updates
-** Freeform notes
+** Eventually
+*** TODO Markdown export
+* Freeform notes
 ** 2020-11-22 Picking up
    Starting to tackle this again. Left off with a partially constructed backend. Immediate goal is to get to a point
    where it's usable for day to day editing. The bare minimum for that would be a persistent backend and some more
@@ -223,6 +236,27 @@
 
    (This is something I can do while parsing as well)
    
-   Alright for tomorrow, let's get ats working.
+   Alright for tomorrow, let's get ats working. Goal is to nail down some kind of actual relation / querying for ats. I
+   should be able to @ something.
    
+** 2020-12-31   
+
+   Alright picking up, need to get ats working. Starting by just copying everything.
    
+   One question I have, how do you comment on ats? Maybe they're elements with two children, a void "interface" and an
+   editable text node that can contain a subset of behavior (no nesting ats, but you could use lists etc)
+   
+   Alright question, how does typing work? Document needs to know about the type. But the type doesn't exist until the
+   at is created. Solution: we don't create at directly from completion. Rather we add an "at_creation" node which renders as
+   an element that gives the user the choice to create a new at. When they complete this, it's replaced with an "at" node.
+
+   (Or I could just do two menus. Or a modal. Seems less complicated in a way).
+
+   It's getting late so where do I want to leave it tonight? I should be able to create an at, then click on it to
+   actually search for it.
+   
+   Alright so you create an at @Blah
+
+   Get a menu that gives you types (Yes/No, Yes/No With Timer)
+
+

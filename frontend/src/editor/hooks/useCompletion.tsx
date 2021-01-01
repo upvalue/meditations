@@ -3,25 +3,27 @@ import { useState, useRef, useReducer, useEffect } from "react";
 import { usePopper } from "react-popper";
 import { VirtualElement } from "@popperjs/core";
 
-import { EditorInstance, insertTag } from "../lib/editor";
+import { EditorInstance, insertAtTypeSelect, insertTag } from "../lib/editor";
 import { Editor, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
-import { tagSlice, StoreState } from '../../store/store';
+import { tagSlice, StoreState, atSlice } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Raised } from '../../arche';
 import { useScratchContext } from '../../routes/ScratchRoute';
 import { generateId } from '../../lib/utilities';
-import { useCreateTagMutation } from '../../api/client';
+import { useCreateAtMutation, useCreateTagMutation } from '../../api/client';
 
 const log = (...args: any[]) => {
   args.unshift(`[complete]`);
   console.log.apply(console, args as any);
 }
 
-export type CompletionState = {
+type CompletionType = 'at' | 'tag';
+
+export interface CompletionState {
   // Completion state
   editor?: EditorInstance;
-  completionType: 'at' | 'tag';
+  completionType: CompletionType;
   target?: Range;
   search: string;
   selectedIndex: number;
@@ -43,7 +45,7 @@ const initialCompletionState: CompletionState = {
 };
 
 const completionReducer = (state: CompletionState, action: CompletionAction) => {
-  // console.log(state, action);
+  console.log(state, action);
   switch (action.type) {
     case 'update':
       return action.state;
@@ -72,6 +74,7 @@ export const useCompletion = () => {
   const [scratch,] = useScratchContext();
 
   const [, createTagMutation] = useCreateTagMutation();
+  const [, createAtMutation] = useCreateAtMutation();
 
   const dispatch = useDispatch();
 
@@ -95,9 +98,7 @@ export const useCompletion = () => {
         const beforeRange = before && Editor.range(editor, before, start);
         const beforeText = beforeRange && Editor.string(editor, beforeRange);
 
-        // Determine if this is the beginning of a line
-        // (at a depth of exactly two, word offset is zero)
-        // if (before && beforeRange && beforeText && before.path.length === 2 && before.offset === 0) {
+        // Detect completion text
         if (before && beforeRange && beforeText) {
           if (beforeText[0] === '#') {
             completionDispatch({
@@ -105,6 +106,26 @@ export const useCompletion = () => {
               state: {
                 editor,
                 completionType: 'tag',
+                target: beforeRange,
+                search: beforeText.slice(1),
+                // TODO: This resets selection probably unnecessarily. Should try to preserve it
+                // could determine the location of what triggered the actual completion and use that
+                // to determine whether to reset this.
+                selectedIndex: 0,
+              }
+            });
+
+            return;
+          }
+
+          // Determine if this is the beginning of a line
+          // (at a depth of exactly two, word offset is zero)
+          if (beforeText[0] === '@' && before.path.length === 2 && before.offset === 0) {
+            completionDispatch({
+              type: 'update',
+              state: {
+                editor,
+                completionType: 'at',
                 target: beforeRange,
                 search: beforeText.slice(1),
                 selectedIndex: 0,
@@ -147,11 +168,14 @@ export const useCompletion = () => {
 
   // Find relevant collections
   const tagsByName = useSelector((state: StoreState) => state.tags.tagsByName);
+  const atsByName = useSelector((state: StoreState) => state.ats.atsByName);
 
   let searchItems: string[] = [];
 
   if (completionState.completionType === 'tag') {
     searchItems = Object.values(tagsByName).map(t => t.tagName).filter(tagName => tagName.toLowerCase().startsWith(completionState.search.toLowerCase()));
+  } else if (completionState.completionType === 'at') {
+    searchItems = Object.values(atsByName).map(t => t.atName).filter(atName => atName.toLowerCase().startsWith(completionState.search.toLowerCase()));
   }
 
   const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -192,27 +216,57 @@ export const useCompletion = () => {
           // indicated that they want to add another
           const completionName = (completionState.selectedIndex >= searchItems.length) ? completionState.search : searchItems[completionState.selectedIndex];
 
-          // Generate tagId if not found in map
-          const tag = tagsByName[completionName];
-          if (!tag) {
-            log(`tag ${completionName} not found, generating new tag`);
-            const newTagId = generateId('tag');
+          if (completionState.completionType === 'tag') {
+            // Generate tagId if not found in map
+            const tag = tagsByName[completionName];
+            if (!tag) {
+              log(`tag ${completionName} not found, generating new tag`);
+              const newTagId = generateId('tag');
 
-            if (scratch) {
-              insertTag(completionState.editor, newTagId);
+              if (scratch) {
+                insertTag(completionState.editor, newTagId);
+              } else {
+                createTagMutation({ tagId: newTagId, tagName: completionName }).then(result => {
+                  // TODO: Handle errors
+                  if (result.data && completionState.editor) {
+                    const tag = result.data.createTag;
+                    dispatch(tagSlice.actions.addTag(tag))
+                    insertTag(completionState.editor, tag.tagId);
+                  }
+                })
+              }
             } else {
-              createTagMutation({ tagId: newTagId, tagName: completionName }).then(result => {
-                // TODO: Handle errors
-                if (result.data && completionState.editor) {
-                  const tag = result.data.createTag;
-                  dispatch(tagSlice.actions.addTag(tag))
-                  insertTag(completionState.editor, tag.tagId);
-                }
-              })
+              log(`tag ${completionName} found!`);
+              insertTag(completionState.editor, tag.tagId);
             }
-          } else {
-            log(`tag ${completionName} found!`);
-            insertTag(completionState.editor, tag.tagId);
+          } else if (completionState.completionType === 'at') {
+            const at = atsByName[completionName];
+            if (!at) {
+              log(`at ${completionName} not found, generating new at`);
+
+              const newAtId = generateId('at');
+
+              if (scratch) {
+                console.error('not supported yet');
+              } else {
+                createAtMutation({ atId: newAtId, atName: completionName }).then(result => {
+                  if (result.data && completionState.editor) {
+                    const at = result.data.createAt;
+                    dispatch(atSlice.actions.addAt(at));
+                    insertAtTypeSelect(completionState.editor, at.atId);
+                  }
+                })
+              }
+
+
+
+
+              // const newAtId = generateId('at');
+
+              // if (scratch) {
+              // insertAt(completionState.editor, new
+              // }
+            }
           }
 
           break;
@@ -222,6 +276,7 @@ export const useCompletion = () => {
 
   return {
     completionProps: {
+      completionType: completionState.completionType,
       selectedIndex: completionState.selectedIndex,
       search: completionState.search,
       searchItems,
@@ -250,6 +305,7 @@ export const CompleteItem = (props: CompleteItemProps) => {
 }
 
 export type CompleteProps = {
+  completionType: CompletionType;
   searchItems: ReadonlyArray<string>,
   selectedIndex: number,
   search: string,
@@ -265,11 +321,16 @@ export type CompleteProps = {
   }
 }
 
+const completionSymbol: { [key: string]: string } = {
+  'at': '@',
+  'tag': '#',
+};
+
 /**
  * Complete component. Handles actually rendering completion info and user selection from useCompletion
  */
 export const Complete = (props: CompleteProps) => {
-  const { searchItems, search, selectedIndex } = props;
+  const { searchItems, search, selectedIndex, completionType } = props;
 
   return (
     <div ref={props.setPopperElement} style={{ ...props.styles.popper, display: props.active ? '' : 'none' }} {...props.attributes.popper}>
@@ -278,7 +339,7 @@ export const Complete = (props: CompleteProps) => {
           <CompleteItem item={s} selected={i === selectedIndex} key={s} />
         ))}
         <hr />
-        <CompleteItem item={`+ Add #${search}`} selected={selectedIndex === searchItems.length} />
+        <CompleteItem item={`+ Add ${completionSymbol[completionType]}${search}`} selected={selectedIndex === searchItems.length} />
       </Raised>
     </div>
   );

@@ -25,6 +25,8 @@
   --a-black: 0,0,0;
   --a-white: 255,255,255;
 
+  --a-background: 255,255,255;
+
   --a-dark-gray-1: 16,22,26;
   --a-dark-gray-2: 32,43,51;
   --a-dark-gray-3: 41,55,66;
@@ -246,6 +248,7 @@
     0 2px 4px rgba(var(--a-black), 0.2),
     0 4px 8px rgba(var(--a-black), 0.2);
   z-index: 10;
+  background: rgb(var(--a-background));
 }
 
 /*****

@@ -32,24 +32,27 @@ export const Sidebar = (props: SidebarProps) => {
 
   return (
     <nav className="sidebar">
-      <div className="a-p4">
-        <div style={{ lineHeight: '32px' }}>
-          <h4>Notes</h4>
-          {notes.map(d => {
-            return <div key={d.noteId}><Link to={`/note-remount/${d.noteId}`}>{d.noteId}</Link></div>
-          })}
+      <div className="sidebar-panel a-p4">
+        <h4>Notes</h4>
+        {notes.map(d => {
+          return <div key={d.noteId}><Link to={`/note-remount/${d.noteId}`}>{d.noteId}</Link></div>
+        })}
 
-          {<Button onClick={createNote}>+ New document</Button>}
-        </div>
+        {<Button onClick={createNote}>+ New document</Button>}
       </div>
 
-      <div className="a-p4">
-        <div style={{ lineHeight: '32px' }}>
-          <h4>Tags</h4>
-          {Object.values(tagsByName).map(tag => (
-            <div key={tag.tagId}>#{tag.tagName}</div>
-          ))}
-        </div>
+      <div className="sidebar-panel a-p4">
+        <h4>Tags</h4>
+        {Object.values(tagsByName).map(tag => (
+          <div key={tag.tagId}>#{tag.tagName}</div>
+        ))}
+      </div>
+
+      <div className="sidebar-panel a-p4">
+        <h4>Ats</h4>
+        {Object.values(tagsByName).map(tag => (
+          <div key={tag.tagId}>#{tag.tagName}</div>
+        ))}
       </div>
 
       {errors.length > 0 &&

@@ -2,8 +2,7 @@ import { combineReducers, configureStore, createSlice, PayloadAction } from '@re
 import logger from 'redux-logger';
 import { CombinedError } from 'urql';
 
-import { NoteBody, Tag, ErrorCode } from '../../../shared';
-
+import { NoteBody, Tag, ErrorCode, At } from '../../../shared';
 
 export type UpdateDocumentAction = {
   type: string;
@@ -66,11 +65,6 @@ export const errorSlice = createSlice({
   }
 })
 
-export type CreateTagAction = {
-  type: string;
-  tag: Tag;
-};
-
 export type TagState = {
   tagsByName: { [tagName: string]: Tag },
   tagsById: { [tagId: string]: Tag },
@@ -85,12 +79,13 @@ export const tagSlice = createSlice({
   name: "tags",
   initialState: initialTagState,
   reducers: {
-    loadTags: (state, action: PayloadAction<{ tags: Tag[] }>) => {
-      action.payload.tags.forEach(tag => {
+    loadTags: (state, action: PayloadAction<Tag[]>) => {
+      action.payload.forEach(tag => {
         state.tagsByName[tag.tagName] = tag;
         state.tagsById[tag.tagId] = tag;
       });
     },
+
     addTag: (state, action: PayloadAction<Tag>) => {
       const tag = action.payload;
       state.tagsByName[tag.tagName] = tag;
@@ -99,16 +94,50 @@ export const tagSlice = createSlice({
   },
 });
 
+// There's a lot of code duplication here because these are fairly similar features. Keeping it
+// separate now to not get distracted with fancy type factoring, but it might be good to combine
+// these if they end up not diverging very much
+
+export type AtState = {
+  atsByName: { [atName: string]: At },
+  atsById: { [atIdk: string]: At },
+}
+
+const initialAtState: AtState = {
+  atsByName: {},
+  atsById: {},
+};
+
+export const atSlice = createSlice({
+  name: "ats",
+  initialState: initialAtState,
+  reducers: {
+    loadAts: (state, action: PayloadAction<At[]>) => {
+      action.payload.forEach(at => {
+        state.atsByName[at.atName] = at;
+        state.atsById[at.atId] = at;
+      });
+    },
+
+    addAt: (state, action: PayloadAction<At>) => {
+      const at = action.payload;
+      state.atsByName[at.atName] = at;
+      state.atsById[at.atId] = at;
+    },
+  },
+});
 
 export type StoreState = {
   errors: ErrorState,
   tags: TagState,
+  ats: AtState,
 };
 
 export const store = configureStore({
   reducer: combineReducers({
     errors: errorSlice.reducer,
     tags: tagSlice.reducer,
+    ats: atSlice.reducer,
   }),
   middleware: [
     logger,

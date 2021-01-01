@@ -1,6 +1,7 @@
 import React from 'react';
-import { RenderElementProps, useFocused, useSelected } from 'slate-react';
+import { RenderElementProps } from 'slate-react';
 import { TNode } from '../../../shared';
+import { AtTypeSelect } from './elements/AtTypeSelect';
 import { Tag } from './elements/Tag';
 
 export const RenderElement = (args: RenderElementProps) => {
@@ -16,8 +17,11 @@ export const RenderElement = (args: RenderElementProps) => {
     }
     case 'line':
       return <div {...attributes}>{children}</div>
+    case 'at_type_select':
+      return <AtTypeSelect {...args}>{children}</AtTypeSelect>
     case 'tag':
       return <Tag {...args} />
+
     default:
       return <div>this should never happen</div>
   }

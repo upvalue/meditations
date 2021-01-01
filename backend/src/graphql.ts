@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import knex from './knex';
 
-import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs, QuerySearchArgs } from '../../shared';
+import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs, MutationCreateAtArgs, QuerySearchArgs, At } from '../../shared';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
 
@@ -30,6 +30,13 @@ export const resolvers = {
 
     allTags: async (_parent: any) => {
       return knex.from('tags').select<Tag[]>('*').then(rows => {
+        return rows;
+      });
+    },
+
+    allAts: async (_parent: any) => {
+      return knex.from('ats').select<At[]>('*').then(rows => {
+        console.log(rows);
         return rows;
       });
     },
@@ -98,6 +105,20 @@ export const resolvers = {
       return knex.table('tags').insert({
         tagId,
         tagName,
+        createdAt,
+      }).returning('*').then(rows => {
+        console.log(rows);
+        return rows[0];
+      });
+    },
+
+    createAt: async (_parent: any, { atId, atName }: MutationCreateAtArgs) => {
+      const createdAt = new Date();
+
+      return knex.table('ats').insert({
+        atId,
+        atName,
+        atType: 'unset',
         createdAt,
       }).returning('*').then(rows => {
         console.log(rows);

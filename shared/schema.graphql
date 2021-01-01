@@ -14,10 +14,24 @@ type Tag {
   tagName: String!
 }
 
+enum AtType {
+  unset,
+  yesno,
+  yesno_timer,
+  timer
+}
+
+type At {
+  atId: String!
+  atName: String!
+  atType: AtType!
+}
+
 type Query {
   allNotes: [NoteRecord!]!
   getNote(noteId: String!): Note!
   allTags: [Tag!]!
+  allAts: [At!]!
   search(tagIds: [String!]): [Note!]! 
 }
 
@@ -26,4 +40,5 @@ type Mutation {
   updateNote(noteId: String!, noteRevisionId: Int, updatedAt: String!, body: String!): NoteRecord
 
   createTag(tagId: String!, tagName: String!): Tag!
+  createAt(atId: String!, atName: String!): At!
 }

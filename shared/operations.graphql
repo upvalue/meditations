@@ -14,6 +14,19 @@ query GetAllTags {
   }
 }
 
+query GetInitialData {
+  allTags {
+    tagId
+    tagName
+  }
+
+  allAts {
+    atId
+    atName
+    atType
+  }
+}
+
 query GetNote($noteId: String!) {
   getNote(noteId: $noteId) {
     noteId
@@ -48,5 +61,13 @@ mutation CreateTag($tagId: String!, $tagName: String!) {
   createTag(tagId: $tagId, tagName: $tagName) {
     tagId,
     tagName
+  }
+}
+
+mutation CreateAt($atId: String!, $atName: String!) {
+  createAt(atId: $atId, atName: $atName) {
+    atId,
+    atName
+    atType
   }
 }

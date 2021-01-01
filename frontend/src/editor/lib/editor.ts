@@ -41,7 +41,7 @@ const withTechne = (editor: Editor) => {
   }
 
   editor.isVoid = elt => {
-    return elt.type === 'tag' ? true : isVoid(elt);
+    return (elt.type === 'tag' || elt.type === 'at_type_select' || isVoid(elt));
   }
 
   // TODO: I'm not sure what the best behavior is here. 
@@ -136,6 +136,25 @@ export const insertTag = (editor: EditorInstance, tag: string) => {
   const entry = {
     type: 'tag',
     tagId: tag,
+    children: [{ text: '' }],
+  }
+  // Remove the entered text
+  // Commented out lines are for toplevel-only voids (ats)
+  // Transforms.removeNodes(editor);
+  // Insert the entry
+  Transforms.insertNodes(editor, entry);
+  Transforms.move(editor);
+}
+
+/**
+ * Insert an at type selection node (user created a new @, but needs to choose a type)
+ * @param editor 
+ * @param at 
+ */
+export const insertAtTypeSelect = (editor: EditorInstance, at: string) => {
+  const entry = {
+    type: 'at_type_select',
+    atId: at,
     children: [{ text: '' }],
   }
   // Remove the entered text
