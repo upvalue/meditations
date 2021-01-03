@@ -1,6 +1,7 @@
 // editor.ts - slatejs extensions
 import { withReact, ReactEditor } from 'slate-react'
 import { Editor, createEditor, Transforms, Range, Element } from 'slate';
+import { At } from '../../shared';
 
 const softAssert = (exp: boolean, message: string) => {
   if (!exp) {
@@ -41,7 +42,7 @@ const withTechne = (editor: Editor) => {
   }
 
   editor.isVoid = elt => {
-    return (elt.type === 'tag' || elt.type === 'at_type_select' || isVoid(elt));
+    return elt.type === 'tag' || elt.type === 'at_type_select' || elt.type === 'at' || isVoid(elt);
   }
 
   // TODO: I'm not sure what the best behavior is here. 
@@ -157,11 +158,34 @@ export const insertAtTypeSelect = (editor: EditorInstance, at: string) => {
     atId: at,
     children: [{ text: '' }],
   }
-  // Remove the entered text
-  // Commented out lines are for toplevel-only voids (ats)
-  // Transforms.removeNodes(editor);
-  // Insert the entry
+
+  Transforms.insertText(editor, '');
   Transforms.insertNodes(editor, entry);
+  Transforms.move(editor);
+}
+
+export const insertAt = (editor: EditorInstance, at: At) => {
+  if (at.atType === 'unset') {
+    insertAtTypeSelect(editor, at.atId);
+    return;
+  }
+
+  const entry = {
+    type: 'at',
+    atId: at.atId,
+    atType: at.atType,
+    children: [{ text: '' }],
+  }
+
+  Transforms.insertNodes(editor, entry);
+  Transforms.mergeNodes(editor);
+  Transforms.insertNodes(editor, {
+    type: 'line',
+    children: [
+      { text: '' }
+    ],
+  });
+  // TODO This should also move the selection to the new text node
   Transforms.move(editor);
 }
 

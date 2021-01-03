@@ -3,7 +3,7 @@ import { useState, useRef, useReducer, useEffect } from "react";
 import { usePopper } from "react-popper";
 import { VirtualElement } from "@popperjs/core";
 
-import { EditorInstance, insertAtTypeSelect, insertTag } from "../lib/editor";
+import { EditorInstance, insertAt, insertAtTypeSelect, insertTag } from "../lib/editor";
 import { Editor, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { tagSlice, StoreState, atSlice } from '../../store/store';
@@ -230,7 +230,7 @@ export const useCompletion = () => {
                   // TODO: Handle errors
                   if (result.data && completionState.editor) {
                     const tag = result.data.createTag;
-                    dispatch(tagSlice.actions.addTag(tag))
+                    dispatch(tagSlice.actions.upsertTag(tag))
                     insertTag(completionState.editor, tag.tagId);
                   }
                 })
@@ -252,20 +252,20 @@ export const useCompletion = () => {
                 createAtMutation({ atId: newAtId, atName: completionName }).then(result => {
                   if (result.data && completionState.editor) {
                     const at = result.data.createAt;
-                    dispatch(atSlice.actions.addAt(at));
+                    dispatch(atSlice.actions.upsertAt(at));
                     insertAtTypeSelect(completionState.editor, at.atId);
                   }
                 })
               }
-
-
-
 
               // const newAtId = generateId('at');
 
               // if (scratch) {
               // insertAt(completionState.editor, new
               // }
+            } else {
+              log(`at ${completionName} found`);
+              insertAt(completionState.editor, at);
             }
           }
 

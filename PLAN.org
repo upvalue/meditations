@@ -260,3 +260,16 @@
    Get a menu that gives you types (Yes/No, Yes/No With Timer)
 
 
+** 2020-01-02
+
+   Getting ats working. Have type selection and node replacement kind of working, still need:
+
+   Inserting ats that already exist
+   Updating ats when types are selected in the store
+   Updating at data
+   Pulling at data out of relations
+   
+   Then search ->
+
+   Search for tagged document bits
+   Search for ats by name and aggregate data

@@ -36,6 +36,9 @@ export const discoverRelations = (noteBody: NoteBody, path: number[] = []): Rela
         relations = relations.concat(discoverRelations(node.children, [...path, i]));
         break;
       }
+      case 'at': {
+        break;
+      }
       case 'at_type_select':
         // ignore, no relations and no children
         break;

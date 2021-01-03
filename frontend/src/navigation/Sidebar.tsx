@@ -7,6 +7,8 @@ import { generateId } from '../lib/utilities';
 import { ReloadFunction } from '../common/Load'
 import { StoreState } from '../store/store';
 import { useSelector } from 'react-redux';
+import { IconButton } from '../common/IconButton';
+import { MdAddCircleOutline } from 'react-icons/md';
 
 export type SidebarProps = {
   notes: NoteRecord[];
@@ -35,25 +37,30 @@ export const Sidebar = (props: SidebarProps) => {
     <nav className="sidebar">
       <div className="sidebar-panel a-p4">
         <h4>Notes</h4>
-        {notes.map(d => {
-          return <div key={d.noteId}><Link to={`/note-remount/${d.noteId}`}>{d.noteId}</Link></div>
-        })}
-
-        {<Button onClick={createNote}>+ New document</Button>}
+        <div className="sidebar-items">
+          {notes.map(d => {
+            return <div key={d.noteId}><Link to={`/note-remount/${d.noteId}`}>{d.noteId}</Link></div>
+          })}
+        </div>
+        {<IconButton icon={MdAddCircleOutline} onClick={createNote}><div>New document</div></IconButton>}
       </div>
 
       <div className="sidebar-panel a-p4">
         <h4>Tags</h4>
-        {Object.values(tagsByName).map(tag => (
-          <div key={tag.tagId}>#{tag.tagName}</div>
-        ))}
+        <div className="sidebar-items">
+          {Object.values(tagsByName).map(tag => (
+            <div key={tag.tagId}>#{tag.tagName}</div>
+          ))}
+        </div>
       </div>
 
       <div className="sidebar-panel a-p4">
         <h4>Ats</h4>
-        {Object.values(atsByName).map(at => (
-          <div key={at.atId}>@{at.atName}</div>
-        ))}
+        <div className="sidebar-items">
+          {Object.values(atsByName).map(at => (
+            <div key={at.atId}>@{at.atName}</div>
+          ))}
+        </div>
       </div>
 
       {errors.length > 0 &&

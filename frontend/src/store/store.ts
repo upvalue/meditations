@@ -86,7 +86,7 @@ export const tagSlice = createSlice({
       });
     },
 
-    addTag: (state, action: PayloadAction<Tag>) => {
+    upsertTag: (state, action: PayloadAction<Tag>) => {
       const tag = action.payload;
       state.tagsByName[tag.tagName] = tag;
       state.tagsById[tag.tagId] = tag;
@@ -119,7 +119,7 @@ export const atSlice = createSlice({
       });
     },
 
-    addAt: (state, action: PayloadAction<At>) => {
+    upsertAt: (state, action: PayloadAction<At>) => {
       const at = action.payload;
       state.atsByName[at.atName] = at;
       state.atsById[at.atId] = at;

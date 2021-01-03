@@ -61,14 +61,22 @@ mutation UpdateNote($noteId: String!, $noteRevisionId: Int!, $updatedAt: String!
 
 mutation CreateTag($tagId: String!, $tagName: String!) {
   createTag(tagId: $tagId, tagName: $tagName) {
-    tagId,
+    tagId
     tagName
   }
 }
 
 mutation CreateAt($atId: String!, $atName: String!) {
   createAt(atId: $atId, atName: $atName) {
-    atId,
+    atId
+    atName
+    atType
+  }
+}
+
+mutation AtTypeSelect($atId: String!, $atType: AtType!) {
+  atTypeSelect(atId: $atId, atType: $atType) {
+    atId
     atName
     atType
   }

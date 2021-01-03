@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import knex from './knex';
 
-import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs, MutationCreateAtArgs, QuerySearchArgs, At } from '../../shared';
+import { NoteRecord, MutationCreateNoteArgs, QueryGetNoteArgs, MutationUpdateNoteArgs, Tag, MutationCreateTagArgs, MutationCreateAtArgs, QuerySearchArgs, At, MutationAtTypeSelectArgs } from '../../shared';
 import { getNote, updateNote } from './queries';
 import { InvariantError } from './errors';
 
@@ -124,6 +124,20 @@ export const resolvers = {
         console.log(rows);
         return rows[0];
       });
+    },
+
+    atTypeSelect: async (_parent: any, { atId, atType }: MutationAtTypeSelectArgs) => {
+      const [at,]: At[] = await knex.table('ats').select('*').where('atId', '=', atId);
+
+      /*if (at.atType !== 'unset') {
+        throw new InvariantError('cannot change at type after setting');
+      }*/
+
+      const [atUpdated,] = await knex.table('ats').update({
+        atType
+      }).returning('*').where('atId', '=', atId);
+
+      return atUpdated;
     }
   }
 }

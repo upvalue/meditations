@@ -43,4 +43,6 @@ type Mutation {
 
   createTag(tagId: String!, tagName: String!): Tag!
   createAt(atId: String!, atName: String!): At!
+
+  atTypeSelect(atId: String!, atType: AtType!): At!
 }
