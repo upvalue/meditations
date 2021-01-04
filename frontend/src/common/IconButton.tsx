@@ -12,13 +12,14 @@ export const IconButton = (props: IconButtonProps & ButtonProps) => {
   return (
     <Button
       {...buttonProps}
-      className="a-flex a-items-center"
+      className="a-flex a-items-center a-justify-center"
     >
-      <Icon className="a-mr1" />
-      <div>
-
-        {children}
-      </div>
+      <Icon className={children ? "a-mr1" : ""} />
+      {children &&
+        <div>
+          {children}
+        </div>
+      }
     </Button>
   );
 }

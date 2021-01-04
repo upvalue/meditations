@@ -23,9 +23,16 @@ export type TTag = {
   children: [TText],
 };
 
+export interface TAtYesno {
+  type: 'yesno',
+  status: 'complete' | 'incomplete' | 'unset';
+};
+
 export type TAt = {
   type: 'at',
   atId: string,
+  status?: 'complete' | 'incomplete' | 'unset';
+  atData?: TAtYesno,
   children: [TText],
 }
 

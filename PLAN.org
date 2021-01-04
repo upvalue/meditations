@@ -273,3 +273,10 @@
 
    Search for tagged document bits
    Search for ats by name and aggregate data
+
+** 2020-01-03
+
+   Got basic at insertion working, now need to actually log data, put it into relational form, and then implement basic
+   search.
+   
+   And just gonna call it...

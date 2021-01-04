@@ -70,7 +70,6 @@ a:visited {
   margin:0;
 }
 
-
 .sidebar h3, h4 {
   /* maybe? */
   margin:0;
@@ -128,17 +127,21 @@ a:visited {
 }
 
 .t-tag.outline {
-  border: 1px solid blue;
+  outline: 1px solid blue;
 }
 
-.at {
+.t-at {
   margin-top: 8px;
   margin-bottom: 8px;
 }
 
-.at > .a-Callout {
+.t-at > .a-Callout {
   width:300px;
   display: inline-flex;
+}
+
+.t-at > .a-Callout.outline {
+  outline: 1px solid blue;
 }
 
 /** doc - document source viewing */
