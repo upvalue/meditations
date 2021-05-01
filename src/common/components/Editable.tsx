@@ -79,7 +79,7 @@ export class Editable<
     if (!this.editor) {
       console.log('making new editor');
       const options = {
-        autoLink: true,
+        autoLink: false,
         placeholder: true,
 
         toolbar: {

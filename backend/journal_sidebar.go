@@ -50,7 +50,7 @@ func sidebarCalculate(chrono bool, tag bool, alpha bool) {
 		years := []ChronoLink{}
 
 		var yearsindb []struct{ Year string }
-		DB.Raw("SELECT DISTINCT strftime('%Y', date) as year FROM entries ORDER BY date desc").Scan(&yearsindb)
+		DB.Raw("SELECT DISTINCT strftime('%Y', date) as year FROM entries WHERE deleted_at is not null ORDER BY date desc").Scan(&yearsindb)
 
 		for _, row := range yearsindb {
 			datestr := row.Year
