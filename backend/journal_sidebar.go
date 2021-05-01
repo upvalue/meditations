@@ -50,7 +50,7 @@ func sidebarCalculate(chrono bool, tag bool, alpha bool) {
 		years := []ChronoLink{}
 
 		var yearsindb []struct{ Year string }
-		DB.Raw("SELECT DISTINCT strftime('%Y', date) as year FROM entries WHERE deleted_at is not null ORDER BY date desc").Scan(&yearsindb)
+		DB.Raw("SELECT DISTINCT strftime('%Y', date) as year FROM entries WHERE deleted_at is null ORDER BY date desc").Scan(&yearsindb)
 
 		for _, row := range yearsindb {
 			datestr := row.Year
@@ -59,16 +59,16 @@ func sidebarCalculate(chrono bool, tag bool, alpha bool) {
 			sub := []ChronoLink{}
 
 			var monthsinyear []struct{ Datestr string }
-			DB.Raw("SELECT DISTINCT strftime('%Y-%m', date) as datestr from entries where strftime('%Y', date) = ? order by date desc", datestr).Scan(&monthsinyear)
+			DB.Raw("SELECT DISTINCT strftime('%Y-%m', date) as datestr from entries where deleted_at is null and strftime('%Y', date) = ? order by date desc", datestr).Scan(&monthsinyear)
 
 			for _, row := range monthsinyear {
 				monthstr := row.Datestr
 
 				d, _ := time.Parse("2006-01", monthstr)
-				DB.Raw("SELECT count(*) as count from entries where strftime('%Y-%m', date) = ?", monthstr).Scan(&count)
+				DB.Raw("SELECT count(*) as count from entries where deleted_at is null and strftime('%Y-%m', date) = ?", monthstr).Scan(&count)
 				sub = append(sub, ChronoLink{Date: d.Format("January"), Link: d.Format("2006-01"), Count: count.Count})
 			}
-			DB.Raw("SELECT count(*) as count from entries where strftime('%Y', date) = ?", datestr).Scan(&count)
+			DB.Raw("SELECT count(*) as count from entries where deleted_at is null and strftime('%Y', date) = ?", datestr).Scan(&count)
 
 			year := ChronoLink{Date: datestr, Count: count.Count, Sub: sub}
 			years = append(years, year)
