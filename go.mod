@@ -6,7 +6,6 @@ require (
 	github.com/functionalfoundry/graphqlws v0.0.0-20180830144941-4a19181eb54f
 	github.com/go-macaron/binding v1.0.1
 	github.com/go-macaron/pongo2 v0.0.0-20191101041146-a81b2720734b
-	github.com/golang/groupcache v0.0.0-20181024230925-c65c006176ff
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/graphql-go/graphql v0.7.7

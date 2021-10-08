@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/unknwon/com"
 	"github.com/go-macaron/binding"
 	"github.com/jinzhu/gorm"
+	"github.com/unknwon/com"
 	macaron "gopkg.in/macaron.v1"
 )
 
@@ -197,9 +197,6 @@ func taskSelect(c *macaron.Context) {
 func taskUpdate(c *macaron.Context, task Task) {
 	DB.Save(&task)
 
-	// fmt.Printf("%v %v\n", task.Comment, comment)
-
-	task.clearCache()
 	task.Sync(false, true, true)
 	serverOK(c)
 }
@@ -220,7 +217,6 @@ func taskNew(c *macaron.Context, task Task) {
 	}
 
 	// If this new task should have stats attached
-	task.clearCache()
 	task.CalculateStats()
 
 	task.Sync(false, true, true)
@@ -239,7 +235,6 @@ func taskDelete(c *macaron.Context) {
 		return
 	}
 
-	task.clearCache()
 	task.Near(&tasks)
 
 	DB.LogMode(true)
