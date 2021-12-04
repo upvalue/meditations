@@ -10,7 +10,6 @@ import { Spinner } from "../../common/components/Spinner";
 
 import { HabitsControlBar } from "../components/HabitsControlBar";
 import { TimeScope } from "../components/TimeScope";
-import { HabitsMobileMenu } from "../components/HabitsMobileMenu";
 import { ProjectScope } from "../components/ProjectScope";
 import { ProjectList } from "../components/ProjectList";
 import { DndProvider } from "react-dnd";
@@ -103,7 +102,6 @@ export const HabitsRoot = common.connect()(
           <DndProvider backend={HTML5Backend}>
             <CommonUI {...this.props}>
               <HabitsControlBar {...this.props} />
-              <HabitsMobileMenu />
               <div className="d-flex flex-column flex-md-row">
                 <div id="scope-days" className="scope-column mr-md-1">
                   {this.props.days ? this.renderDays() : <Spinner />}
@@ -118,8 +116,8 @@ export const HabitsRoot = common.connect()(
                   {this.props.pinnedProjects ? (
                     this.renderProjects()
                   ) : (
-                      <Spinner />
-                    )}
+                    <Spinner />
+                  )}
                 </div>
               </div>
             </CommonUI>

@@ -29,7 +29,6 @@
     "medium-editor-tables": "git+https://github.com/upvalue/medium-editor-tables.git",
     "moment": "^2.18.1",
     "mousetrap": "^1.6.2",
-    "node-sass": "^5.0.0",
     "octicons": "^7.3.0",
     "primer": "^10.6.0",
     "randomatic": "^3.0.0",
@@ -46,7 +45,6 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "riot-route": "^3.1.1",
-    "sass-loader": "^6.0.6",
     "style-loader": "^0.13.1",
     "tslint": "^5.20.0",
     "tslint-config-airbnb": "^5.9.2",
@@ -58,7 +56,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "cp node_modules/primer/build/build.css public/primer.css"
   },
   "eslintConfig": {
     "extends": "react-app"

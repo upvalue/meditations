@@ -3,7 +3,9 @@
 import { main as habitsMain } from './habits/main';
 import { main as journalMain } from './journal/main';
 
-import './style/index.scss';
+// import './style/index.scss';
+
+import './style/shared.css';
 
 document.addEventListener('DOMContentLoaded', () => {
   const { pathname } = window.location;

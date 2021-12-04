@@ -1,6 +1,6 @@
-// animations.scss - CSS animations
+/* animations.scss - CSS animations */
 
-///// Up and down shake, for notifications
+/* Up and down shake, for notifications */
 
 @keyframes shake {
   10%, 90% {

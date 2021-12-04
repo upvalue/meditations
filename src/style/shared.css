@@ -1,4 +1,9 @@
-// Import only what is necessary
+@import "/node_modules/react-tabs/style/react-tabs.css";
+@import "/node_modules/react-datepicker/dist/react-datepicker.min.css";
+@import "/node_modules/medium-editor/dist/css/medium-editor.min.css";
+@import "/node_modules/medium-editor/dist/css/themes/mani.min.css";
+@import "/node_modules/medium-editor-tables/dist/css/medium-editor-tables.min.css";
+/*
 @import "primer-base/index";
 @import "primer-box/index";
 @import "primer-buttons/index";
@@ -13,21 +18,40 @@
 @import "animations.scss";
 @import "datepicker.scss";
 @import "medium-editor.scss";
+*/
 
+/*
 $linkColor: #09d;
 $bodyBg: white;
+*/
 /* Slightly muted color of some UI actions e.g. task modifiers */
+/*
 $uiColorMuted: #586069;
 $uiColorSlightlyMuted: #23282d;
 $bgSlightlyMuted: #c8cfd6;
+*/
 
+@import "./habits.css";
+@import "./notes.css";
+@import "./animations.css";
+
+:root {
+  --bg-gray: #f6f8fa;
+  --ui-slightly-muted: #586069;
+  --body-font: "Roboto", sans-serif;
+  --mono-font: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+  --editable-bg: #fcfcfc;
+}
+
+/*
 // Width at which to put the UI into mobile mode
 // NOTE: This should also be changed in constants.ts
 $mobileWidth: 1024px;
 $editableBg: #fcfcfc;
+*/
 
 body {
-  font-family: "Roboto", $body-font;
+  font-family: var(--body-font);
 }
 
 .masthead {
@@ -51,13 +75,7 @@ body {
   z-index: 1;
 }
 
-@media (max-width: $mobileWidth) {
-  #mobile-menu {
-    display: flex !important;
-  }
-}
-
-///// Notification bar
+/* Notification bar */
 #notifications {
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
@@ -71,7 +89,7 @@ body {
   width: 320px;
 }
 
-///// MODAL PROMPT
+/* MODAL PROMPT */
 #modal {
   position: fixed;
   z-index: 1;
@@ -94,14 +112,14 @@ body {
 }
 
 .octicon-svg {
-  fill: $uiColorSlightlyMuted;
+  fill: var(--ui-slightly-muted);
 }
 
 .btn-danger svg {
   fill: #b33630;
 }
 
-// Primer resets LI margin for some reason; it may change in a future version
+/* Primer resets LI margin for some reason; it may change in a future version */
 li {
   margin-left: 20px;
 }
@@ -123,7 +141,7 @@ blockquote {
   margin-bottom: .5em;
 }
 
-// For time navigator, don't allow dragging and dropping of buttons
+/* For time navigator, don't allow dragging and dropping of buttons */
 .btn.navigator-btn {
   -webkit-user-drag: none;
 }

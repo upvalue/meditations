@@ -16,8 +16,8 @@ const ViewEntry = (props: { entry: Entry | null }) => {
   return props.entry ? (
     <CEntry editableID={`entry-${props.entry.ID}`} context={true} entry={props.entry} />
   ) : (
-      <p>Entry deleted</p>
-    );
+    <p>Entry deleted</p>
+  );
 };
 
 export const JournalRoot = common.connect()(
@@ -25,7 +25,7 @@ export const JournalRoot = common.connect()(
     render() {
       return (
         <CommonUI {...this.props}>
-          <div className="d-flex flex-column flex-md-row flex-justify-between mr-md-1">
+          <div className="d-flex flex-column flex-md-row mr-md-1">
             <div id="journal-sidebar" className="mb-1">
               {React.createElement(JournalSidebar)}
             </div>

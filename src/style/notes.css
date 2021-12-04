@@ -1,17 +1,11 @@
-// journal.scss - journal-specific styling
-
-@import "~react-tabs/style/react-tabs.css";
+/* notes.css - notes styling */
 
 #journal-sidebar {
-  width: 18%;
+  flex-basis: 320px;
 }
 
 #journal-main {
-  width: 82%;
-}
-
-@media (max-width: $mobileWidth) {
-  #journal-sidebar, #journal-main { width: 100%; }
+  flex: 1;
 }
 
 .react-tabs {
@@ -54,7 +48,7 @@
 }
 
 .entry-body {
-  font-family: $body-font;
+  font-family: var(--body-font);
   background-color: white;
   font-size: 16px;
 }
@@ -78,7 +72,7 @@
 
 .tag {
   background-color: #e1e4e8;
-  color: $uiColorSlightlyMuted;
+  color: var(--ui-slightly-muted);
   border-radius: 4px;
   border: none;
 }
@@ -90,12 +84,16 @@
 */
 
 .tag a {
-  color: $uiColorSlightlyMuted;
+  color: var(--ui-slightly-muted);
 }
 
-.entry-locked {
-  .entry-body {
-    cursor: not-allowed;
-    filter: contrast(0.9);
-  }
+.entry-locked .entry-body {
+  cursor: not-allowed;
+  filter: contrast(0.9);
+}
+
+/* medium editor styling */
+.medium-editor-toolbar li button {
+  height: 48px;
+  min-width: 0;
 }

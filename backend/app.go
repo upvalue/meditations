@@ -173,10 +173,9 @@ func App() *macaron.Macaron {
 		c.Next()
 	})
 
-	// Routes
-	m.Get("/favicon.ico", func(c *macaron.Context) {
-		c.ServeFileContent("favicon.ico")
-	})
+	m.Use(macaron.Static("public", macaron.StaticOptions{
+		Prefix: "/public",
+	}))
 
 	// Block robots from indexing the demo page
 	m.Get("/robots.txt", func(c *macaron.Context) {
