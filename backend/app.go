@@ -173,7 +173,7 @@ func App() *macaron.Macaron {
 		c.Next()
 	})
 
-	m.Use(macaron.Static("public", macaron.StaticOptions{
+	m.Use(macaron.Static(path.Join(packagePath, "public"), macaron.StaticOptions{
 		Prefix: "/public",
 	}))
 
