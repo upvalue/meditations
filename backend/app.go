@@ -177,6 +177,10 @@ func App() *macaron.Macaron {
 		Prefix: "/public",
 	}))
 
+	m.Use(macaron.Static("build/static", macaron.StaticOptions{
+		Prefix: "static",
+	}))
+
 	// Block robots from indexing the demo page
 	m.Get("/robots.txt", func(c *macaron.Context) {
 		c.PlainText(200, []byte("User-agent: *\nDisallow: /\n"))
@@ -189,10 +193,6 @@ func App() *macaron.Macaron {
 	init("/habits", habitsInit)
 	init("/journal", journalInit)
 	graphqlWebInit(m)
-
-	m.Use(macaron.Static("build/static", macaron.StaticOptions{
-		Prefix: "static",
-	}))
 
 	return m
 }

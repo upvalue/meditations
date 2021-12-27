@@ -13,7 +13,7 @@ import { Spinner } from "../../common/components/Spinner";
 class JournalNavigation1 extends React.Component<
   JournalState,
   { searching: boolean }
-  > {
+> {
   searchText!: HTMLInputElement;
 
   constructor(props: any) {
@@ -102,16 +102,19 @@ class JournalNavigation1 extends React.Component<
           )}
           {this.props.searchResults && this.props.searchResults > 0 ? (
             <button
-              className="tooltipped tooltipped-s tag"
+              className="tooltipped tooltipped-s tag d-flex flex-items-center "
               onClick={this.clearSearch}
               aria-label="Clear search results"
             >
-              Displaying <strong>{this.props.searchResults}</strong> results
-              <OcticonSpan icon={OcticonX} className="ml-1" />
+              <div>
+
+                Displaying <strong>{this.props.searchResults}</strong> results
+              </div>
+              <OcticonSpan icon={OcticonX} className="ml-1 d-flex flex-items-center" />
             </button>
           ) : (
-              ""
-            )}
+            ""
+          )}
         </div>
       </div>
     );
