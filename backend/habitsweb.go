@@ -282,7 +282,15 @@ func taskReorder(c *macaron.Context) {
 
 	// We have to compare dates formatted, as dates not be exactly equal (tasks that are copied from
 	// other scopes have slightly different times in the date column than those added by the user)
-	withinScope := src.Date.Format("2006-02-01") == target.Date.Format("2006-02-01") && src.Scope == target.Scope
+	cmpFormat := "2006-02-01"
+
+	if src.Scope == ScopeYear && target.Scope == ScopeYear {
+		cmpFormat = "2006"
+	} else if src.Scope == ScopeMonth && target.Scope == ScopeMonth {
+		cmpFormat = "2006-02"
+	}
+
+	withinScope := src.Date.Format(cmpFormat) == target.Date.Format(cmpFormat) && src.Scope == target.Scope
 
 	fmt.Printf("%v %v\n", src.Date, target.Date)
 	fmt.Printf("Re-ordering tasks within scope %v\n", withinScope)
