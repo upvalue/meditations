@@ -1,5 +1,7 @@
 import pkg from 'pg';
 import * as schema from './schema';
-import {pool} from './db/connection';
+import {pool, runMigrations} from './db/connection';
 
 export const db = pool;
+
+runMigrations();
