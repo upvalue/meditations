@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
-import pg from 'pg-promise';
+import pg from 'pg';
 import * as schema from './schema';
 export const connection = await pg({
   host: process.env.DB_HOST,
