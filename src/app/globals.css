@@ -7,3 +7,16 @@
     text-wrap: balance;
   }
 }
+
+.tiptap {
+  width: 48em;
+  height: 100vh;
+}
+
+.mention {
+  background-color: red;
+}
+
+.second {
+  padding-left: 12em;
+}

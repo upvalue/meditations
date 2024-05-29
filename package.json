@@ -11,17 +11,20 @@
   "dependencies": {
     "@mantine/core": "^7.6.1",
     "@mantine/hooks": "^7.6.1",
-    "@tiptap/pm": "^2.2.4",
-    "@tiptap/react": "^2.2.4",
-    "@tiptap/starter-kit": "^2.2.4",
+    "@types/lodash-es": "^4.17.12",
+    "dotenv": "^16.4.5",
     "knex": "^3.1.0",
+    "lodash-es": "^4.17.21",
     "next": "14.1.1",
     "pg": "^8.11.3",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@pgtyped/cli": "^2.3.0",
+    "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20",
+    "@types/pg": "^8.11.2",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
@@ -31,6 +34,7 @@
     "postcss-preset-mantine": "^1.13.0",
     "postcss-simple-vars": "^7.0.1",
     "tailwindcss": "^3.3.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

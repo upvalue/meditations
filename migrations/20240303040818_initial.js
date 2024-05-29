@@ -20,6 +20,15 @@ exports.up = function(knex) {
       updated_at timestamp with time zone NOT NULL DEFAULT now(),
       body jsonb NOT NULL
     );
+
+    CREATE TABLE doc_tags(
+      doc_id text NOT NULL REFERENCES docs(id) ON DELETE CASCADE,
+      doc_location text NOT NULL,
+      tag_name text NOT NULL,
+      PRIMARY KEY (doc_id, doc_location, tag_name)
+    );
+
+    INSERT INTO docs (id, body) VALUES ('doc-1', '{}');
   
   `);
 };
@@ -30,6 +39,8 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
   return knex.raw(`
+    DROP TABLE IF EXISTS doc_tags;
+    DROP TABLE IF EXISTS doc_revisions;
     DROP TABLE IF EXISTS docs;
   `);
 };

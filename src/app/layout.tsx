@@ -9,8 +9,8 @@ import {theme} from '../theme';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Techne",
-  description: "techne",
+  title: "dungeon",
+  description: "dungeon",
 };
 
 export default function RootLayout({
