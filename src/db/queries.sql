@@ -1,9 +1,6 @@
 /* @name selectOne */
 SELECT 1 as one;
 
-/* @name selectTwo */
-SELECT 2 as two;
-
 /* @name updateDocById */
 UPDATE docs
 SET body = :body, revision = :revision, updated_at = now()

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pgtyped": "pgtyped --watch --config config.json"
   },
   "dependencies": {
     "@mantine/core": "^7.6.1",

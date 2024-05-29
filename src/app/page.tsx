@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import Image from "next/image";
 import { TEditor } from "./editor/TEditor";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { makeClient } from "@/db/config";
 import { dropDocTags, insertDocTags, updateDocById } from "@/db/queries.queries";
 
@@ -37,12 +37,6 @@ const diveDoc = (doc: any, loc: string) => {
   }
 
   return res;
-}
-
-const Progress = () => {
-  useEffect(() => {
-
-  })
 }
 
 export default function Home() {
