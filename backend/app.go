@@ -116,23 +116,8 @@ func App() *macaron.Macaron {
 	packagePath := GetAppPath()
 
 	Config.PackagePath = packagePath
-	cwd, err := os.Getwd()
 
 	fmt.Printf("Using %s as path\n", packagePath)
-
-	webpackCheck := path.Join(Config.PackagePath, "assets/webpack/bundle-habits.js")
-
-	_, err = os.Stat(webpackCheck)
-
-	if os.IsNotExist(err) {
-		webpackCheck2 := path.Join(cwd, "assets/webpack/bundle-habits.js")
-		_, err = os.Stat(webpackCheck2)
-		packagePath = cwd
-		fmt.Printf("Scratch that, using CWD %s as path\n", cwd)
-		if os.IsNotExist(err) {
-			panic(fmt.Sprintf("Could not find bundle-habits.js at %s or %s; have you run yarn and webpack?", webpackCheck, webpackCheck2))
-		}
-	}
 
 	m := macaron.New()
 
