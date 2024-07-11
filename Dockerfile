@@ -32,6 +32,7 @@ RUN yarn build
 # since this is now basically just a statically compiled binary and some web assets
 RUN rm -rf node_modules
 RUN apk del nodejs yarn go git gcc musl-dev 
+RUN rm -rf /usr/local/share/.cache /root/.cache /root/go
 
 COPY docker_run_meditations.sh docker_run_meditations.sh
 
