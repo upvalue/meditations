@@ -1,0 +1,9 @@
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.run
+    volumes:
+      - ./docker-out:/docker-out
+    ports:
+      - "8080:8080"

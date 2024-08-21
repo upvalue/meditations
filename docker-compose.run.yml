@@ -1,0 +1,7 @@
+services:
+  meditations:
+    build:
+      context: .
+      dockerfile: Dockerfile.run
+    ports:
+      - "8080:8080"

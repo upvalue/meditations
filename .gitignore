@@ -15,3 +15,4 @@
 /_book
 /backend/src/*.js
 /public/primer.css
+/docker-out
