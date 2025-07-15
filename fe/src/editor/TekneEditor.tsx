@@ -3,6 +3,7 @@ import { mergeAttributes, Node } from '@tiptap/core'
 import { Paragraph } from '@tiptap/extension-paragraph'
 import { useState } from 'react'
 import { invariant } from '@tanstack/react-router'
+import './Editor.css'
 
 class EditorInvariantError extends Error {
   constructor(message: string) {
@@ -18,24 +19,6 @@ function assert(condition: any, message: string): asserts condition {
     throw new EditorInvariantError(message)
   }
 }
-
-// Current issue:
-//   Enter needs to create a new line node
-//   at the same level as current line node
-//   This also needs to handle splitting content
-//
-//   Backspace needs to delete a line node (if at the
-//   end of current line node). This also means that
-//   children need to be spliced into the existing line
-//   node
-
-// Hierarchy: doc -> line -> line_text and line*
-
-/**
- * The editor; this editor is an outline editor
- * implemented with Tiptap that allows the user to
- * edit Lines which are rendered as a list.
- */
 
 const TDoc = Node.create({
   name: 'doc',
@@ -106,6 +89,10 @@ const LineBody = Node.create({
       Tab: () => {
         this.editor.commands.sinkListItem('lineBody')
         // Swallow tab commands instead of refusing to multi-indent
+        return true
+      },
+      'Shift-Tab': () => {
+        this.editor.commands.liftListItem('lineBody')
         return true
       },
     }
