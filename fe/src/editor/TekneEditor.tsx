@@ -1,16 +1,8 @@
 import { useEditor, EditorContent } from '@tiptap/react'
-import {
-  defaultBlockAt,
-  getSplittedAttributes,
-  mergeAttributes,
-  Node,
-  type RawCommands,
-} from '@tiptap/core'
-import { EditorState, NodeSelection, TextSelection } from '@tiptap/pm/state'
+import { mergeAttributes, Node } from '@tiptap/core'
+import { Paragraph } from '@tiptap/extension-paragraph'
 import { useState } from 'react'
-import { findParentNode } from '@tiptap/core'
 import { invariant } from '@tanstack/react-router'
-import { canSplit } from '@tiptap/pm/transform'
 
 class EditorInvariantError extends Error {
   constructor(message: string) {
@@ -51,259 +43,80 @@ const TDoc = Node.create({
   content: 'line+',
 })
 
-/**
- * Line nodes can contain both text
- * and other outline nodes; as ProseMirror
- * doesn't want us to mix inline and
- * block content, this is a block purely
- * to contain the text of an outline node
- */
-const LineBody = Node.create({
-  name: 'line_text',
-  group: 'block',
-  content: 'inline*',
-
-  parseHTML() {
-    return [{ tag: 'span.line-text' }]
-  },
-
-  renderHTML({ HTMLAttributes }) {
-    return ['span', mergeAttributes(HTMLAttributes, { class: 'line-text' }), 0]
-  },
+const Text = Node.create({
+  name: 'text',
+  group: 'inline',
 })
-
-function ensureMarks(state: EditorState, splittableMarks?: string[]) {
-  const marks =
-    state.storedMarks ||
-    (state.selection.$to.parentOffset && state.selection.$from.marks())
-
-  if (marks) {
-    const filteredMarks = marks.filter((mark) =>
-      splittableMarks?.includes(mark.type.name)
-    )
-
-    state.tr.ensureMarks(filteredMarks)
-  }
-}
-
-export const splitBlock: RawCommands['splitBlock'] =
-  ({ keepMarks = true } = {}) =>
-  ({ tr, state, dispatch, editor }) => {
-    console.log('Meowdy :)')
-    const { selection, doc } = tr
-    const { $from, $to } = selection
-    const extensionAttributes = editor.extensionManager.attributes
-    const newAttributes = getSplittedAttributes(
-      extensionAttributes,
-      $from.node().type.name,
-      $from.node().attrs
-    )
-
-    if (selection instanceof NodeSelection && selection.node.isBlock) {
-      // doesn't trip on empty so far
-      if (!$from.parentOffset || !canSplit(doc, $from.pos)) {
-        return false
-      }
-
-      if (dispatch) {
-        if (keepMarks) {
-          ensureMarks(state, editor.extensionManager.splittableMarks)
-        }
-
-        tr.split($from.pos).scrollIntoView()
-      }
-
-      return true
-    }
-
-    if (!$from.parent.isBlock) {
-      console.log('early return')
-      return false
-    }
-
-    const atEnd = $to.parentOffset === $to.parent.content.size
-
-    const deflt =
-      $from.depth === 0
-        ? undefined
-        : defaultBlockAt($from.node(-1).contentMatchAt($from.indexAfter(-1)))
-
-    let types =
-      atEnd && deflt
-        ? [
-            {
-              type: deflt,
-              attrs: newAttributes,
-            },
-          ]
-        : undefined
-
-    let can = canSplit(tr.doc, tr.mapping.map($from.pos), 1, types)
-
-    if (
-      !types &&
-      !can &&
-      canSplit(
-        tr.doc,
-        tr.mapping.map($from.pos),
-        1,
-        deflt ? [{ type: deflt }] : undefined
-      )
-    ) {
-      can = true
-      types = deflt
-        ? [
-            {
-              type: deflt,
-              attrs: newAttributes,
-            },
-          ]
-        : undefined
-    }
-
-    if ($from.node().type.name === 'line_text') {
-      can = true
-    }
-
-    if (dispatch) {
-      if (can) {
-        if (selection instanceof TextSelection) {
-          tr.deleteSelection()
-        }
-
-        tr.split(tr.mapping.map($from.pos), 1, types)
-
-        if (
-          deflt &&
-          !atEnd &&
-          !$from.parentOffset &&
-          $from.parent.type !== deflt
-        ) {
-          const first = tr.mapping.map($from.before())
-          const $first = tr.doc.resolve(first)
-
-          if (
-            $from
-              .node(-1)
-              .canReplaceWith($first.index(), $first.index() + 1, deflt)
-          ) {
-            tr.setNodeMarkup(tr.mapping.map($from.before()), deflt)
-          }
-        }
-      }
-
-      if (keepMarks) {
-        ensureMarks(state, editor.extensionManager.splittableMarks)
-      }
-
-      tr.scrollIntoView()
-    }
-
-    return can
-  }
 
 const Line = Node.create({
   name: 'line',
   group: 'block',
-  // Contains text and any amount of line_nodes
-  content: 'line_text line*',
+
+  addOptions() {
+    return {
+      itemTypeName: 'lineBody',
+      HTMLAttributes: {},
+      keepMarks: false,
+      keepAttributes: false,
+    }
+  },
+
+  content() {
+    return `${this.options.itemTypeName}*`
+  },
 
   parseHTML() {
     return [{ tag: 'div.line' }]
   },
 
   renderHTML({ HTMLAttributes }) {
+    return ['div', mergeAttributes({ class: 'line' }, HTMLAttributes), 0]
+  },
+})
+
+const LineBody = Node.create({
+  name: 'lineBody',
+
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+      bulletListTypeName: 'line',
+    }
+  },
+
+  content: 'paragraph block*',
+
+  defining: true,
+
+  parseHTML() {
     return [
-      'div',
-      mergeAttributes(
-        {
-          class: 'line-node',
-        },
-        HTMLAttributes
-      ),
-      0,
+      {
+        tag: 'div.line-body',
+      },
     ]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['div', mergeAttributes({ class: 'line-body' }, HTMLAttributes), 0]
   },
 
   addKeyboardShortcuts() {
     return {
-      // If performed on an empty line, delete said line
-      Backspace: () => {
-        return this.editor.commands.command(({ tr, state, editor }) => {
-          return (
-            editor.commands.deleteSelection() ||
-            editor.commands.joinBackward() ||
-            editor.commands.selectNodeBackward()
-          )
-        })
-      },
+      Enter: () => this.editor.commands.splitListItem('lineBody'),
       Tab: () => {
-        return this.editor.commands.command(({ tr, state, editor }) => {
-          console.log('what have I DONE')
-          return true
-        })
-      },
-      Enter: () => {
-        return this.editor.commands.splitListItem('line')
-        return this.editor.commands.command(
-          ({ tr, state, editor, dispatch, ...rest }) => {
-            // return splitBlock()({ tr, state, editor, dispatch, ...rest })
-            // return editor.commands.splitListItem('line')
-            return editor.commands.splitBlock()
-            const { selection } = tr
-
-            // editor.
-
-            const lineSelection = findParentNode((n) => n.type.name === 'line')(
-              selection
-            )
-
-            assert(
-              lineSelection !== undefined &&
-                lineSelection.node.type.name === 'line',
-              'Could not locate line node'
-            )
-
-            let side = lineSelection.pos + lineSelection.node.nodeSize
-
-            const { line, line_text } = editor.schema.nodes
-            // const type = lineSelection.node.type
-
-            if (dispatch) {
-              const lt = line_text.create()
-              const l = line.create(null, lt)
-
-              tr.insert(side, l)
-
-              tr.setSelection(TextSelection.create(tr.doc, side + 2))
-
-              return true
-            }
-            // tr.insert(side, Line.)
-
-            return false
-
-            console.log('insert at side', side)
-          }
-        )
+        this.editor.commands.sinkListItem('lineBody')
+        // Swallow tab commands instead of refusing to multi-indent
+        return true
       },
     }
   },
 })
 
-const Text = Node.create({
-  name: 'text',
-  group: 'inline',
-})
-
-const extensions = [TDoc, Line, LineBody, Text]
+const extensions = [TDoc, Line, LineBody, Paragraph, Text]
 
 const content = `
 <div class="line">
-  <span class="line-text">Let's make a line node!</span>
-</div>
-<div class="line">
-  <span class="line-text">s</span>
+ <div class="line-body"><p>hi</p></div>
 </div>
 `
 
