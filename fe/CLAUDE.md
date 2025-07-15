@@ -11,8 +11,13 @@ router.
 
 It uses pnpm as the package manager (do not use normal npm).
 
+# Editor
+
 Its primary interface is an editor, based on TipTap. This editor lives in the
 `src/editor` folder.
+
+The editor's goal is to be an outline editor: Everything should be part of a Line;
+Lines can contain other Lines (which are rendered as nested lines).
 
 # Tests
 
