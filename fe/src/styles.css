@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@plugin '../hero.ts';
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *))
 
 body {
   margin: 0;
@@ -20,10 +23,6 @@ code {
 
 .ProseMirror {
   outline: none;
-}
-
-.editor-container ul {
-  list-style-type: disc;
 }
 
 .line-node {

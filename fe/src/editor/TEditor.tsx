@@ -107,8 +107,11 @@ const content = `
 </div>
 `
 
-export const TekneEditor = () => {
-  const [jsonDoc, setJsonDoc] = useState<any>({})
+export const TEditor = ({
+  onDocChange,
+}: {
+  onDocChange: (doc: any) => void
+}) => {
   const editor = useEditor({
     extensions,
     content,
@@ -118,22 +121,16 @@ export const TekneEditor = () => {
       },
     },
     onCreate: ({ editor }) => {
-      setJsonDoc(editor.getJSON())
+      onDocChange(editor.getJSON())
     },
     onUpdate: ({ editor }) => {
-      setJsonDoc(editor.getJSON())
+      onDocChange(editor.getJSON())
     },
   })
 
   return (
-    <div className="editor-container h-full w-full p-8 flex">
-      <EditorContent autoFocus className="h-full w-[50%]" editor={editor} />
-      <div className="raw-doc w-[50%] overflow-scroll">
-        <h1>Raw Node Content</h1>
-        <div className="whitespace-pre-wrap font-mono ">
-          {JSON.stringify(editor.getJSON(), null, 2)}
-        </div>
-      </div>
+    <div className="editor-container h-full w-full ">
+      <EditorContent autoFocus className="h-full w-full" editor={editor} />
     </div>
   )
 }
