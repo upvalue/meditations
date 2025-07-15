@@ -53,6 +53,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^3.0.1
         version: 3.0.1
+      classnames:
+        specifier: ^2.5.1
+        version: 2.5.1
       framer-motion:
         specifier: ^12.23.6
         version: 12.23.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -2368,6 +2371,9 @@ packages:
   chownr@3.0.0:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
+
+  classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
   clsx@1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
@@ -7014,6 +7020,8 @@ snapshots:
       fsevents: 2.3.3
 
   chownr@3.0.0: {}
+
+  classnames@2.5.1: {}
 
   clsx@1.2.1: {}
 

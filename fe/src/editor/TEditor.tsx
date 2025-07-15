@@ -1,9 +1,16 @@
-import { useEditor, EditorContent } from '@tiptap/react'
-import { mergeAttributes, Node } from '@tiptap/core'
+import {
+  useEditor,
+  EditorContent,
+  NodeViewWrapper,
+  NodeViewContent,
+  ReactNodeViewRenderer,
+} from '@tiptap/react'
+import { BeakerIcon } from '@heroicons/react/20/solid'
+import { InputRule, mergeAttributes, Node, nodeInputRule } from '@tiptap/core'
 import { Paragraph } from '@tiptap/extension-paragraph'
-import { useState } from 'react'
 import { invariant } from '@tanstack/react-router'
 import './Editor.css'
+import Icon from '@/Icon'
 
 class EditorInvariantError extends Error {
   constructor(message: string) {
@@ -57,6 +64,96 @@ const Line = Node.create({
   },
 })
 
+const LineBodyControls = ({ node }: { node: any }) => {
+  return (
+    <NodeViewWrapper>
+      <div className="flex items-top">
+        <div
+          onClick={() => {
+            console.log('you found me hehe')
+          }}
+        >
+          <Icon icon={BeakerIcon} className="mr-2" />
+        </div>
+        <NodeViewContent />
+      </div>
+    </NodeViewWrapper>
+  )
+}
+
+const Tag = Node.create({
+  name: 'tag',
+  group: 'inline',
+  // Unclear why this is necessary in addition to group: 'inline',
+  // but omitting it causes an error when a tag is added.
+  inline: true,
+  atom: true,
+  selectable: false,
+
+  addAttributes() {
+    return {
+      name: {
+        default: null,
+        parseHTML: (elt) => elt.dataset.name,
+        renderHTML: (attrs) => {
+          return {
+            'data-name': attrs.name,
+          }
+        },
+      },
+    }
+  },
+
+  parseHTML() {
+    // return [{ tag: `span.tag[data-name=${this.name}]` }]
+    return [{ tag: `span.tag` }]
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    console.log('this', this)
+    return [
+      'span',
+      mergeAttributes({ class: 'tag', name: node.attrs.name }, HTMLAttributes),
+      // render name as body
+      node.attrs.name,
+    ]
+  },
+
+  // TODO: Tags cannot be copied
+
+  addInputRules() {
+    return [
+      new InputRule({
+        // TODO: Handle tag at end of line with no space after.
+        find: /(#\w+)\s$/,
+        handler: ({ range, match, chain }) => {
+          const name = match[1]
+
+          chain()
+            .deleteRange(range)
+            .insertContentAt(range.from, [
+              {
+                type: this.type.name,
+                attrs: { name },
+              },
+              {
+                type: 'text',
+                text: ' ',
+              },
+            ])
+            .command(({ tr, state }) => {
+              tr.setStoredMarks(
+                state.doc.resolve(state.selection.to - 1).marks()
+              )
+              return true
+            })
+            .run()
+        },
+      }),
+    ]
+  },
+})
+
 const LineBody = Node.create({
   name: 'lineBody',
 
@@ -97,9 +194,13 @@ const LineBody = Node.create({
       },
     }
   },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(LineBodyControls, {})
+  },
 })
 
-const extensions = [TDoc, Line, LineBody, Paragraph, Text]
+const extensions = [TDoc, Line, LineBody, Paragraph, Tag, Text]
 
 const content = `
 <div class="line">

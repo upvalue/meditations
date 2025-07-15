@@ -28,6 +28,7 @@
     "@tiptap/pm": "^3.0.1",
     "@tiptap/react": "^3.0.1",
     "@tiptap/starter-kit": "^3.0.1",
+    "classnames": "^2.5.1",
     "framer-motion": "^12.23.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
