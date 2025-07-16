@@ -1,10 +1,5 @@
 import { useEffect, useRef } from 'react'
 import type { ZDoc, ZLine } from './Schema'
-// import { EditorView, EditorState, basicSetup } from '@codemirror/basic-setup'
-
-import { EditorView, keymap } from '@codemirror/view'
-import { emacsStyleKeymap } from '@codemirror/commands'
-import { EditorState } from '@codemirror/state'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'
@@ -12,7 +7,6 @@ import { ListBulletIcon } from '@heroicons/react/20/solid'
 
 import { atom, useAtom } from 'jotai'
 
-import { produce } from 'immer'
 import { useCodeMirror, type LineInfo } from './codemirror-hook'
 
 // TODO: Consider renaming doc to outline in order
@@ -23,22 +17,20 @@ export const docAtom = atom<ZDoc>({
   children: [
     {
       type: 'line',
-      mdContent: 'The world is your canvas',
+      mdContent: 'The world is #test',
       indent: 0,
     },
   ],
 })
 
 const ELine = (lineInfo: LineInfo) => {
-  const { cmRef, cmView } = useCodeMirror(lineInfo)
+  const { cmRef } = useCodeMirror(lineInfo)
 
   // Codemirror of course doesn't receive recreated
   // callbacks with new component state; this table
   // lets us update them on the fly
 
-  const [doc, setDoc] = useAtom(docAtom)
-
-  const { line, lineIdx } = lineInfo
+  const { line } = lineInfo
 
   return (
     <div
@@ -55,9 +47,26 @@ const ELine = (lineInfo: LineInfo) => {
 
 interface TEditorProps {}
 
+type TagClickEvent = CustomEvent<{ name: string }>
+
 export const TEditor = () => {
   const [doc] = useAtom(docAtom)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Custom event listener
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (e.type === 'cm-tag-click') {
+        console.log('Tag clicked', e.detail.name)
+      }
+    }
+    window.addEventListener('cm-tag-click', handler)
+    return () => window.removeEventListener('cm-tag-click', handler)
+  }, [])
+
+  useEffect(() => {
+    console.log('Doc changed', doc)
+  }, [doc])
 
   useEffect(() => {
     if (!containerRef.current) return

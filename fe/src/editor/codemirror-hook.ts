@@ -34,10 +34,24 @@ export type CallbackTable = {
 
 const tagPattern = /#[a-zA-Z0-9_-]+/g
 
-const tagDecoration = Decoration.mark({
+const makeTagDecoration = (tag: string) => {
+  return Decoration.mark({
+    class: 'cm-tag cursor-pointer',
+    tagName: 'span',
+    attributes: {
+      'data-name': tag,
+      onclick: `window.dispatchEvent(new CustomEvent('cm-tag-click', { detail: { name: "${tag}" } }))`,
+    },
+  })
+}
+
+/*const tagDecoration = Decoration.mark({
   class: 'cm-tag',
   tagName: 'span',
-})
+  attributes: {
+    onclick: `console.log('hi test')`,
+  },
+})*/
 
 const tagPlugin = ViewPlugin.fromClass(
   class implements PluginValue {
@@ -64,7 +78,7 @@ const tagPlugin = ViewPlugin.fromClass(
         while ((match = tagPattern.exec(text)) !== null) {
           const start = from + match.index
           const end = start + match[0].length
-          builder.add(start, end, tagDecoration)
+          builder.add(start, end, makeTagDecoration(match[0]))
         }
       }
 
@@ -92,116 +106,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
   const cmView = useRef<EditorView | null>(null)
   const [doc, setDoc] = useAtom(docAtom)
 
-  useEffect(() => {
-    const { line, lineIdx } = lineInfo
-    cmCallbacks.current = {
-      // List sink and lift
-      Tab: () => {
-        // Don't allow indenting more than one level past previous line
-        if (lineIdx === 0) return false
-        if (lineIdx > 0 && line.indent > doc.children[lineIdx - 1].indent) {
-          return false
-        }
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].indent += 1
-        })
-        setDoc(newDoc)
-        return true
-      },
-
-      'Shift-Tab': () => {
-        if (line.indent === 0) {
-          return false
-        }
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].indent -= 1
-        })
-        setDoc(newDoc)
-        return true
-      },
-
-      // Enter and backspace (line creation and deletion)
-
-      Enter: () => {
-        const view = cmView.current
-
-        if (!view) return false
-
-        const { state } = view
-        const { selection } = state
-
-        let newLine = ''
-
-        const docEnd = state.doc.length
-
-        // Handling cursor and selection:
-        // We delete any text which the user has selected
-        // Any text after selection (or the cursor if there is no selection)
-        // becomes part of the new line
-        if (!selection.main.empty) {
-          const { from, to } = selection.main
-
-          newLine = state.doc.slice(to, docEnd).toString()
-
-          view.dispatch({
-            changes: {
-              from,
-              to: docEnd,
-              insert: '',
-            },
-          })
-
-          console.log('Delete from', from, 'to', to)
-        } else {
-          const from = selection.main.anchor
-          newLine = state.doc.slice(from, docEnd).toString()
-
-          view.dispatch({
-            changes: {
-              from,
-              to: docEnd,
-              insert: '',
-            },
-          })
-        }
-
-        const newDoc = produce(doc, (draft) => {
-          draft.children.splice(lineIdx + 1, 0, {
-            type: 'line',
-            mdContent: newLine,
-            indent: line.indent,
-          })
-        })
-
-        setDoc(newDoc)
-        return true
-      },
-
-      contentUpdated: (content: string) => {
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].mdContent = content
-        })
-        setDoc(newDoc)
-      },
-    }
-
-    if (cmView.current) {
-      const v = cmView.current
-
-      if (v.state.doc.toString() !== line.mdContent) {
-        console.log('Line changed externally, update editor')
-        v.dispatch({
-          changes: {
-            from: 0,
-            to: doc.children.length,
-            insert: line.mdContent,
-          },
-        })
-      }
-    }
-  }, [lineInfo])
-
-  useEffect(() => {
+  const makeEditor = () => {
     const customKeymap = keymap.of([
       {
         key: 'Tab',
@@ -248,7 +153,132 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
     return () => {
       view.destroy()
     }
-  }, [])
+  }
+
+  useEffect(() => {
+    if (!cmView.current) return
+    const { line, lineIdx } = lineInfo
+    cmCallbacks.current = {
+      // List sink and lift
+      Tab: () => {
+        // Don't allow indenting more than one level past previous line
+        if (lineIdx === 0) return false
+        if (lineIdx > 0 && line.indent > doc.children[lineIdx - 1].indent) {
+          return false
+        }
+        const newDoc = produce(doc, (draft) => {
+          draft.children[lineIdx].indent += 1
+        })
+        setDoc(newDoc)
+        return true
+      },
+
+      'Shift-Tab': () => {
+        if (line.indent === 0) {
+          return false
+        }
+        const newDoc = produce(doc, (draft) => {
+          draft.children[lineIdx].indent -= 1
+        })
+        setDoc(newDoc)
+        return true
+      },
+
+      // Enter and backspace (line creation and deletion)
+      Backspace: () => {
+        return false
+      },
+
+      Enter: () => {
+        console.log('enter called along with line ', lineInfo)
+        const view = cmView.current
+
+        if (!view) return false
+
+        const { state } = view
+        const { selection } = state
+
+        let newLine = ''
+
+        const docEnd = state.doc.length
+
+        // Handling cursor and selection:
+        // We delete any text which the user has selected
+        // Any text after selection (or the cursor if there is no selection)
+        // becomes part of the new line
+        if (!selection.main.empty) {
+          const { from, to } = selection.main
+
+          newLine = state.doc.slice(to, docEnd).toString()
+
+          view.dispatch({
+            changes: {
+              from,
+              to: docEnd,
+              insert: '',
+            },
+          })
+
+          console.log('Delete from', from, 'to', to)
+        } else {
+          const from = selection.main.anchor
+          newLine = state.doc.slice(from, docEnd).toString()
+          console.log('Creating new line', newLine)
+
+          view.dispatch({
+            changes: {
+              from,
+              to: docEnd,
+              insert: '',
+            },
+          })
+        }
+
+        console.log('Enter: adding new line with content', newLine)
+
+        setDoc((recentDoc) => {
+          return produce(recentDoc, (draft) => {
+            draft.children.splice(lineIdx + 1, 0, {
+              type: 'line',
+              mdContent: newLine,
+              indent: line.indent,
+            })
+          })
+        })
+
+        return true
+      },
+
+      contentUpdated: (content: string) => {
+        console.log('Line', lineIdx, 'content updated', content)
+        const newDoc = produce(doc, (draft) => {
+          draft.children[lineIdx].mdContent = content
+        })
+        setDoc(newDoc)
+      },
+    }
+
+    const v = cmView.current
+
+    // When the document itself is updated, we need to synchronize
+    // React state with Codemirror state
+    if (v.state.doc.toString() !== line.mdContent) {
+      console.log('Line changed externally, updating', lineInfo.lineIdx)
+      cmView.current?.destroy()
+      makeEditor()
+      /*
+
+      v.dispatch({
+        changes: {
+          from: 0,
+          to: doc.children.length,
+          insert: line.mdContent,
+        },
+      })*/
+    }
+  }, [lineInfo])
+
+  useEffect(makeEditor, [])
 
   return {
     cmCallbacks,

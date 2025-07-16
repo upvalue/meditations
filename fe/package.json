@@ -23,6 +23,7 @@
     "@tanstack/react-router": "^1.121.2",
     "@tanstack/react-router-devtools": "^1.121.2",
     "@tanstack/router-plugin": "^1.121.2",
+    "@uidotdev/usehooks": "^2.4.1",
     "classnames": "^2.5.1",
     "codemirror": "^6.0.2",
     "framer-motion": "^12.23.6",
