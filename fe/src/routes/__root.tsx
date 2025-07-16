@@ -5,7 +5,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 export const Route = createRootRoute({
   component: () => (
     <>
-      <HeroUIProvider className="dark">
+      <HeroUIProvider className="dark ">
         <Outlet />
       </HeroUIProvider>
       <TanStackRouterDevtools />

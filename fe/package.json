@@ -13,6 +13,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.2",
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.8.1",
     "@tailwindcss/vite": "^4.1.11",
@@ -28,11 +29,13 @@
     "@tiptap/pm": "^3.0.1",
     "@tiptap/react": "^3.0.1",
     "@tiptap/starter-kit": "^3.0.1",
+    "@tiptap/suggestion": "^3.0.6",
     "classnames": "^2.5.1",
     "framer-motion": "^12.23.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.1.11",
+    "ts-pattern": "^5.7.1",
     "zod": "^4.0.5"
   },
   "devDependencies": {
