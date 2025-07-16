@@ -13,7 +13,7 @@ import { ListBulletIcon } from '@heroicons/react/20/solid'
 import { atom, useAtom } from 'jotai'
 
 import { produce } from 'immer'
-import { useCodeMirror } from './codemirror-hook'
+import { useCodeMirror, type LineInfo } from './codemirror-hook'
 
 // TODO: Consider renaming doc to outline in order
 // to reduce conflicts with builtin codemirror concepts
@@ -29,8 +29,8 @@ export const docAtom = atom<ZDoc>({
   ],
 })
 
-const ELine = ({ line, lineIdx }: { line: ZLine; lineIdx: number }) => {
-  const { cmCallbacks, cmRef, cmView } = useCodeMirror(line.mdContent)
+const ELine = (lineInfo: LineInfo) => {
+  const { cmRef, cmView } = useCodeMirror(lineInfo)
 
   // Codemirror of course doesn't receive recreated
   // callbacks with new component state; this table
@@ -38,113 +38,7 @@ const ELine = ({ line, lineIdx }: { line: ZLine; lineIdx: number }) => {
 
   const [doc, setDoc] = useAtom(docAtom)
 
-  useEffect(() => {
-    cmCallbacks.current = {
-      // List sink and lift
-      Tab: () => {
-        // Don't allow indenting more than one level past previous line
-        if (lineIdx === 0) return false
-        if (lineIdx > 0 && line.indent > doc.children[lineIdx - 1].indent) {
-          return false
-        }
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].indent += 1
-        })
-        setDoc(newDoc)
-        return true
-      },
-
-      'Shift-Tab': () => {
-        if (line.indent === 0) {
-          return false
-        }
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].indent -= 1
-        })
-        setDoc(newDoc)
-        return true
-      },
-
-      // Enter and backspace (line creation and deletion)
-
-      Enter: () => {
-        const view = cmView.current
-
-        if (!view) return false
-
-        const { state } = view
-        const { selection } = state
-
-        let newLine = ''
-
-        const docEnd = state.doc.length
-
-        // Handling cursor and selection:
-        // We delete any text which the user has selected
-        // Any text after selection (or the cursor if there is no selection)
-        // becomes part of the new line
-        if (!selection.main.empty) {
-          const { from, to } = selection.main
-
-          newLine = state.doc.slice(to, docEnd).toString()
-
-          view.dispatch({
-            changes: {
-              from,
-              to: docEnd,
-              insert: '',
-            },
-          })
-
-          console.log('Delete from', from, 'to', to)
-        } else {
-          const from = selection.main.anchor
-          newLine = state.doc.slice(from, docEnd).toString()
-
-          view.dispatch({
-            changes: {
-              from,
-              to: docEnd,
-              insert: '',
-            },
-          })
-        }
-
-        const newDoc = produce(doc, (draft) => {
-          draft.children.splice(lineIdx + 1, 0, {
-            type: 'line',
-            mdContent: newLine,
-            indent: line.indent,
-          })
-        })
-
-        setDoc(newDoc)
-        return true
-      },
-
-      contentUpdated: (content: string) => {
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].mdContent = content
-        })
-        setDoc(newDoc)
-      },
-    }
-
-    if (cmView.current) {
-      const v = cmView.current
-
-      if (v.state.doc.toString() !== line.mdContent) {
-        console.log('Line changed externally, update editor')
-        v.dispatch({
-          changes: {
-            from: 0,
-            to: doc.children.length,
-            insert: line.mdContent,
-          },
-        })
-      }
-    }
-  }, [line])
+  const { line, lineIdx } = lineInfo
 
   return (
     <div

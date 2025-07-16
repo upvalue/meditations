@@ -1,3 +1,7 @@
 .cm-editor-container [contenteditable] {
   caret-color: white;
 }
+
+.cm-tag {
+  color: blue;
+}
