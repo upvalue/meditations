@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { ZDoc, ZLine } from './Schema'
 // import { EditorView, EditorState, basicSetup } from '@codemirror/basic-setup'
 
@@ -13,6 +13,10 @@ import { ListBulletIcon } from '@heroicons/react/20/solid'
 import { atom, useAtom } from 'jotai'
 
 import { produce } from 'immer'
+import { useCodeMirror } from './codemirror-hook'
+
+// TODO: Consider renaming doc to outline in order
+// to reduce conflicts with builtin codemirror concepts
 
 export const docAtom = atom<ZDoc>({
   type: 'doc',
@@ -26,57 +30,16 @@ export const docAtom = atom<ZDoc>({
 })
 
 const ELine = ({ line, lineIdx }: { line: ZLine; lineIdx: number }) => {
-  const elt = useRef<HTMLDivElement>(null)
-  const cmView = useRef<EditorView | null>(null)
+  const { cmCallbacks, cmRef, cmView } = useCodeMirror(line.mdContent)
 
-  const keymapTable = useRef<{
-    [key: string]: () => boolean
-  }>({})
+  // Codemirror of course doesn't receive recreated
+  // callbacks with new component state; this table
+  // lets us update them on the fly
 
   const [doc, setDoc] = useAtom(docAtom)
 
   useEffect(() => {
-    if (elt.current) {
-      // TODO: Keymap doesn't update because it's created once right now.
-      // Thoughts?
-      const customKeymap = keymap.of([
-        {
-          key: 'Tab',
-          run: () => keymapTable.current.Tab() ?? false,
-        },
-        {
-          key: 'Enter',
-          run: () => keymapTable.current.Enter() ?? false,
-        },
-        {
-          key: 'Shift-Tab',
-          run: () => keymapTable.current['Shift-Tab']() ?? false,
-        },
-      ])
-
-      const state = EditorState.create({
-        doc: line.mdContent,
-        extensions: [
-          customKeymap, // Add our custom keymap first to take precedence
-          keymap.of(emacsStyleKeymap),
-          EditorView.lineWrapping,
-        ],
-      })
-      const view = new EditorView({
-        state,
-        parent: elt.current,
-      })
-
-      cmView.current = view
-
-      return () => {
-        view.destroy()
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    keymapTable.current = {
+    cmCallbacks.current = {
       // List sink and lift
       Tab: () => {
         // Don't allow indenting more than one level past previous line
@@ -105,16 +68,81 @@ const ELine = ({ line, lineIdx }: { line: ZLine; lineIdx: number }) => {
       // Enter and backspace (line creation and deletion)
 
       Enter: () => {
+        const view = cmView.current
+
+        if (!view) return false
+
+        const { state } = view
+        const { selection } = state
+
+        let newLine = ''
+
+        const docEnd = state.doc.length
+
+        // Handling cursor and selection:
+        // We delete any text which the user has selected
+        // Any text after selection (or the cursor if there is no selection)
+        // becomes part of the new line
+        if (!selection.main.empty) {
+          const { from, to } = selection.main
+
+          newLine = state.doc.slice(to, docEnd).toString()
+
+          view.dispatch({
+            changes: {
+              from,
+              to: docEnd,
+              insert: '',
+            },
+          })
+
+          console.log('Delete from', from, 'to', to)
+        } else {
+          const from = selection.main.anchor
+          newLine = state.doc.slice(from, docEnd).toString()
+
+          view.dispatch({
+            changes: {
+              from,
+              to: docEnd,
+              insert: '',
+            },
+          })
+        }
+
         const newDoc = produce(doc, (draft) => {
           draft.children.splice(lineIdx + 1, 0, {
             type: 'line',
-            mdContent: '',
+            mdContent: newLine,
             indent: line.indent,
           })
         })
+
         setDoc(newDoc)
         return true
       },
+
+      contentUpdated: (content: string) => {
+        const newDoc = produce(doc, (draft) => {
+          draft.children[lineIdx].mdContent = content
+        })
+        setDoc(newDoc)
+      },
+    }
+
+    if (cmView.current) {
+      const v = cmView.current
+
+      if (v.state.doc.toString() !== line.mdContent) {
+        console.log('Line changed externally, update editor')
+        v.dispatch({
+          changes: {
+            from: 0,
+            to: doc.children.length,
+            insert: line.mdContent,
+          },
+        })
+      }
     }
   }, [line])
 
@@ -126,7 +154,7 @@ const ELine = ({ line, lineIdx }: { line: ZLine; lineIdx: number }) => {
       }}
     >
       <Icon icon={ListBulletIcon} />
-      <div className="cm-editor-container w-full" ref={elt} />
+      <div className="cm-editor-container w-full" ref={cmRef} />
     </div>
   )
 }
@@ -134,7 +162,7 @@ const ELine = ({ line, lineIdx }: { line: ZLine; lineIdx: number }) => {
 interface TEditorProps {}
 
 export const TEditor = () => {
-  const [doc, setDoc] = useAtom(docAtom)
+  const [doc] = useAtom(docAtom)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -143,7 +171,9 @@ export const TEditor = () => {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
+          // @ts-expect-error
           if (mutation.target.classList.contains('cm-content')) {
+            // @ts-expect-error
             mutation.target.focus()
           }
         }
