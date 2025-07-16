@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import type { ZDoc, ZLine } from './Schema'
+import type { ZDoc, ZLine } from './schema'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'

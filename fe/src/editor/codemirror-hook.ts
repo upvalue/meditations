@@ -11,7 +11,7 @@ import {
 } from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
 import { EditorState, RangeSetBuilder } from '@codemirror/state'
-import type { ZLine } from './Schema'
+import type { ZLine } from './schema'
 import { useAtom } from 'jotai'
 import { docAtom } from './TEditor'
 import { produce } from 'immer'
