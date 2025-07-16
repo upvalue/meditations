@@ -9,26 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LxeditorRouteImport } from './routes/lxeditor'
-import { Route as Editor4RouteImport } from './routes/editor4'
-import { Route as CmeditorRouteImport } from './routes/cmeditor'
 import { Route as IndexRouteImport } from './routes/index'
 
-const LxeditorRoute = LxeditorRouteImport.update({
-  id: '/lxeditor',
-  path: '/lxeditor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Editor4Route = Editor4RouteImport.update({
-  id: '/editor4',
-  path: '/editor4',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CmeditorRoute = CmeditorRouteImport.update({
-  id: '/cmeditor',
-  path: '/cmeditor',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,61 +19,28 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/cmeditor': typeof CmeditorRoute
-  '/editor4': typeof Editor4Route
-  '/lxeditor': typeof LxeditorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cmeditor': typeof CmeditorRoute
-  '/editor4': typeof Editor4Route
-  '/lxeditor': typeof LxeditorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/cmeditor': typeof CmeditorRoute
-  '/editor4': typeof Editor4Route
-  '/lxeditor': typeof LxeditorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cmeditor' | '/editor4' | '/lxeditor'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cmeditor' | '/editor4' | '/lxeditor'
-  id: '__root__' | '/' | '/cmeditor' | '/editor4' | '/lxeditor'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CmeditorRoute: typeof CmeditorRoute
-  Editor4Route: typeof Editor4Route
-  LxeditorRoute: typeof LxeditorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/lxeditor': {
-      id: '/lxeditor'
-      path: '/lxeditor'
-      fullPath: '/lxeditor'
-      preLoaderRoute: typeof LxeditorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/editor4': {
-      id: '/editor4'
-      path: '/editor4'
-      fullPath: '/editor4'
-      preLoaderRoute: typeof Editor4RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cmeditor': {
-      id: '/cmeditor'
-      path: '/cmeditor'
-      fullPath: '/cmeditor'
-      preLoaderRoute: typeof CmeditorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -104,9 +53,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CmeditorRoute: CmeditorRoute,
-  Editor4Route: Editor4Route,
-  LxeditorRoute: LxeditorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
