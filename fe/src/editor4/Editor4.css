@@ -1,0 +1,3 @@
+.cm-editor-container [contenteditable] {
+  caret-color: white;
+}

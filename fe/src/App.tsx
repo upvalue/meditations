@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TEditor } from '@/editor/TEditor'
 import { Tabs, Tab, Alert } from '@heroui/react'
 import { useState } from 'react'
@@ -96,6 +96,10 @@ export function App() {
   const [doc, setDoc] = useState<z.infer<typeof zdoc> | null>(null)
   const [rawDoc, setRawDoc] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    console.log('app init')
+  }, [])
   return (
     <>
       <div className="w-full flex p-8">

@@ -1,5 +1,5 @@
 import cx from 'classnames'
-const Icon = ({
+export const Icon = ({
   icon: IconComponent,
   className,
 }: {
@@ -8,5 +8,3 @@ const Icon = ({
 }) => {
   return <IconComponent className={cx('size-[14px]', className)} />
 }
-
-export default Icon
