@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LxeditorRouteImport } from './routes/lxeditor'
 import { Route as CmeditorRouteImport } from './routes/cmeditor'
 import { Route as IndexRouteImport } from './routes/index'
 
+const LxeditorRoute = LxeditorRouteImport.update({
+  id: '/lxeditor',
+  path: '/lxeditor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CmeditorRoute = CmeditorRouteImport.update({
   id: '/cmeditor',
   path: '/cmeditor',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cmeditor': typeof CmeditorRoute
+  '/lxeditor': typeof LxeditorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cmeditor': typeof CmeditorRoute
+  '/lxeditor': typeof LxeditorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cmeditor': typeof CmeditorRoute
+  '/lxeditor': typeof LxeditorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cmeditor'
+  fullPaths: '/' | '/cmeditor' | '/lxeditor'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cmeditor'
-  id: '__root__' | '/' | '/cmeditor'
+  to: '/' | '/cmeditor' | '/lxeditor'
+  id: '__root__' | '/' | '/cmeditor' | '/lxeditor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CmeditorRoute: typeof CmeditorRoute
+  LxeditorRoute: typeof LxeditorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/lxeditor': {
+      id: '/lxeditor'
+      path: '/lxeditor'
+      fullPath: '/lxeditor'
+      preLoaderRoute: typeof LxeditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cmeditor': {
       id: '/cmeditor'
       path: '/cmeditor'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CmeditorRoute: CmeditorRoute,
+  LxeditorRoute: LxeditorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
