@@ -3,11 +3,12 @@ import type { ZDoc, ZLine } from './Schema'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'
-import { ListBulletIcon } from '@heroicons/react/20/solid'
+import { ListBulletIcon, BeakerIcon } from '@heroicons/react/20/solid'
 
 import { atom, useAtom } from 'jotai'
 
 import { useCodeMirror, type LineInfo } from './codemirror-hook'
+import { produce } from 'immer'
 
 // TODO: Consider renaming doc to outline in order
 // to reduce conflicts with builtin codemirror concepts
@@ -32,6 +33,8 @@ const ELine = (lineInfo: LineInfo) => {
 
   const { line } = lineInfo
 
+  const [, setDoc] = useAtom(docAtom)
+
   return (
     <div
       className="e4-line flex items-center gap-2 w-full"
@@ -39,15 +42,38 @@ const ELine = (lineInfo: LineInfo) => {
         marginLeft: `${line.indent * 16}px`,
       }}
     >
+      <div
+        className="cursor-pointer"
+        onClick={() => {
+          setDoc((recentDoc) => {
+            return produce(recentDoc, (draft) => {
+              draft.children[lineInfo.lineIdx].taskStatus = 'unset'
+            })
+          })
+        }}
+      >
+        <Icon icon={BeakerIcon} />
+      </div>
       <Icon icon={ListBulletIcon} />
+      {line.taskStatus && (
+        <input
+          type="checkbox"
+          onChange={(e) => {
+            // TOOD: This pattern repeats itself and could be turned into a hook
+            setDoc((recentDoc) => {
+              return produce(recentDoc, (draft) => {
+                draft.children[lineInfo.lineIdx].taskStatus = e.target.checked
+                  ? 'complete'
+                  : 'incomplete'
+              })
+            })
+          }}
+        />
+      )}
       <div className="cm-editor-container w-full" ref={cmRef} />
     </div>
   )
 }
-
-interface TEditorProps {}
-
-type TagClickEvent = CustomEvent<{ name: string }>
 
 export const TEditor = () => {
   const [doc] = useAtom(docAtom)

@@ -1,18 +1,14 @@
 import { z } from 'zod'
 
-// Define the base interface
-interface ZLine {
-  type: 'line'
-  mdContent: string
-  indent: number
-}
-
-// Define the Zod schema - no recursion needed
 const zline = z.object({
   type: z.literal('line'),
   mdContent: z.string(),
   indent: z.number(),
+  // If present, this has a task datum
+  taskStatus: z.optional(z.enum(['complete', 'incomplete', 'unset'])),
 })
+
+type ZLine = z.infer<typeof zline>
 
 const zdoc = z.object({
   type: z.literal('doc'),

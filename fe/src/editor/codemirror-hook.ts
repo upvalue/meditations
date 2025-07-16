@@ -166,10 +166,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         if (lineIdx > 0 && line.indent > doc.children[lineIdx - 1].indent) {
           return false
         }
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].indent += 1
+        setDoc((recentDoc) => {
+          return produce(recentDoc, (draft) => {
+            draft.children[lineIdx].indent += 1
+          })
         })
-        setDoc(newDoc)
         return true
       },
 
@@ -177,10 +178,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         if (line.indent === 0) {
           return false
         }
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].indent -= 1
+        setDoc((recentDoc) => {
+          return produce(recentDoc, (draft) => {
+            draft.children[lineIdx].indent -= 1
+          })
         })
-        setDoc(newDoc)
         return true
       },
 
@@ -190,7 +192,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
       },
 
       Enter: () => {
-        console.log('enter called along with line ', lineInfo)
+        // console.log('enter called along with line ', lineInfo)
         const view = cmView.current
 
         if (!view) return false
@@ -219,11 +221,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
             },
           })
 
-          console.log('Delete from', from, 'to', to)
+          // console.log('Delete from', from, 'to', to)
         } else {
           const from = selection.main.anchor
           newLine = state.doc.slice(from, docEnd).toString()
-          console.log('Creating new line', newLine)
+          // console.log('Creating new line', newLine)
 
           view.dispatch({
             changes: {
@@ -234,7 +236,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
           })
         }
 
-        console.log('Enter: adding new line with content', newLine)
+        // console.log('Enter: adding new line with content', newLine)
 
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
@@ -251,10 +253,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
 
       contentUpdated: (content: string) => {
         console.log('Line', lineIdx, 'content updated', content)
-        const newDoc = produce(doc, (draft) => {
-          draft.children[lineIdx].mdContent = content
+        setDoc((recentDoc) => {
+          return produce(recentDoc, (draft) => {
+            draft.children[lineIdx].mdContent = content
+          })
         })
-        setDoc(newDoc)
       },
     }
 
