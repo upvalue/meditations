@@ -1,5 +1,5 @@
 // codemirror-ext.ts - CodeMirror wrapper and
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import {
   Decoration,
@@ -10,13 +10,18 @@ import {
   type PluginValue,
 } from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
-import { EditorState, RangeSetBuilder } from '@codemirror/state'
+import {
+  EditorSelection,
+  EditorState,
+  RangeSetBuilder,
+} from '@codemirror/state'
 import { tagPattern, type ZLine } from './schema'
 import { useAtom } from 'jotai'
 import { docAtom, docIterationAtom, focusLineAtom } from './state'
 import { produce } from 'immer'
 import { autocompletion } from '@codemirror/autocomplete'
 import { CompletionContext } from '@codemirror/autocomplete'
+import { useAtomCallback } from 'jotai/utils'
 
 const theme = EditorView.theme(
   {
@@ -159,7 +164,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
   const cmRef = useRef<HTMLDivElement>(null)
   const cmView = useRef<EditorView | null>(null)
   const [doc, setDoc] = useAtom(docAtom)
-  const [, setFocusLine] = useAtom(focusLineAtom)
+  const [focusLine, setFocusLine] = useAtom(focusLineAtom)
+
+  const readFocusLine = useAtomCallback(
+    useCallback((get) => get(focusLineAtom), [])
+  )
 
   const makeEditor = () => {
     const customKeymap = keymap.of([
@@ -286,10 +295,16 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
                 state.doc.slice(0, state.doc.length).toString()
               )
 
+              console.log(
+                'New line content ',
+                draft.children[lineIdx - 1].mdContent
+              )
+
               // Remove current line from line array
               draft.children.splice(lineIdx, 1)
             })
           )
+          return true
         }
 
         return false
@@ -378,6 +393,75 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
       makeEditor()
     }
   }, [lineInfo])
+
+  const obtainFocus = () => {
+    const { lineIdx } = lineInfo
+
+    if (focusLine.lineIdx !== lineIdx || !cmView.current) {
+      return
+    }
+  }
+
+  /**
+   * Focus management.
+   *
+   * Lines can request focus on a specific line / position due to
+   * line editing operations. This effect determines when that's happened,
+   * loops until Codemirror is ready to handle it, and then does so
+   */
+  useEffect(() => {
+    const { lineIdx } = lineInfo
+
+    if (focusLine.lineIdx !== lineIdx) {
+      return
+    }
+
+    console.log('Focus requested on line ', lineIdx, ' view ', cmView.current)
+
+    const obtainFocus = () => {
+      const view = cmView.current
+
+      if (!view) {
+        console.log('Focus: View not defined, returning early')
+        setTimeout(obtainFocus, 10)
+        return
+      }
+
+      view.focus()
+      view.dispatch({
+        selection: EditorSelection.cursor(focusLine.pos),
+        scrollIntoView: true,
+      })
+
+      // Clear line focus status
+      setFocusLine({
+        lineIdx: -1,
+        pos: 0,
+      })
+
+      /*
+      view.requestMeasure({
+        read() {
+          return view.dom && document.body.contains(view.dom)
+        },
+
+        write(isReady) {
+          if (isReady) {
+            view.focus()
+            view.dispatch({
+              selection: EditorSelection.cursor(focusLine.pos),
+              scrollIntoView: true,
+            })
+          } else {
+            console.log('Not ready, setting timeout for focus')
+          }
+        },
+      })
+        */
+    }
+
+    obtainFocus()
+  }, [focusLine, lineInfo, cmView.current])
 
   useEffect(makeEditor, [])
 

@@ -84,10 +84,6 @@ export const TEditor = () => {
     return () => window.removeEventListener('cm-tag-click', handler)
   }, [])
 
-  useEffect(() => {
-    console.log('Doc changed', doc)
-  }, [doc])
-
   /**
    * Focus manager
    *
@@ -98,62 +94,6 @@ export const TEditor = () => {
     useCallback((get) => get(focusLineAtom), [])
   )
   const [, setFocusLine] = useAtom(focusLineAtom)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const observer = new MutationObserver((mutations) => {
-      const focusLine = readFocusLine()
-
-      if (focusLine.lineIdx === -1) return
-
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          // @ts-expect-error
-          if (mutation.target.classList.contains('cm-content')) {
-            let elt: any = mutation.target
-
-            while (elt && !elt.getAttribute('data-line-idx')) {
-              elt = elt.parentElement
-            }
-
-            if (!elt) return
-
-            const lineIdx = parseInt(elt.getAttribute('data-line-idx'), 10)
-
-            if (lineIdx === focusLine.lineIdx) {
-              // Handle cursor position
-              if (focusLine.pos >= 0 && mutation.target.cmView) {
-                const { cmView } = mutation.target
-                const view = cmView.view
-
-                view.dispatch({
-                  selection: { anchor: focusLine.pos },
-                })
-              }
-              mutation.target.focus()
-              console.log('Focusing on line', elt, lineIdx)
-              // @ts-expect-error
-            }
-
-            setFocusLine({
-              lineIdx: -1,
-              pos: 0,
-            })
-          }
-        }
-      })
-    })
-
-    observer.observe(containerRef.current, {
-      childList: true,
-      subtree: true, // Watch all descendants
-    })
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
 
   return (
     <div ref={containerRef}>
