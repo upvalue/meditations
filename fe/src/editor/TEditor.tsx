@@ -1,45 +1,16 @@
-import { useEffect, useRef } from 'react'
-import type { ZDoc, ZLine } from './schema'
+import { useCallback, useEffect, useRef } from 'react'
+import type { ZDoc } from './schema'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'
 import { ListBulletIcon, BeakerIcon } from '@heroicons/react/20/solid'
 
 import { atom, useAtom } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
 
 import { useCodeMirror, type LineInfo } from './codemirror-hook'
 import { produce } from 'immer'
-
-// TODO: Consider renaming doc to outline in order
-// to reduce conflicts with builtin codemirror concepts
-
-export const docAtom = atom<ZDoc>({
-  type: 'doc',
-  children: [
-    {
-      type: 'line',
-      mdContent: 'The world is #test',
-      indent: 0,
-    },
-    {
-      type: 'line',
-      mdContent: 'Task test',
-      indent: 1,
-      taskStatus: 'incomplete',
-    },
-    {
-      type: 'line',
-      mdContent: 'Number 2 #test',
-      indent: 0,
-    },
-    {
-      type: 'line',
-      mdContent: 'Task test 2',
-      taskStatus: 'incomplete',
-      indent: 1,
-    },
-  ],
-})
+import { docAtom, docIterationAtom, focusLineAtom } from './state'
 
 const ELine = (lineInfo: LineInfo) => {
   const { cmRef } = useCodeMirror(lineInfo)
@@ -88,7 +59,11 @@ const ELine = (lineInfo: LineInfo) => {
           }}
         />
       )}
-      <div className="cm-editor-container w-full" ref={cmRef} />
+      <div
+        className="cm-editor-container w-full"
+        ref={cmRef}
+        data-line-idx={lineInfo.lineIdx}
+      />
     </div>
   )
 }
@@ -112,16 +87,67 @@ export const TEditor = () => {
     console.log('Doc changed', doc)
   }, [doc])
 
+  /**
+   * Focus manager
+   *
+   * Handles managing focus when the document is altered
+   * (e.g. lines added, removed)
+   */
+
+  const readFocusLine = useAtomCallback(
+    useCallback((get) => get(focusLineAtom), [])
+  )
+  const [, setFocusLine] = useAtom(focusLineAtom)
+
   useEffect(() => {
     if (!containerRef.current) return
 
     const observer = new MutationObserver((mutations) => {
+      const focusIdx = readFocusLine()
+
+      if (focusIdx === -1) return
+
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           // @ts-expect-error
           if (mutation.target.classList.contains('cm-content')) {
             // @ts-expect-error
-            mutation.target.focus()
+            let elt: any = mutation.target
+
+            while (elt && !elt.getAttribute('data-line-idx')) {
+              elt = elt.parentElement
+            }
+
+            if (!elt) return
+
+            const lineIdx = parseInt(elt.getAttribute('data-line-idx'), 10)
+
+            if (lineIdx === focusIdx) {
+              console.log('Focusing on line', elt, lineIdx)
+              mutation.target.focus()
+            }
+
+            setFocusLine(-1)
+
+            // let elt: any = mutation.target
+
+            // debugger
+
+            /*
+            while (elt && !elt.getAttribute('data-line-idx')) {
+              elt = elt.parentElement
+            }
+
+            if (!elt) return
+
+            const lineIdx = elt['data-line-idx']
+
+            if (lineIdx === flxIdx) {
+              elt.focus()
+            }
+              */
+
+            // mutation.target.focus()
           }
         }
       })
@@ -145,3 +171,5 @@ export const TEditor = () => {
     </div>
   )
 }
+
+export { docAtom }

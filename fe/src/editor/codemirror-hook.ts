@@ -13,8 +13,19 @@ import { emacsStyleKeymap } from '@codemirror/commands'
 import { EditorState, RangeSetBuilder } from '@codemirror/state'
 import { tagPattern, type ZLine } from './schema'
 import { useAtom } from 'jotai'
-import { docAtom } from './TEditor'
+import { docAtom, docIterationAtom, focusLineAtom } from './state'
 import { produce } from 'immer'
+import { autocompletion } from '@codemirror/autocomplete'
+import { CompletionContext } from '@codemirror/autocomplete'
+
+const theme = EditorView.theme(
+  {
+    '.cm-line': {
+      '@apply': 'flex',
+    },
+  },
+  { dark: true }
+)
 
 export type LineInfo = {
   line: ZLine
@@ -80,6 +91,38 @@ const tagPlugin = ViewPlugin.fromClass(
   }
 )
 
+function slashCommands(context: CompletionContext) {
+  let word = context.matchBefore(/\w*/)
+  if (word.from == word.to && !context.explicit) return null
+  return {
+    from: word.from,
+    options: [
+      {
+        // TODO: Needs a different label
+        // TODO: Styling
+        label: '/date: Insert current date',
+        type: 'text',
+        apply: (view, completion, from, to) => {
+          // Get YYYY-MM-DD date
+          const date = new Date().toISOString().split('T')[0]
+
+          view.dispatch({
+            changes: {
+              from,
+              to,
+              insert: date,
+            },
+          })
+          // TODO: Needs to add the pickedCompletion annotation
+        },
+      },
+      // { label: 'match', type: 'keyword' },
+      // { label: 'hello', type: 'variable', info: '(World)' },
+      // { label: 'magic', type: 'text', apply: '⠁⭒*.✩.*⭒⠁', detail: 'macro' },
+    ],
+  }
+}
+
 /**
  * Sets up a Codemirror editor
  *
@@ -116,6 +159,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
   const cmRef = useRef<HTMLDivElement>(null)
   const cmView = useRef<EditorView | null>(null)
   const [doc, setDoc] = useAtom(docAtom)
+  const [, setFocusLine] = useAtom(focusLineAtom)
 
   const makeEditor = () => {
     const customKeymap = keymap.of([
@@ -138,6 +182,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
     ])
 
     const updateListener = EditorView.updateListener.of((update) => {
+      // console.log({ update })
+      if (!update.docChanged) {
+        return
+      }
+
       if (cmCallbacks.current && cmCallbacks.current.contentUpdated) {
         cmCallbacks.current.contentUpdated(update.state.doc.toString())
       }
@@ -146,11 +195,15 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
     const state = EditorState.create({
       doc: lineInfo.line.mdContent,
       extensions: [
+        theme,
         updateListener,
         customKeymap,
         keymap.of(emacsStyleKeymap),
         EditorView.lineWrapping,
         tagPlugin,
+        autocompletion({
+          override: [slashCommands],
+        }),
       ],
     })
 
@@ -177,6 +230,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         if (lineIdx > 0 && line.indent > doc.children[lineIdx - 1].indent) {
           return false
         }
+
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
             draft.children[lineIdx].indent += 1
@@ -247,8 +301,9 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
           })
         }
 
-        // console.log('Enter: adding new line with content', newLine)
-
+        // setDocIteration((di) => di + 1)
+        console.log('After line addition, setting focus line to', lineIdx + 1)
+        setFocusLine(lineIdx + 1)
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
             draft.children.splice(lineIdx + 1, 0, {
@@ -280,6 +335,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
       console.log('Line changed externally, updating', lineInfo.lineIdx)
       cmView.current?.destroy()
       makeEditor()
+
       /*
 
       v.dispatch({

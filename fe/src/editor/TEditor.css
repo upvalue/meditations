@@ -5,3 +5,9 @@
 .cm-tag {
   color: blue;
 }
+
+.cm-editor .cm-scroller {
+  font-family: var(--font-stack);
+  /* @apply flex */
+  /* by example to mix in tailwind */
+}

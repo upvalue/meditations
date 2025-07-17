@@ -18,8 +18,8 @@ const zdoc = z.object({
 
 type ZDoc = z.infer<typeof zdoc>
 
-type ZLineAnnotated = ZLine & {
-  children: ZLineAnnotated[]
+export type ZTreeLine = ZLine & {
+  children: ZTreeLine[]
   tags: string[]
   arrayIdx: number
 }
@@ -28,30 +28,30 @@ type ZLineAnnotated = ZLine & {
  * For analysis purpose -- lines are converted into a tree struct
  * and information from mdContent is pulled out
  */
-const zlineAnnotated: z.ZodType<ZLineAnnotated> = zline.extend({
-  children: z.array(z.lazy(() => zlineAnnotated)),
+const ztreeLine: z.ZodType<ZTreeLine> = zline.extend({
+  children: z.array(z.lazy(() => ztreeLine)),
   tags: z.array(z.string()),
   // Index of the line in the original document
   arrayIdx: z.number(),
 })
 
-const zdocAnnotated = zdoc.extend({
-  children: z.array(zlineAnnotated),
+const zdocTree = zdoc.extend({
+  children: z.array(ztreeLine),
 })
 
-type ZDocAnnotated = z.infer<typeof zdocAnnotated>
+type ZDocTree = z.infer<typeof zdocTree>
 
 export const tagPattern = /#[a-zA-Z0-9_-]+/g
 
-const analyzeDoc = (doc: ZDoc): ZDocAnnotated => {
-  const root: ZDocAnnotated = {
+const analyzeDoc = (doc: ZDoc): ZDocTree => {
+  const root: ZDocTree = {
     ...doc,
     children: [],
   }
 
-  const stack: ZLineAnnotated[] = []
+  const stack: ZTreeLine[] = []
   for (let i = 0; i != doc.children.length; i++) {
-    const node: ZLineAnnotated = {
+    const node: ZTreeLine = {
       ...doc.children[i],
       children: [],
       tags: [],
@@ -86,6 +86,6 @@ export {
   analyzeDoc,
   type ZLine,
   type ZDoc,
-  type ZLineAnnotated,
-  type ZDocAnnotated,
+  type ZTreeLine as ZLineTree,
+  type ZDocTree,
 }

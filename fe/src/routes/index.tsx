@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import { TEditor } from '@/editor/TEditor'
 import { Tabs, Tab } from '@heroui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { docAtom } from '@/editor/TEditor'
+import { docAtom, docIterationAtom } from '@/editor/state'
 import { useAtom } from 'jotai'
-import { analyzeDoc } from '@/editor/schema'
+import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
 import { uniq } from 'lodash-es'
 
 export const Route = createFileRoute('/')({
@@ -20,7 +19,7 @@ const RawDocument = () => {
   )
 }
 
-const AnnotatedDocument = () => {
+const TreeDocument = () => {
   const [doc] = useAtom(docAtom)
   return (
     <div className="whitespace-pre-wrap font-mono">
@@ -37,7 +36,7 @@ type TagData = {
   }
 }
 
-const diveLine = (line: ZLineAnnotated, tagData: TagData, tags: string[]) => {
+const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
   for (const tag of tags) {
     if (!tagData[tag]) {
       tagData[tag] = {
@@ -77,10 +76,11 @@ const TimeView = () => {
 }
 
 function RouteComponent() {
+  const [docIteration] = useAtom(docIterationAtom)
   return (
     <div className="w-full flex p-8">
       <div className="w-[50%]">
-        <TEditor />
+        <TEditor key={docIteration} />
       </div>
       <div className="w-[50%]">
         <Tabs>
@@ -90,8 +90,8 @@ function RouteComponent() {
           <Tab key="raw" title="Document Content">
             <RawDocument />
           </Tab>
-          <Tab key="annotated" title="Annotated Document">
-            <AnnotatedDocument />
+          <Tab key="tree" title="Tree Document">
+            <TreeDocument />
           </Tab>
           <Tab key="error" title="No Error">
             <div className="whitespace-pre-wrap font-mono">No errors</div>
