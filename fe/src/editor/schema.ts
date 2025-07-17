@@ -21,6 +21,7 @@ type ZDoc = z.infer<typeof zdoc>
 type ZLineAnnotated = ZLine & {
   children: ZLineAnnotated[]
   tags: string[]
+  arrayIdx: number
 }
 
 /**
@@ -30,6 +31,8 @@ type ZLineAnnotated = ZLine & {
 const zlineAnnotated: z.ZodType<ZLineAnnotated> = zline.extend({
   children: z.array(z.lazy(() => zlineAnnotated)),
   tags: z.array(z.string()),
+  // Index of the line in the original document
+  arrayIdx: z.number(),
 })
 
 const zdocAnnotated = zdoc.extend({
@@ -38,7 +41,7 @@ const zdocAnnotated = zdoc.extend({
 
 type ZDocAnnotated = z.infer<typeof zdocAnnotated>
 
-// TODO: Write tests
+export const tagPattern = /#[a-zA-Z0-9_-]+/g
 
 const analyzeDoc = (doc: ZDoc): ZDocAnnotated => {
   const root: ZDocAnnotated = {
@@ -52,6 +55,13 @@ const analyzeDoc = (doc: ZDoc): ZDocAnnotated => {
       ...doc.children[i],
       children: [],
       tags: [],
+      arrayIdx: i,
+    }
+
+    // Handle multiple matches
+    const matches = node.mdContent.match(tagPattern)
+    if (matches) {
+      node.tags.push(...matches)
     }
 
     while (stack.length > node.indent) {

@@ -21,6 +21,23 @@ export const docAtom = atom<ZDoc>({
       mdContent: 'The world is #test',
       indent: 0,
     },
+    {
+      type: 'line',
+      mdContent: 'Task test',
+      indent: 1,
+      taskStatus: 'complete',
+    },
+    {
+      type: 'line',
+      mdContent: 'Number 2 #test',
+      indent: 0,
+    },
+    {
+      type: 'line',
+      mdContent: 'Task test 2',
+      taskStatus: 'incomplete',
+      indent: 1,
+    },
   ],
 })
 

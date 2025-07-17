@@ -11,7 +11,7 @@ import {
 } from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
 import { EditorState, RangeSetBuilder } from '@codemirror/state'
-import type { ZLine } from './schema'
+import { tagPattern, type ZLine } from './schema'
 import { useAtom } from 'jotai'
 import { docAtom } from './TEditor'
 import { produce } from 'immer'
@@ -32,8 +32,6 @@ export type CallbackTable = {
   contentUpdated: (content: string) => void
 }
 
-const tagPattern = /#[a-zA-Z0-9_-]+/g
-
 const makeTagDecoration = (tag: string) => {
   return Decoration.mark({
     class: 'cm-tag cursor-pointer',
@@ -44,14 +42,6 @@ const makeTagDecoration = (tag: string) => {
     },
   })
 }
-
-/*const tagDecoration = Decoration.mark({
-  class: 'cm-tag',
-  tagName: 'span',
-  attributes: {
-    onclick: `console.log('hi test')`,
-  },
-})*/
 
 const tagPlugin = ViewPlugin.fromClass(
   class implements PluginValue {
@@ -91,8 +81,29 @@ const tagPlugin = ViewPlugin.fromClass(
 )
 
 /**
- * Sets up a codemirror editor; returns several references
- * that are used to mount codemirror
+ * Sets up a Codemirror editor
+ *
+ * How the Codemirror integration works currently.
+ *
+ * The hook returns a ref which the component for the actual line
+ * gives to the div where Codemirror will be set up.
+ *
+ * On hook mount, a Codemirror view is set up with the markdown content of the line
+ *
+ * Within the hook, a "callbacks" ref is updated when the document changes.
+ * This is because callbacks will need to update document state. (It's possible
+ * that some of this can be done away now with thanks to the setState callback)
+ *
+ * There's bidirectional synchronization of codemirror view and document state;
+ * updates to codemirror update the document, and updates to the document update
+ * codemirror (if there are any changes). This is because lines can alter the state
+ * of other lines (for example, if a line is deleted via backspace, the content of that
+ * line is spliced onto the previous line). This probably shouldn't work... but it seems
+ * to work fine.
+ *
+ * It's probable that https://github.com/uiwjs/react-codemirror should be used
+ * instead of this hand rolled thing, but I wanted to use vanilla codemirror because
+ * various prosemirror wrappers became very confusing.
  */
 export const useCodeMirror = (lineInfo: LineInfo) => {
   const cmCallbacks = useRef<CallbackTable>({
