@@ -1,4 +1,5 @@
-// codemirror-ext.ts - CodeMirror wrapper and
+// line-editor.ts - Meat of the actual editor implementation
+// Wraps Codemirror with lots of custom behavior
 import { useCallback, useEffect, useRef } from 'react'
 
 import {
@@ -17,20 +18,23 @@ import {
 } from '@codemirror/state'
 import { tagPattern, type ZLine } from './schema'
 import { useAtom } from 'jotai'
-import { docAtom, docIterationAtom, focusLineAtom } from './state'
+import { docAtom, focusLineAtom } from './state'
 import { produce } from 'immer'
-import { autocompletion } from '@codemirror/autocomplete'
+import { autocompletion, type Completion } from '@codemirror/autocomplete'
 import { CompletionContext } from '@codemirror/autocomplete'
 import { useAtomCallback } from 'jotai/utils'
+import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 
-const theme = EditorView.theme(
-  {
-    '.cm-line': {
-      '@apply': 'flex',
-    },
-  },
-  { dark: true }
-)
+const theme = EditorView.theme({}, { dark: true })
+
+// Define specific custom event types
+export type TagClickEventDetail = {
+  name: string
+}
+
+export type TagToggleEvent = {
+  lineIdx: number
+}
 
 export type LineInfo = {
   line: ZLine
@@ -96,35 +100,65 @@ const tagPlugin = ViewPlugin.fromClass(
   }
 )
 
-function slashCommands(context: CompletionContext) {
-  let word = context.matchBefore(/\w*/)
-  if (word.from == word.to && !context.explicit) return null
-  return {
-    from: word.from,
-    options: [
-      {
-        // TODO: Needs a different label
-        // TODO: Styling
-        label: '/date: Insert current date',
-        type: 'text',
-        apply: (view, completion, from, to) => {
-          // Get YYYY-MM-DD date
-          const date = new Date().toISOString().split('T')[0]
+// TODO: Styling
+const slashCommands = (lineIdx: number) => {
+  return (context: CompletionContext) => {
+    // Check for words beginning with a slash
+    let word = context.matchBefore(/\/\w*/)
+    if (!word) return null
+    if (word.from == word.to && !context.explicit) return null
+    return {
+      from: word.from,
+      options: [
+        {
+          label: '/date: Insert current date',
+          type: 'text',
+          apply: (
+            view: EditorView,
+            _completion: Completion,
+            from: number,
+            to: number
+          ) => {
+            // Get YYYY-MM-DD date
+            const date = new Date().toISOString().split('T')[0]
 
-          view.dispatch({
-            changes: {
-              from,
-              to,
-              insert: date,
-            },
-          })
-          // TODO: Needs to add the pickedCompletion annotation
+            view.dispatch({
+              changes: {
+                from,
+                to,
+                insert: date,
+              },
+            })
+          },
         },
-      },
-      // { label: 'match', type: 'keyword' },
-      // { label: 'hello', type: 'variable', info: '(World)' },
-      // { label: 'magic', type: 'text', apply: '⠁⭒*.✩.*⭒⠁', detail: 'macro' },
-    ],
+        {
+          label: '/task: Toggle whether line is a task',
+          type: 'text',
+          apply: (
+            view: EditorView,
+            _completion: Completion,
+            from: number,
+            to: number
+          ) => {
+            const event = new CustomEvent<TagToggleEvent>('cm-tag-toggle', {
+              detail: {
+                lineIdx,
+              },
+            })
+            dispatchEvent(event)
+
+            // Erase autocompleted text
+            view.dispatch({
+              changes: {
+                from,
+                to,
+                insert: '',
+              },
+            })
+          },
+        },
+      ],
+    }
   }
 }
 
@@ -211,7 +245,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         EditorView.lineWrapping,
         tagPlugin,
         autocompletion({
-          override: [slashCommands],
+          override: [slashCommands(lineInfo.lineIdx)],
         }),
       ],
     })
@@ -394,14 +428,6 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
     }
   }, [lineInfo])
 
-  const obtainFocus = () => {
-    const { lineIdx } = lineInfo
-
-    if (focusLine.lineIdx !== lineIdx || !cmView.current) {
-      return
-    }
-  }
-
   /**
    * Focus management.
    *
@@ -438,32 +464,35 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         lineIdx: -1,
         pos: 0,
       })
-
-      /*
-      view.requestMeasure({
-        read() {
-          return view.dom && document.body.contains(view.dom)
-        },
-
-        write(isReady) {
-          if (isReady) {
-            view.focus()
-            view.dispatch({
-              selection: EditorSelection.cursor(focusLine.pos),
-              scrollIntoView: true,
-            })
-          } else {
-            console.log('Not ready, setting timeout for focus')
-          }
-        },
-      })
-        */
     }
 
     obtainFocus()
   }, [focusLine, lineInfo, cmView.current])
 
   useEffect(makeEditor, [])
+
+  useCustomEventListener(
+    'cm-tag-toggle',
+    (event: CustomEvent<TagToggleEvent>) => {
+      const { lineIdx } = event.detail
+      if (lineIdx !== lineInfo.lineIdx) {
+        return
+      }
+
+      setDoc((recentDoc) => {
+        return produce(recentDoc, (draft) => {
+          if (draft.children[lineIdx].taskStatus) {
+            delete draft.children[lineIdx].taskStatus
+          } else {
+            draft.children[lineIdx].taskStatus = 'unset'
+          }
+        })
+      })
+
+      console.log('Tag toggle event', event.detail.lineIdx)
+    },
+    [lineInfo.lineIdx]
+  )
 
   return {
     cmCallbacks,

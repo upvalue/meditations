@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useRef } from 'react'
-import type { ZDoc } from './schema'
+import { useRef } from 'react'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'
 import { ListBulletIcon, BeakerIcon } from '@heroicons/react/20/solid'
 
-import { atom, useAtom } from 'jotai'
-import { useAtomCallback } from 'jotai/utils'
+import { useAtom } from 'jotai'
 
-import { useCodeMirror, type LineInfo } from './codemirror-hook'
+import {
+  useCodeMirror,
+  type LineInfo,
+  type TagClickEventDetail,
+} from './line-editor'
 import { produce } from 'immer'
-import { docAtom, focusLineAtom } from './state'
+import { docAtom } from './state'
+import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 
 const ELine = (lineInfo: LineInfo) => {
   const { cmRef } = useCodeMirror(lineInfo)
@@ -30,18 +33,6 @@ const ELine = (lineInfo: LineInfo) => {
         marginLeft: `${line.indent * 16}px`,
       }}
     >
-      <div
-        className="cursor-pointer"
-        onClick={() => {
-          setDoc((recentDoc) => {
-            return produce(recentDoc, (draft) => {
-              draft.children[lineInfo.lineIdx].taskStatus = 'unset'
-            })
-          })
-        }}
-      >
-        <Icon icon={BeakerIcon} />
-      </div>
       <Icon icon={ListBulletIcon} />
       {line.taskStatus && (
         <input
@@ -73,27 +64,12 @@ export const TEditor = () => {
   const [doc] = useAtom(docAtom)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Custom event listener
-  useEffect(() => {
-    const handler = (e: any) => {
-      if (e.type === 'cm-tag-click') {
-        console.log('Tag clicked', e.detail.name)
-      }
+  useCustomEventListener(
+    'cm-tag-click',
+    (event: CustomEvent<TagClickEventDetail>) => {
+      console.log('Tag clicked', event.detail.name)
     }
-    window.addEventListener('cm-tag-click', handler)
-    return () => window.removeEventListener('cm-tag-click', handler)
-  }, [])
-
-  /**
-   * Focus manager
-   *
-   * Handles managing focus when the document is altered
-   * (e.g. lines added, removed)
-   */
-  const readFocusLine = useAtomCallback(
-    useCallback((get) => get(focusLineAtom), [])
   )
-  const [, setFocusLine] = useAtom(focusLineAtom)
 
   return (
     <div ref={containerRef}>
