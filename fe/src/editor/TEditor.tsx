@@ -25,7 +25,7 @@ export const docAtom = atom<ZDoc>({
       type: 'line',
       mdContent: 'Task test',
       indent: 1,
-      taskStatus: 'complete',
+      taskStatus: 'incomplete',
     },
     {
       type: 'line',
@@ -54,7 +54,7 @@ const ELine = (lineInfo: LineInfo) => {
 
   return (
     <div
-      className="e4-line flex items-center gap-2 w-full"
+      className="flex items-center gap-2 w-full"
       style={{
         marginLeft: `${line.indent * 16}px`,
       }}
@@ -75,6 +75,7 @@ const ELine = (lineInfo: LineInfo) => {
       {line.taskStatus && (
         <input
           type="checkbox"
+          checked={line.taskStatus === 'complete'}
           onChange={(e) => {
             // TOOD: This pattern repeats itself and could be turned into a hook
             setDoc((recentDoc) => {

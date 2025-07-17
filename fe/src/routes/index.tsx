@@ -5,6 +5,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { docAtom } from '@/editor/TEditor'
 import { useAtom } from 'jotai'
 import { analyzeDoc } from '@/editor/schema'
+import { uniq } from 'lodash-es'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
@@ -27,6 +28,54 @@ const AnnotatedDocument = () => {
     </div>
   )
 }
+
+type TagData = {
+  [name: string]: {
+    name: string
+    complete: number | undefined
+    incomplete: number | undefined
+  }
+}
+
+const diveLine = (line: ZLineAnnotated, tagData: TagData, tags: string[]) => {
+  for (const tag of tags) {
+    if (!tagData[tag]) {
+      tagData[tag] = {
+        name: tag,
+        complete: undefined,
+        incomplete: undefined,
+      }
+    }
+
+    if (line.taskStatus === 'complete') {
+      if (tagData[tag].complete === undefined) {
+        tagData[tag].complete = 0
+      }
+      tagData[tag].complete += 1
+    } else if (line.taskStatus) {
+      if (tagData[tag].incomplete === undefined) {
+        tagData[tag].incomplete = 0
+      }
+      tagData[tag].incomplete += 1
+    }
+  }
+
+  for (const child of line.children) {
+    diveLine(child, tagData, uniq([...tags, ...child.tags]))
+  }
+}
+
+const TimeView = () => {
+  const [doc] = useAtom(docAtom)
+  const tree = analyzeDoc(doc)
+
+  const tagData: TagData = {}
+
+  tree.children.forEach((child) => diveLine(child, tagData, child.tags))
+
+  return JSON.stringify(tagData, null, 2)
+}
+
 function RouteComponent() {
   return (
     <div className="w-full flex p-8">
@@ -35,6 +84,9 @@ function RouteComponent() {
       </div>
       <div className="w-[50%]">
         <Tabs>
+          <Tab key="time" title="Time View">
+            <TimeView />
+          </Tab>
           <Tab key="raw" title="Document Content">
             <RawDocument />
           </Tab>
