@@ -10,7 +10,7 @@ import { useAtomCallback } from 'jotai/utils'
 
 import { useCodeMirror, type LineInfo } from './codemirror-hook'
 import { produce } from 'immer'
-import { docAtom, docIterationAtom, focusLineAtom } from './state'
+import { docAtom, focusLineAtom } from './state'
 
 const ELine = (lineInfo: LineInfo) => {
   const { cmRef } = useCodeMirror(lineInfo)
@@ -46,6 +46,7 @@ const ELine = (lineInfo: LineInfo) => {
       {line.taskStatus && (
         <input
           type="checkbox"
+          tabIndex={-1}
           checked={line.taskStatus === 'complete'}
           onChange={(e) => {
             // TOOD: This pattern repeats itself and could be turned into a hook
@@ -93,7 +94,6 @@ export const TEditor = () => {
    * Handles managing focus when the document is altered
    * (e.g. lines added, removed)
    */
-
   const readFocusLine = useAtomCallback(
     useCallback((get) => get(focusLineAtom), [])
   )
@@ -103,15 +103,14 @@ export const TEditor = () => {
     if (!containerRef.current) return
 
     const observer = new MutationObserver((mutations) => {
-      const focusIdx = readFocusLine()
+      const focusLine = readFocusLine()
 
-      if (focusIdx === -1) return
+      if (focusLine.lineIdx === -1) return
 
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           // @ts-expect-error
           if (mutation.target.classList.contains('cm-content')) {
-            // @ts-expect-error
             let elt: any = mutation.target
 
             while (elt && !elt.getAttribute('data-line-idx')) {
@@ -122,32 +121,25 @@ export const TEditor = () => {
 
             const lineIdx = parseInt(elt.getAttribute('data-line-idx'), 10)
 
-            if (lineIdx === focusIdx) {
-              console.log('Focusing on line', elt, lineIdx)
+            if (lineIdx === focusLine.lineIdx) {
+              // Handle cursor position
+              if (focusLine.pos >= 0 && mutation.target.cmView) {
+                const { cmView } = mutation.target
+                const view = cmView.view
+
+                view.dispatch({
+                  selection: { anchor: focusLine.pos },
+                })
+              }
               mutation.target.focus()
+              console.log('Focusing on line', elt, lineIdx)
+              // @ts-expect-error
             }
 
-            setFocusLine(-1)
-
-            // let elt: any = mutation.target
-
-            // debugger
-
-            /*
-            while (elt && !elt.getAttribute('data-line-idx')) {
-              elt = elt.parentElement
-            }
-
-            if (!elt) return
-
-            const lineIdx = elt['data-line-idx']
-
-            if (lineIdx === flxIdx) {
-              elt.focus()
-            }
-              */
-
-            // mutation.target.focus()
+            setFocusLine({
+              lineIdx: -1,
+              pos: 0,
+            })
           }
         }
       })

@@ -253,6 +253,45 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
 
       // Enter and backspace (line creation and deletion)
       Backspace: () => {
+        const view = cmView.current
+
+        if (!view) return false
+
+        // Check that we are at the beginning of a line
+        const { state } = view
+        const { selection } = state
+        const { ranges } = selection
+
+        if (ranges.length === 0) return false
+
+        const r = ranges[0]
+
+        if (r.from === 0 && r.to === 0) {
+          // Won't delete the first line (for now)
+          if (lineIdx === 0) return false
+
+          const prevLine = doc.children[lineIdx - 1]
+
+          const endOfPrevLine = prevLine.mdContent.length
+
+          setFocusLine({
+            lineIdx: lineIdx - 1,
+            pos: endOfPrevLine,
+          })
+
+          setDoc((recentDoc) =>
+            produce(recentDoc, (draft) => {
+              // Append content after backspace to previous line
+              draft.children[lineIdx - 1].mdContent = prevLine.mdContent.concat(
+                state.doc.slice(0, state.doc.length).toString()
+              )
+
+              // Remove current line from line array
+              draft.children.splice(lineIdx, 1)
+            })
+          )
+        }
+
         return false
       },
 
@@ -301,9 +340,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
           })
         }
 
-        // setDocIteration((di) => di + 1)
         console.log('After line addition, setting focus line to', lineIdx + 1)
-        setFocusLine(lineIdx + 1)
+        setFocusLine({
+          lineIdx: lineIdx + 1,
+          pos: 0,
+        })
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
             draft.children.splice(lineIdx + 1, 0, {
@@ -335,16 +376,6 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
       console.log('Line changed externally, updating', lineInfo.lineIdx)
       cmView.current?.destroy()
       makeEditor()
-
-      /*
-
-      v.dispatch({
-        changes: {
-          from: 0,
-          to: doc.children.length,
-          insert: line.mdContent,
-        },
-      })*/
     }
   }, [lineInfo])
 
