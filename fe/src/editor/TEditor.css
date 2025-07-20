@@ -1,13 +1,15 @@
+@import 'tailwindcss';
+
 .cm-editor-container [contenteditable] {
   caret-color: white;
 }
 
-.cm-tag {
-  color: blue;
+.cm-tag,
+.cm-wiki-link {
+  @apply text-emerald-500;
+  @apply cursor-pointer;
 }
 
 .cm-editor .cm-scroller {
   font-family: var(--font-stack);
-  /* @apply flex */
-  /* by example to mix in tailwind */
 }

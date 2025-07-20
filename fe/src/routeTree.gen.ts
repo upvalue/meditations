@@ -9,38 +9,82 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrpcTestRouteImport } from './routes/trpc-test'
+import { Route as LabRouteImport } from './routes/lab'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NTitleRouteImport } from './routes/n/$title'
 
+const TrpcTestRoute = TrpcTestRouteImport.update({
+  id: '/trpc-test',
+  path: '/trpc-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabRoute = LabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NTitleRoute = NTitleRouteImport.update({
+  id: '/n/$title',
+  path: '/n/$title',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/lab': typeof LabRoute
+  '/trpc-test': typeof TrpcTestRoute
+  '/n/$title': typeof NTitleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/lab': typeof LabRoute
+  '/trpc-test': typeof TrpcTestRoute
+  '/n/$title': typeof NTitleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/lab': typeof LabRoute
+  '/trpc-test': typeof TrpcTestRoute
+  '/n/$title': typeof NTitleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/lab' | '/trpc-test' | '/n/$title'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/lab' | '/trpc-test' | '/n/$title'
+  id: '__root__' | '/' | '/lab' | '/trpc-test' | '/n/$title'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LabRoute: typeof LabRoute
+  TrpcTestRoute: typeof TrpcTestRoute
+  NTitleRoute: typeof NTitleRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trpc-test': {
+      id: '/trpc-test'
+      path: '/trpc-test'
+      fullPath: '/trpc-test'
+      preLoaderRoute: typeof TrpcTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lab': {
+      id: '/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof LabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/n/$title': {
+      id: '/n/$title'
+      path: '/n/$title'
+      fullPath: '/n/$title'
+      preLoaderRoute: typeof NTitleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LabRoute: LabRoute,
+  TrpcTestRoute: TrpcTestRoute,
+  NTitleRoute: NTitleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

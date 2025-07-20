@@ -63,6 +63,56 @@ const makeTagDecoration = (tag: string) => {
   })
 }
 
+const wikiLinkPattern = /\[\[(.*?)\]\]/g
+
+const makeWikiLinkDecoration = (link: string) => {
+  return Decoration.mark({
+    class: 'cm-wiki-link',
+    tagName: 'span',
+    attributes: {
+      'data-link': link.slice(2, -2),
+    },
+  })
+}
+
+const wikiLinkPlugin = ViewPlugin.fromClass(
+  class implements PluginValue {
+    decorations = Decoration.none
+
+    constructor(view: EditorView) {
+      this.decorations = this.buildDecorations(view)
+    }
+
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged) {
+        this.decorations = this.buildDecorations(update.view)
+      }
+    }
+
+    buildDecorations(view: EditorView) {
+      const builder = new RangeSetBuilder<Decoration>()
+
+      for (const { from, to } of view.visibleRanges) {
+        const text = view.state.doc.sliceString(from, to)
+        let match: RegExpExecArray | null
+
+        wikiLinkPattern.lastIndex = 0
+        while ((match = wikiLinkPattern.exec(text)) !== null) {
+          const start = from + match.index
+          const end = start + match[0].length
+          console.log('add decoration for', match[0])
+          builder.add(start, end, makeWikiLinkDecoration(match[0]))
+        }
+      }
+
+      return builder.finish()
+    }
+  },
+  {
+    decorations: (value) => value.decorations,
+  }
+)
+
 const tagPlugin = ViewPlugin.fromClass(
   class implements PluginValue {
     decorations = Decoration.none
@@ -244,6 +294,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         keymap.of(emacsStyleKeymap),
         EditorView.lineWrapping,
         tagPlugin,
+        wikiLinkPlugin,
         autocompletion({
           override: [slashCommands(lineInfo.lineIdx)],
         }),

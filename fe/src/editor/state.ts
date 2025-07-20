@@ -26,6 +26,11 @@ export const docAtom = atom<ZDoc>({
       taskStatus: 'incomplete',
       indent: 1,
     },
+    {
+      type: 'line',
+      mdContent: '[[WikiLink]]',
+      indent: 1,
+    },
   ],
 })
 
@@ -33,5 +38,3 @@ export const focusLineAtom = atom({
   lineIdx: -1,
   pos: 0,
 })
-
-export const docIterationAtom = atom(0)
