@@ -82,7 +82,7 @@ uses actual TRPC for communication. This backend simply saves document changes a
 # Running the application
 
 T,he application is already running with supervisord at port
-"http://localhost:6000". Never run the application directly.
+"http://localhost:8000". Never run the application directly.
 
 The application will automatically restart after code changes, but it can also be manually restarted with
 
@@ -102,7 +102,7 @@ If there are any tests present for a specific file, you can run them with
 
 > pnpm run test filename
 
-Once this is done, use Playwright to interact with the running application. Use
+Once this is done, use the Playwright MCP to interact with the running application. Use
 browser snapshots to confirm that the page content has changed in a way that
 reflects the change being made.
 
