@@ -2,7 +2,7 @@ import { useRef } from 'react'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'
-import { ListBulletIcon, BeakerIcon } from '@heroicons/react/20/solid'
+import { ListBulletIcon } from '@heroicons/react/20/solid'
 
 import { useAtom } from 'jotai'
 

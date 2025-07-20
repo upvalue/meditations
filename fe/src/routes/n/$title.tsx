@@ -5,15 +5,11 @@ import { createStore, useAtom } from 'jotai'
 import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
 import { uniq } from 'lodash-es'
 import { Provider } from 'jotai'
-import { useHydrateAtoms } from 'jotai/utils'
 import { trpc } from '@/trpc'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef } from 'react'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
-import {
-  type TagClickEventDetail,
-  type WikiLinkClickEventDetail,
-} from '@/editor/line-editor'
+import { type WikiLinkClickEventDetail } from '@/editor/line-editor'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -96,10 +92,12 @@ function RouteComponent() {
     return store
   }, [])
 
+  const loadDocQuery = trpc.loadDoc.useQuery({ name: title })
+
   useEffect(() => {
+    if (loadDocQuery.isLoading) return
     const unsub = store.sub(docAtom, () => {
       // console.log('doc changed!', { doc: store.get(docAtom) })
-      // Causes infinite recursion
       if (isNavigating.current) return
       updateDocMutation.mutate({
         name: title,
@@ -110,9 +108,7 @@ function RouteComponent() {
     return () => {
       return unsub()
     }
-  }, [title])
-
-  const loadDocQuery = trpc.loadDoc.useQuery({ name: title })
+  }, [title, loadDocQuery.isLoading])
 
   useEffect(() => {
     if (!loadDocQuery.isLoading && loadDocQuery.data) {
@@ -154,9 +150,6 @@ function RouteComponent() {
             </Tab>
             <Tab key="tree" title="Tree Document">
               <TreeDocument />
-            </Tab>
-            <Tab key="error" title="No Error">
-              <div className="whitespace-pre-wrap font-mono">No errors</div>
             </Tab>
           </Tabs>
         </div>

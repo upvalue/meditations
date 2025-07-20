@@ -1,7 +1,7 @@
 import { TEditor } from '@/editor/TEditor'
 import { Tabs, Tab } from '@heroui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { docAtom, docIterationAtom } from '@/editor/state'
+import { docAtom } from '@/editor/state'
 import { useAtom } from 'jotai'
 import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
 import { uniq } from 'lodash-es'
@@ -98,13 +98,12 @@ const ExampleDoc = ({ children }: { children: React.ReactNode }) => {
 }
 
 function RouteComponent() {
-  const [docIteration] = useAtom(docIterationAtom)
   return (
     <div className="w-full flex p-8">
       <div className="w-[50%]">
         <Provider>
           <ExampleDoc>
-            <TEditor key={docIteration} />
+            <TEditor />
           </ExampleDoc>
         </Provider>
       </div>
