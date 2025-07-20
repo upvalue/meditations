@@ -20,6 +20,7 @@ const getStateDB = () => {
 }
 
 const updateNote = (name: string, doc: ZDoc) => {
+  console.log('updateNote', name, doc)
   const statedb = getStateDB()
   statedb.names[name] = doc
   localStorage.setItem('statedb', JSON.stringify(statedb))

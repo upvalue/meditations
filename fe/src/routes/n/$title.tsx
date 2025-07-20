@@ -7,8 +7,13 @@ import { uniq } from 'lodash-es'
 import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import { trpc } from '@/trpc'
-import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useMemo, useRef } from 'react'
+import { useCustomEventListener } from '@/hooks/useCustomEventListener'
+import {
+  type TagClickEventDetail,
+  type WikiLinkClickEventDetail,
+} from '@/editor/line-editor'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -84,7 +89,28 @@ function RouteComponent() {
     select: (p) => p.title,
   })
 
-  const store = useMemo(() => createStore(), [])
+  const updateDocMutation = trpc.updateDoc.useMutation()
+
+  const store = useMemo(() => {
+    const store = createStore()
+    return store
+  }, [])
+
+  useEffect(() => {
+    const unsub = store.sub(docAtom, () => {
+      // console.log('doc changed!', { doc: store.get(docAtom) })
+      // Causes infinite recursion
+      if (isNavigating.current) return
+      updateDocMutation.mutate({
+        name: title,
+        doc: store.get(docAtom),
+      })
+    })
+
+    return () => {
+      return unsub()
+    }
+  }, [title])
 
   const loadDocQuery = trpc.loadDoc.useQuery({ name: title })
 
@@ -94,16 +120,23 @@ function RouteComponent() {
     }
   }, [loadDocQuery.data])
 
-  const updateDocMutation = trpc.updateDoc.useMutation()
+  const isNavigating = useRef(false)
+  const navigate = useNavigate()
 
-  store.sub(docAtom, () => {
-    // console.log('doc changed!', { doc: store.get(docAtom) })
-    // Causes infinite recursion
-    updateDocMutation.mutate({
-      name: title,
-      doc: store.get(docAtom),
-    })
-  })
+  useCustomEventListener(
+    'cm-wiki-link-click',
+    (event: CustomEvent<WikiLinkClickEventDetail>) => {
+      isNavigating.current = true
+      navigate({
+        to: '/n/$title',
+        params: {
+          title: event.detail.link,
+        },
+      }).then(() => {
+        isNavigating.current = false
+      })
+    }
+  )
 
   return (
     <Provider store={store}>

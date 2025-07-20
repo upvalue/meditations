@@ -32,6 +32,10 @@ export type TagClickEventDetail = {
   name: string
 }
 
+export type WikiLinkClickEventDetail = {
+  link: string
+}
+
 export type TagToggleEvent = {
   lineIdx: number
 }
@@ -58,7 +62,7 @@ const makeTagDecoration = (tag: string) => {
     tagName: 'span',
     attributes: {
       'data-name': tag,
-      onclick: `window.dispatchEvent(new CustomEvent('cm-tag-click', { detail: { name: "${tag}" } }))`,
+      onClick: `window.dispatchEvent(new CustomEvent('cm-tag-click', { detail: { name: "${tag}" } }))`,
     },
   })
 }
@@ -66,11 +70,13 @@ const makeTagDecoration = (tag: string) => {
 const wikiLinkPattern = /\[\[(.*?)\]\]/g
 
 const makeWikiLinkDecoration = (link: string) => {
+  const linkText = link.slice(2, -2)
   return Decoration.mark({
     class: 'cm-wiki-link',
     tagName: 'span',
     attributes: {
-      'data-link': link.slice(2, -2),
+      'data-link': linkText,
+      onClick: `window.dispatchEvent(new CustomEvent('cm-wiki-link-click', { detail: { link: "${linkText}" } }))`,
     },
   })
 }
