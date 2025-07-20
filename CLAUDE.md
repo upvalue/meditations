@@ -4,6 +4,18 @@ Tekne is a freestyle productivity application structured as an outline editor
 (like Logseq) which allows users to tag chunks of text, record structured data
 (such as time spent on a task) and search or navigate through that data easily.
 
+# Development environment and workflow
+
+This instance of Claude Code is running in a git worktree that is associated
+with a GitHub pull request. You will be given a specific issue to work on; you
+can interact with the local git repository using the `git` command and the
+GitHub CLI.
+
+You should commit and push to git after making major changes. When you finish,
+push to git and leave a comment describing what changes were made and why.
+
+> gh pr comment --body "Description"
+
 # Architecture
 
 It's written in React, bundled with Vite and uses [Tanstack
@@ -69,7 +81,7 @@ uses actual TRPC for communication. This backend simply saves document changes a
 
 # Running the application
 
-The application is already running with supervisord at port
+T,he application is already running with supervisord at port
 "http://localhost:6000". Never run the application directly.
 
 The application will automatically restart after code changes, but it can also be manually restarted with
