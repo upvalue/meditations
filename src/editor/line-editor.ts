@@ -1,6 +1,6 @@
 // line-editor.ts - Meat of the actual editor implementation
 // Wraps Codemirror with lots of custom behavior
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import {
   Decoration,
@@ -22,7 +22,6 @@ import { docAtom, focusLineAtom } from './state'
 import { produce } from 'immer'
 import { autocompletion, type Completion } from '@codemirror/autocomplete'
 import { CompletionContext } from '@codemirror/autocomplete'
-import { useAtomCallback } from 'jotai/utils'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 
 const theme = EditorView.theme({}, { dark: true })
@@ -51,6 +50,8 @@ export type CallbackTable = {
   'Shift-Tab': () => boolean
   Tab: () => boolean
   Backspace: () => boolean
+  ArrowUp: () => boolean
+  ArrowDown: () => boolean
 
   // Editor state callbacks
   contentUpdated: (content: string) => void
@@ -249,16 +250,14 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
     'Shift-Tab': () => false,
     Tab: () => false,
     Backspace: () => false,
+    ArrowUp: () => false,
+    ArrowDown: () => false,
     contentUpdated: () => {},
   })
   const cmRef = useRef<HTMLDivElement>(null)
   const cmView = useRef<EditorView | null>(null)
   const [doc, setDoc] = useAtom(docAtom)
   const [focusLine, setFocusLine] = useAtom(focusLineAtom)
-
-  const readFocusLine = useAtomCallback(
-    useCallback((get) => get(focusLineAtom), [])
-  )
 
   const makeEditor = () => {
     const customKeymap = keymap.of([
@@ -277,6 +276,14 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
       {
         key: 'Backspace',
         run: () => cmCallbacks.current.Backspace() ?? false,
+      },
+      {
+        key: 'ArrowUp',
+        run: () => cmCallbacks.current.ArrowUp() ?? false,
+      },
+      {
+        key: 'ArrowDown',
+        run: () => cmCallbacks.current.ArrowDown() ?? false,
       },
     ])
 
@@ -471,6 +478,48 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
               indent: line.indent,
             })
           })
+        })
+
+        return true
+      },
+
+      ArrowUp: () => {
+        const view = cmView.current
+        if (!view) return false
+
+        // Get current cursor position
+        const cursorPos = view.state.selection.main.head
+
+        // Check if we can navigate up (not at first line)
+        if (lineIdx === 0) return false
+
+        const prevLine = doc.children[lineIdx - 1]
+
+        // Focus on previous line at same cursor position
+        setFocusLine({
+          lineIdx: lineIdx - 1,
+          pos: Math.min(cursorPos, prevLine.mdContent.length),
+        })
+
+        return true
+      },
+
+      ArrowDown: () => {
+        const view = cmView.current
+        if (!view) return false
+
+        // Get current cursor position
+        const cursorPos = view.state.selection.main.head
+
+        // Check if we can navigate down (not at last line)
+        if (lineIdx >= doc.children.length - 1) return false
+
+        const nextLine = doc.children[lineIdx + 1]
+
+        // Focus on next line at same cursor position
+        setFocusLine({
+          lineIdx: lineIdx + 1,
+          pos: Math.min(cursorPos, nextLine.mdContent.length),
         })
 
         return true

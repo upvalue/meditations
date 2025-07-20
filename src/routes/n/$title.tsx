@@ -133,6 +133,7 @@ function RouteComponent() {
     <Provider store={store}>
       <div className="w-full flex p-8">
         <div className="w-[50%]">
+          <h1>{title}</h1>
           {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
         </div>
         <div className="w-[50%]">
