@@ -410,9 +410,21 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         const { state } = view
         const { selection } = state
 
-        let newLine = ''
-
         const docEnd = state.doc.length
+        const currentLineContent = state.doc.toString()
+
+        // Check if the current line is empty and has indentation
+        if (currentLineContent.trim() === '' && line.indent > 0) {
+          // De-dent the current line instead of creating a new one
+          setDoc((recentDoc) => {
+            return produce(recentDoc, (draft) => {
+              draft.children[lineIdx].indent = Math.max(0, line.indent - 1)
+            })
+          })
+          return true
+        }
+
+        let newLine = ''
 
         // Handling cursor and selection:
         // We delete any text which the user has selected
