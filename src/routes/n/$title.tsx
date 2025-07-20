@@ -10,6 +10,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef } from 'react'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 import { type WikiLinkClickEventDetail } from '@/editor/line-editor'
+import { PgliteRepl } from '@/dev/DevTools'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -97,8 +98,6 @@ function RouteComponent() {
   useEffect(() => {
     if (loadDocQuery.isLoading) return
     const unsub = store.sub(docAtom, () => {
-      // console.log('doc changed!', { doc: store.get(docAtom) })
-      if (isNavigating.current) return
       updateDocMutation.mutate({
         name: title,
         doc: store.get(docAtom),
@@ -116,21 +115,17 @@ function RouteComponent() {
     }
   }, [loadDocQuery.data])
 
-  const isNavigating = useRef(false)
   const navigate = useNavigate()
 
   useCustomEventListener(
     'cm-wiki-link-click',
     (event: CustomEvent<WikiLinkClickEventDetail>) => {
-      isNavigating.current = true
       navigate({
         to: '/n/$title',
         params: {
           title: event.detail.link,
         },
-      }).then(() => {
-        isNavigating.current = false
-      })
+      }).then(() => {})
     }
   )
 
@@ -138,7 +133,7 @@ function RouteComponent() {
     <Provider store={store}>
       <div className="w-full flex p-8">
         <div className="w-[50%]">
-          <TEditor />
+          {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
         </div>
         <div className="w-[50%]">
           <Tabs>
@@ -150,6 +145,9 @@ function RouteComponent() {
             </Tab>
             <Tab key="tree" title="Tree Document">
               <TreeDocument />
+            </Tab>
+            <Tab key="dev" title="PG Repl">
+              <PgliteRepl />
             </Tab>
           </Tabs>
         </div>

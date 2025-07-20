@@ -11,3 +11,4 @@ count.txt
 /README.draft.md
 
 /Justfile
+./dev/data

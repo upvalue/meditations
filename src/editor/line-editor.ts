@@ -376,7 +376,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
 
           setFocusLine({
             lineIdx: lineIdx - 1,
-            pos: endOfPrevLine,
+            pos: endOfPrevLine - 1,
           })
 
           setDoc((recentDoc) =>

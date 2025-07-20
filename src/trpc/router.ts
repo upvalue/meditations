@@ -1,36 +1,47 @@
 import z from 'zod'
-import { router, proc } from './trpc'
 import { zdoc, type ZDoc } from '@/editor/schema'
+import { initTRPC } from '@trpc/server'
+import type { Database } from '@/db'
+import { sql, type Kysely } from 'kysely'
 
-const statedb = z.object({
-  names: z.record(z.string(), zdoc),
+type Context = {}
+
+export const t = initTRPC.context<{ db: Kysely<Database> }>().create({
+  allowOutsideOfServer: true,
 })
 
-type StateDB = z.infer<typeof statedb>
+export const router = t.router
+export const proc = t.procedure
 
-const getStateDB = () => {
-  let db = localStorage.getItem('statedb')
-  if (!db) {
-    db = JSON.stringify({
-      names: {},
+const upsertNote = (db: Kysely<Database>, name: string, body: ZDoc) => {
+  const r = db
+    .insertInto('notes')
+    .values({
+      title: name,
+      body,
     })
-    localStorage.setItem('statedb', db)
-  }
-  return JSON.parse(db) as StateDB
+    .onConflict((oc) => oc.column('title').doUpdateSet({ body }))
+    .execute()
+
+  console.log('upsertNote', r)
+  return r
 }
 
-const updateNote = (name: string, doc: ZDoc) => {
-  console.log('updateNote', name, doc)
-  const statedb = getStateDB()
-  statedb.names[name] = doc
-  localStorage.setItem('statedb', JSON.stringify(statedb))
-}
-
+// @ts-expect-error
 window.clearData = () => {
   localStorage.removeItem('statedb')
 }
 
 export const appRouter = router({
+  healthcheck: proc.query(async ({ ctx: { db } }) => {
+    const q = await db
+      .selectFrom(sql`(select 1) as subquery`.as('subquery'))
+      .selectAll()
+      .execute()
+
+    return q
+  }),
+
   ping: proc.query(() => {
     return 'pong2'
   }),
@@ -41,12 +52,18 @@ export const appRouter = router({
         name: z.string(),
       })
     )
-    .query(({ input }) => {
-      let statedb = getStateDB()
+    .query(async ({ input, ctx: { db } }) => {
+      console.log('loadDoc called')
+      const doc = await db
+        .selectFrom('notes')
+        .selectAll()
+        .where('title', '=', input.name)
+        .executeTakeFirst()
 
-      let doc = statedb.names[input.name]
+      console.log('lodDoc 2', doc)
+
       if (!doc) {
-        updateNote(input.name, {
+        const mydoc: ZDoc = {
           type: 'doc',
           children: [
             {
@@ -55,13 +72,13 @@ export const appRouter = router({
               indent: 0,
             },
           ],
-        })
+        }
 
-        statedb = getStateDB()
-        doc = statedb.names[input.name]
+        await upsertNote(db, input.name, mydoc)
+        return mydoc
       }
 
-      return doc
+      return doc.body
     }),
 
   updateDoc: proc
@@ -71,8 +88,9 @@ export const appRouter = router({
         doc: zdoc,
       })
     )
-    .mutation(({ input }) => {
-      updateNote(input.name, input.doc)
+    .mutation(async ({ input, ctx: { db } }) => {
+      await upsertNote(db, input.name, input.doc)
+      return true
     }),
 })
 

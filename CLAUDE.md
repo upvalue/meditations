@@ -41,10 +41,10 @@ It uses pnpm as the package manager (do not use normal npm).
 Its primary interface is a document editor written on top of CodeMirror, and the
 code for this editor lives in `src/editor`.
 
-The editor edits a document, which
-is a collection of lines stored as a flat array. Lines can be indented or
-dedented which is rendered as a tree-like interface for the user (and the
-document can be converted into a tree for analysis if necessary)
+The editor edits a document, which is a collection of lines stored as a flat
+array. Lines can be indented or dedented which is rendered as a tree-like
+interface for the user (and the document can be converted into a tree for
+analysis if necessary)
 
 Major components of the editor are:
 
@@ -63,16 +63,21 @@ The synchronization between Codemirror (which has its own DOM rendering and
 management system) and React is custom:
 
 - lines can update the overall editor state by changing Jotai atoms
-- changes to the overall editor state are synchronized to Codemirror by glue code which destroys and recreates Codemirror when the line changes externally
+- changes to the overall editor state are synchronized to Codemirror by glue
+  code which destroys and recreates Codemirror when the line changes externally
 - any changes on the individual line content change React state via a codemirror plugin
-- Vanilla JS components written in Codemirror may emit CustomEvents, which can be listened to higher in
-  the render tree
+- Vanilla JS components written in Codemirror may emit CustomEvents, which can
+  be listened to higher in the render tree
 
 Additional features of the editor:
 
-- Slash commands allow the user to autocomplete useful commands while directly in the editor interface.
-  For example, typing `/date` and then selecting the autocomplete for this command will insert today's date in
-  `YYYY-MM-DD` format.
+- Slash commands allow the user to autocomplete useful commands while directly
+  in the editor interface. For example, typing `/date` and then selecting the
+  autocomplete for this command will insert today's date in `YYYY-MM-DD` format.
+
+The editor has a standalone route at `/lab` -- this can be useful for testing
+the document editor in isolation from other features from the application, and
+should be preferred unless more complex testing seems necessary.
 
 # Backend
 
@@ -84,7 +89,8 @@ uses actual TRPC for communication. This backend simply saves document changes a
 T,he application is already running with supervisord at port
 "http://localhost:8000". Never run the application directly.
 
-The application will automatically restart after code changes, but it can also be manually restarted with
+The application will automatically restart after code changes, but it can also
+be manually restarted with
 
 > supervisorctl -c supervisord.conf restart all
 

@@ -13,7 +13,7 @@ const RootComponent = () => {
       <HeroUIProvider className="dark ">
         <Outlet />
       </HeroUIProvider>
-      <TanStackRouterDevtools />
+      <TanStackRouterDevtools initialIsOpen={false} />
     </>
   )
 }

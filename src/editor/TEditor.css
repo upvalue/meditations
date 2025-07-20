@@ -13,3 +13,7 @@
 .cm-editor .cm-scroller {
   font-family: var(--font-stack);
 }
+
+.cm-line {
+  font-size: 1.1rem;
+}
