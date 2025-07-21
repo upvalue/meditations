@@ -4,8 +4,6 @@ import { initTRPC } from '@trpc/server'
 import type { Database } from '@/db'
 import { sql, type Kysely } from 'kysely'
 
-type Context = {}
-
 export const t = initTRPC.context<{ db: Kysely<Database> }>().create({
   allowOutsideOfServer: true,
 })
@@ -27,15 +25,10 @@ const upsertNote = (db: Kysely<Database>, name: string, body: ZDoc) => {
   return r
 }
 
-// @ts-expect-error
-window.clearData = () => {
-  localStorage.removeItem('statedb')
-}
-
 export const appRouter = router({
   healthcheck: proc.query(async ({ ctx: { db } }) => {
     const q = await db
-      .selectFrom(sql`(select 1) as subquery`.as('subquery'))
+      .selectFrom(sql`(select 1)`.as('subquery'))
       .selectAll()
       .execute()
 

@@ -15,6 +15,5 @@ export const Route = createFileRoute('/')({
 })
 
 function RouteComponent() {
-  const x: number = 'five'
   return null
 }

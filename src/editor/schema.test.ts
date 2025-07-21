@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { analyzeDoc, type ZDoc, type ZDocTree } from './schema'
+import { analyzeDoc, type ZDoc } from './schema'
 
 describe('analyzeDoc', () => {
   test('should handle empty document', () => {
