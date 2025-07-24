@@ -4,15 +4,15 @@
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit && eslint . && prettier --check .",
-    "dev": "vite --port 3000",
-    "start": "vite --port 3000",
-    "build": "vite build && tsc",
-    "serve": "vite preview",
+    "client:dev": "vite --port 3000",
+    "client:start": "vite --port 3000",
+    "client:build": "vite build && tsc",
+    "client:serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "kysely": "kysely",
-    "dev:server": "DATABASE_URL=postgres://postgres:password@localhost/tekne tsx --watch src/server/index.ts"
+    "server:dev": "DATABASE_URL=postgres://postgres:password@localhost/tekne tsx --watch src/server/index.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.6",

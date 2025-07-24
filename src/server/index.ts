@@ -33,14 +33,14 @@ const createContext = async ({ req, res }: { req: Request; res: Response }) => {
 }
 
 app.use(
-  '/trpc',
+  '/api/trpc',
   trpcExpress.createExpressMiddleware({
     router: appRouter,
     createContext,
   })
 )
 
-app.get('/ping', async (_req: Request, res: Response) => {
+app.get('/healthcheck', async (_req: Request, res: Response) => {
   const db = await dbServer()
   const q = await db
     .selectFrom(sql`(select 1)`.as('subquery'))
@@ -48,11 +48,11 @@ app.get('/ping', async (_req: Request, res: Response) => {
     .execute()
 
   res.json({
-    message: 'pong',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   })
 })
+
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' })
 })

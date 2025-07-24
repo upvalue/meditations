@@ -16,6 +16,7 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  envPrefix: ['VITE_', 'TEKNE_'],
   optimizeDeps: {
     exclude: ['@electric-sql/pglite'],
   },
