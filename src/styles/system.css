@@ -1,0 +1,10 @@
+:root {
+  --font-stack:
+    'Inter', -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, Adwaita Sans, Cantarell, Ubuntu, roboto, noto, helvetica,
+    arial, sans-serif;
+}
+
+@theme {
+  --color-test: var(--color-zinc-50);
+}

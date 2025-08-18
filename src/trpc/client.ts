@@ -11,7 +11,7 @@ let trpcUrl: string | undefined
 if (import.meta && import.meta.env && import.meta.env.TEKNE_TRPC_URL) {
   trpcUrl = import.meta.env.TEKNE_TRPC_URL
   console.log('[init] Using TRPC at backend ', trpcUrl)
-} else {
+} else if (!(typeof process !== 'undefined')) {
   console.log('[init] Using in-memory TRPC and database')
 }
 

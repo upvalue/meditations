@@ -15,5 +15,6 @@
 }
 
 .cm-line {
-  font-size: 1.1rem;
+  font-weight: 400;
+  font-family: var(--font-stack);
 }

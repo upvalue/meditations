@@ -38,29 +38,27 @@ It uses pnpm as the package manager (do not use normal npm).
 
 # Editor
 
-Its primary interface is a document editor written on top of CodeMirror, and the
-code for this editor lives in `src/editor`.
+Its primary interface is a document editor written on top of CodeMirror, and the code for
+this editor lives in `src/editor`.
 
-The editor edits a document, which is a collection of lines stored as a flat
-array. Lines can be indented or dedented which is rendered as a tree-like
-interface for the user (and the document can be converted into a tree for
-analysis if necessary)
+The editor edits a document, which is a collection of lines stored as a flat array. Lines
+can be indented or dedented which is rendered as a tree-like interface for the user (and
+the document can be converted into a tree for analysis if necessary)
 
 Major components of the editor are:
 
 - `src/editor/schema.ts` - Zod-defined schema for documents and lines
 - `src/editor/state.ts` - Defines the Jotai atoms where state is stored.
   Depending on where the editor is mounted, the editor
-- `src/editor/line-editor.ts` Which contains most of the code relating to
-  Codemirror. The line editor edits individual lines in a document, currently
-  handles all key bindings. It can also change overall editor state by changing Jotai:
-  for example, if the user enters a new line by pressing enter, this appends a new line
-  to the document's `children` array.
-- `src/editor/TEditor.tsx` contains the React components that wrap the
-  CodeMirror line editor and the overall document editor
+- `src/editor/line-editor.ts` Which contains most of the code relating to Codemirror. The
+  line editor edits individual lines in a document, currently handles all key bindings. It
+  can also change overall editor state by changing Jotai: for example, if the user enters a
+  new line by pressing enter, this appends a new line to the document's `children` array.
+- `src/editor/TEditor.tsx` contains the React components that wrap the CodeMirror line
+  editor and the overall document editor
 
-The synchronization between Codemirror (which has its own DOM rendering and
-management system) and React is custom:
+The synchronization between Codemirror (which has its own DOM rendering and management
+system) and React is custom:
 
 - lines can update the overall editor state by changing Jotai atoms
 - changes to the overall editor state are synchronized to Codemirror by glue
@@ -71,30 +69,24 @@ management system) and React is custom:
 
 Additional features of the editor:
 
-- Slash commands allow the user to autocomplete useful commands while directly
-  in the editor interface. For example, typing `/date` and then selecting the
-  autocomplete for this command will insert today's date in `YYYY-MM-DD` format.
+- Slash commands allow the user to autocomplete useful commands while directly in the
+  editor interface. For example, typing `/date` and then selecting the autocomplete for this
+  command will insert today's date in `YYYY-MM-DD` format.
 
-The editor has a standalone route at `/lab` -- this can be useful for testing
-the document editor in isolation from other features from the application, and
-should be preferred unless more complex testing seems necessary.
+The editor has a standalone route at `/lab` -- this can be useful for testing the document
+editor in isolation from other features from the application, and should be preferred
+unless more complex testing seems necessary.
 
 # Backend
 
-Currently, there is no real backend, but `src/trpc` contains a faux backend that
-uses actual TRPC for communication. This backend simply saves document changes as
+Currently, there is no real backend, but `src/trpc` contains a faux backend that uses
+actual TRPC for communication. This backend simply saves document changes as
 
 # Running the application
 
-T,he application is already running with supervisord at port
-"http://localhost:8000". Never run the application directly.
-
-The application will automatically restart after code changes, but it can also
-be manually restarted with
-
-> supervisorctl -c supervisord.conf restart all
-
-Its logs are available at `./dev/log/vite-stdout.log` and `./dev/log/vite-stderr.log`
+You can run the application with `pnpm run client:dev`. Although the application does have
+a server, it is also capable of running completely in the client. Prefer to do this unless
+the changes make it seem necessary to run the server.
 
 # Testing changes
 

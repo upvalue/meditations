@@ -71,8 +71,6 @@ export const TEditor = () => {
     }
   )
 
-  console.log({ doc })
-
   return (
     <div ref={containerRef}>
       {doc.children.map((l, i) => (
