@@ -17,13 +17,16 @@ export const proc = t.procedure
  * out of it with the database
  */
 const docMigrator = (doc: any): any => {
-  doc.body.children = doc.body.children.map((child) => {
-    if (child.createdAt) return child
-    return {
-      ...child,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+  doc.body.children = doc.body.children.map((child: any) => {
+    let mod = { ...child }
+    if (!child.createdAt) {
+      mod.createdAt = new Date().toISOString()
+      mod.updatedAt = new Date().toISOString()
     }
+    if (child.datumTaskStatus) {
+      mod.datumTaskStatus = child.datumTaskStatus
+    }
+    return mod
   })
   return doc
 }

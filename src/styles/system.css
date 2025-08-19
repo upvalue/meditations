@@ -10,5 +10,5 @@
 }
 
 @theme {
-  --color-test: var(--color-zinc-50);
+  --color-primary: var(--color-zinc-50);
 }

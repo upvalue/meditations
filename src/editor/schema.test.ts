@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { analyzeDoc, type ZDoc } from './schema'
+import { analyzeDoc, lineMake, type ZDoc } from './schema'
 
 describe('analyzeDoc', () => {
   test('should handle empty document', () => {
@@ -20,9 +20,9 @@ describe('analyzeDoc', () => {
     const doc: ZDoc = {
       type: 'doc',
       children: [
-        { type: 'line', mdContent: 'First line', indent: 0 },
-        { type: 'line', mdContent: 'Second line', indent: 0 },
-        { type: 'line', mdContent: 'Third line', indent: 0 },
+        { ...lineMake(0, 'First line') },
+        { ...lineMake(0, 'Second line') },
+        { ...lineMake(0, 'Third line') },
       ],
     }
 
@@ -30,23 +30,20 @@ describe('analyzeDoc', () => {
 
     expect(result.children).toHaveLength(3)
     expect(result.children[0]).toEqual({
-      type: 'line',
-      mdContent: 'First line',
-      indent: 0,
+      ...doc.children[0],
+      arrayIdx: 0,
       children: [],
       tags: [],
     })
     expect(result.children[1]).toEqual({
-      type: 'line',
-      mdContent: 'Second line',
-      indent: 0,
+      ...doc.children[1],
+      arrayIdx: 1,
       children: [],
       tags: [],
     })
     expect(result.children[2]).toEqual({
-      type: 'line',
-      mdContent: 'Third line',
-      indent: 0,
+      ...doc.children[2],
+      arrayIdx: 2,
       children: [],
       tags: [],
     })
@@ -56,10 +53,10 @@ describe('analyzeDoc', () => {
     const doc: ZDoc = {
       type: 'doc',
       children: [
-        { type: 'line', mdContent: 'Parent 1', indent: 0 },
-        { type: 'line', mdContent: 'Child 1.1', indent: 1 },
-        { type: 'line', mdContent: 'Child 1.2', indent: 1 },
-        { type: 'line', mdContent: 'Parent 2', indent: 0 },
+        { ...lineMake(0, 'Parent 1') },
+        { ...lineMake(1, 'Child 1.1') },
+        { ...lineMake(1, 'Child 1.2') },
+        { ...lineMake(0, 'Parent 2') },
       ],
     }
 
@@ -82,11 +79,11 @@ describe('analyzeDoc', () => {
     const doc: ZDoc = {
       type: 'doc',
       children: [
-        { type: 'line', mdContent: 'Level 0', indent: 0 },
-        { type: 'line', mdContent: 'Level 1', indent: 1 },
-        { type: 'line', mdContent: 'Level 2', indent: 2 },
-        { type: 'line', mdContent: 'Level 3', indent: 3 },
-        { type: 'line', mdContent: 'Back to Level 1', indent: 1 },
+        { ...lineMake(0, 'Level 0') },
+        { ...lineMake(1, 'Level 1') },
+        { ...lineMake(2, 'Level 2') },
+        { ...lineMake(3, 'Level 3') },
+        { ...lineMake(1, 'Back to Level 1') },
       ],
     }
 
@@ -119,14 +116,14 @@ describe('analyzeDoc', () => {
     const doc: ZDoc = {
       type: 'doc',
       children: [
-        { type: 'line', mdContent: 'Root 1', indent: 0 },
-        { type: 'line', mdContent: 'Child 1.1', indent: 1 },
-        { type: 'line', mdContent: 'Grandchild 1.1.1', indent: 2 },
-        { type: 'line', mdContent: 'Root 2', indent: 0 },
-        { type: 'line', mdContent: 'Child 2.1', indent: 1 },
-        { type: 'line', mdContent: 'Child 2.2', indent: 1 },
-        { type: 'line', mdContent: 'Grandchild 2.2.1', indent: 2 },
-        { type: 'line', mdContent: 'Grandchild 2.2.2', indent: 2 },
+        { ...lineMake(0, 'Root 1') },
+        { ...lineMake(1, 'Child 1.1') },
+        { ...lineMake(2, 'Grandchild 1.1.1') },
+        { ...lineMake(0, 'Root 2') },
+        { ...lineMake(1, 'Child 2.1') },
+        { ...lineMake(1, 'Child 2.2') },
+        { ...lineMake(2, 'Grandchild 2.2.1') },
+        { ...lineMake(2, 'Grandchild 2.2.2') },
       ],
     }
 
@@ -155,18 +152,18 @@ describe('analyzeDoc', () => {
   })
 
   test('should handle single line document', () => {
+    const line = lineMake(0, 'Only line')
     const doc: ZDoc = {
       type: 'doc',
-      children: [{ type: 'line', mdContent: 'Only line', indent: 0 }],
+      children: [line],
     }
 
     const result = analyzeDoc(doc)
 
     expect(result.children).toHaveLength(1)
     expect(result.children[0]).toEqual({
-      type: 'line',
-      mdContent: 'Only line',
-      indent: 0,
+      ...line,
+      arrayIdx: 0,
       children: [],
       tags: [],
     })
@@ -177,16 +174,12 @@ describe('analyzeDoc', () => {
       type: 'doc',
       children: [
         {
-          type: 'line',
-          mdContent: 'Task line',
-          indent: 0,
-          taskStatus: 'incomplete',
+          ...lineMake(0, 'Task line'),
+          datumTaskStatus: 'incomplete',
         },
         {
-          type: 'line',
-          mdContent: 'Child task',
-          indent: 1,
-          taskStatus: 'complete',
+          ...lineMake(1, 'Child task'),
+          datumTaskStatus: 'complete',
         },
       ],
     }
@@ -194,18 +187,18 @@ describe('analyzeDoc', () => {
     const result = analyzeDoc(doc)
 
     expect(result.children).toHaveLength(1)
-    expect(result.children[0].taskStatus).toBe('incomplete')
+    expect(result.children[0].datumTaskStatus).toBe('incomplete')
     expect(result.children[0].children).toHaveLength(1)
-    expect(result.children[0].children[0].taskStatus).toBe('complete')
+    expect(result.children[0].children[0].datumTaskStatus).toBe('complete')
   })
 
   test('should handle skipped indentation levels', () => {
     const doc: ZDoc = {
       type: 'doc',
       children: [
-        { type: 'line', mdContent: 'Level 0', indent: 0 },
-        { type: 'line', mdContent: 'Level 2 (skipped 1)', indent: 2 },
-        { type: 'line', mdContent: 'Level 1', indent: 1 },
+        { ...lineMake(0, 'Level 0') },
+        { ...lineMake(2, 'Level 2 (skipped 1)') },
+        { ...lineMake(1, 'Level 1') },
       ],
     }
 
@@ -225,10 +218,7 @@ describe('analyzeDoc', () => {
   test('should initialize tags and children arrays for all lines', () => {
     const doc: ZDoc = {
       type: 'doc',
-      children: [
-        { type: 'line', mdContent: 'Line 1', indent: 0 },
-        { type: 'line', mdContent: 'Line 2', indent: 1 },
-      ],
+      children: [{ ...lineMake(0, 'Line 1') }, { ...lineMake(1, 'Line 2') }],
     }
 
     const result = analyzeDoc(doc)

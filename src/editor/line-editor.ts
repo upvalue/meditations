@@ -35,7 +35,11 @@ export type WikiLinkClickEventDetail = {
   link: string
 }
 
-export type TagToggleEvent = {
+export type LineStatusEvent = {
+  lineIdx: number
+}
+
+export type LineTimerEvent = {
   lineIdx: number
 }
 
@@ -189,6 +193,32 @@ const slashCommands = (lineIdx: number) => {
           },
         },
         {
+          label: '/timer: Add a timer to the line',
+          type: 'text',
+          apply: (
+            view: EditorView,
+            _completion: Completion,
+            from: number,
+            to: number
+          ) => {
+            const event = new CustomEvent<LineTimerEvent>('cm-timer-add', {
+              detail: {
+                lineIdx,
+              },
+            })
+            dispatchEvent(event)
+
+            // Erase autocompleted text
+            view.dispatch({
+              changes: {
+                from,
+                to,
+                insert: '',
+              },
+            })
+          },
+        },
+        {
           label: '/task: Toggle whether line is a task',
           type: 'text',
           apply: (
@@ -197,7 +227,7 @@ const slashCommands = (lineIdx: number) => {
             from: number,
             to: number
           ) => {
-            const event = new CustomEvent<TagToggleEvent>('cm-tag-toggle', {
+            const event = new CustomEvent<LineStatusEvent>('cm-tag-toggle', {
               detail: {
                 lineIdx,
               },
@@ -338,11 +368,9 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
           return false
         }
 
-        setDoc((recentDoc) => {
-          return produce(recentDoc, (draft) => {
-            draft.children[lineIdx].indent += 1
-            draft.children[lineIdx].updatedAt = new Date().toISOString()
-          })
+        setDoc((draft) => {
+          draft.children[lineIdx].indent += 1
+          draft.children[lineIdx].updatedAt = new Date().toISOString()
         })
         return true
       },
@@ -351,10 +379,8 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         if (line.indent === 0) {
           return false
         }
-        setDoc((recentDoc) => {
-          return produce(recentDoc, (draft) => {
-            draft.children[lineIdx].indent -= 1
-          })
+        setDoc((draft) => {
+          draft.children[lineIdx].indent -= 1
         })
         return true
       },
@@ -387,22 +413,20 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
             pos: endOfPrevLine,
           })
 
-          setDoc((recentDoc) =>
-            produce(recentDoc, (draft) => {
-              // Append content after backspace to previous line
-              draft.children[lineIdx - 1].mdContent = prevLine.mdContent.concat(
-                state.doc.slice(0, state.doc.length).toString()
-              )
+          setDoc((draft) => {
+            // Append content after backspace to previous line
+            draft.children[lineIdx - 1].mdContent = prevLine.mdContent.concat(
+              state.doc.slice(0, state.doc.length).toString()
+            )
 
-              console.log(
-                'New line content ',
-                draft.children[lineIdx - 1].mdContent
-              )
+            console.log(
+              'New line content ',
+              draft.children[lineIdx - 1].mdContent
+            )
 
-              // Remove current line from line array
-              draft.children.splice(lineIdx, 1)
-            })
-          )
+            // Remove current line from line array
+            draft.children.splice(lineIdx, 1)
+          })
           return true
         }
 
@@ -424,10 +448,8 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         // Check if the current line is empty and has indentation
         if (currentLineContent.trim() === '' && line.indent > 0) {
           // De-dent the current line instead of creating a new one
-          setDoc((recentDoc) => {
-            return produce(recentDoc, (draft) => {
-              draft.children[lineIdx].indent = Math.max(0, line.indent - 1)
-            })
+          setDoc((draft) => {
+            draft.children[lineIdx].indent = Math.max(0, line.indent - 1)
           })
           return true
         }
@@ -471,14 +493,12 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
           lineIdx: lineIdx + 1,
           pos: 0,
         })
-        setDoc((recentDoc) => {
-          return produce(recentDoc, (draft) => {
-            const newLineObj = {
-              ...lineMake(line.indent),
-              mdContent: newLine,
-            }
-            draft.children.splice(lineIdx + 1, 0, newLineObj)
-          })
+        setDoc((draft) => {
+          const newLineObj = {
+            ...lineMake(line.indent),
+            mdContent: newLine,
+          }
+          draft.children.splice(lineIdx + 1, 0, newLineObj)
         })
 
         return true
@@ -528,11 +548,9 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
 
       contentUpdated: (content: string) => {
         console.log('Line', lineIdx, 'content updated', content)
-        setDoc((recentDoc) => {
-          return produce(recentDoc, (draft) => {
-            draft.children[lineIdx].mdContent = content
-            draft.children[lineIdx].updatedAt = new Date().toISOString()
-          })
+        setDoc((draft) => {
+          draft.children[lineIdx].mdContent = content
+          draft.children[lineIdx].updatedAt = new Date().toISOString()
         })
       },
     }
@@ -592,21 +610,37 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
   useEffect(makeEditor, [])
 
   useCustomEventListener(
+    'cm-timer-add',
+    (event: CustomEvent<LineTimerEvent>) => {
+      const { lineIdx } = event.detail
+      if (lineIdx !== lineInfo.lineIdx) {
+        return
+      }
+      // If it's already got a time, don't do anything
+      if (lineInfo.line.datumTime) {
+        return
+      }
+      setDoc((draft) => {
+        draft.children[lineIdx].datumTime = 0
+      })
+    },
+    [lineInfo.lineIdx]
+  )
+
+  useCustomEventListener(
     'cm-tag-toggle',
-    (event: CustomEvent<TagToggleEvent>) => {
+    (event: CustomEvent<LineStatusEvent>) => {
       const { lineIdx } = event.detail
       if (lineIdx !== lineInfo.lineIdx) {
         return
       }
 
-      setDoc((recentDoc) => {
-        return produce(recentDoc, (draft) => {
-          if (draft.children[lineIdx].taskStatus) {
-            delete draft.children[lineIdx].taskStatus
-          } else {
-            draft.children[lineIdx].taskStatus = 'unset'
-          }
-        })
+      setDoc((draft) => {
+        if (draft.children[lineIdx].datumTaskStatus) {
+          delete draft.children[lineIdx].datumTaskStatus
+        } else {
+          draft.children[lineIdx].datumTaskStatus = 'unset'
+        }
       })
 
       console.log('Tag toggle event', event.detail.lineIdx)

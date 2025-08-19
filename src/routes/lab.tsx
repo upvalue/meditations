@@ -1,5 +1,4 @@
 import { TEditor } from '@/editor/TEditor'
-import { Tabs, Tab } from '@heroui/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { docAtom } from '@/editor/state'
 import { useAtom } from 'jotai'
@@ -48,12 +47,12 @@ const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
       }
     }
 
-    if (line.taskStatus === 'complete') {
+    if (line.datumTaskStatus === 'complete') {
       if (tagData[tag].complete === undefined) {
         tagData[tag].complete = 0
       }
       tagData[tag].complete += 1
-    } else if (line.taskStatus) {
+    } else if (line.datumTaskStatus) {
       if (tagData[tag].incomplete === undefined) {
         tagData[tag].incomplete = 0
       }
@@ -110,20 +109,8 @@ function RouteComponent() {
         </Provider>
       </div>
       <div className="w-[50%]">
-        <Tabs>
-          <Tab key="time" title="Time View">
-            <TimeView />
-          </Tab>
-          <Tab key="raw" title="Document Content">
-            <RawDocument />
-          </Tab>
-          <Tab key="tree" title="Tree Document">
-            <TreeDocument />
-          </Tab>
-          <Tab key="error" title="No Error">
-            <div className="whitespace-pre-wrap font-mono">No errors</div>
-          </Tab>
-        </Tabs>
+        <RawDocument />
+        {/* heroui tabs deleted, replace later */}
       </div>
     </div>
   )

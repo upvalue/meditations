@@ -49,6 +49,7 @@ type TagData = {
   }
 }
 
+// Some experimental analysis code
 const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
   for (const tag of tags) {
     if (!tagData[tag]) {
@@ -59,12 +60,12 @@ const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
       }
     }
 
-    if (line.taskStatus === 'complete') {
+    if (line.datumTaskStatus === 'complete') {
       if (tagData[tag].complete === undefined) {
         tagData[tag].complete = 0
       }
       tagData[tag].complete += 1
-    } else if (line.taskStatus) {
+    } else if (line.datumTaskStatus) {
       if (tagData[tag].incomplete === undefined) {
         tagData[tag].incomplete = 0
       }
@@ -155,14 +156,13 @@ function RouteComponent() {
   return (
     <Provider store={store}>
       <div className="w-full h-full flex flex-col ">
+        <ModeLine />
         <div className="flex flex-grow p-8">
-          <div className="w-[50%]">
-            <h1 className="text-zinc-500 text-2xl font-bold ml-[128px] mb-4">
-              {title}
-            </h1>
+          <div className="w-[60%]">
+            <h1 className="text-zinc-500 text-2xl ml-[128px] mb-4">{title}</h1>
             {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
           </div>
-          <div className="w-[50%]">
+          <div className="w-[40%]">
             <Tabs>
               <TabsList>
                 <TabsTrigger value="time">Time View</TabsTrigger>
@@ -189,7 +189,6 @@ function RouteComponent() {
             </Tabs>
           </div>
         </div>
-        <ModeLine />
       </div>
     </Provider>
   )

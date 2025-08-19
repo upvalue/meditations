@@ -7,8 +7,17 @@ const zline = z.object({
   indent: z.number(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
-  // If present, this has a task datum
-  taskStatus: z.optional(z.enum(['complete', 'incomplete', 'unset'])),
+  collapsed: z.boolean().optional(),
+
+  /**
+   * Time recorded (in seconds)
+   */
+  datumTime: z.number().optional(),
+
+  /**
+   * Task completion status
+   */
+  datumTaskStatus: z.optional(z.enum(['complete', 'incomplete', 'unset'])),
 })
 
 type ZLine = z.infer<typeof zline>
