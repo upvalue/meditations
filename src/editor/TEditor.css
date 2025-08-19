@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
 
 .cm-editor-container [contenteditable] {
   caret-color: white;
@@ -14,7 +17,15 @@
   font-family: var(--font-stack);
 }
 
+.cm-gutter {
+  font-family: var(--font-stack);
+}
+
 .cm-line {
   font-weight: 400;
   font-family: var(--font-stack);
+}
+
+.ELine-gutter {
+  width: 80px;
 }

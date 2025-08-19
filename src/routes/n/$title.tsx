@@ -1,16 +1,23 @@
 import { TEditor } from '@/editor/TEditor'
-import { Tabs, Tab } from '@heroui/react'
+import { toast } from 'sonner'
+// import { Tabs, Tab } from '@heroui/react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { docAtom } from '@/editor/state'
 import { createStore, useAtom } from 'jotai'
 import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
-import { uniq } from 'lodash-es'
+import { truncate, uniq } from 'lodash-es'
 import { Provider } from 'jotai'
 import { trpc } from '@/trpc'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef } from 'react'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
-import { type WikiLinkClickEventDetail } from '@/editor/line-editor'
 import { PgliteRepl } from '@/dev/DevTools'
+import {
+  TanStackRouterDevtools,
+  TanStackRouterDevtoolsPanel,
+} from '@tanstack/react-router-devtools'
+import type { WikiLinkClickEventDetail } from '@/editor/line-editor'
+import { ModeLine } from '@/editor/ModeLine'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -86,7 +93,16 @@ function RouteComponent() {
     select: (p) => p.title,
   })
 
-  const updateDocMutation = trpc.updateDoc.useMutation()
+  const router = useRouter()
+
+  const updateDocMutation = trpc.updateDoc.useMutation({
+    onError: (e) => {
+      console.error(e)
+      toast.error(
+        `Error while updating document ${truncate(e.toString(), { length: 100 })}`
+      )
+    },
+  })
 
   const store = useMemo(() => {
     const store = createStore()
@@ -96,8 +112,14 @@ function RouteComponent() {
   const loadDocQuery = trpc.loadDoc.useQuery({ name: title })
 
   useEffect(() => {
-    if (loadDocQuery.isLoading) return
+    if (loadDocQuery.isLoading) {
+      return
+    }
     const unsub = store.sub(docAtom, () => {
+      // Data hasn't changed, don't do anything
+      if (store.get(docAtom) === loadDocQuery.data) {
+        return
+      }
       updateDocMutation.mutate({
         name: title,
         doc: store.get(docAtom),
@@ -131,27 +153,42 @@ function RouteComponent() {
 
   return (
     <Provider store={store}>
-      <div className="w-full flex p-8">
-        <div className="w-[50%]">
-          <h1>{title}</h1>
-          {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
+      <div className="w-full h-full flex flex-col ">
+        <div className="flex flex-grow p-8">
+          <div className="w-[50%]">
+            <h1 className="text-zinc-500 text-2xl font-bold ml-[80px] mb-4">
+              {title}
+            </h1>
+            {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
+          </div>
+          <div className="w-[50%]">
+            <Tabs>
+              <TabsList>
+                <TabsTrigger value="time">Time View</TabsTrigger>
+                <TabsTrigger value="raw">Document Content</TabsTrigger>
+                <TabsTrigger value="tree">Tree Document</TabsTrigger>
+                <TabsTrigger value="dev">PG Repl</TabsTrigger>
+                <TabsTrigger value="tanstackdev">TanStack Devtools</TabsTrigger>
+              </TabsList>
+              <TabsContent value="time">
+                <TimeView />
+              </TabsContent>
+              <TabsContent value="raw">
+                <RawDocument />
+              </TabsContent>
+              <TabsContent value="tree">
+                <TreeDocument />
+              </TabsContent>
+              <TabsContent value="dev">
+                <PgliteRepl />
+              </TabsContent>
+              <TabsContent value="tanstackdev">
+                <TanStackRouterDevtoolsPanel router={router} />
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
-        <div className="w-[50%]">
-          <Tabs>
-            <Tab key="time" title="Time View">
-              <TimeView />
-            </Tab>
-            <Tab key="raw" title="Document Content">
-              <RawDocument />
-            </Tab>
-            <Tab key="tree" title="Tree Document">
-              <TreeDocument />
-            </Tab>
-            <Tab key="dev" title="PG Repl">
-              <PgliteRepl />
-            </Tab>
-          </Tabs>
-        </div>
+        <ModeLine />
       </div>
     </Provider>
   )

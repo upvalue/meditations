@@ -1,7 +1,7 @@
 import { HeroUIProvider } from '@heroui/react'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { trpc } from '@/trpc'
+import { Toaster } from '@/components/ui/sonner'
 
 export type RouterAppContext = {
   trpc: typeof trpc
@@ -10,10 +10,10 @@ export type RouterAppContext = {
 const RootComponent = () => {
   return (
     <>
-      <HeroUIProvider className="dark ">
+      <HeroUIProvider className="dark  h-full">
         <Outlet />
+        <Toaster />
       </HeroUIProvider>
-      <TanStackRouterDevtools initialIsOpen={false} />
     </>
   )
 }

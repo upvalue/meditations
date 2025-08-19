@@ -27,35 +27,40 @@ const ELine = (lineInfo: LineInfo) => {
   const [, setDoc] = useAtom(docAtom)
 
   return (
-    <div
-      className="flex items-center gap-2 w-full"
-      style={{
-        marginLeft: `${line.indent * 16}px`,
-      }}
-    >
-      <Icon icon={ListBulletIcon} />
-      {line.taskStatus && (
-        <input
-          type="checkbox"
-          tabIndex={-1}
-          checked={line.taskStatus === 'complete'}
-          onChange={(e) => {
-            // TOOD: This pattern repeats itself and could be turned into a hook
-            setDoc((recentDoc) => {
-              return produce(recentDoc, (draft) => {
-                draft.children[lineInfo.lineIdx].taskStatus = e.target.checked
-                  ? 'complete'
-                  : 'incomplete'
-              })
-            })
-          }}
-        />
-      )}
+    <div className="flex items-center gap-2 w-full">
+      <div className="ELine-gutter font-mono text-zinc-600 text-sm flex-shrink-0">
+        8:05 PM
+      </div>
       <div
-        className="cm-editor-container w-full"
-        ref={cmRef}
-        data-line-idx={lineInfo.lineIdx}
-      />
+        className="flex items-start flex-grow"
+        style={{
+          marginLeft: `${line.indent * 16}px`,
+        }}
+      >
+        <Icon icon={ListBulletIcon} className="mt-2" />
+        {line.taskStatus && (
+          <input
+            type="checkbox"
+            tabIndex={-1}
+            checked={line.taskStatus === 'complete'}
+            onChange={(e) => {
+              // TOOD: This pattern repeats itself and could be turned into a hook
+              setDoc((recentDoc) => {
+                return produce(recentDoc, (draft) => {
+                  draft.children[lineInfo.lineIdx].taskStatus = e.target.checked
+                    ? 'complete'
+                    : 'incomplete'
+                })
+              })
+            }}
+          />
+        )}
+        <div
+          className="cm-editor-container w-full"
+          ref={cmRef}
+          data-line-idx={lineInfo.lineIdx}
+        />
+      </div>
     </div>
   )
 }

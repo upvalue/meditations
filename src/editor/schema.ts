@@ -5,6 +5,8 @@ const zline = z.object({
   type: z.literal('line'),
   mdContent: z.string(),
   indent: z.number(),
+  createdAt: z.iso.datetime({ offset: true }),
+  updatedAt: z.iso.datetime({ offset: true }),
   // If present, this has a task datum
   taskStatus: z.optional(z.enum(['complete', 'incomplete', 'unset'])),
 })
