@@ -42,7 +42,7 @@ export const TEditor = () => {
           line={l}
           lineIdx={i}
           timestamp={gutterTimestamps[i]}
-          collapsed={collapsedStates[i]}
+          collapseState={collapsedStates[i]}
         />
       ))}
     </div>

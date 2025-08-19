@@ -1,14 +1,15 @@
 import { useAtom } from 'jotai'
 import { docAtom } from './state'
 import { Checkbox } from '@/components/ui/Checkbox'
-import { Circle } from 'lucide-react'
+import { Circle, CircleDot } from 'lucide-react'
 import { useCodeMirror, type LineWithIdx } from './line-editor'
 import { TimerBadge } from './TimerBadge'
 import { cn } from '@/lib/utils'
+import type { CollapseState } from './collapse'
 
 type ELineProps = LineWithIdx & {
   timestamp: string | null
-  collapsed: boolean
+  collapseState: CollapseState
 }
 
 /**
@@ -25,13 +26,16 @@ export const ELine = (lineInfo: ELineProps) => {
   // callbacks with new component state; this table
   // lets us update them on the fly
 
-  const { line, timestamp, collapsed } = lineInfo
+  const { line, timestamp, collapseState } = lineInfo
 
   const [, setDoc] = useAtom(docAtom)
 
   return (
     <div
-      className={cn('flex items-center gap-2 w-full', collapsed && 'hidden')}
+      className={cn(
+        'flex items-center gap-2 w-full',
+        collapseState === 'collapsed' && 'hidden'
+      )}
     >
       <div className="ELine-gutter font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
         {timestamp || ''}
@@ -42,7 +46,11 @@ export const ELine = (lineInfo: ELineProps) => {
           marginLeft: `${line.indent * 16}px`,
         }}
       >
-        <Circle width={8} height={8} className="mt-3" />
+        {collapseState === 'collapse-start' ? (
+          <CircleDot width={8} height={8} className="mt-3" />
+        ) : (
+          <Circle width={8} height={8} className="mt-3" />
+        )}
         {line.datumTime !== undefined && (
           <TimerBadge lineInfo={lineInfo} time={line.datumTime} />
         )}
