@@ -11,6 +11,23 @@ export const t = initTRPC.context<{ db: Kysely<Database> }>().create({
 export const router = t.router
 export const proc = t.procedure
 
+/**
+ * While developing, it's sometimes useful to just change
+ * the schema of data on the fly while not making a big deal
+ * out of it with the database
+ */
+const docMigrator = (doc: any): any => {
+  doc.body.children = doc.body.children.map((child) => {
+    if (child.createdAt) return child
+    return {
+      ...child,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+  })
+  return doc
+}
+
 const upsertNote = (db: Kysely<Database>, name: string, body: ZDoc) => {
   const r = db
     .insertInto('notes')
@@ -46,14 +63,11 @@ export const appRouter = router({
       })
     )
     .query(async ({ input, ctx: { db } }) => {
-      console.log('loadDoc called')
-      const doc = await db
+      let doc = await db
         .selectFrom('notes')
         .selectAll()
         .where('title', '=', input.name)
         .executeTakeFirst()
-
-      console.log('lodDoc 2', doc)
 
       if (!doc) {
         const mydoc: ZDoc = {
@@ -63,6 +77,8 @@ export const appRouter = router({
               type: 'line',
               mdContent: 'The world is your canvas',
               indent: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
             },
           ],
         }
@@ -70,6 +86,8 @@ export const appRouter = router({
         await upsertNote(db, input.name, mydoc)
         return mydoc
       }
+
+      doc = docMigrator(doc)
 
       return doc.body
     }),
@@ -82,7 +100,9 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ input, ctx: { db } }) => {
+      console.log('updateDoc', input)
       await upsertNote(db, input.name, input.doc)
+
       return true
     }),
 })

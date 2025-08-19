@@ -1,12 +1,12 @@
-// schema.ts - schema definition and raw operations on the schema
+// schema.ts - schema definition and raw line operations (eg no external dependencies)
 import { z } from 'zod'
 
 const zline = z.object({
   type: z.literal('line'),
   mdContent: z.string(),
   indent: z.number(),
-  createdAt: z.iso.datetime({ offset: true }),
-  updatedAt: z.iso.datetime({ offset: true }),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
   // If present, this has a task datum
   taskStatus: z.optional(z.enum(['complete', 'incomplete', 'unset'])),
 })
@@ -82,10 +82,19 @@ const analyzeDoc = (doc: ZDoc): ZDocTree => {
   return root
 }
 
+const lineMake = (indent: number, mdContent: string = ''): ZLine => ({
+  type: 'line',
+  mdContent,
+  indent,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+})
+
 export {
   zline,
   zdoc,
   analyzeDoc,
+  lineMake,
   type ZLine,
   type ZDoc,
   type ZTreeLine as ZLineTree,

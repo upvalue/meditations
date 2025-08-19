@@ -27,5 +27,6 @@
 }
 
 .ELine-gutter {
-  width: 80px;
+  width: 120px;
+  @apply pr-2;
 }

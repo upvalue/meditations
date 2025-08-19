@@ -88,6 +88,8 @@ const ExampleDoc = ({ children }: { children: React.ReactNode }) => {
             type: 'line',
             mdContent: '[[WikiLink]]',
             indent: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           },
         ],
       },

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 
 import './TEditor.css'
 import { Icon } from '@/Icon'
@@ -14,22 +14,23 @@ import {
 import { produce } from 'immer'
 import { docAtom } from './state'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
+import { generateGutterTimestamps } from './gutters'
 
-const ELine = (lineInfo: LineInfo) => {
+const ELine = (lineInfo: LineInfo & { timestamp: string | null }) => {
   const { cmRef } = useCodeMirror(lineInfo)
 
   // Codemirror of course doesn't receive recreated
   // callbacks with new component state; this table
   // lets us update them on the fly
 
-  const { line } = lineInfo
+  const { line, timestamp } = lineInfo
 
   const [, setDoc] = useAtom(docAtom)
 
   return (
     <div className="flex items-center gap-2 w-full">
-      <div className="ELine-gutter font-mono text-zinc-600 text-sm flex-shrink-0">
-        8:05 PM
+      <div className="ELine-gutter font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
+        {timestamp || ''}
       </div>
       <div
         className="flex items-start flex-grow"
@@ -69,6 +70,10 @@ export const TEditor = () => {
   const [doc] = useAtom(docAtom)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  const gutterTimestamps = useMemo(() => {
+    return generateGutterTimestamps(doc.children)
+  }, [doc.children])
+
   useCustomEventListener(
     'cm-tag-click',
     (event: CustomEvent<TagClickEventDetail>) => {
@@ -79,7 +84,7 @@ export const TEditor = () => {
   return (
     <div ref={containerRef}>
       {doc.children.map((l, i) => (
-        <ELine key={i} line={l} lineIdx={i} />
+        <ELine key={i} line={l} lineIdx={i} timestamp={gutterTimestamps[i]} />
       ))}
     </div>
   )

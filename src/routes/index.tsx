@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 export const Route = createFileRoute('/')({
   component: RouteComponent,
   loader: () => {
-    const yyyymmdd = new Date().toISOString().split('T')[0]
+    const yyyymmdd = new Date().toLocaleDateString('en-CA')
 
     throw redirect({
       to: '/n/$title',

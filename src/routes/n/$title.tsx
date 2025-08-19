@@ -110,6 +110,7 @@ function RouteComponent() {
   }, [])
 
   const loadDocQuery = trpc.loadDoc.useQuery({ name: title })
+  // TODO Silently fails
 
   useEffect(() => {
     if (loadDocQuery.isLoading) {
@@ -156,7 +157,7 @@ function RouteComponent() {
       <div className="w-full h-full flex flex-col ">
         <div className="flex flex-grow p-8">
           <div className="w-[50%]">
-            <h1 className="text-zinc-500 text-2xl font-bold ml-[80px] mb-4">
+            <h1 className="text-zinc-500 text-2xl font-bold ml-[128px] mb-4">
               {title}
             </h1>
             {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}

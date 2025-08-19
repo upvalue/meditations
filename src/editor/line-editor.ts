@@ -16,7 +16,7 @@ import {
   EditorState,
   RangeSetBuilder,
 } from '@codemirror/state'
-import { tagPattern, type ZLine } from './schema'
+import { tagPattern, lineMake, type ZLine } from './schema'
 import { useAtom } from 'jotai'
 import { docAtom, focusLineAtom } from './state'
 import { produce } from 'immer'
@@ -341,6 +341,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
             draft.children[lineIdx].indent += 1
+            draft.children[lineIdx].updatedAt = new Date().toISOString()
           })
         })
         return true
@@ -472,11 +473,11 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         })
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
-            draft.children.splice(lineIdx + 1, 0, {
-              type: 'line',
+            const newLineObj = {
+              ...lineMake(line.indent),
               mdContent: newLine,
-              indent: line.indent,
-            })
+            }
+            draft.children.splice(lineIdx + 1, 0, newLineObj)
           })
         })
 
@@ -530,6 +531,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         setDoc((recentDoc) => {
           return produce(recentDoc, (draft) => {
             draft.children[lineIdx].mdContent = content
+            draft.children[lineIdx].updatedAt = new Date().toISOString()
           })
         })
       },
