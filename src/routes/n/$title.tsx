@@ -9,10 +9,9 @@ import { Provider } from 'jotai'
 import { trpc } from '@/trpc'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
-import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 import { PgliteRepl } from '@/dev/DevTools'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import type { WikiLinkClickEventDetail } from '@/editor/line-editor'
+import { useCodemirrorEvent } from '@/editor/line-editor'
 import { TopBar } from '@/controls/TopBar'
 
 export const Route = createFileRoute('/n/$title')({
@@ -137,13 +136,13 @@ function RouteComponent() {
 
   const navigate = useNavigate()
 
-  useCustomEventListener(
-    'cm-wiki-link-click',
-    (event: CustomEvent<WikiLinkClickEventDetail>) => {
+  useCodemirrorEvent(
+    'wiki-link-click',
+    (event) => {
       navigate({
         to: '/n/$title',
         params: {
-          title: event.detail.link,
+          title: event.link,
         },
       }).then(() => {})
     }

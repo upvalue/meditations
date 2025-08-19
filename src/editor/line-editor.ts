@@ -19,14 +19,13 @@ import {
 import { tagPattern, lineMake, type ZLine } from './schema'
 import { useAtom } from 'jotai'
 import { docAtom, focusLineAtom } from './state'
-import { produce } from 'immer'
 import { autocompletion, type Completion } from '@codemirror/autocomplete'
 import { CompletionContext } from '@codemirror/autocomplete'
-import { useCustomEventListener } from '@/hooks/useCustomEventListener'
+import { TypedEventEmitter, useEventListener } from '@/lib/events'
 
 const theme = EditorView.theme({}, { dark: true })
 
-// Define specific custom event types
+// Define specific event types for codemirror communication
 export type TagClickEventDetail = {
   name: string
 }
@@ -41,6 +40,60 @@ export type LineStatusEvent = {
 
 export type LineTimerEvent = {
   lineIdx: number
+}
+
+// Combined event interface for the codemirror emitter
+type CodemirrorEvents = {
+  tagClick: TagClickEventDetail
+  wikiLinkClick: WikiLinkClickEventDetail
+  lineTimerAdd: LineTimerEvent;
+  lineTagToggle: LineStatusEvent;
+};
+
+// Singleton emitter for codemirror events
+const codemirrorEmitter = new TypedEventEmitter<CodemirrorEvents>();
+
+// Expose emitter globally for decoration string handlers
+declare global {
+  interface Window {
+    __codemirrorEmitter: TypedEventEmitter<CodemirrorEvents>
+  };
+}
+window.__codemirrorEmitter = codemirrorEmitter;
+
+// Convenience hooks
+export const useCodemirrorEvent = <K extends keyof CodemirrorEvents>(
+  event: K,
+  handler: CodemirrorEvents[K] extends undefined
+    ? () => void
+    : (data: CodemirrorEvents[K]) => void,
+) => {
+  useEventListener(codemirrorEmitter, event, handler);
+}
+
+export const emitCodemirrorEvent = <K extends keyof CodemirrorEvents>(
+  event: K,
+  ...args: CodemirrorEvents[K] extends undefined ? [] : [data: CodemirrorEvents[K]]
+) => {
+  codemirrorEmitter.emit(event, ...args)
+}
+
+// Helper for line-specific events that include lineIdx
+type LineSpecificEvents = {
+  [K in keyof CodemirrorEvents]: CodemirrorEvents[K] extends { lineIdx: number } ? K : never
+}[keyof CodemirrorEvents]
+
+export const useLineEvent = <K extends LineSpecificEvents>(
+  event: K,
+  lineIdx: number,
+  handler: (data: CodemirrorEvents[K]) => void
+) => {
+  useCodemirrorEvent(event, (data) => {
+    if ((data as any).lineIdx !== lineIdx) {
+      return
+    }
+    handler(data)
+  })
 }
 
 /**
@@ -71,7 +124,7 @@ const makeTagDecoration = (tag: string) => {
     tagName: 'span',
     attributes: {
       'data-name': tag,
-      onClick: `window.dispatchEvent(new CustomEvent('cm-tag-click', { detail: { name: "${tag}" } }))`,
+      onClick: `window.__codemirrorEmitter.emit('tagClick', { name: "${tag}" })`,
     },
   })
 }
@@ -85,7 +138,7 @@ const makeWikiLinkDecoration = (link: string) => {
     tagName: 'span',
     attributes: {
       'data-link': linkText,
-      onClick: `window.dispatchEvent(new CustomEvent('cm-wiki-link-click', { detail: { link: "${linkText}" } }))`,
+      onClick: `window.__codemirrorEmitter.emit('wikiLinkClick', { link: "${linkText}" })`,
     },
   })
 }
@@ -205,12 +258,9 @@ const slashCommands = (lineIdx: number) => {
             from: number,
             to: number
           ) => {
-            const event = new CustomEvent<LineTimerEvent>('cm-timer-add', {
-              detail: {
-                lineIdx,
-              },
+            emitCodemirrorEvent('lineTimerAdd', {
+              lineIdx,
             })
-            dispatchEvent(event)
 
             // Erase autocompleted text
             view.dispatch({
@@ -231,12 +281,9 @@ const slashCommands = (lineIdx: number) => {
             from: number,
             to: number
           ) => {
-            const event = new CustomEvent<LineStatusEvent>('cm-tag-toggle', {
-              detail: {
-                lineIdx,
-              },
+            emitCodemirrorEvent('lineTagToggle', {
+              lineIdx,
             })
-            dispatchEvent(event)
 
             // Erase autocompleted text
             view.dispatch({
@@ -613,43 +660,34 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
 
   useEffect(makeEditor, [])
 
-  useCustomEventListener(
-    'cm-timer-add',
-    (event: CustomEvent<LineTimerEvent>) => {
-      const { lineIdx } = event.detail
-      if (lineIdx !== lineInfo.lineIdx) {
-        return
-      }
+  useLineEvent(
+    'lineTimerAdd',
+    lineInfo.lineIdx,
+    (event) => {
       // If it's already got a time, don't do anything
       if (lineInfo.line.datumTime) {
         return
       }
       setDoc((draft) => {
-        draft.children[lineIdx].datumTime = 0
+        draft.children[event.lineIdx].datumTime = 0
       })
-    },
-    [lineInfo.lineIdx]
+    }
   )
 
-  useCustomEventListener(
-    'cm-tag-toggle',
-    (event: CustomEvent<LineStatusEvent>) => {
-      const { lineIdx } = event.detail
-      if (lineIdx !== lineInfo.lineIdx) {
-        return
-      }
-
+  useLineEvent(
+    'lineTagToggle',
+    lineInfo.lineIdx,
+    (event) => {
       setDoc((draft) => {
-        if (draft.children[lineIdx].datumTaskStatus) {
-          delete draft.children[lineIdx].datumTaskStatus
+        if (draft.children[event.lineIdx].datumTaskStatus) {
+          delete draft.children[event.lineIdx].datumTaskStatus
         } else {
-          draft.children[lineIdx].datumTaskStatus = 'unset'
+          draft.children[event.lineIdx].datumTaskStatus = 'unset'
         }
       })
 
-      console.log('Tag toggle event', event.detail.lineIdx)
-    },
-    [lineInfo.lineIdx]
+      console.log('Tag toggle event', event.lineIdx)
+    }
   )
 
   return {

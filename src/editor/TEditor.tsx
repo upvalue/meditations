@@ -4,9 +4,8 @@ import './TEditor.css'
 
 import { useAtom } from 'jotai'
 
-import { type TagClickEventDetail } from './line-editor'
+import { useCodemirrorEvent } from './line-editor'
 import { docAtom } from './state'
-import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 import { generateGutterTimestamps } from './gutters'
 import { ELine } from './ELine'
 
@@ -21,10 +20,10 @@ export const TEditor = () => {
     return generateGutterTimestamps(doc.children)
   }, [doc.children])
 
-  useCustomEventListener(
-    'cm-tag-click',
-    (event: CustomEvent<TagClickEventDetail>) => {
-      console.log('Tag clicked', event.detail.name)
+  useCodemirrorEvent(
+    'tagClick',
+    (event) => {
+      console.log('Tag clicked', event.name)
     }
   )
 
