@@ -2,7 +2,7 @@
 
 import type { ZLine } from './schema'
 
-type CollapseState = 'collapsed' | 'uncollapsed' | 'collapse-start'
+export type CollapseState = 'collapsed' | 'uncollapsed' | 'collapse-start'
 
 /**
  * Generates an array of booleans indicating which lines should be visually collapsed.

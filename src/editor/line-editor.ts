@@ -93,12 +93,19 @@ export const useLineEvent = <K extends LineSpecificEvents>(
   lineIdx: number,
   handler: (data: CodemirrorEvents[K]) => void
 ) => {
-  useCodemirrorEvent(event, (data: any) => {
-    if ((data as any).lineIdx !== lineIdx) {
+  // Create a properly typed wrapper that filters by lineIdx
+  const wrappedHandler = (data: CodemirrorEvents[K]) => {
+    // Type assertion is safe here because LineSpecificEvents ensures data has lineIdx
+    if ((data as CodemirrorEvents[K] & { lineIdx: number }).lineIdx !== lineIdx) {
       return
     }
     handler(data)
-  })
+  }
+  
+  // Use the wrapped handler with proper typing
+  useCodemirrorEvent(event, wrappedHandler as CodemirrorEvents[K] extends undefined
+    ? () => void
+    : (data: CodemirrorEvents[K]) => void)
 }
 
 /**

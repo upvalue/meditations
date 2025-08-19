@@ -6,6 +6,8 @@ import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
 import { uniq } from 'lodash-es'
 import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
+import { EditorLayout } from '@/layout/EditorLayout'
+import { Panel } from '@/panel/Panel'
 
 export const Route = createFileRoute('/lab')({
   component: RouteComponent,
@@ -114,18 +116,14 @@ const ExampleDoc = ({ children }: { children: React.ReactNode }) => {
 
 function RouteComponent() {
   return (
-    <div className="w-full flex p-8">
-      <div className="w-[50%]">
-        <Provider>
-          <ExampleDoc>
-            <TEditor />
-          </ExampleDoc>
-        </Provider>
-      </div>
-      <div className="w-[50%]">
-        <RawDocument />
-        {/* heroui tabs deleted, replace later */}
-      </div>
-    </div>
+    <Provider>
+      <ExampleDoc>
+        <EditorLayout
+          showControlBar={false}
+          editor={<TEditor />}
+          sidepanel={<Panel />}
+        />
+      </ExampleDoc>
+    </Provider>
   )
 }

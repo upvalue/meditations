@@ -53,9 +53,8 @@ export const TimerBadge = ({
   const [line, setLine] = useDocLine(lineInfo.lineIdx)
 
   const [timeInput, setTimeInput] = React.useState(renderTime(time))
-  const [activeTimerInterval, setActiveTimerInterval] = React.useState<
-    number | null
-  >(null)
+  const [activeTimerInterval, setActiveTimerInterval] =
+    React.useState<NodeJS.Timeout | null>(null)
 
   const [activeTimer, setActiveTimer] = React.useState<any>(false)
   const [activeTimerStart, setActiveTimerStart] = React.useState(0)

@@ -73,14 +73,14 @@ export const appRouter = router({
     )
     .query(async ({ input, ctx: { db } }) => {
       let query = db.selectFrom('notes').select(['title'])
-      
+
       if (input.query.length > 0) {
         query = query.where('title', 'ilike', `%${input.query}%`)
       }
-      
+
       const docs = await query.execute()
 
-      return docs.map(doc => ({
+      return docs.map((doc) => ({
         id: doc.title,
         title: doc.title,
         subtitle: 'Document',
@@ -120,7 +120,7 @@ export const appRouter = router({
 
       doc = docMigrator(doc)
 
-      return doc.body
+      return doc!.body
     }),
 
   updateDoc: proc

@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrpcTestRouteImport } from './routes/trpc-test'
 import { Route as LabRouteImport } from './routes/lab'
+import { Route as DemoRouteImport } from './routes/demo'
+import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NTitleRouteImport } from './routes/n/$title'
 
@@ -22,6 +24,16 @@ const TrpcTestRoute = TrpcTestRouteImport.update({
 const LabRoute = LabRouteImport.update({
   id: '/lab',
   path: '/lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R404Route = R404RouteImport.update({
+  id: '/404',
+  path: '/404',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +49,16 @@ const NTitleRoute = NTitleRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/demo': typeof DemoRoute
   '/lab': typeof LabRoute
   '/trpc-test': typeof TrpcTestRoute
   '/n/$title': typeof NTitleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/demo': typeof DemoRoute
   '/lab': typeof LabRoute
   '/trpc-test': typeof TrpcTestRoute
   '/n/$title': typeof NTitleRoute
@@ -50,20 +66,24 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/demo': typeof DemoRoute
   '/lab': typeof LabRoute
   '/trpc-test': typeof TrpcTestRoute
   '/n/$title': typeof NTitleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lab' | '/trpc-test' | '/n/$title'
+  fullPaths: '/' | '/404' | '/demo' | '/lab' | '/trpc-test' | '/n/$title'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lab' | '/trpc-test' | '/n/$title'
-  id: '__root__' | '/' | '/lab' | '/trpc-test' | '/n/$title'
+  to: '/' | '/404' | '/demo' | '/lab' | '/trpc-test' | '/n/$title'
+  id: '__root__' | '/' | '/404' | '/demo' | '/lab' | '/trpc-test' | '/n/$title'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R404Route: typeof R404Route
+  DemoRoute: typeof DemoRoute
   LabRoute: typeof LabRoute
   TrpcTestRoute: typeof TrpcTestRoute
   NTitleRoute: typeof NTitleRoute
@@ -85,6 +105,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/404': {
+      id: '/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof R404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +138,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R404Route: R404Route,
+  DemoRoute: DemoRoute,
   LabRoute: LabRoute,
   TrpcTestRoute: TrpcTestRoute,
   NTitleRoute: NTitleRoute,

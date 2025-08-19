@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit && eslint . && prettier --check .",
+    "types": "tsc --noEmit",
     "client:dev": "vite --port 3000",
     "client:start": "vite --port 3000",
     "client:build": "vite build && tsc",

@@ -85,9 +85,13 @@ applied when the page is loaded.
 
 After making changes
 
-> pnpm run check
+> pnpm types
 
-To ensure there are no type errors and that tests run properly.
+To ensure there are no type errors and
+
+> pnpm test
+
+if you changed a file with tests that should be testd
 
 If there are any tests present for a specific file, you can run them with
 

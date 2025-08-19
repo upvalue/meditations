@@ -1,6 +1,5 @@
 import { TEditor } from '@/editor/TEditor'
 import { toast } from 'sonner'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { docAtom } from '@/editor/state'
 import { createStore, useAtom } from 'jotai'
 import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
@@ -9,80 +8,13 @@ import { Provider } from 'jotai'
 import { trpc } from '@/trpc'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
-import { PgliteRepl } from '@/dev/DevTools'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useCodemirrorEvent } from '@/editor/line-editor'
-import { TopBar } from '@/controls/TopBar'
+import { EditorLayout } from '@/layout/EditorLayout'
+import { Panel } from '@/panel/Panel'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
 })
-
-const RawDocument = () => {
-  const [doc] = useAtom(docAtom)
-  return (
-    <div className="whitespace-pre-wrap font-mono">
-      {JSON.stringify(doc, null, 2)}
-    </div>
-  )
-}
-
-const TreeDocument = () => {
-  const [doc] = useAtom(docAtom)
-  return (
-    <div className="whitespace-pre-wrap font-mono">
-      {JSON.stringify(analyzeDoc(doc), null, 2)}
-    </div>
-  )
-}
-
-type TagData = {
-  [name: string]: {
-    name: string
-    complete: number | undefined
-    incomplete: number | undefined
-  }
-}
-
-// Some experimental analysis code
-const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
-  for (const tag of tags) {
-    if (!tagData[tag]) {
-      tagData[tag] = {
-        name: tag,
-        complete: undefined,
-        incomplete: undefined,
-      }
-    }
-
-    if (line.datumTaskStatus === 'complete') {
-      if (tagData[tag].complete === undefined) {
-        tagData[tag].complete = 0
-      }
-      tagData[tag].complete += 1
-    } else if (line.datumTaskStatus) {
-      if (tagData[tag].incomplete === undefined) {
-        tagData[tag].incomplete = 0
-      }
-      tagData[tag].incomplete += 1
-    }
-  }
-
-  for (const child of line.children) {
-    diveLine(child, tagData, uniq([...tags, ...child.tags]))
-  }
-}
-
-const TimeView = () => {
-  const [doc] = useAtom(docAtom)
-  const tree = analyzeDoc(doc)
-
-  const tagData: TagData = {}
-
-  tree.children.forEach((child) => diveLine(child, tagData, child.tags))
-
-  return JSON.stringify(tagData, null, 2)
-}
 
 function RouteComponent() {
   const title = Route.useParams({
@@ -147,41 +79,15 @@ function RouteComponent() {
 
   return (
     <Provider store={store}>
-      <div className="w-full h-full flex flex-col ">
-        <TopBar />
-        <div className="flex flex-grow p-8">
-          <div className="w-[60%]">
+      <EditorLayout
+        editor={
+          <>
             <h1 className="text-zinc-500 text-2xl ml-[128px] mb-4">{title}</h1>
             {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
-          </div>
-          <div className="w-[40%]">
-            <Tabs>
-              <TabsList>
-                <TabsTrigger value="time">Time View</TabsTrigger>
-                <TabsTrigger value="raw">Document Content</TabsTrigger>
-                <TabsTrigger value="tree">Tree Document</TabsTrigger>
-                <TabsTrigger value="dev">PG Repl</TabsTrigger>
-                <TabsTrigger value="tanstackdev">TanStack Devtools</TabsTrigger>
-              </TabsList>
-              <TabsContent value="time">
-                <TimeView />
-              </TabsContent>
-              <TabsContent value="raw">
-                <RawDocument />
-              </TabsContent>
-              <TabsContent value="tree">
-                <TreeDocument />
-              </TabsContent>
-              <TabsContent value="dev">
-                <PgliteRepl />
-              </TabsContent>
-              <TabsContent value="tanstackdev">
-                <TanStackRouterDevtoolsPanel router={router} />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+        sidepanel={<Panel />}
+      />
     </Provider>
   )
 }
