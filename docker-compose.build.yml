@@ -2,7 +2,7 @@ services:
   builder:
     build:
       context: .
-      dockerfile: Dockerfile.run
+      dockerfile: Dockerfile.build
     volumes:
       - ./docker-out:/docker-out
     ports:

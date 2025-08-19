@@ -7,7 +7,7 @@ docker-build:
 	docker compose -f docker-compose.build.yml up --build --force-recreate --remove-orphans
 
 docker-run:
-	docker-compose -f docker-compose.run.yml up --build 
+	docker-compose -f docker-compose.run.yml up --build  --force-recreate --remove-orphans
 
 
 clean:
