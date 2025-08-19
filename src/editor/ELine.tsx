@@ -1,19 +1,20 @@
 import { useAtom } from 'jotai'
 import { docAtom } from './state'
-import { produce } from 'immer'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Icon } from '@/Icon'
 import { ListBulletIcon } from '@heroicons/react/20/solid'
-import { useCodeMirror, type LineInfo } from './line-editor'
+import { Circle } from 'lucide-react'
+import { useCodeMirror, type LineWithIdx } from './line-editor'
 import { TimerBadge } from './TimerBadge'
 
 /**
  * The individual line editor React component. Note that the bulk of
  * the logic is contained in the line-editor.ts file which handles
- * CodeMirror integration; this component mainly handles rendering React
- * stuff around it
+ * CodeMirror integration; this component handles rendering React
+ * components and other functionality that doesn't need to live in
+ * the codemirror layer
  */
-export const ELine = (lineInfo: LineInfo & { timestamp: string | null }) => {
+export const ELine = (lineInfo: LineWithIdx & { timestamp: string | null }) => {
   const { cmRef } = useCodeMirror(lineInfo)
 
   // Codemirror of course doesn't receive recreated
@@ -35,7 +36,7 @@ export const ELine = (lineInfo: LineInfo & { timestamp: string | null }) => {
           marginLeft: `${line.indent * 16}px`,
         }}
       >
-        <Icon icon={ListBulletIcon} className="mt-2" />
+        <Circle width={8} height={8} className="mt-3" />
         {line.datumTime !== undefined && (
           <TimerBadge lineInfo={lineInfo} time={line.datumTime} />
         )}

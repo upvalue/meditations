@@ -6,11 +6,13 @@ Tekne is a freestyle productivity application structured as an outline editor
 
 # Architecture
 
-It's written in React, bundled with Vite and uses [Tanstack
-Router](https://tanstack.com/router/latest) as the router. It uses
-[Jotai](https://jotai.org/docs) for state management.
-
-It uses pnpm as the package manager (do not use normal npm).
+- Written in React
+- Bundled with Vite and uses [Tanstack Router](https://tanstack.com/router/latest) as the
+  router.
+- [Jotai](https://jotai.org/docs) for state management
+- pnpm as the package manager (do not use normal npm)
+- Postgres/kysely for databases
+- TRPC for communication between frontend and backend
 
 # File structure
 
@@ -23,6 +25,8 @@ It uses pnpm as the package manager (do not use normal npm).
 - Tests should be placed in the same directory as the file they test, not in a separate
   tests folder. For example `./src/editor/schema.ts` is tested by
   `./src/editor/schema.test.ts`
+
+# Frontend design
 
 # Editor
 
@@ -42,8 +46,8 @@ Major components of the editor are:
   line editor edits individual lines in a document, currently handles all key bindings. It
   can also change overall editor state by changing Jotai: for example, if the user enters a
   new line by pressing enter, this appends a new line to the document's `children` array.
-- `src/editor/TEditor.tsx` contains the React components that wrap the CodeMirror line
-  editor and the overall document editor
+- `src/editor/TEditor.tsx` overall document editor
+- `src/editor/ELine.tsx` React wrapper of the Codemirror editor
 
 The synchronization between Codemirror (which has its own DOM rendering and management
 system) and React is custom:
@@ -62,19 +66,20 @@ Additional features of the editor:
   command will insert today's date in `YYYY-MM-DD` format.
 
 The editor has a standalone route at `/lab` -- this can be useful for testing the document
-editor in isolation from other features from the application, and should be preferred
-unless more complex testing seems necessary.
-
-# Backend
-
-Currently, there is no real backend, but `src/trpc` contains a faux backend that uses
-actual TRPC for communication. This backend simply saves document changes as
+editor in isolation from other features from the application.
 
 # Running the application
 
 You can run the application with `pnpm run client:dev`. Although the application does have
-a server, it is also capable of running completely in the client. Prefer to do this unless
-the changes make it seem necessary to run the server.
+a server, it is also capable of running completely in the client, including fully
+functional TRPC endpoints and SQL queries. Prefer to do this unless the changes make it
+seem necessary to run the server.
+
+# Database structure
+
+The database is managed with Kysely, which can be run with `pnpm kysely` in server mode.
+Note that when the application is run in client-only mode, migrations are automatically
+applied when the page is loaded.
 
 # Testing changes
 

@@ -1,6 +1,5 @@
 import { TEditor } from '@/editor/TEditor'
 import { toast } from 'sonner'
-// import { Tabs, Tab } from '@heroui/react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { docAtom } from '@/editor/state'
 import { createStore, useAtom } from 'jotai'
@@ -9,15 +8,12 @@ import { truncate, uniq } from 'lodash-es'
 import { Provider } from 'jotai'
 import { trpc } from '@/trpc'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 import { PgliteRepl } from '@/dev/DevTools'
-import {
-  TanStackRouterDevtools,
-  TanStackRouterDevtoolsPanel,
-} from '@tanstack/react-router-devtools'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import type { WikiLinkClickEventDetail } from '@/editor/line-editor'
-import { ModeLine } from '@/editor/ModeLine'
+import { TopBar } from '@/controls/TopBar'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -156,7 +152,7 @@ function RouteComponent() {
   return (
     <Provider store={store}>
       <div className="w-full h-full flex flex-col ">
-        <ModeLine />
+        <TopBar />
         <div className="flex flex-grow p-8">
           <div className="w-[60%]">
             <h1 className="text-zinc-500 text-2xl ml-[128px] mb-4">{title}</h1>

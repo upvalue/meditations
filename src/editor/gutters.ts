@@ -18,7 +18,7 @@ export function generateGutterTimestamps(lines: ZLine[]): (string | null)[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
-    const lineDate = new Date(line.updatedAt)
+    const lineDate = new Date(line.timeUpdated)
 
     let shouldShow = false
     let showFullDate = false

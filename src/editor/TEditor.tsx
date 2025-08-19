@@ -1,21 +1,13 @@
 import { useRef, useMemo } from 'react'
 
 import './TEditor.css'
-import { Icon } from '@/Icon'
-import { ListBulletIcon } from '@heroicons/react/20/solid'
 
 import { useAtom } from 'jotai'
 
-import {
-  useCodeMirror,
-  type LineInfo,
-  type TagClickEventDetail,
-} from './line-editor'
-import { produce } from 'immer'
+import { type TagClickEventDetail } from './line-editor'
 import { docAtom } from './state'
 import { useCustomEventListener } from '@/hooks/useCustomEventListener'
 import { generateGutterTimestamps } from './gutters'
-import { Checkbox } from '@/components/ui/checkbox'
 import { ELine } from './ELine'
 
 /**

@@ -5,8 +5,8 @@ const zline = z.object({
   type: z.literal('line'),
   mdContent: z.string(),
   indent: z.number(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  timeCreated: z.iso.datetime(),
+  timeUpdated: z.iso.datetime(),
   collapsed: z.boolean().optional(),
 
   /**
@@ -95,8 +95,8 @@ const lineMake = (indent: number, mdContent: string = ''): ZLine => ({
   type: 'line',
   mdContent,
   indent,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  timeCreated: new Date().toISOString(),
+  timeUpdated: new Date().toISOString(),
 })
 
 export {

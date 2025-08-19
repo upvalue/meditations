@@ -43,7 +43,11 @@ export type LineTimerEvent = {
   lineIdx: number
 }
 
-export type LineInfo = {
+/**
+ * Line with its index. Handy for being able to
+ * change the document without knowing its structure:
+ */
+export type LineWithIdx = {
   line: ZLine
   lineIdx: number
 }
@@ -274,7 +278,7 @@ const slashCommands = (lineIdx: number) => {
  * instead of this hand rolled thing, but I wanted to use vanilla codemirror because
  * various prosemirror wrappers became very confusing.
  */
-export const useCodeMirror = (lineInfo: LineInfo) => {
+export const useCodeMirror = (lineInfo: LineWithIdx) => {
   const cmCallbacks = useRef<CallbackTable>({
     Enter: () => false,
     'Shift-Tab': () => false,
@@ -370,7 +374,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
 
         setDoc((draft) => {
           draft.children[lineIdx].indent += 1
-          draft.children[lineIdx].updatedAt = new Date().toISOString()
+          draft.children[lineIdx].timeUpdated = new Date().toISOString()
         })
         return true
       },
@@ -550,7 +554,7 @@ export const useCodeMirror = (lineInfo: LineInfo) => {
         console.log('Line', lineIdx, 'content updated', content)
         setDoc((draft) => {
           draft.children[lineIdx].mdContent = content
-          draft.children[lineIdx].updatedAt = new Date().toISOString()
+          draft.children[lineIdx].timeUpdated = new Date().toISOString()
         })
       },
     }

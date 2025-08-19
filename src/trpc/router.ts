@@ -23,6 +23,12 @@ const docMigrator = (doc: any): any => {
       mod.createdAt = new Date().toISOString()
       mod.updatedAt = new Date().toISOString()
     }
+    if (!child.timeCreated) {
+      mod.timeCreated = mod.createdAt
+    }
+    if (!child.timeUpdated) {
+      mod.timeUpdated = mod.updatedAt
+    }
     if (child.datumTaskStatus) {
       mod.datumTaskStatus = child.datumTaskStatus
     }
@@ -80,8 +86,8 @@ export const appRouter = router({
               type: 'line',
               mdContent: 'The world is your canvas',
               indent: 0,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
+              timeCreated: new Date().toISOString(),
+              timeUpdated: new Date().toISOString(),
             },
           ],
         }

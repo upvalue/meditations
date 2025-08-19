@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { LineInfo } from './line-editor'
+import type { LineWithIdx } from './line-editor'
 import { docAtom, useDocLine } from './state'
 import { useAtom } from 'jotai'
 import { Input } from '@/components/ui/input'
@@ -47,7 +47,7 @@ export const TimerBadge = ({
   lineInfo,
   time,
 }: {
-  lineInfo: LineInfo
+  lineInfo: LineWithIdx
   time: number
 }) => {
   const [line, setLine] = useDocLine(lineInfo.lineIdx)

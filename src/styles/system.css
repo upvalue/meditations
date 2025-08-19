@@ -1,3 +1,5 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --font-stack:
     'Inter', -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
