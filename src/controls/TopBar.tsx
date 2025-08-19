@@ -14,8 +14,7 @@ import {
 } from '@/components/ui/description-list'
 import { HelpCircle } from 'lucide-react'
 import { useState } from 'react'
-import { useHotkeys } from 'react-hotkeys-hook'
-import { getAllKeybindings, keybindings } from '@/lib/keys'
+import { getAllKeybindings } from '@/lib/keys'
 
 const HelpDialog = ({
   isOpen,
@@ -50,32 +49,12 @@ const HelpDialog = ({
   )
 }
 
-const DocumentSearch = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean
-  onClose: () => void
-}) => {
-  const [search, setSearch] = useState('')
-
-  return (
-    <Dialog open={isOpen} onClose={onClose} className="text-primary">
-      example document search dialog
-    </Dialog>
-  )
-}
 
 /*
  * Bar that lives at the top. Has various controls
  */
 export const TopBar = () => {
   const [helpOpen, setHelpOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-
-  useHotkeys(keybindings.documentSearch.key, () => {
-    setSearchOpen((h) => !h)
-  })
 
   return (
     <div className="bg-zinc-800 py-2 pt-4 pl-[160px]">
@@ -83,11 +62,6 @@ export const TopBar = () => {
         <HelpCircle className="w-4 h-4" />
       </Button>
       <HelpDialog isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
-
-      <DocumentSearch
-        isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
-      />
     </div>
   )
 }

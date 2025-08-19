@@ -1,6 +1,7 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { trpc } from '@/trpc'
 import { Toaster } from '@/components/ui/sonner'
+import { DocumentSearch } from '@/controls/DocumentSearch'
 
 export type RouterAppContext = {
   trpc: typeof trpc
@@ -8,10 +9,10 @@ export type RouterAppContext = {
 
 const RootComponent = () => {
   return (
-    <>
+    <DocumentSearch>
       <Outlet />
       <Toaster />
-    </>
+    </DocumentSearch>
   )
 }
 

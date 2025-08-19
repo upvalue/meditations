@@ -65,6 +65,28 @@ export const appRouter = router({
     return 'pong2'
   }),
 
+  searchDocs: proc
+    .input(
+      z.object({
+        query: z.string(),
+      })
+    )
+    .query(async ({ input, ctx: { db } }) => {
+      let query = db.selectFrom('notes').select(['title'])
+      
+      if (input.query.length > 0) {
+        query = query.where('title', 'ilike', `%${input.query}%`)
+      }
+      
+      const docs = await query.execute()
+
+      return docs.map(doc => ({
+        id: doc.title,
+        title: doc.title,
+        subtitle: 'Document',
+      }))
+    }),
+
   loadDoc: proc
     .input(
       z.object({
