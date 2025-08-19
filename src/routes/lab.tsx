@@ -85,6 +85,20 @@ const ExampleDoc = ({ children }: { children: React.ReactNode }) => {
         children: [
           {
             type: 'line',
+            mdContent: 'The world is #test',
+            indent: 0,
+            timeCreated: new Date().toISOString(),
+            timeUpdated: new Date().toISOString(),
+          },
+          {
+            type: 'line',
+            mdContent: 'Number 2 #test',
+            indent: 0,
+            timeCreated: new Date().toISOString(),
+            timeUpdated: new Date().toISOString(),
+          },
+          {
+            type: 'line',
             mdContent: '[[WikiLink]]',
             indent: 1,
             timeCreated: new Date().toISOString(),

@@ -22,6 +22,7 @@ import { docAtom, focusLineAtom } from './state'
 import { autocompletion, type Completion } from '@codemirror/autocomplete'
 import { CompletionContext } from '@codemirror/autocomplete'
 import { TypedEventEmitter, useEventListener } from '@/lib/events'
+import { keybindings } from '@/lib/keys'
 
 const theme = EditorView.theme({}, { dark: true })
 
@@ -46,41 +47,45 @@ export type LineTimerEvent = {
 type CodemirrorEvents = {
   tagClick: TagClickEventDetail
   wikiLinkClick: WikiLinkClickEventDetail
-  lineTimerAdd: LineTimerEvent;
-  lineTagToggle: LineStatusEvent;
-};
+  lineTimerAdd: LineTimerEvent
+  lineTagToggle: LineStatusEvent
+}
 
 // Singleton emitter for codemirror events
-const codemirrorEmitter = new TypedEventEmitter<CodemirrorEvents>();
+const codemirrorEmitter = new TypedEventEmitter<CodemirrorEvents>()
 
 // Expose emitter globally for decoration string handlers
 declare global {
   interface Window {
     __codemirrorEmitter: TypedEventEmitter<CodemirrorEvents>
-  };
+  }
 }
-window.__codemirrorEmitter = codemirrorEmitter;
+window.__codemirrorEmitter = codemirrorEmitter
 
 // Convenience hooks
 export const useCodemirrorEvent = <K extends keyof CodemirrorEvents>(
   event: K,
   handler: CodemirrorEvents[K] extends undefined
     ? () => void
-    : (data: CodemirrorEvents[K]) => void,
+    : (data: CodemirrorEvents[K]) => void
 ) => {
-  useEventListener(codemirrorEmitter, event, handler);
+  useEventListener(codemirrorEmitter, event, handler)
 }
 
 export const emitCodemirrorEvent = <K extends keyof CodemirrorEvents>(
   event: K,
-  ...args: CodemirrorEvents[K] extends undefined ? [] : [data: CodemirrorEvents[K]]
+  ...args: CodemirrorEvents[K] extends undefined
+    ? []
+    : [data: CodemirrorEvents[K]]
 ) => {
   codemirrorEmitter.emit(event, ...args)
 }
 
 // Helper for line-specific events that include lineIdx
 type LineSpecificEvents = {
-  [K in keyof CodemirrorEvents]: CodemirrorEvents[K] extends { lineIdx: number } ? K : never
+  [K in keyof CodemirrorEvents]: CodemirrorEvents[K] extends { lineIdx: number }
+    ? K
+    : never
 }[keyof CodemirrorEvents]
 
 export const useLineEvent = <K extends LineSpecificEvents>(
@@ -88,7 +93,7 @@ export const useLineEvent = <K extends LineSpecificEvents>(
   lineIdx: number,
   handler: (data: CodemirrorEvents[K]) => void
 ) => {
-  useCodemirrorEvent(event, (data) => {
+  useCodemirrorEvent(event, (data: any) => {
     if ((data as any).lineIdx !== lineIdx) {
       return
     }
@@ -113,6 +118,7 @@ export type CallbackTable = {
   Backspace: () => boolean
   ArrowUp: () => boolean
   ArrowDown: () => boolean
+  Collapse: () => boolean
 
   // Editor state callbacks
   contentUpdated: (content: string) => void
@@ -333,6 +339,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     Backspace: () => false,
     ArrowUp: () => false,
     ArrowDown: () => false,
+    Collapse: () => false,
     contentUpdated: () => {},
   })
   const cmRef = useRef<HTMLDivElement>(null)
@@ -365,6 +372,10 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       {
         key: 'ArrowDown',
         run: () => cmCallbacks.current.ArrowDown() ?? false,
+      },
+      {
+        key: keybindings.toggleCollapse.key,
+        run: () => cmCallbacks.current['Collapse']() ?? false,
       },
     ])
 
@@ -549,6 +560,9 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
             ...lineMake(line.indent),
             mdContent: newLine,
           }
+          if (draft.children[lineIdx].collapsed) {
+            delete draft.children[lineIdx].collapsed
+          }
           draft.children.splice(lineIdx + 1, 0, newLineObj)
         })
 
@@ -594,6 +608,24 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
           pos: Math.min(cursorPos, nextLine.mdContent.length),
         })
 
+        return true
+      },
+
+      Collapse: () => {
+        // If a line has no indented lines after it, it's not eligible
+        // to be collapsed
+        const nextLine = doc.children[lineIdx + 1]
+        if (nextLine && nextLine.indent <= line.indent) {
+          return false
+        }
+
+        setDoc((draft) => {
+          if (draft.children[lineIdx].collapsed) {
+            delete draft.children[lineIdx].collapsed
+          } else {
+            draft.children[lineIdx].collapsed = true
+          }
+        })
         return true
       },
 
@@ -660,35 +692,27 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
 
   useEffect(makeEditor, [])
 
-  useLineEvent(
-    'lineTimerAdd',
-    lineInfo.lineIdx,
-    (event) => {
-      // If it's already got a time, don't do anything
-      if (lineInfo.line.datumTime) {
-        return
+  useLineEvent('lineTimerAdd', lineInfo.lineIdx, (event) => {
+    // If it's already got a time, don't do anything
+    if (lineInfo.line.datumTime) {
+      return
+    }
+    setDoc((draft) => {
+      draft.children[event.lineIdx].datumTime = 0
+    })
+  })
+
+  useLineEvent('lineTagToggle', lineInfo.lineIdx, (event) => {
+    setDoc((draft) => {
+      if (draft.children[event.lineIdx].datumTaskStatus) {
+        delete draft.children[event.lineIdx].datumTaskStatus
+      } else {
+        draft.children[event.lineIdx].datumTaskStatus = 'unset'
       }
-      setDoc((draft) => {
-        draft.children[event.lineIdx].datumTime = 0
-      })
-    }
-  )
+    })
 
-  useLineEvent(
-    'lineTagToggle',
-    lineInfo.lineIdx,
-    (event) => {
-      setDoc((draft) => {
-        if (draft.children[event.lineIdx].datumTaskStatus) {
-          delete draft.children[event.lineIdx].datumTaskStatus
-        } else {
-          draft.children[event.lineIdx].datumTaskStatus = 'unset'
-        }
-      })
-
-      console.log('Tag toggle event', event.lineIdx)
-    }
-  )
+    console.log('Tag toggle event', event.lineIdx)
+  })
 
   return {
     cmCallbacks,

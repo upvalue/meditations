@@ -1,11 +1,15 @@
 import { useAtom } from 'jotai'
 import { docAtom } from './state'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Icon } from '@/Icon'
-import { ListBulletIcon } from '@heroicons/react/20/solid'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Circle } from 'lucide-react'
 import { useCodeMirror, type LineWithIdx } from './line-editor'
 import { TimerBadge } from './TimerBadge'
+import { cn } from '@/lib/utils'
+
+type ELineProps = LineWithIdx & {
+  timestamp: string | null
+  collapsed: boolean
+}
 
 /**
  * The individual line editor React component. Note that the bulk of
@@ -14,19 +18,21 @@ import { TimerBadge } from './TimerBadge'
  * components and other functionality that doesn't need to live in
  * the codemirror layer
  */
-export const ELine = (lineInfo: LineWithIdx & { timestamp: string | null }) => {
+export const ELine = (lineInfo: ELineProps) => {
   const { cmRef } = useCodeMirror(lineInfo)
 
   // Codemirror of course doesn't receive recreated
   // callbacks with new component state; this table
   // lets us update them on the fly
 
-  const { line, timestamp } = lineInfo
+  const { line, timestamp, collapsed } = lineInfo
 
   const [, setDoc] = useAtom(docAtom)
 
   return (
-    <div className="flex items-center gap-2 w-full">
+    <div
+      className={cn('flex items-center gap-2 w-full', collapsed && 'hidden')}
+    >
       <div className="ELine-gutter font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
         {timestamp || ''}
       </div>

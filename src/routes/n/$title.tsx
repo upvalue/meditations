@@ -136,17 +136,14 @@ function RouteComponent() {
 
   const navigate = useNavigate()
 
-  useCodemirrorEvent(
-    'wiki-link-click',
-    (event) => {
-      navigate({
-        to: '/n/$title',
-        params: {
-          title: event.link,
-        },
-      }).then(() => {})
-    }
-  )
+  useCodemirrorEvent('wikiLinkClick', (event) => {
+    navigate({
+      to: '/n/$title',
+      params: {
+        title: event.link,
+      },
+    }).then(() => {})
+  })
 
   return (
     <Provider store={store}>

@@ -1,7 +1,11 @@
 // keys.ts -- Key bindings
 
 export interface Keybinding {
-  /** The key combination (e.g., 'meta+k', 'ctrl+shift+p') */
+  /**
+   * The key combination (e.g., 'meta+k', 'ctrl+shift+p')
+   * Note that codemirror and react key codes are different
+   *
+   */
   key: string
   /** Descriptive name for the keybinding (e.g., 'document-search') */
   name: string
@@ -9,6 +13,8 @@ export interface Keybinding {
   description: string
   /** Display string for the key combination (e.g., '⌘ K') */
   displayKey: string
+  /** Type of keybinding - 'react' for react-hotkeys-hook, 'codemirror' for CodeMirror keymap */
+  type: 'react' | 'codemirror'
 }
 
 export const keybindings = {
@@ -17,12 +23,21 @@ export const keybindings = {
     name: 'document-search',
     description: 'Open a document',
     displayKey: '⌘ K',
+    type: 'react' as const,
   },
   commandPalette: {
     key: 'meta+shift+k',
     name: 'command-palette',
     description: 'Run a command',
     displayKey: '⌘ Shift K',
+    type: 'react' as const,
+  },
+  toggleCollapse: {
+    key: 'Cmd-.',
+    name: 'toggle-collapse',
+    description: 'Toggle line collapse',
+    displayKey: '⌘ .',
+    type: 'codemirror' as const,
   },
 } as const satisfies Record<string, Keybinding>
 
