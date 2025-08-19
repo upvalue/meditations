@@ -53,7 +53,6 @@ export function Badge({
   )
 }
 
-// @ts-expect-error
 export const BadgeButton = forwardRef(function BadgeButton(
   {
     color = 'zinc',
