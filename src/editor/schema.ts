@@ -24,6 +24,7 @@ type ZLine = z.infer<typeof zline>
 
 const zdoc = z.object({
   type: z.literal('doc'),
+  schemaVersion: z.number(),
   children: z.array(zline),
 })
 

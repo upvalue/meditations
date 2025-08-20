@@ -34,7 +34,13 @@ const docMigrator = (doc: any): any => {
     }
     return mod
   })
-  return doc
+  return {
+    ...doc,
+    body: {
+      ...doc.body,
+      schemaVersion: 1,
+    },
+  }
 }
 
 const upsertNote = (db: Kysely<Database>, name: string, body: ZDoc) => {
@@ -93,7 +99,7 @@ export const appRouter = router({
         name: z.string(),
       })
     )
-    .query(async ({ input, ctx: { db } }) => {
+    .query(async ({ input, ctx: { db } }): Promise<ZDoc> => {
       let doc = await db
         .selectFrom('notes')
         .selectAll()
@@ -103,6 +109,7 @@ export const appRouter = router({
       if (!doc) {
         const mydoc: ZDoc = {
           type: 'doc',
+          schemaVersion: 1,
           children: [
             {
               type: 'line',

@@ -55,9 +55,9 @@ export const KBarModal: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   return (
     <KBarPortal>
-      <KBarPositioner className="fixed inset-0 z-50 flex items-start justify-center">
+      <KBarPositioner className="KBarModal-positioner fixed inset-0 z-50 flex items-start justify-center">
         <KBarAnimator className="w-full max-w-xl">
-          <div className="KBarModal-container rounded-lg shadow-xl overflow-hidden text-white">
+          <div className="KBarModal-container p-2 rounded-lg shadow-xl overflow-hidden text-white">
             {children}
           </div>
         </KBarAnimator>

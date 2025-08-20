@@ -13,3 +13,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+[data-sonner-toast] {
+  background-color: var(--color-zinc-700) !important;
+}

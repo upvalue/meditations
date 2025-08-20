@@ -62,6 +62,7 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!loadDocQuery.isLoading && loadDocQuery.data) {
+      console.log('set with', loadDocQuery.data)
       store.set(docAtom, loadDocQuery.data)
     }
   }, [loadDocQuery.data])

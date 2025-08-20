@@ -54,6 +54,7 @@ app.get('/healthcheck', async (_req: Request, res: Response) => {
 })
 
 app.use((_req: Request, res: Response) => {
+  //
   res.status(404).json({ error: 'Route not found' })
 })
 

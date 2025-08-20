@@ -11,6 +11,8 @@ const DocumentSearchContent = () => {
   const query = kbarState.searchQuery || ''
   const [debouncedQuery, setDebouncedQuery] = useState('')
 
+  // TODO: This fires on page load and shouldn't.
+
   // Debounce the search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,6 +34,9 @@ const DocumentSearchContent = () => {
     let exactMatch = false
     if (searchDocs.data) {
       actions = searchDocs.data.map((doc) => {
+        if (doc.title.toLowerCase() === query.toLowerCase()) {
+          exactMatch = true
+        }
         return {
           id: `doc-${doc.id}`,
           name: doc.title,
@@ -43,9 +48,8 @@ const DocumentSearchContent = () => {
       })
     }
 
-    return [
-      ...actions,
-      {
+    if (!exactMatch) {
+      actions.push({
         id: 'create-doc',
         name: `Create document titled ${query}`,
         subtitle: 'Create a new document',
@@ -53,17 +57,17 @@ const DocumentSearchContent = () => {
           navigate({ to: `/n/${query}` })
         },
         keywords: `create ${query}`,
-      },
-    ]
-  }, [searchDocs.data, navigate, query])
+      })
+    }
 
-  console.log({ actions })
+    return actions
+  }, [searchDocs.data, navigate, query])
 
   useRegisterActions(actions, [actions, debouncedQuery])
 
   return (
     <KBarModal>
-      <KBarSearchInput placeholder="Search documents…" />
+      <KBarSearchInput placeholder="Search documents by title…" />
       <div className="overflow-y-auto">
         <KBarResultRenderer />
       </div>
