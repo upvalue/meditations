@@ -50,32 +50,11 @@ const HelpDialog = ({
   )
 }
 
-const DocumentSearch = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean
-  onClose: () => void
-}) => {
-  const [search, setSearch] = useState('')
-
-  return (
-    <Dialog open={isOpen} onClose={onClose} className="text-primary">
-      example document search dialog
-    </Dialog>
-  )
-}
-
 /*
  * Bar that lives at the top. Has various controls
  */
 export const ControlBar = () => {
   const [helpOpen, setHelpOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-
-  useHotkeys(keybindings.documentSearch.key, () => {
-    setSearchOpen((h) => !h)
-  })
 
   return (
     <div className="bg-zinc-900 py-2 pt-4 px-[160px]">
@@ -91,11 +70,6 @@ export const ControlBar = () => {
           </Button>
 
           <HelpDialog isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
-
-          <DocumentSearch
-            isOpen={searchOpen}
-            onClose={() => setSearchOpen(false)}
-          />
         </div>
       </div>
     </div>
