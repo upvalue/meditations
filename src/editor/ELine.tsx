@@ -1,5 +1,5 @@
-import { useAtom } from 'jotai'
-import { docAtom } from './state'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { docAtom, focusedLineAtom } from './state'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Circle, CircleDot } from 'lucide-react'
 import { useCodeMirror, type LineWithIdx } from './line-editor'
@@ -28,16 +28,19 @@ export const ELine = (lineInfo: ELineProps) => {
 
   const { line, timestamp, collapseState } = lineInfo
 
-  const [, setDoc] = useAtom(docAtom)
+  const setDoc = useSetAtom(docAtom)
+
+  const isFocused = useAtomValue(focusedLineAtom) === lineInfo.lineIdx
 
   return (
     <div
       className={cn(
-        'flex items-center gap-2 w-full',
-        collapseState === 'collapsed' && 'hidden'
+        'flex gap-2 w-full',
+        collapseState === 'collapsed' && 'hidden',
+        isFocused && 'ELine-focused'
       )}
     >
-      <div className="ELine-gutter font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
+      <div className="ELine-gutter items-center font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
         {timestamp || ''}
       </div>
       <div
@@ -47,9 +50,9 @@ export const ELine = (lineInfo: ELineProps) => {
         }}
       >
         {collapseState === 'collapse-start' ? (
-          <CircleDot width={8} height={8} className="mt-3" />
+          <CircleDot width={8} height={8} className="mt-2.5" />
         ) : (
-          <Circle width={8} height={8} className="mt-3" />
+          <Circle width={8} height={8} className="mt-2.5" />
         )}
         {line.datumTime !== undefined && (
           <TimerBadge lineInfo={lineInfo} time={line.datumTime} />

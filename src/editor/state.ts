@@ -11,10 +11,12 @@ export const docAtom = withImmer(
       lineMake(0, 'Number 2 #test'),
       lineMake(1, '[[WikiLink]]'),
     ],
-  })
+  } as any as ZDoc)
 )
 
-export const focusLineAtom = atom({
+export const focusedLineAtom = atom<number | null>(null)
+
+export const requestFocusLineAtom = atom({
   lineIdx: -1,
   pos: 0,
 })

@@ -1,56 +1,6 @@
-import React from 'react'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogTitle,
-} from '@/components/ui/catalystdialog'
-import {
-  DescriptionDetails,
-  DescriptionList,
-  DescriptionTerm,
-} from '@/components/ui/description-list'
-import { HelpCircle } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
-import { useHotkeys } from 'react-hotkeys-hook'
-import { getAllKeybindings, keybindings } from '@/lib/keys'
 import { trpc } from '@/trpc'
 import { useNavigate } from '@tanstack/react-router'
-
-const HelpDialog = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean
-  onClose: () => void
-}) => {
-  const allKeybindings = getAllKeybindings()
-
-  console.log(allKeybindings)
-
-  return (
-    <Dialog open={isOpen} onClose={onClose} className="text-primary">
-      <DialogTitle>Help</DialogTitle>
-      <DialogBody>
-        <DescriptionList>
-          {allKeybindings.map((keybinding) => (
-            <React.Fragment key={keybinding.name}>
-              <DescriptionTerm>
-                <Badge>{keybinding.displayKey}</Badge>
-              </DescriptionTerm>
-              <DescriptionDetails>{keybinding.description}</DescriptionDetails>
-            </React.Fragment>
-          ))}
-        </DescriptionList>
-      </DialogBody>
-      <DialogActions>
-        <Button onClick={onClose}>Close</Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
 
 /*
  * Bar that lives at the top. Has various controls
@@ -62,7 +12,6 @@ export const ControlBar = ({
   title: string
   allowTitleEdit?: boolean
 }) => {
-  const [helpOpen, setHelpOpen] = useState(false)
   const [proposedTitle, setProposedTitle] = useState(title)
   const [isEditing, setIsEditing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -70,7 +19,7 @@ export const ControlBar = ({
   const navigate = useNavigate()
 
   const renameDocMutation = trpc.renameDoc.useMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       setError(null)
       setIsEditing(false)
       navigate({
@@ -166,17 +115,6 @@ export const ControlBar = ({
             )}
           </div>
           {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
-        </div>
-
-        <div>
-          <Button
-            className="cursor-pointer "
-            onClick={() => setHelpOpen(!helpOpen)}
-          >
-            <HelpCircle className="w-4 h-4" />
-          </Button>
-
-          <HelpDialog isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
         </div>
       </div>
     </div>

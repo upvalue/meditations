@@ -17,8 +17,8 @@ import {
   RangeSetBuilder,
 } from '@codemirror/state'
 import { tagPattern, lineMake, type ZLine } from './schema'
-import { useAtom } from 'jotai'
-import { docAtom, focusLineAtom } from './state'
+import { useAtom, useSetAtom } from 'jotai'
+import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
 import { autocompletion, type Completion } from '@codemirror/autocomplete'
 import { CompletionContext } from '@codemirror/autocomplete'
 import { TypedEventEmitter, useEventListener } from '@/lib/events'
@@ -96,16 +96,21 @@ export const useLineEvent = <K extends LineSpecificEvents>(
   // Create a properly typed wrapper that filters by lineIdx
   const wrappedHandler = (data: CodemirrorEvents[K]) => {
     // Type assertion is safe here because LineSpecificEvents ensures data has lineIdx
-    if ((data as CodemirrorEvents[K] & { lineIdx: number }).lineIdx !== lineIdx) {
+    if (
+      (data as CodemirrorEvents[K] & { lineIdx: number }).lineIdx !== lineIdx
+    ) {
       return
     }
     handler(data)
   }
-  
+
   // Use the wrapped handler with proper typing
-  useCodemirrorEvent(event, wrappedHandler as CodemirrorEvents[K] extends undefined
-    ? () => void
-    : (data: CodemirrorEvents[K]) => void)
+  useCodemirrorEvent(
+    event,
+    wrappedHandler as CodemirrorEvents[K] extends undefined
+      ? () => void
+      : (data: CodemirrorEvents[K]) => void
+  )
 }
 
 /**
@@ -352,7 +357,8 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
   const cmRef = useRef<HTMLDivElement>(null)
   const cmView = useRef<EditorView | null>(null)
   const [doc, setDoc] = useAtom(docAtom)
-  const [focusLine, setFocusLine] = useAtom(focusLineAtom)
+  const [requestFocusLine, setRequestFocusLine] = useAtom(requestFocusLineAtom)
+  const setFocusedLine = useSetAtom(focusedLineAtom)
 
   const makeEditor = () => {
     const customKeymap = keymap.of([
@@ -397,11 +403,19 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       }
     })
 
+    const focusListener = EditorView.updateListener.of((update) => {
+      if (!update.focusChanged) return
+      if (update.view.hasFocus) {
+        setFocusedLine(lineInfo.lineIdx)
+      }
+    })
+
     const state = EditorState.create({
       doc: lineInfo.line.mdContent,
       extensions: [
         theme,
         updateListener,
+        focusListener,
         customKeymap,
         keymap.of(emacsStyleKeymap),
         EditorView.lineWrapping,
@@ -477,7 +491,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
 
           const endOfPrevLine = prevLine.mdContent.length
 
-          setFocusLine({
+          setRequestFocusLine({
             lineIdx: lineIdx - 1,
             pos: endOfPrevLine,
           })
@@ -558,7 +572,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         }
 
         console.log('After line addition, setting focus line to', lineIdx + 1)
-        setFocusLine({
+        setRequestFocusLine({
           lineIdx: lineIdx + 1,
           pos: 0,
         })
@@ -589,7 +603,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         const prevLine = doc.children[lineIdx - 1]
 
         // Focus on previous line at same cursor position
-        setFocusLine({
+        setRequestFocusLine({
           lineIdx: lineIdx - 1,
           pos: Math.min(cursorPos, prevLine.mdContent.length),
         })
@@ -610,7 +624,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         const nextLine = doc.children[lineIdx + 1]
 
         // Focus on next line at same cursor position
-        setFocusLine({
+        setRequestFocusLine({
           lineIdx: lineIdx + 1,
           pos: Math.min(cursorPos, nextLine.mdContent.length),
         })
@@ -666,7 +680,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
   useEffect(() => {
     const { lineIdx } = lineInfo
 
-    if (focusLine.lineIdx !== lineIdx) {
+    if (requestFocusLine.lineIdx !== lineIdx) {
       return
     }
 
@@ -683,19 +697,19 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
 
       view.focus()
       view.dispatch({
-        selection: EditorSelection.cursor(focusLine.pos),
+        selection: EditorSelection.cursor(requestFocusLine.pos),
         scrollIntoView: true,
       })
 
       // Clear line focus status
-      setFocusLine({
+      setRequestFocusLine({
         lineIdx: -1,
         pos: 0,
       })
     }
 
     obtainFocus()
-  }, [focusLine, lineInfo, cmView.current])
+  }, [requestFocusLine, lineInfo, cmView.current])
 
   useEffect(makeEditor, [])
 

@@ -12,19 +12,19 @@
 }
 
 .cm-editor .cm-scroller {
-  font-family: var(--font-stack);
-}
-
-.cm-gutter {
-  font-family: var(--font-stack);
+  font-family: var(--font-editor);
 }
 
 .cm-line {
   font-weight: 400;
-  font-family: var(--font-stack);
+  font-family: var(--font-editor);
 }
 
 .ELine-gutter {
   width: 120px;
   @apply pr-2;
+}
+
+.ELine-focused {
+  background-color: color-mix(in srgb, var(--color-sky-800) 10%, transparent);
 }

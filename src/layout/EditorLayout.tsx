@@ -10,7 +10,7 @@ export function EditorLayout({ editor, sidepanel }: EditorLayoutProps) {
     <div className="w-full h-full flex flex-col ">
       <div className="flex flex-grow ">
         <div className="w-[60%] bg-zinc-900">{editor}</div>
-        <div className="w-[40%]">{sidepanel}</div>
+        <div className="w-[40%] Panel">{sidepanel}</div>
       </div>
     </div>
   )
