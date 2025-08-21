@@ -5,7 +5,7 @@ import { useNavigate } from '@tanstack/react-router'
 /*
  * Bar that lives at the top. Has various controls
  */
-export const ControlBar = ({
+export const TitleBar = ({
   title,
   allowTitleEdit = false,
 }: {
@@ -87,11 +87,11 @@ export const ControlBar = ({
   }
 
   return (
-    <div className="bg-zinc-900 py-2 pt-4 pl-[138px] pr-4">
-      <div className="flex justify-between">
-        <div className="flex flex-col">
+    <div className="py-2 pt-4 pl-[138px] pr-4 w-full">
+      <div className="flex justify-between w-full">
+        <div className="flex flex-col w-full">
           <div
-            className="text-2xl text-zinc-500 cursor-pointer"
+            className="text-2xl text-zinc-500 cursor-pointer w-full"
             onClick={() => {
               if (allowTitleEdit) {
                 setIsEditing(true)
@@ -102,6 +102,7 @@ export const ControlBar = ({
               <div
                 ref={editableRef}
                 contentEditable
+                autoFocus
                 suppressContentEditableWarning={true}
                 className="outline-none "
                 onInput={(e) =>

@@ -11,7 +11,7 @@ import { useEffect, useMemo } from 'react'
 import { useCodemirrorEvent } from '@/editor/line-editor'
 import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
-import { ControlBar } from '@/controls/ControlBar'
+import { TitleBar } from '@/controls/TitleBar'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -84,7 +84,7 @@ function RouteComponent() {
       <EditorLayout
         editor={
           <>
-            <ControlBar title={title} allowTitleEdit={true} />
+            <TitleBar title={title} allowTitleEdit={true} />
             {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
           </>
         }
