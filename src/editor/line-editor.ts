@@ -2,116 +2,22 @@
 // Wraps Codemirror with lots of custom behavior
 import { useEffect, useRef } from 'react'
 
-import {
-  Decoration,
-  EditorView,
-  keymap,
-  ViewPlugin,
-  ViewUpdate,
-  type PluginValue,
-} from '@codemirror/view'
+import { EditorView, keymap } from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
-import {
-  EditorSelection,
-  EditorState,
-  RangeSetBuilder,
-} from '@codemirror/state'
-import { tagPattern, lineMake, type ZLine, type ZDoc } from './schema'
+import { EditorSelection, EditorState } from '@codemirror/state'
+import { lineMake, type ZLine } from './schema'
 import { useAtom, useSetAtom } from 'jotai'
 import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
-import { autocompletion, type Completion } from '@codemirror/autocomplete'
-import { CompletionContext } from '@codemirror/autocomplete'
-import { TypedEventEmitter, useEventListener } from '@/lib/events'
+import { autocompletion } from '@codemirror/autocomplete'
 import { keybindings } from '@/lib/keys'
+import { useLineEvent } from './line-editor/cm-events'
+import { wikiLinkPlugin } from './line-editor/wiki-link-plugin'
+import { tagPlugin } from './line-editor/tag-plugin'
+import { slashCommandsPlugin } from './line-editor/slash-commands-plugin'
 
 const theme = EditorView.theme({}, { dark: true })
 
-// Define specific event types for codemirror communication
-export type TagClickEventDetail = {
-  name: string
-}
-
-export type WikiLinkClickEventDetail = {
-  link: string
-}
-
-export type LineStatusEvent = {
-  lineIdx: number
-}
-
-export type LineTimerEvent = {
-  lineIdx: number
-}
-
-// Combined event interface for the codemirror emitter
-type CodemirrorEvents = {
-  tagClick: TagClickEventDetail
-  wikiLinkClick: WikiLinkClickEventDetail
-  lineTimerAdd: LineTimerEvent
-  lineTagToggle: LineStatusEvent
-}
-
-// Singleton emitter for codemirror events
-const codemirrorEmitter = new TypedEventEmitter<CodemirrorEvents>()
-
-// Expose emitter globally for decoration string handlers
-declare global {
-  interface Window {
-    __codemirrorEmitter: TypedEventEmitter<CodemirrorEvents>
-  }
-}
-window.__codemirrorEmitter = codemirrorEmitter
-
-// Convenience hooks
-export const useCodemirrorEvent = <K extends keyof CodemirrorEvents>(
-  event: K,
-  handler: CodemirrorEvents[K] extends undefined
-    ? () => void
-    : (data: CodemirrorEvents[K]) => void
-) => {
-  useEventListener(codemirrorEmitter, event, handler)
-}
-
-export const emitCodemirrorEvent = <K extends keyof CodemirrorEvents>(
-  event: K,
-  ...args: CodemirrorEvents[K] extends undefined
-    ? []
-    : [data: CodemirrorEvents[K]]
-) => {
-  codemirrorEmitter.emit(event, ...args)
-}
-
-// Helper for line-specific events that include lineIdx
-type LineSpecificEvents = {
-  [K in keyof CodemirrorEvents]: CodemirrorEvents[K] extends { lineIdx: number }
-    ? K
-    : never
-}[keyof CodemirrorEvents]
-
-export const useLineEvent = <K extends LineSpecificEvents>(
-  event: K,
-  lineIdx: number,
-  handler: (data: CodemirrorEvents[K]) => void
-) => {
-  // Create a properly typed wrapper that filters by lineIdx
-  const wrappedHandler = (data: CodemirrorEvents[K]) => {
-    // Type assertion is safe here because LineSpecificEvents ensures data has lineIdx
-    if (
-      (data as CodemirrorEvents[K] & { lineIdx: number }).lineIdx !== lineIdx
-    ) {
-      return
-    }
-    handler(data)
-  }
-
-  // Use the wrapped handler with proper typing
-  useCodemirrorEvent(
-    event,
-    wrappedHandler as CodemirrorEvents[K] extends undefined
-      ? () => void
-      : (data: CodemirrorEvents[K]) => void
-  )
-}
+export { useCodemirrorEvent, useLineEvent } from './line-editor/cm-events'
 
 /**
  * Line with its index. Handy for being able to
@@ -134,188 +40,6 @@ export type CallbackTable = {
   'Mod-Backspace': () => boolean
   // Editor state callbacks
   contentUpdated: (content: string) => void
-}
-
-const makeTagDecoration = (tag: string) => {
-  return Decoration.mark({
-    class: 'cm-tag cursor-pointer',
-    tagName: 'span',
-    attributes: {
-      'data-name': tag,
-      onClick: `window.__codemirrorEmitter.emit('tagClick', { name: "${tag}" })`,
-    },
-  })
-}
-
-const wikiLinkPattern = /\[\[(.*?)\]\]/g
-
-const makeWikiLinkDecoration = (link: string) => {
-  const linkText = link.slice(2, -2)
-  return Decoration.mark({
-    class: 'cm-wiki-link',
-    tagName: 'span',
-    attributes: {
-      'data-link': linkText,
-      onClick: `window.__codemirrorEmitter.emit('wikiLinkClick', { link: "${linkText}" })`,
-    },
-  })
-}
-
-const wikiLinkPlugin = ViewPlugin.fromClass(
-  class implements PluginValue {
-    decorations = Decoration.none
-
-    constructor(view: EditorView) {
-      this.decorations = this.buildDecorations(view)
-    }
-
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged) {
-        this.decorations = this.buildDecorations(update.view)
-      }
-    }
-
-    buildDecorations(view: EditorView) {
-      const builder = new RangeSetBuilder<Decoration>()
-
-      for (const { from, to } of view.visibleRanges) {
-        const text = view.state.doc.sliceString(from, to)
-        let match: RegExpExecArray | null
-
-        wikiLinkPattern.lastIndex = 0
-        while ((match = wikiLinkPattern.exec(text)) !== null) {
-          const start = from + match.index
-          const end = start + match[0].length
-          console.log('add decoration for', match[0])
-          builder.add(start, end, makeWikiLinkDecoration(match[0]))
-        }
-      }
-
-      return builder.finish()
-    }
-  },
-  {
-    decorations: (value) => value.decorations,
-  }
-)
-
-const tagPlugin = ViewPlugin.fromClass(
-  class implements PluginValue {
-    decorations = Decoration.none
-
-    constructor(view: EditorView) {
-      this.decorations = this.buildDecorations(view)
-    }
-
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged) {
-        this.decorations = this.buildDecorations(update.view)
-      }
-    }
-
-    buildDecorations(view: EditorView) {
-      const builder = new RangeSetBuilder<Decoration>()
-
-      for (const { from, to } of view.visibleRanges) {
-        const text = view.state.doc.sliceString(from, to)
-        let match: RegExpExecArray | null
-
-        tagPattern.lastIndex = 0
-        while ((match = tagPattern.exec(text)) !== null) {
-          const start = from + match.index
-          const end = start + match[0].length
-          builder.add(start, end, makeTagDecoration(match[0]))
-        }
-      }
-
-      return builder.finish()
-    }
-  },
-  {
-    decorations: (value) => value.decorations,
-  }
-)
-
-// TODO: Styling
-const slashCommands = (lineIdx: number) => {
-  return (context: CompletionContext) => {
-    // Check for words beginning with a slash
-    let word = context.matchBefore(/\/\w*/)
-    if (!word) return null
-    if (word.from == word.to && !context.explicit) return null
-    return {
-      from: word.from,
-      options: [
-        {
-          label: '/date: Insert current date',
-          type: 'text',
-          apply: (
-            view: EditorView,
-            _completion: Completion,
-            from: number,
-            to: number
-          ) => {
-            // Get YYYY-MM-DD date
-            const date = new Date().toISOString().split('T')[0]
-
-            view.dispatch({
-              changes: {
-                from,
-                to,
-                insert: date,
-              },
-            })
-          },
-        },
-        {
-          label: '/timer: Add a timer to the line',
-          type: 'text',
-          apply: (
-            view: EditorView,
-            _completion: Completion,
-            from: number,
-            to: number
-          ) => {
-            emitCodemirrorEvent('lineTimerAdd', {
-              lineIdx,
-            })
-
-            // Erase autocompleted text
-            view.dispatch({
-              changes: {
-                from,
-                to,
-                insert: '',
-              },
-            })
-          },
-        },
-        {
-          label: '/task: Toggle whether line is a task',
-          type: 'text',
-          apply: (
-            view: EditorView,
-            _completion: Completion,
-            from: number,
-            to: number
-          ) => {
-            emitCodemirrorEvent('lineTagToggle', {
-              lineIdx,
-            })
-
-            // Erase autocompleted text
-            view.dispatch({
-              changes: {
-                from,
-                to,
-                insert: '',
-              },
-            })
-          },
-        },
-      ],
-    }
-  }
 }
 
 // Line operations
@@ -429,7 +153,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         tagPlugin,
         wikiLinkPlugin,
         autocompletion({
-          override: [slashCommands(lineInfo.lineIdx)],
+          override: [slashCommandsPlugin(lineInfo.lineIdx)],
         }),
       ],
     })
@@ -498,8 +222,6 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
             if (doc.children.length === 1) {
               return false
             }
-
-            const nextLine = doc.children[lineIdx + 1]
 
             setRequestFocusLine({
               lineIdx: lineIdx,
