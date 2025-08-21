@@ -11,6 +11,7 @@ import { useEffect, useMemo } from 'react'
 import { useCodemirrorEvent } from '@/editor/line-editor'
 import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
+import { ControlBar } from '@/controls/ControlBar'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -49,6 +50,7 @@ function RouteComponent() {
       if (store.get(docAtom) === loadDocQuery.data) {
         return
       }
+
       updateDocMutation.mutate({
         name: title,
         doc: store.get(docAtom),
@@ -62,7 +64,6 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!loadDocQuery.isLoading && loadDocQuery.data) {
-      console.log('set with', loadDocQuery.data)
       store.set(docAtom, loadDocQuery.data)
     }
   }, [loadDocQuery.data])
@@ -83,7 +84,7 @@ function RouteComponent() {
       <EditorLayout
         editor={
           <>
-            <h1 className="text-zinc-500 text-2xl ml-[128px] mb-4">{title}</h1>
+            <ControlBar title={title} allowTitleEdit={true} />
             {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
           </>
         }

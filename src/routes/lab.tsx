@@ -8,6 +8,7 @@ import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
+import { ControlBar } from '@/controls/ControlBar'
 
 export const Route = createFileRoute('/lab')({
   component: RouteComponent,
@@ -119,8 +120,12 @@ function RouteComponent() {
     <Provider>
       <ExampleDoc>
         <EditorLayout
-          showControlBar={false}
-          editor={<TEditor />}
+          editor={
+            <>
+              <ControlBar title="Lab" allowTitleEdit={false} />
+              <TEditor />
+            </>
+          }
           sidepanel={<Panel />}
         />
       </ExampleDoc>

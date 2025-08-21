@@ -17,3 +17,7 @@ body {
 [data-sonner-toast] {
   background-color: var(--color-zinc-700) !important;
 }
+
+.Panel {
+  background-color: color-mix(in srgb, var(--color-zinc-900) 98%, white);
+}

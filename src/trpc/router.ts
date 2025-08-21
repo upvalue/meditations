@@ -3,6 +3,7 @@ import { zdoc, type ZDoc } from '@/editor/schema'
 import { initTRPC } from '@trpc/server'
 import type { Database } from '@/db'
 import { sql, type Kysely } from 'kysely'
+import { documentNameSchema } from '@/lib/validation'
 
 export const t = initTRPC.context<{ db: Kysely<Database> }>().create({
   allowOutsideOfServer: true,
@@ -142,6 +143,96 @@ export const appRouter = router({
       await upsertNote(db, input.name, input.doc)
 
       return true
+    }),
+
+  renameDoc: proc
+    .input(
+      z.object({
+        oldName: z.string(),
+        newName: documentNameSchema,
+      })
+    )
+    .mutation(async ({ input, ctx: { db } }) => {
+      const { oldName, newName } = input
+
+      // Check if new name already exists
+      const existingDoc = await db
+        .selectFrom('notes')
+        .select(['title'])
+        .where('title', '=', newName)
+        .executeTakeFirst()
+
+      if (existingDoc) {
+        throw new Error(`Document with name "${newName}" already exists`)
+      }
+
+      // Get the old document
+      const oldDoc = await db
+        .selectFrom('notes')
+        .selectAll()
+        .where('title', '=', oldName)
+        .executeTakeFirst()
+
+      if (!oldDoc) {
+        throw new Error(`Document "${oldName}" not found`)
+      }
+
+      // Create new document and delete old one
+      await db.transaction().execute(async (trx) => {
+        await trx
+          .insertInto('notes')
+          .values({
+            title: newName,
+            body: oldDoc.body,
+          })
+          .execute()
+
+        await trx
+          .deleteFrom('notes')
+          .where('title', '=', oldName)
+          .execute()
+      })
+
+      return { success: true, newName }
+    }),
+
+  createDoc: proc
+    .input(
+      z.object({
+        name: documentNameSchema,
+      })
+    )
+    .mutation(async ({ input, ctx: { db } }) => {
+      const { name } = input
+
+      // Check if document already exists
+      const existingDoc = await db
+        .selectFrom('notes')
+        .select(['title'])
+        .where('title', '=', name)
+        .executeTakeFirst()
+
+      if (existingDoc) {
+        throw new Error(`Document with name "${name}" already exists`)
+      }
+
+      const newDoc: ZDoc = {
+        type: 'doc',
+        schemaVersion: 1,
+        children: [
+          {
+            type: 'line',
+            mdContent: 'The world is your canvas',
+            indent: 0,
+            timeCreated: new Date().toISOString(),
+            timeUpdated: new Date().toISOString(),
+          },
+        ],
+      }
+
+      await upsertNote(db, name, newDoc)
+
+      return { success: true, name }
     }),
 })
 
