@@ -42,7 +42,75 @@ export type CallbackTable = {
   contentUpdated: (content: string) => void
 }
 
-// Line operations
+const useLineOperations = (
+  cmView: React.RefObject<EditorView | null>,
+  lineIdx: number
+) => {
+  const [doc, setDoc] = useAtom(docAtom)
+  const setRequestFocusLine = useSetAtom(requestFocusLineAtom)
+
+  const deleteLineIfEmpty = () => {
+    const view = cmView.current
+    if (!view) return false
+
+    const { state } = view
+    const { selection } = state
+    const { ranges } = selection
+
+    if (ranges.length === 0) return false
+
+    const r = ranges[0]
+
+    if (r.from === 0 && r.to === 0) {
+      // If deleting the first line, we'll refuse if
+      // there are no other lines, otherwise we go to
+      // the first char of next line
+      if (lineIdx === 0) {
+        if (doc.children.length === 1) {
+          return false
+        }
+
+        setRequestFocusLine({
+          lineIdx: lineIdx,
+          pos: 0,
+        })
+
+        setDoc((draft) => {
+          draft.children = draft.children.slice(1)
+        })
+        return true
+      }
+
+      const prevLine = doc.children[lineIdx - 1]
+
+      console.log(doc, prevLine, lineIdx)
+
+      const endOfPrevLine = prevLine.mdContent.length
+
+      setRequestFocusLine({
+        lineIdx: lineIdx - 1,
+        pos: endOfPrevLine,
+      })
+
+      setDoc((draft) => {
+        // Append content after backspace to previous line
+        draft.children[lineIdx - 1].mdContent = prevLine.mdContent.concat(
+          state.doc.slice(0, state.doc.length).toString()
+        )
+
+        // Remove current line from line array
+        draft.children.splice(lineIdx, 1)
+      })
+      return true
+    }
+
+    return false
+  }
+
+  return {
+    deleteLineIfEmpty,
+  }
+}
 
 /**
  * Sets up a Codemirror editor
@@ -86,6 +154,8 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
   const [doc, setDoc] = useAtom(docAtom)
   const [requestFocusLine, setRequestFocusLine] = useAtom(requestFocusLineAtom)
   const setFocusedLine = useSetAtom(focusedLineAtom)
+
+  const lineOps = useLineOperations(cmView, lineInfo.lineIdx)
 
   const makeEditor = () => {
     const customKeymap = keymap.of([
@@ -199,69 +269,10 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         return true
       },
 
+      'Mod-Backspace': () => lineOps.deleteLineIfEmpty(),
+
       // Enter and backspace (line creation and deletion)
-      Backspace: () => {
-        const view = cmView.current
-
-        if (!view) return false
-
-        // Check that we are at the beginning of a line
-        const { state } = view
-        const { selection } = state
-        const { ranges } = selection
-
-        if (ranges.length === 0) return false
-
-        const r = ranges[0]
-
-        if (r.from === 0 && r.to === 0) {
-          // If deleting the first line, we'll refuse if
-          // there are no other lines, otherwise we go to
-          // the first char of next line
-          if (lineIdx === 0) {
-            if (doc.children.length === 1) {
-              return false
-            }
-
-            setRequestFocusLine({
-              lineIdx: lineIdx,
-              pos: 0,
-            })
-
-            setDoc((draft) => {
-              draft.children = draft.children.slice(1)
-            })
-            return true
-          }
-
-          const prevLine = doc.children[lineIdx - 1]
-
-          const endOfPrevLine = prevLine.mdContent.length
-
-          setRequestFocusLine({
-            lineIdx: lineIdx - 1,
-            pos: endOfPrevLine,
-          })
-
-          setDoc((draft) => {
-            // Append content after backspace to previous line
-            draft.children[lineIdx - 1].mdContent = prevLine.mdContent.concat(
-              state.doc.slice(0, state.doc.length).toString()
-            )
-
-            console.log(
-              'New line content ',
-              draft.children[lineIdx - 1].mdContent
-            )
-
-            // Remove current line from line array
-            draft.children.splice(lineIdx, 1)
-          })
-          return true
-        }
-
-        return false
-      },
+      Backspace: () => lineOps.deleteLineIfEmpty(),
 
       Enter: () => {
         // console.log('enter called along with line ', lineInfo)
@@ -395,13 +406,6 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
           }
         })
         return true
-      },
-
-      'Mod-Backspace': () => {
-        const view = cmView.current
-        if (!view) return false
-
-        return false
       },
 
       contentUpdated: (content: string) => {
