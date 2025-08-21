@@ -16,7 +16,7 @@ import {
   EditorState,
   RangeSetBuilder,
 } from '@codemirror/state'
-import { tagPattern, lineMake, type ZLine } from './schema'
+import { tagPattern, lineMake, type ZLine, type ZDoc } from './schema'
 import { useAtom, useSetAtom } from 'jotai'
 import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
 import { autocompletion, type Completion } from '@codemirror/autocomplete'
@@ -131,7 +131,7 @@ export type CallbackTable = {
   ArrowUp: () => boolean
   ArrowDown: () => boolean
   Collapse: () => boolean
-
+  'Mod-Backspace': () => boolean
   // Editor state callbacks
   contentUpdated: (content: string) => void
 }
@@ -318,6 +318,8 @@ const slashCommands = (lineIdx: number) => {
   }
 }
 
+// Line operations
+
 /**
  * Sets up a Codemirror editor
  *
@@ -352,6 +354,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     ArrowUp: () => false,
     ArrowDown: () => false,
     Collapse: () => false,
+    'Mod-Backspace': () => false,
     contentUpdated: () => {},
   })
   const cmRef = useRef<HTMLDivElement>(null)
@@ -385,6 +388,10 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       {
         key: 'ArrowDown',
         run: () => cmCallbacks.current.ArrowDown() ?? false,
+      },
+      {
+        key: 'Mod-Backspace',
+        run: () => cmCallbacks.current['Mod-Backspace']() ?? false,
       },
       {
         key: keybindings.toggleCollapse.key,
@@ -484,8 +491,26 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         const r = ranges[0]
 
         if (r.from === 0 && r.to === 0) {
-          // Won't delete the first line (for now)
-          if (lineIdx === 0) return false
+          // If deleting the first line, we'll refuse if
+          // there are no other lines, otherwise we go to
+          // the first char of next line
+          if (lineIdx === 0) {
+            if (doc.children.length === 1) {
+              return false
+            }
+
+            const nextLine = doc.children[lineIdx + 1]
+
+            setRequestFocusLine({
+              lineIdx: lineIdx,
+              pos: 0,
+            })
+
+            setDoc((draft) => {
+              draft.children = draft.children.slice(1)
+            })
+            return true
+          }
 
           const prevLine = doc.children[lineIdx - 1]
 
@@ -648,6 +673,13 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
           }
         })
         return true
+      },
+
+      'Mod-Backspace': () => {
+        const view = cmView.current
+        if (!view) return false
+
+        return false
       },
 
       contentUpdated: (content: string) => {

@@ -26,5 +26,9 @@
 }
 
 .ELine-focused {
-  background-color: color-mix(in srgb, var(--color-sky-800) 10%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--color-emerald-500) 10%,
+    transparent
+  );
 }

@@ -11,6 +11,13 @@ export function Panel() {
         <div className="flex items-center border-b border-zinc-800 px-2 py-1">
           <TabsList className="bg-transparent p-0 h-auto gap-1">
             <TabsTrigger
+              value="devtools"
+              className="p-2 rounded data-[state=active]:bg-zinc-800 hover:bg-zinc-800/50"
+              title="DevTools"
+            >
+              <Wrench className="w-4 h-4" />
+            </TabsTrigger>
+            <TabsTrigger
               value="search"
               className="p-2 rounded data-[state=active]:bg-zinc-800 hover:bg-zinc-800/50"
               title="Search"
@@ -23,13 +30,6 @@ export function Panel() {
               title="Help"
             >
               <HelpCircle className="w-4 h-4" />
-            </TabsTrigger>
-            <TabsTrigger
-              value="devtools"
-              className="p-2 rounded data-[state=active]:bg-zinc-800 hover:bg-zinc-800/50"
-              title="DevTools"
-            >
-              <Wrench className="w-4 h-4" />
             </TabsTrigger>
           </TabsList>
         </div>
