@@ -8,7 +8,7 @@ import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
-import { TitleBar } from '@/controls/TitleBar'
+import { TitleBar } from '@/editor/TitleBar'
 
 export const Route = createFileRoute('/lab')({
   component: RouteComponent,

@@ -15,6 +15,17 @@
   font-family: var(--font-editor);
 }
 
+.cm-editor .cm-tooltip {
+  @apply bg-zinc-800;
+  @apply rounded-md;
+  @apply p-2;
+  font-size: 1rem;
+}
+
+.cm-completionLabel {
+  font-family: var(--font-editor);
+}
+
 .cm-line {
   font-weight: 400;
   font-family: var(--font-editor);
@@ -29,6 +40,14 @@
   background-color: color-mix(
     in srgb,
     var(--color-emerald-500) 10%,
+    transparent
+  );
+}
+
+.StatusBar {
+  background-color: color-mix(
+    in srgb,
+    var(--color-emerald-200) 10%,
     transparent
   );
 }

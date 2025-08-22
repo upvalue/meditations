@@ -58,22 +58,24 @@ export const TimerBadge = ({
 
   const [activeTimer, setActiveTimer] = React.useState<any>(false)
   const [activeTimerStart, setActiveTimerStart] = React.useState(0)
-  const [refreshCount, setRefreshCount] = React.useState(0)
+  const [setRefreshCount] = React.useState(0)
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <BadgeButton className="cursor-pointer whitespace-nowrap">
-          <div className="flex items-start justify-start gap-2">
-            <Clock7 className="w-4 h-4" />
-            <div>{time > 0 && renderTime(time)}</div>
-          </div>
-        </BadgeButton>
+        <div className="pl-2 pt-1">
+          <BadgeButton className="cursor-pointer whitespace-nowrap">
+            <div className="flex items-start justify-start gap-2 p-0.5">
+              <Clock7 className="w-4 h-4" />
+              {time > 0 && <div>{renderTime(time)}</div>}
+            </div>
+          </BadgeButton>
+        </div>
       </DialogTrigger>
       <DialogOverlay>
-        <DialogContent>
+        <DialogContent className="text-white">
           <DialogHeader>
-            <DialogTitle className="text-primary">Timer</DialogTitle>
+            <DialogTitle>Timer</DialogTitle>
           </DialogHeader>
           <div className="text-primary flex flex-col gap-4">
             <div>Line: {lineInfo.line.mdContent}</div>

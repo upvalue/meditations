@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
+import { useAtom } from 'jotai'
 import { trpc } from '@/trpc'
 import { useNavigate } from '@tanstack/react-router'
+import { errorMessageAtom } from './state'
 
 /*
- * Bar that lives at the top. Has various controls
+ * Title bar; allows user to change the title of a document
  */
 export const TitleBar = ({
   title,
@@ -13,15 +15,13 @@ export const TitleBar = ({
   allowTitleEdit?: boolean
 }) => {
   const [proposedTitle, setProposedTitle] = useState(title)
-  const [isEditing, setIsEditing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [, setErrorMessage] = useAtom(errorMessageAtom)
   const editableRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
 
   const renameDocMutation = trpc.renameDoc.useMutation({
     onSuccess: () => {
-      setError(null)
-      setIsEditing(false)
+      setErrorMessage(null)
       navigate({
         to: '/n/$title',
         params: {
@@ -40,28 +40,22 @@ export const TitleBar = ({
       } catch {
         // If parsing fails, use the original message
       }
-      setError(message)
+      setErrorMessage(message)
+
+      // Revert the title to the original
+      setProposedTitle(title)
+      if (editableRef.current) {
+        editableRef.current.textContent = title
+      }
     },
   })
 
   useEffect(() => {
     setProposedTitle(title)
-  }, [title])
-
-  useEffect(() => {
-    if (isEditing && editableRef.current) {
-      // Set the initial content only when entering edit mode
-      editableRef.current.textContent = proposedTitle
-      editableRef.current.focus()
-
-      // Select all text
-      const range = document.createRange()
-      range.selectNodeContents(editableRef.current)
-      const selection = window.getSelection()
-      selection?.removeAllRanges()
-      selection?.addRange(range)
+    if (editableRef.current) {
+      editableRef.current.textContent = title
     }
-  }, [isEditing])
+  }, [title])
 
   const handleSubmit = () => {
     if (proposedTitle.trim() !== title && allowTitleEdit) {
@@ -70,8 +64,7 @@ export const TitleBar = ({
         newName: proposedTitle.trim(),
       })
     } else {
-      setIsEditing(false)
-      setError(null)
+      setErrorMessage(null)
     }
   }
 
@@ -81,8 +74,10 @@ export const TitleBar = ({
       handleSubmit()
     } else if (e.key === 'Escape') {
       setProposedTitle(title)
-      setIsEditing(false)
-      setError(null)
+      if (editableRef.current) {
+        editableRef.current.textContent = title
+      }
+      setErrorMessage(null)
     }
   }
 
@@ -91,31 +86,14 @@ export const TitleBar = ({
       <div className="flex justify-between w-full">
         <div className="flex flex-col w-full">
           <div
-            className="text-2xl text-zinc-500 cursor-pointer w-full"
-            onClick={() => {
-              if (allowTitleEdit) {
-                setIsEditing(true)
-              }
-            }}
-          >
-            {isEditing ? (
-              <div
-                ref={editableRef}
-                contentEditable
-                autoFocus
-                suppressContentEditableWarning={true}
-                className="outline-none "
-                onInput={(e) =>
-                  setProposedTitle(e.currentTarget.textContent || '')
-                }
-                onBlur={handleSubmit}
-                onKeyDown={handleKeyDown}
-              />
-            ) : (
-              title
-            )}
-          </div>
-          {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+            ref={editableRef}
+            contentEditable={allowTitleEdit}
+            suppressContentEditableWarning={true}
+            className="text-2xl text-zinc-500 outline-none w-full"
+            onInput={(e) => setProposedTitle(e.currentTarget.textContent || '')}
+            onBlur={handleSubmit}
+            onKeyDown={handleKeyDown}
+          />
         </div>
       </div>
     </div>

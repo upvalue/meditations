@@ -15,7 +15,14 @@ import { wikiLinkPlugin } from './line-editor/wiki-link-plugin'
 import { tagPlugin } from './line-editor/tag-plugin'
 import { slashCommandsPlugin } from './line-editor/slash-commands-plugin'
 
-const theme = EditorView.theme({}, { dark: true })
+const theme = EditorView.theme(
+  {
+    '.cm-completionIcon': {
+      display: 'none',
+    },
+  },
+  { dark: true }
+)
 
 export { useCodemirrorEvent, useLineEvent } from './line-editor/cm-events'
 

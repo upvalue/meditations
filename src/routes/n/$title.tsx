@@ -11,7 +11,8 @@ import { useEffect, useMemo } from 'react'
 import { useCodemirrorEvent } from '@/editor/line-editor'
 import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
-import { TitleBar } from '@/controls/TitleBar'
+import { TitleBar } from '@/editor/TitleBar'
+import { StatusBar } from '@/editor/StatusBar'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -21,8 +22,6 @@ function RouteComponent() {
   const title = Route.useParams({
     select: (p) => p.title,
   })
-
-  const router = useRouter()
 
   const updateDocMutation = trpc.updateDoc.useMutation({
     onError: (e) => {
@@ -85,6 +84,7 @@ function RouteComponent() {
         editor={
           <>
             <TitleBar title={title} allowTitleEdit={true} />
+            <StatusBar />
             {loadDocQuery.isLoading ? <div>Loading...</div> : <TEditor />}
           </>
         }

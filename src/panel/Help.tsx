@@ -16,10 +16,10 @@ export const Help = () => {
       <DescriptionList>
         {allKeybindings.map((keybinding) => (
           <React.Fragment key={keybinding.name}>
-            <DescriptionTerm>
+            <DescriptionTerm>{keybinding.description}</DescriptionTerm>
+            <DescriptionDetails>
               <Badge>{keybinding.displayKey}</Badge>
-            </DescriptionTerm>
-            <DescriptionDetails>{keybinding.description}</DescriptionDetails>
+            </DescriptionDetails>
           </React.Fragment>
         ))}
       </DescriptionList>

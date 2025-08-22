@@ -21,6 +21,8 @@ export const requestFocusLineAtom = atom({
   pos: 0,
 })
 
+export const errorMessageAtom = atom<string | null>(null)
+
 /**
  * Allows reading or modifying a specific line
  * in the document
