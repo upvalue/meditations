@@ -58,7 +58,7 @@ export const TimerBadge = ({
 
   const [activeTimer, setActiveTimer] = React.useState<any>(false)
   const [activeTimerStart, setActiveTimerStart] = React.useState(0)
-  const [setRefreshCount] = React.useState(0)
+  const [refreshCount, setRefreshCount] = React.useState(0)
 
   return (
     <Dialog>
@@ -113,7 +113,7 @@ export const TimerBadge = ({
                 setActiveTimerStart(Date.now())
                 setActiveTimerInterval(
                   setInterval(() => {
-                    setRefreshCount((count) => count + 1)
+                    setRefreshCount((count: number) => count + 1)
                   }, 1000)
                 )
               }}

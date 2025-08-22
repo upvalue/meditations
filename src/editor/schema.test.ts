@@ -1,30 +1,25 @@
 import { describe, test, expect } from 'vitest'
-import { analyzeDoc, lineMake, type ZDoc } from './schema'
+import { analyzeDoc, lineMake, docMake, type ZDoc } from './schema'
 
 describe('analyzeDoc', () => {
   test('should handle empty document', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [],
-    }
+    const doc: ZDoc = docMake([])
 
     const result = analyzeDoc(doc)
 
     expect(result).toEqual({
       type: 'doc',
+      schemaVersion: 1,
       children: [],
     })
   })
 
   test('should handle flat structure with no indentation', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [
-        { ...lineMake(0, 'First line') },
-        { ...lineMake(0, 'Second line') },
-        { ...lineMake(0, 'Third line') },
-      ],
-    }
+    const doc: ZDoc = docMake([
+      { ...lineMake(0, 'First line') },
+      { ...lineMake(0, 'Second line') },
+      { ...lineMake(0, 'Third line') },
+    ])
 
     const result = analyzeDoc(doc)
 
@@ -50,15 +45,12 @@ describe('analyzeDoc', () => {
   })
 
   test('should handle simple nested structure', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [
-        { ...lineMake(0, 'Parent 1') },
-        { ...lineMake(1, 'Child 1.1') },
-        { ...lineMake(1, 'Child 1.2') },
-        { ...lineMake(0, 'Parent 2') },
-      ],
-    }
+    const doc: ZDoc = docMake([
+      { ...lineMake(0, 'Parent 1') },
+      { ...lineMake(1, 'Child 1.1') },
+      { ...lineMake(1, 'Child 1.2') },
+      { ...lineMake(0, 'Parent 2') },
+    ])
 
     const result = analyzeDoc(doc)
 
@@ -76,16 +68,13 @@ describe('analyzeDoc', () => {
   })
 
   test('should handle deeply nested structure', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [
-        { ...lineMake(0, 'Level 0') },
-        { ...lineMake(1, 'Level 1') },
-        { ...lineMake(2, 'Level 2') },
-        { ...lineMake(3, 'Level 3') },
-        { ...lineMake(1, 'Back to Level 1') },
-      ],
-    }
+    const doc: ZDoc = docMake([
+      { ...lineMake(0, 'Level 0') },
+      { ...lineMake(1, 'Level 1') },
+      { ...lineMake(2, 'Level 2') },
+      { ...lineMake(3, 'Level 3') },
+      { ...lineMake(1, 'Back to Level 1') },
+    ])
 
     const result = analyzeDoc(doc)
 
@@ -113,19 +102,16 @@ describe('analyzeDoc', () => {
   })
 
   test('should handle mixed indentation levels', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [
-        { ...lineMake(0, 'Root 1') },
-        { ...lineMake(1, 'Child 1.1') },
-        { ...lineMake(2, 'Grandchild 1.1.1') },
-        { ...lineMake(0, 'Root 2') },
-        { ...lineMake(1, 'Child 2.1') },
-        { ...lineMake(1, 'Child 2.2') },
-        { ...lineMake(2, 'Grandchild 2.2.1') },
-        { ...lineMake(2, 'Grandchild 2.2.2') },
-      ],
-    }
+    const doc: ZDoc = docMake([
+      { ...lineMake(0, 'Root 1') },
+      { ...lineMake(1, 'Child 1.1') },
+      { ...lineMake(2, 'Grandchild 1.1.1') },
+      { ...lineMake(0, 'Root 2') },
+      { ...lineMake(1, 'Child 2.1') },
+      { ...lineMake(1, 'Child 2.2') },
+      { ...lineMake(2, 'Grandchild 2.2.1') },
+      { ...lineMake(2, 'Grandchild 2.2.2') },
+    ])
 
     const result = analyzeDoc(doc)
 
@@ -153,10 +139,7 @@ describe('analyzeDoc', () => {
 
   test('should handle single line document', () => {
     const line = lineMake(0, 'Only line')
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [line],
-    }
+    const doc: ZDoc = docMake([line])
 
     const result = analyzeDoc(doc)
 
@@ -170,9 +153,7 @@ describe('analyzeDoc', () => {
   })
 
   test('should preserve original line properties', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [
+    const doc: ZDoc = docMake([
         {
           ...lineMake(0, 'Task line'),
           datumTaskStatus: 'incomplete',
@@ -181,8 +162,7 @@ describe('analyzeDoc', () => {
           ...lineMake(1, 'Child task'),
           datumTaskStatus: 'complete',
         },
-      ],
-    }
+      ])
 
     const result = analyzeDoc(doc)
 
@@ -193,14 +173,11 @@ describe('analyzeDoc', () => {
   })
 
   test('should handle skipped indentation levels', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [
+    const doc: ZDoc = docMake([
         { ...lineMake(0, 'Level 0') },
         { ...lineMake(2, 'Level 2 (skipped 1)') },
         { ...lineMake(1, 'Level 1') },
-      ],
-    }
+      ])
 
     const result = analyzeDoc(doc)
 
@@ -216,10 +193,7 @@ describe('analyzeDoc', () => {
   })
 
   test('should initialize tags and children arrays for all lines', () => {
-    const doc: ZDoc = {
-      type: 'doc',
-      children: [{ ...lineMake(0, 'Line 1') }, { ...lineMake(1, 'Line 2') }],
-    }
+    const doc: ZDoc = docMake([{ ...lineMake(0, 'Line 1') }, { ...lineMake(1, 'Line 2') }])
 
     const result = analyzeDoc(doc)
 

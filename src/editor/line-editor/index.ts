@@ -2,4 +2,4 @@
 export * from './cm-events'
 export * from './wiki-link-plugin'
 export * from './tag-plugin'
-export * from './slash-commands'
+export * from './slash-commands-plugin'

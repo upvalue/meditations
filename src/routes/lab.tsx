@@ -2,7 +2,7 @@ import { TEditor } from '@/editor/TEditor'
 import { createFileRoute } from '@tanstack/react-router'
 import { docAtom } from '@/editor/state'
 import { useAtom } from 'jotai'
-import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
+import { analyzeDoc, docMake, lineMake, type ZTreeLine } from '@/editor/schema'
 import { uniq } from 'lodash-es'
 import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
@@ -83,32 +83,17 @@ const ExampleDoc = ({ children }: { children: React.ReactNode }) => {
   useHydrateAtoms([
     [
       docAtom,
-      {
-        type: 'doc',
-        children: [
-          {
-            type: 'line',
-            mdContent: 'The world is #test',
-            indent: 0,
-            timeCreated: new Date().toISOString(),
-            timeUpdated: new Date().toISOString(),
-          },
-          {
-            type: 'line',
-            mdContent: 'Number 2 #test',
-            indent: 0,
-            timeCreated: new Date().toISOString(),
-            timeUpdated: new Date().toISOString(),
-          },
-          {
-            type: 'line',
-            mdContent: '[[WikiLink]]',
-            indent: 1,
-            timeCreated: new Date().toISOString(),
-            timeUpdated: new Date().toISOString(),
-          },
-        ],
-      },
+      docMake([
+        {
+          ...lineMake(0, 'The world is #test'),
+        },
+        {
+          ...lineMake(0, 'Number 2 #test'),
+        },
+        {
+          ...lineMake(1, '[[WikiLink]]'),
+        },
+      ]),
     ],
   ])
 

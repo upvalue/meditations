@@ -100,11 +100,21 @@ const lineMake = (indent: number, mdContent: string = ''): ZLine => ({
   timeUpdated: new Date().toISOString(),
 })
 
+const CURRENT_SCHEMA_VERSION = 1
+
+const docMake = (children: ZLine[] = []): ZDoc => ({
+  type: 'doc',
+  schemaVersion: CURRENT_SCHEMA_VERSION,
+  children,
+})
+
 export {
   zline,
   zdoc,
   analyzeDoc,
   lineMake,
+  docMake,
+  CURRENT_SCHEMA_VERSION,
   type ZLine,
   type ZDoc,
   type ZTreeLine as ZLineTree,

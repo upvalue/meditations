@@ -7,13 +7,19 @@
     "types": "tsc --noEmit",
     "client:dev": "vite --port 3000",
     "client:start": "vite --port 3000",
-    "client:build": "vite build && tsc",
+    "client:build": "vite build",
+    "client:build-for-server": "TEKNE_TRPC_URL=/api/trpc vite build",
     "client:serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "kysely": "kysely",
-    "server:dev": "DATABASE_URL=postgres://postgres:password@localhost/tekne tsx --watch src/server/index.ts"
+    "generate:routes": "node scripts/generate-client-routes.js",
+    "server:dev": "DATABASE_URL=postgres://postgres:password@localhost/tekne tsx --watch src/server/index.ts",
+    "server:start": "NODE_ENV=production DATABASE_URL=postgres://postgres:password@localhost/tekne tsx src/server/index.ts",
+    "build": "pnpm run generate:routes && pnpm run client:build",
+    "start": "pnpm run server:start",
+    "prod": "NODE_ENV=production DATABASE_URL=postgres://postgres:password@localhost/tekne pnpm run start"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.6",

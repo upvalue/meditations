@@ -40,7 +40,7 @@ export const ELine = (lineInfo: ELineProps) => {
         isFocused && 'ELine-focused'
       )}
     >
-      <div className="ELine-gutter items-center font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
+      <div className="ELine-gutter items-start pt-1 font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
         {timestamp || ''}
       </div>
       <div
