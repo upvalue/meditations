@@ -1,7 +1,7 @@
 import { TEditor } from '@/editor/TEditor'
 import { toast } from 'sonner'
 import { docAtom } from '@/editor/state'
-import { createStore, useAtom } from 'jotai'
+import { createStore, useAtom, useSetAtom } from 'jotai'
 import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
 import { truncate, uniq } from 'lodash-es'
 import { Provider } from 'jotai'
@@ -13,7 +13,7 @@ import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
 import { TitleBar } from '@/editor/TitleBar'
 import { StatusBar } from '@/editor/StatusBar'
-import { useSetMainTitle } from '@/hooks/useTitle'
+import { setMainTitle } from '@/lib/title'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -24,11 +24,9 @@ function RouteComponent() {
     select: (p) => p.title,
   })
 
-  const setMainTitle = useSetMainTitle()
-
   useEffect(() => {
     setMainTitle(title)
-  }, [title, setMainTitle])
+  }, [title])
 
   const updateDocMutation = trpc.updateDoc.useMutation({
     onError: (e) => {
@@ -82,7 +80,7 @@ function RouteComponent() {
       params: {
         title: event.link,
       },
-    }).then(() => {})
+    }).then(() => { })
   })
 
   return (

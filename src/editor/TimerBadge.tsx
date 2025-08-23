@@ -11,13 +11,14 @@ import {
 } from '@/components/ui/dialog'
 import type { LineWithIdx } from './line-editor'
 import { docAtom, useDocLine } from './state'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { Input } from '@/components/ui/input'
 import parseDuration from 'parse-duration'
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { ClockIcon, PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/16/solid'
 import { useCallback, useRef } from 'react'
+import { setDetailTitle } from '@/lib/title'
 
 const renderTime = (seconds: number) => {
   if (seconds === 0) return '0s'
@@ -71,7 +72,7 @@ export const TimerBadge = ({
   lineInfo: LineWithIdx
   time: number
 }) => {
-  const [line, setLine] = useDocLine(lineInfo.lineIdx)
+  const [, setLine] = useDocLine(lineInfo.lineIdx)
 
   const [timerState, setTimerState] = React.useState<TimerState>({
     mode: 'stopwatch',
@@ -84,7 +85,8 @@ export const TimerBadge = ({
   const [timeInput, setTimeInput] = React.useState(renderTime(time))
   const [countdownInput, setCountdownInput] = React.useState('25m')
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
-  const [currentTime, setCurrentTime] = React.useState(0)
+
+  const lineContent = lineInfo.line.mdContent;
 
   // Timer management functions
   const startTimer = useCallback(() => {
@@ -94,6 +96,8 @@ export const TimerBadge = ({
       startTime: Date.now(),
       elapsedTime: prev.mode === 'countdown' ? prev.targetDuration : 0,
     }))
+
+    setDetailTitle(lineContent);
 
     intervalRef.current = setInterval(() => {
       setTimerState(prev => {
@@ -119,15 +123,18 @@ export const TimerBadge = ({
         }
         return prev
       })
-      setCurrentTime(Date.now())
     }, 1000)
-  }, [])
+  }, [lineContent])
 
   const stopTimer = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
+
+    console.log('stoptimer');
+
+    setDetailTitle(null);
 
     setTimerState(prev => {
       if (prev.mode === 'stopwatch' && prev.isRunning) {
@@ -241,7 +248,7 @@ export const TimerBadge = ({
               </div>
 
             </div>
-            <div className="text-lg text-gray-400">{lineInfo.line.mdContent}</div>
+            <div className="text-lg text-gray-400">{lineContent}</div>
           </DialogHeader>
           <div className="text-primary flex flex-col gap-4 h-full overflow-hidden">
 
