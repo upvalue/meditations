@@ -1,7 +1,0 @@
-# docker-compose.yml - easily up a postgres database
-version: '3.1'
-services:
-  database:
-    image: postgres
-    ports:
-    - 5432:5432
