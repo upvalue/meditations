@@ -58,8 +58,13 @@ export const BadgeButton = forwardRef(function BadgeButton(
     color = 'zinc',
     className,
     children,
+    badgeClassName,
     ...props
-  }: BadgeProps & { className?: string; children: React.ReactNode } & (
+  }: BadgeProps & {
+    className?: string
+    children: React.ReactNode
+    badgeClassName?: string
+  } & (
       | Omit<Headless.ButtonProps, 'as' | 'className'>
       | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>
     ),
@@ -77,13 +82,17 @@ export const BadgeButton = forwardRef(function BadgeButton(
       ref={ref as React.ForwardedRef<HTMLAnchorElement>}
     >
       <TouchTarget>
-        <Badge color={color}>{children}</Badge>
+        <Badge color={color} className={badgeClassName}>
+          {children}
+        </Badge>
       </TouchTarget>
     </Link>
   ) : (
     <Headless.Button {...props} className={classes} ref={ref}>
       <TouchTarget>
-        <Badge color={color}>{children}</Badge>
+        <Badge color={color} className={badgeClassName}>
+          {children}
+        </Badge>
       </TouchTarget>
     </Headless.Button>
   )

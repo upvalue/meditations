@@ -51,3 +51,7 @@
     transparent
   );
 }
+
+.cm-content.cm-lineWrapping {
+  padding: 0;
+}

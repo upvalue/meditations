@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { Badge, BadgeButton } from '@/components/ui/Badge'
 
-import { Clock7 } from 'lucide-react'
-
 import {
   Dialog,
   DialogHeader,
@@ -18,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import parseDuration from 'parse-duration'
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@radix-ui/react-dialog'
+import { ClockIcon } from '@heroicons/react/16/solid'
 
 const renderTime = (seconds: number) => {
   if (seconds === 0) return '0s'
@@ -63,10 +62,13 @@ export const TimerBadge = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="pl-2 pt-1">
-          <BadgeButton className="cursor-pointer whitespace-nowrap">
-            <div className="flex items-start justify-start gap-2 p-0.5">
-              <Clock7 className="w-4 h-4" />
+        <div className="ml-1">
+          <BadgeButton
+            className="cursor-pointer whitespace-nowrap"
+            badgeClassName="px-[4px] py-[1px]"
+          >
+            <div className="flex items-center gap-1">
+              <ClockIcon style={{ width: '16px', height: '16px' }} />
               {time > 0 && <div>{renderTime(time)}</div>}
             </div>
           </BadgeButton>

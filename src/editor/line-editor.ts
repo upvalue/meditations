@@ -16,9 +16,15 @@ import { tagPlugin } from './line-editor/tag-plugin'
 import { slashCommandsPlugin } from './line-editor/slash-commands-plugin'
 
 const theme = EditorView.theme(
+  // Preferring to do these in TEditor.css
+  // but due to the css-in-js approach in some cases
+  // it's challenging
   {
     '.cm-completionIcon': {
       display: 'none',
+    },
+    '.cm-line': {
+      padding: '0',
     },
   },
   { dark: true }
@@ -408,7 +414,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         // If a line has no indented lines after it, it's not eligible
         // to be collapsed
         const nextLine = doc.children[lineIdx + 1]
-        if (nextLine && nextLine.indent <= line.indent) {
+        if (!nextLine || nextLine.indent <= line.indent) {
           return false
         }
 

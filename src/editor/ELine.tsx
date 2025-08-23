@@ -35,49 +35,53 @@ export const ELine = (lineInfo: ELineProps) => {
   return (
     <div
       className={cn(
-        'flex gap-2 w-full',
+        'flex gap-2 w-full py-1 items-center',
         collapseState === 'collapsed' && 'hidden',
         isFocused && 'ELine-focused'
       )}
     >
-      <div className="ELine-gutter items-start pt-1 font-mono text-zinc-600 text-sm flex-shrink-0 justify-end flex">
+      <div className="ELine-gutter text-zinc-600 text-sm flex-shrink-0 justify-end flex font-mono">
         {timestamp || ''}
       </div>
+      <div style={{ flex: 'none', width: `${line.indent * 16}px` }} />
+      {/*
       <div
-        className="flex items-start flex-grow"
+        className="flex items-center flex-grow"
         style={{
           marginLeft: `${line.indent * 16}px`,
         }}
       >
-        {collapseState === 'collapse-start' ? (
-          <CircleDot width={8} height={8} className="mt-2.5" />
+        */}
+      <span className="text-zinc-600 font-sans ">*</span>
+      {/*collapseState === 'collapse-start' ? (
+          <CircleDot width={8} height={8} />
         ) : (
-          <Circle width={8} height={8} className="mt-2.5" />
-        )}
-        {line.datumTime !== undefined && (
-          <TimerBadge lineInfo={lineInfo} time={line.datumTime} />
-        )}
-        {line.datumTaskStatus && (
-          <Checkbox
-            className="mt-2 ml-2"
-            tabIndex={-1}
-            checked={line.datumTaskStatus === 'complete'}
-            onChange={(e) => {
-              // TOOD: This pattern repeats itself and could be turned into a hook
-              setDoc((draft) => {
-                draft.children[lineInfo.lineIdx].datumTaskStatus = e
-                  ? 'complete'
-                  : 'incomplete'
-              })
-            }}
-          />
-        )}
-        <div
-          className="cm-editor-container w-full"
-          ref={cmRef}
-          data-line-idx={lineInfo.lineIdx}
+          <Circle width={8} height={8} />
+        )*/}
+      {line.datumTime !== undefined && (
+        <TimerBadge lineInfo={lineInfo} time={line.datumTime} />
+      )}
+      {line.datumTaskStatus && (
+        <Checkbox
+          className="mt-2 ml-2"
+          tabIndex={-1}
+          checked={line.datumTaskStatus === 'complete'}
+          onChange={(e) => {
+            // TOOD: This pattern repeats itself and could be turned into a hook
+            setDoc((draft) => {
+              draft.children[lineInfo.lineIdx].datumTaskStatus = e
+                ? 'complete'
+                : 'incomplete'
+            })
+          }}
         />
-      </div>
+      )}
+      <div
+        className="cm-editor-container w-full"
+        ref={cmRef}
+        data-line-idx={lineInfo.lineIdx}
+      />
+      {/*</div>*/}
     </div>
   )
 }
