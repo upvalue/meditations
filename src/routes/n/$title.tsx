@@ -13,6 +13,7 @@ import { EditorLayout } from '@/layout/EditorLayout'
 import { Panel } from '@/panel/Panel'
 import { TitleBar } from '@/editor/TitleBar'
 import { StatusBar } from '@/editor/StatusBar'
+import { useSetMainTitle } from '@/hooks/useTitle'
 
 export const Route = createFileRoute('/n/$title')({
   component: RouteComponent,
@@ -22,6 +23,12 @@ function RouteComponent() {
   const title = Route.useParams({
     select: (p) => p.title,
   })
+
+  const setMainTitle = useSetMainTitle()
+
+  useEffect(() => {
+    setMainTitle(title)
+  }, [title, setMainTitle])
 
   const updateDocMutation = trpc.updateDoc.useMutation({
     onError: (e) => {
