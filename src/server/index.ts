@@ -25,7 +25,17 @@ const NODE_ENV = process.env.NODE_ENV || 'development'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DIST_PATH = path.join(__dirname, '../../dist')
 
-app.use(helmet())
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        // Unsafe-inline currently required for codemirror event handlers
+        // Can probably be fixed
+        'script-src': ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+)
 app.use(cors())
 app.use(compression())
 app.use(express.json())
