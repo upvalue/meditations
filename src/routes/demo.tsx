@@ -22,18 +22,9 @@ function RouteComponent() {
     })
   }
 
-  const disclaimerContent = (
-    <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/20 dark:border-yellow-700">
-      <p className="text-sm text-yellow-800 dark:text-yellow-200">
-        <strong>Demo Mode:</strong> This is a demonstration version of Tekne.
-        Your data may not be permanently saved and features may be limited.
-      </p>
-    </div>
-  )
-
   return (
     <CopyLayout
-      title="Hey! Listen!"
+      title="Hey, listen!"
       primaryAction={{
         text: 'Continue to demo',
         onClick: handleContinueDemo,
@@ -45,9 +36,9 @@ function RouteComponent() {
     >
       <p className="max-w-[50%]  text-left">
         This is a demo for a productivity app that's currently super alpha. The
-        demo saves data in your browser storage, and doesn't persist it,
-        probably has horrible bugs and should not, under any circumstances,
-        actually be used.
+        demo saves data in your browser storage, doesn't persist it, probably
+        has horrible bugs and should not, under any circumstances, actually be
+        used.
       </p>
     </CopyLayout>
   )
