@@ -11,6 +11,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { registerClientRoutes } from './client-routes.js'
 
+import dotenv from 'dotenv'
+
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production' })
+} else {
+  dotenv.config()
+}
+
 const app = express()
 const PORT = process.env.PORT || 3005
 const NODE_ENV = process.env.NODE_ENV || 'development'

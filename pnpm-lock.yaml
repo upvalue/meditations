@@ -95,6 +95,9 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
+      dotenv:
+        specifier: ^17.2.1
+        version: 17.2.1
       express:
         specifier: ^5.1.0
         version: 5.1.0
@@ -117,14 +120,14 @@ importers:
         specifier: 0.1.0-beta.48
         version: 0.1.0-beta.48(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       kysely:
-        specifier: ^0.28.3
-        version: 0.28.3
+        specifier: ^0.28.5
+        version: 0.28.5
       kysely-codegen:
         specifier: ^0.18.5
-        version: 0.18.5(kysely@0.28.3)(pg@8.16.3)(typescript@5.8.3)
+        version: 0.18.5(kysely@0.28.5)(pg@8.16.3)(typescript@5.8.3)
       kysely-pglite-dialect:
         specifier: ^1.1.1
-        version: 1.1.1(@electric-sql/pglite@0.3.5)(kysely@0.28.3)
+        version: 1.1.1(@electric-sql/pglite@0.3.5)(kysely@0.28.5)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -233,7 +236,7 @@ importers:
         version: 26.1.0
       kysely-ctl:
         specifier: ^0.13.1
-        version: 0.13.1(kysely@0.28.3)
+        version: 0.13.1(kysely@0.28.5)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -1982,6 +1985,10 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
+  dotenv@17.2.1:
+    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -2670,8 +2677,8 @@ packages:
       '@electric-sql/pglite': ^0.2.0
       kysely: '>=0.23.0'
 
-  kysely@0.28.3:
-    resolution: {integrity: sha512-svKnkSH72APRdjfVCCOknxaC9Eb3nA2StHG9d5/sKOqRvHRp2Dtf1XwDvc92b4B5v6LV+EAGWXQbZ5jMOvHaDw==}
+  kysely@0.28.5:
+    resolution: {integrity: sha512-rlB0I/c6FBDWPcQoDtkxi9zIvpmnV5xoIalfCMSMCa7nuA6VGA3F54TW9mEgX4DVf10sXAWCF5fDbamI/5ZpKA==}
     engines: {node: '>=20.0.0'}
 
   levn@0.4.1:
@@ -5621,6 +5628,8 @@ snapshots:
 
   dotenv@16.6.1: {}
 
+  dotenv@17.2.1: {}
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -6411,14 +6420,14 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  kysely-codegen@0.18.5(kysely@0.28.3)(pg@8.16.3)(typescript@5.8.3):
+  kysely-codegen@0.18.5(kysely@0.28.5)(pg@8.16.3)(typescript@5.8.3):
     dependencies:
       chalk: 4.1.2
       cosmiconfig: 9.0.0(typescript@5.8.3)
       dotenv: 16.6.1
       dotenv-expand: 12.0.2
       git-diff: 2.0.6
-      kysely: 0.28.3
+      kysely: 0.28.5
       micromatch: 4.0.8
       minimist: 1.2.8
       pluralize: 8.0.0
@@ -6428,13 +6437,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  kysely-ctl@0.13.1(kysely@0.28.3):
+  kysely-ctl@0.13.1(kysely@0.28.5):
     dependencies:
       c12: 3.1.0
       citty: 0.1.6
       consola: 3.4.2
       jiti: 2.4.2
-      kysely: 0.28.3
+      kysely: 0.28.5
       nypm: 0.6.0
       ofetch: 1.4.1
       pathe: 2.0.3
@@ -6443,12 +6452,12 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  kysely-pglite-dialect@1.1.1(@electric-sql/pglite@0.3.5)(kysely@0.28.3):
+  kysely-pglite-dialect@1.1.1(@electric-sql/pglite@0.3.5)(kysely@0.28.5):
     dependencies:
       '@electric-sql/pglite': 0.3.5
-      kysely: 0.28.3
+      kysely: 0.28.5
 
-  kysely@0.28.3: {}
+  kysely@0.28.5: {}
 
   levn@0.4.1:
     dependencies:

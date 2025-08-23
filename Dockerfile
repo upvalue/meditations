@@ -1,0 +1,22 @@
+FROM node:24-alpine3.22
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+RUN apk update && \
+  apk add --force --no-cache bash curl postgresql 
+
+ADD .npmrc package.json pnpm-lock.yaml ./
+
+RUN pnpm install
+
+COPY ./ .
+
+ENV TEKNE_TRPC_URL=/api/trpc
+RUN pnpm run client:build-for-server
+
+CMD ["pnpm", "run", "server:start"]
+
+
+
