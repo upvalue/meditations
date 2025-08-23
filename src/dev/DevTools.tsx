@@ -148,15 +148,11 @@ export const DevTools = () => {
   return (
     <Tabs>
       <TabsList>
-        <TabsTrigger value="time">Time View</TabsTrigger>
         <TabsTrigger value="raw">Document Content</TabsTrigger>
         <TabsTrigger value="tree">Tree Document</TabsTrigger>
         <TabsTrigger value="dev">PG Repl</TabsTrigger>
         <TabsTrigger value="tanstackdev">TanStack Devtools</TabsTrigger>
       </TabsList>
-      <TabsContent value="time">
-        <TimeView />
-      </TabsContent>
       <TabsContent value="raw">
         <RawDocument />
       </TabsContent>
