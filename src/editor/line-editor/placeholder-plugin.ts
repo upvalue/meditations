@@ -2,6 +2,9 @@ import {type Extension} from "@codemirror/state"
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet } from "@codemirror/view"
 import { clientRectsFor, flattenRect } from "./vendor/dom"
 
+// This is the original placeholder plugin from CM
+// Modified to we can add more logic around whether to render a placeholder or not
+
 class Placeholder extends WidgetType {
   constructor(readonly content: string | HTMLElement | ((view: EditorView) => HTMLElement)) { super() }
 

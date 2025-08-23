@@ -2,7 +2,7 @@
 // Wraps Codemirror with lots of custom behavior
 import { useEffect, useRef } from 'react'
 
-import { Decoration, EditorView, keymap} from '@codemirror/view'
+import { EditorView, keymap} from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
 import { EditorSelection, EditorState, type Extension } from '@codemirror/state'
 import { lineMake, type ZLine } from './schema'
@@ -255,6 +255,9 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     })
 
     const placeholderPlugin = placeholder('The world is your canvas', (view) => {
+      if(lineInfo.lineIdx === 1) {
+        return true;
+      }
       if(view.state.doc.length > 0) return false;
       if(lineInfo.lineIdx !== 0) return false;
       if(store.get(docAtom).children.length === 1) return true;

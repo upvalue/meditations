@@ -8,7 +8,7 @@
     "client:dev": "vite --port 3000",
     "client:start": "vite --port 3000",
     "client:build": "vite build",
-    "client:build-for-server": "TEKNE_TRPC_URL=/api/trpc vite build",
+    "client:build-for-server": "vite build",
     "client:serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint . --fix",
