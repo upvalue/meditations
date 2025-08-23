@@ -45,6 +45,7 @@ export type CallbackTable = {
   ArrowDown: () => boolean
   Collapse: () => boolean
   'Mod-Backspace': () => boolean
+  'Alt-Backspace': () => boolean
   // Editor state callbacks
   contentUpdated: (content: string) => void
 }
@@ -198,6 +199,10 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         key: keybindings.toggleCollapse.key,
         run: () => cmCallbacks.current['Collapse']() ?? false,
       },
+      {
+        key: 'Alt-Backspace',
+        run: () => cmCallbacks.current['Alt-Backspace']() ?? false,
+      },
     ])
 
     const updateListener = EditorView.updateListener.of((update) => {
@@ -276,10 +281,12 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         return true
       },
 
-      'Mod-Backspace': () => lineOps.deleteLineIfEmpty(),
+      'Mod-Backspace': lineOps.deleteLineIfEmpty,
+
+      'Alt-Backspace': lineOps.deleteLineIfEmpty,
 
       // Enter and backspace (line creation and deletion)
-      Backspace: () => lineOps.deleteLineIfEmpty(),
+      Backspace: lineOps.deleteLineIfEmpty,
 
       Enter: () => {
         // console.log('enter called along with line ', lineInfo)

@@ -13,6 +13,7 @@ Tekne is a freestyle productivity application structured as an outline editor
 - pnpm as the package manager (do not use normal npm)
 - Postgres/kysely for databases
 - TRPC for communication between frontend and backend
+- shadcn & tailwind catalyst for components
 
 # File structure
 
