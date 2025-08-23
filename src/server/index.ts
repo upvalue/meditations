@@ -31,7 +31,8 @@ app.use(
       directives: {
         // Unsafe-inline currently required for codemirror event handlers
         // Can probably be fixed
-        'script-src': ["'self'", "'unsafe-inline'"],
+        'script-src': ["'self'"],
+        'script-src-attr': ["'unsafe-inline'"],
       },
     },
   })
