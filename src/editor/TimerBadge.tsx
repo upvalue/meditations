@@ -20,6 +20,13 @@ import { ClockIcon, PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/16/so
 import { useCallback, useRef } from 'react'
 import { setDetailTitle } from '@/lib/title'
 
+const useEventListener = (event: string, handler: (event: Event) => void) => {
+  React.useEffect(() => {
+    window.addEventListener(event, handler)
+    return () => window.removeEventListener(event, handler)
+  }, [event, handler])
+}
+
 const renderTime = (seconds: number) => {
   if (seconds === 0) return '0s'
 
@@ -199,6 +206,13 @@ export const TimerBadge = ({
       }
     }
   }, [])
+
+  useEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+    if (timerState.isRunning) {
+      event.preventDefault()
+      event.returnValue = 'You have an active timer running. Are you sure you want to leave?'
+    }
+  })
 
   const displayTime = timerState.isRunning ? timerState.elapsedTime : time
 
