@@ -41,7 +41,7 @@ const formatTimeDisplay = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor((seconds % 3600) / 60)
   const secs = seconds % 60
-  
+
   if (hours > 0) {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
@@ -98,10 +98,10 @@ export const TimerBadge = ({
     intervalRef.current = setInterval(() => {
       setTimerState(prev => {
         if (!prev.isRunning) return prev
-        
+
         const now = Date.now()
         const elapsed = Math.floor((now - (prev.startTime || now)) / 1000)
-        
+
         if (prev.mode === 'stopwatch') {
           return { ...prev, elapsedTime: elapsed }
         } else if (prev.mode === 'countdown') {
@@ -128,22 +128,22 @@ export const TimerBadge = ({
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
-    
+
     setTimerState(prev => {
       if (prev.mode === 'stopwatch' && prev.isRunning) {
         // Calculate final elapsed time for stopwatch
         const finalElapsed = prev.startTime ? Math.floor((Date.now() - prev.startTime) / 1000) : prev.elapsedTime
         setLine((line) => {
-          line.datumTime = (line.datumTime || 0) + finalElapsed
+          line.datumTime = finalElapsed
         })
       } else if (prev.mode === 'countdown' && prev.isRunning) {
         // For countdown, save the original target duration (what was actually "worked")
         const timeWorked = prev.startTime ? Math.floor((Date.now() - prev.startTime) / 1000) : 0
         setLine((line) => {
-          line.datumTime = (line.datumTime || 0) + Math.min(timeWorked, prev.targetDuration)
+          line.datumTime = Math.min(timeWorked, prev.targetDuration)
         })
       }
-      
+
       return {
         ...prev,
         isRunning: false,
@@ -219,12 +219,9 @@ export const TimerBadge = ({
       </DialogTrigger>
       <DialogOverlay>
         <DialogContent className="text-white w-96 h-[500px]">
-          <DialogHeader>
+          <DialogHeader className="flex flex-col gap-2">
             <DialogTitle>Timer</DialogTitle>
-          </DialogHeader>
-          <div className="text-primary flex flex-col gap-4 h-full overflow-hidden">
-            <div className="text-sm text-gray-400">Line: {lineInfo.line.mdContent}</div>
-            
+
             {/* Mode Selection */}
             <div className="flex justify-between items-center border-b border-gray-600 pb-2">
               <div className="flex gap-2">
@@ -242,7 +239,12 @@ export const TimerBadge = ({
                   </Button>
                 ))}
               </div>
+
             </div>
+            <div className="text-lg text-gray-400">{lineInfo.line.mdContent}</div>
+          </DialogHeader>
+          <div className="text-primary flex flex-col gap-4 h-full overflow-hidden">
+
 
             {/* Timer Content - Fixed height container */}
             <div className="flex-1 flex flex-col justify-center">
