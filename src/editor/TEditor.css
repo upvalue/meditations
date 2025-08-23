@@ -55,3 +55,7 @@
 .cm-content.cm-lineWrapping {
   padding: 0;
 }
+
+.cm-editor.cm-focused {
+  outline: none;
+}

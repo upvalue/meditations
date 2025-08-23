@@ -35,7 +35,7 @@ export const ELine = (lineInfo: ELineProps) => {
   return (
     <div
       className={cn(
-        'flex gap-2 w-full py-1 items-center',
+        'ELine w-full py-1  flex items-baseline',
         collapseState === 'collapsed' && 'hidden',
         isFocused && 'ELine-focused'
       )}
@@ -43,27 +43,21 @@ export const ELine = (lineInfo: ELineProps) => {
       <div className="ELine-gutter text-zinc-600 text-sm flex-shrink-0 justify-end flex font-mono">
         {timestamp || ''}
       </div>
-      <div style={{ flex: 'none', width: `${line.indent * 16}px` }} />
-      {/*
-      <div
-        className="flex items-center flex-grow"
-        style={{
-          marginLeft: `${line.indent * 16}px`,
-        }}
-      >
-        */}
-      <span className="text-zinc-600 font-sans ">*</span>
-      {/*collapseState === 'collapse-start' ? (
+      <div style={{ flex: 'none', width: `${(line.indent - 1) * 16}px` }} />
+      <div className="flex items-center">
+        &nbsp;
+        {collapseState === 'collapse-start' ? (
           <CircleDot width={8} height={8} />
         ) : (
           <Circle width={8} height={8} />
-        )*/}
+        )}
+      </div>
       {line.datumTime !== undefined && (
         <TimerBadge lineInfo={lineInfo} time={line.datumTime} />
       )}
       {line.datumTaskStatus && (
         <Checkbox
-          className="mt-2 ml-2"
+          className="ml-2"
           tabIndex={-1}
           checked={line.datumTaskStatus === 'complete'}
           onChange={(e) => {
@@ -77,7 +71,7 @@ export const ELine = (lineInfo: ELineProps) => {
         />
       )}
       <div
-        className="cm-editor-container w-full"
+        className="cm-editor-container w-full ml-2"
         ref={cmRef}
         data-line-idx={lineInfo.lineIdx}
       />

@@ -26,6 +26,9 @@ const theme = EditorView.theme(
     '.cm-line': {
       padding: '0',
     },
+    '.cm-focused': {
+      outline: 'none',
+    },
   },
   { dark: true }
 )
