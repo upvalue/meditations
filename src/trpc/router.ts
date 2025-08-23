@@ -114,7 +114,7 @@ export const appRouter = router({
           children: [
             {
               type: 'line',
-              mdContent: 'The world is your canvas',
+              mdContent: '',
               indent: 0,
               timeCreated: new Date().toISOString(),
               timeUpdated: new Date().toISOString(),
@@ -187,10 +187,7 @@ export const appRouter = router({
           })
           .execute()
 
-        await trx
-          .deleteFrom('notes')
-          .where('title', '=', oldName)
-          .execute()
+        await trx.deleteFrom('notes').where('title', '=', oldName).execute()
       })
 
       return { success: true, newName }

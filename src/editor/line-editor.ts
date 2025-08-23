@@ -164,6 +164,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     ArrowDown: () => false,
     Collapse: () => false,
     'Mod-Backspace': () => false,
+    'Alt-Backspace': () => false,
     contentUpdated: () => {},
   })
   const cmRef = useRef<HTMLDivElement>(null)
