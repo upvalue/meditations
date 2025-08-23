@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/horizontal.png" alt="meditations" height="80px"></p>
+# meditations
 
 ![Have a nice day badge](https://img.shields.io/badge/have%20a-nice%20day-0099dd.svg)
 
@@ -7,8 +7,9 @@ thinking.
 
 ## Note
 
-Meditation is under active development (12/28/19) but mostly in the `feature/ng` branch. This code is very old but has
-been hackily upgraded to modern React in order to fix bugs and add minor improvements.
+Meditations is in pure maintenance mode now -- development of the next application, Tekne, is
+ongoing in the [tekne](https://github.com/upvalue/meditations/tree/feature/tekne) branch and will
+replace the main branch when it's a bit further along
 
 ## Intro
 
