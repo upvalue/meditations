@@ -13,17 +13,17 @@ function RouteComponent() {
     localStorage.setItem('tekne-demo-visited', 'true')
 
     // Navigate to today's date document
-    const yyyymmdd = new Date().toLocaleDateString('en-CA')
     navigate({
       to: '/n/$title',
       params: {
-        title: yyyymmdd,
+        title: 'Tutorial',
       },
     })
   }
 
   return (
     <CopyLayout
+      columns
       title="Hey, listen!"
       primaryAction={{
         text: 'Continue to demo',
@@ -32,6 +32,10 @@ function RouteComponent() {
       secondaryAction={{
         text: 'This is deeply offensive, take me to a better website',
         href: 'https://html5zombo.com',
+      }}
+      thirdAction={{
+        text: 'Interested but I think software UX peaked in 1991',
+        href: 'https://upvalue.github.io/kamas-web',
       }}
     >
       <p className="max-w-[50%]  text-left">

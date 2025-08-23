@@ -1,9 +1,10 @@
 import z from 'zod'
-import { zdoc, type ZDoc } from '@/editor/schema'
+import { lineMake, zdoc, type ZDoc } from '@/editor/schema'
 import { initTRPC } from '@trpc/server'
 import type { Database } from '@/db'
 import { sql, type Kysely } from 'kysely'
 import { documentNameSchema } from '@/lib/validation'
+import { makeTutorial } from '@/lib/tutorial'
 
 export const t = initTRPC.context<{ db: Kysely<Database> }>().create({
   allowOutsideOfServer: true,
@@ -111,15 +112,11 @@ export const appRouter = router({
         const mydoc: ZDoc = {
           type: 'doc',
           schemaVersion: 1,
-          children: [
-            {
-              type: 'line',
-              mdContent: '',
-              indent: 0,
-              timeCreated: new Date().toISOString(),
-              timeUpdated: new Date().toISOString(),
-            },
-          ],
+          children: [lineMake(0, 'Empty test document')],
+        }
+
+        if (input.name === 'Tutorial') {
+          mydoc.children = makeTutorial()
         }
 
         await upsertNote(db, input.name, mydoc)
@@ -139,7 +136,6 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ input, ctx: { db } }) => {
-      console.log('updateDoc', input)
       await upsertNote(db, input.name, input.doc)
 
       return true
@@ -213,7 +209,7 @@ export const appRouter = router({
         throw new Error(`Document with name "${name}" already exists`)
       }
 
-      const newDoc: ZDoc = {
+      let newDoc: ZDoc = {
         type: 'doc',
         schemaVersion: 1,
         children: [

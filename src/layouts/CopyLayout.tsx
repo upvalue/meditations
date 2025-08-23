@@ -1,15 +1,21 @@
+import { cn } from '@/lib/utils'
 import type { ReactNode } from 'react'
 
 interface CopyLayoutProps {
   statusCode?: string
   title: string
   subtitle?: string
+  columns?: boolean
   primaryAction: {
     text: string
     href?: string
     onClick?: () => void
   }
   secondaryAction?: {
+    text: string
+    href: string
+  }
+  thirdAction?: {
     text: string
     href: string
   }
@@ -20,8 +26,10 @@ export default function CopyLayout({
   statusCode,
   title,
   subtitle,
+  columns,
   primaryAction,
   secondaryAction,
+  thirdAction,
   children,
 }: CopyLayoutProps) {
   return (
@@ -44,7 +52,12 @@ export default function CopyLayout({
           {children && (
             <div className="mt-6 flex justify-center">{children}</div>
           )}
-          <div className="mt-10 flex items-center justify-center gap-x-6">
+          <div
+            className={cn(
+              'mt-10 flex items-center justify-center gap-6',
+              columns && 'flex-col'
+            )}
+          >
             {primaryAction.onClick ? (
               <button
                 onClick={primaryAction.onClick}
@@ -66,6 +79,14 @@ export default function CopyLayout({
                 className="text-sm font-semibold text-zinc-900 dark:text-white"
               >
                 {secondaryAction.text} <span aria-hidden="true">&rarr;</span>
+              </a>
+            )}
+            {thirdAction && (
+              <a
+                href={thirdAction.href}
+                className="text-sm font-semibold text-zinc-900 dark:text-white"
+              >
+                {thirdAction.text} <span aria-hidden="true">&rarr;</span>
               </a>
             )}
           </div>
