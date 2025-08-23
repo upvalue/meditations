@@ -47,10 +47,10 @@ const RawDocument = () => {
     try {
       const text = await navigator.clipboard.readText()
       const parsedDoc = JSON.parse(text)
-      
+
       // Validate the JSON structure
       const validatedDoc = zdoc.parse(parsedDoc)
-      
+
       setDoc(validatedDoc)
       setMessage('Document JSON pasted and applied!')
       setTimeout(() => setMessage(''), 2000)
@@ -132,25 +132,18 @@ const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
   }
 }
 
-const TimeView = () => {
-  const [doc] = useAtom(docAtom)
-  const tree = analyzeDoc(doc)
-
-  const tagData: TagData = {}
-
-  tree.children.forEach((child) => diveLine(child, tagData, child.tags))
-
-  return JSON.stringify(tagData, null, 2)
-}
-
 export const DevTools = () => {
+  const usingPglite = !!window.dbHandle;
+
   const router = useRouter()
   return (
     <Tabs>
       <TabsList>
         <TabsTrigger value="raw">Document Content</TabsTrigger>
         <TabsTrigger value="tree">Tree Document</TabsTrigger>
-        <TabsTrigger value="dev">PG Repl</TabsTrigger>
+        {usingPglite &&
+          <TabsTrigger value="dev">PG Repl</TabsTrigger>
+        }
         <TabsTrigger value="tanstackdev">TanStack Devtools</TabsTrigger>
       </TabsList>
       <TabsContent value="raw">
@@ -159,9 +152,11 @@ export const DevTools = () => {
       <TabsContent value="tree">
         <TreeDocument />
       </TabsContent>
-      <TabsContent value="dev">
-        <PgliteRepl />
-      </TabsContent>
+      {usingPglite &&
+        <TabsContent value="dev">
+          <PgliteRepl />
+        </TabsContent>
+      }
       <TabsContent value="tanstackdev">
         <TanStackRouterDevtoolsPanel router={router} />
       </TabsContent>
