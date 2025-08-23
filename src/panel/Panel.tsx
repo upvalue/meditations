@@ -1,48 +1,68 @@
 import { DevTools } from '@/dev/DevTools'
 import { Help } from './Help'
 import { Search } from './Search'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { HelpCircle, Wrench, Search as SearchIcon } from 'lucide-react'
+import {
+  Navbar,
+  NavbarSection,
+  NavbarItem,
+  NavbarLabel,
+} from '@/components/ui/navbar'
+import {
+  WrenchScrewdriverIcon,
+  MagnifyingGlassIcon,
+  QuestionMarkCircleIcon,
+} from '@heroicons/react/24/solid'
+import { useState } from 'react'
 
 export function Panel() {
+  const [activeTab, setActiveTab] = useState('devtools')
+
   return (
     <div className="h-full flex flex-col max-h-[93vh] overflow-y-auto">
-      <Tabs defaultValue="devtools" className="flex flex-col h-full">
+      <div className="flex flex-col h-full">
         <div className="flex items-center border-b border-zinc-800 px-2 py-1">
-          <TabsList className="bg-transparent p-0 h-auto gap-1">
-            <TabsTrigger
-              value="devtools"
-              className="p-2 rounded data-[state=active]:bg-zinc-800 hover:bg-zinc-800/50"
-              title="DevTools"
-            >
-              <Wrench className="w-4 h-4" />
-            </TabsTrigger>
-            <TabsTrigger
-              value="search"
-              className="p-2 rounded data-[state=active]:bg-zinc-800 hover:bg-zinc-800/50"
-              title="Search"
-            >
-              <SearchIcon className="w-4 h-4" />
-            </TabsTrigger>
-            <TabsTrigger
-              value="help"
-              className="p-2 rounded data-[state=active]:bg-zinc-800 hover:bg-zinc-800/50"
-              title="Help"
-            >
-              <HelpCircle className="w-4 h-4" />
-            </TabsTrigger>
-          </TabsList>
+          <Navbar className="bg-transparent p-0 h-auto gap-1">
+            <NavbarSection>
+              <NavbarItem
+                current={activeTab === 'devtools'}
+                onClick={() => setActiveTab('devtools')}
+              >
+                <WrenchScrewdriverIcon className="w-4 h-4" data-slot="icon" />
+                <NavbarLabel>Dev</NavbarLabel>
+              </NavbarItem>
+              <NavbarItem
+                current={activeTab === 'search'}
+                onClick={() => setActiveTab('search')}
+              >
+                <MagnifyingGlassIcon className="w-4 h-4" data-slot="icon" />
+                <NavbarLabel>Search</NavbarLabel>
+              </NavbarItem>
+              <NavbarItem
+                current={activeTab === 'help'}
+                onClick={() => setActiveTab('help')}
+              >
+                <QuestionMarkCircleIcon className="w-4 h-4" data-slot="icon" />
+                <NavbarLabel>Help</NavbarLabel>
+              </NavbarItem>
+            </NavbarSection>
+          </Navbar>
         </div>
-        <TabsContent value="search" className="flex-1 overflow-auto">
-          <Search />
-        </TabsContent>
-        <TabsContent value="help" className="flex-1 overflow-auto">
-          <Help />
-        </TabsContent>
-        <TabsContent value="devtools" className="flex-1 overflow-auto p-4">
-          <DevTools />
-        </TabsContent>
-      </Tabs>
+        {activeTab === 'search' && (
+          <div className="flex-1 overflow-auto">
+            <Search />
+          </div>
+        )}
+        {activeTab === 'help' && (
+          <div className="flex-1 overflow-auto">
+            <Help />
+          </div>
+        )}
+        {activeTab === 'devtools' && (
+          <div className="flex-1 overflow-auto p-4">
+            <DevTools />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
