@@ -2,11 +2,11 @@
 // Wraps Codemirror with lots of custom behavior
 import { useEffect, useRef } from 'react'
 
-import { EditorView, keymap } from '@codemirror/view'
+import { Decoration, EditorView, keymap} from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
-import { EditorSelection, EditorState } from '@codemirror/state'
+import { EditorSelection, EditorState, type Extension } from '@codemirror/state'
 import { lineMake, type ZLine } from './schema'
-import { useAtom, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom, useStore } from 'jotai'
 import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
 import { autocompletion } from '@codemirror/autocomplete'
 import { keybindings } from '@/lib/keys'
@@ -14,6 +14,7 @@ import { useLineEvent } from './line-editor/cm-events'
 import { wikiLinkPlugin } from './line-editor/wiki-link-plugin'
 import { tagPlugin } from './line-editor/tag-plugin'
 import { slashCommandsPlugin } from './line-editor/slash-commands-plugin'
+import { placeholder } from './line-editor/placeholder-plugin'
 
 const theme = EditorView.theme(
   // Preferring to do these in TEditor.css
@@ -191,6 +192,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
   const [doc, setDoc] = useAtom(docAtom)
   const [requestFocusLine, setRequestFocusLine] = useAtom(requestFocusLineAtom)
   const setFocusedLine = useSetAtom(focusedLineAtom)
+  const store = useStore();
 
   const lineOps = useLineOperations(cmView, lineInfo.lineIdx)
 
@@ -252,21 +254,31 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       }
     })
 
+    const placeholderPlugin = placeholder('The world is your canvas', (view) => {
+      if(view.state.doc.length > 0) return false;
+      if(lineInfo.lineIdx !== 0) return false;
+      if(store.get(docAtom).children.length === 1) return true;
+      return false;
+    });
+
+    const extensions: Extension[] = [
+      theme,
+      updateListener,
+      focusListener,
+      customKeymap,
+      keymap.of(emacsStyleKeymap),
+      EditorView.lineWrapping,
+      tagPlugin,
+      wikiLinkPlugin,
+       placeholderPlugin,
+      autocompletion({
+        override: [slashCommandsPlugin(lineInfo.lineIdx)],
+      }),
+    ];
+
     const state = EditorState.create({
       doc: lineInfo.line.mdContent,
-      extensions: [
-        theme,
-        updateListener,
-        focusListener,
-        customKeymap,
-        keymap.of(emacsStyleKeymap),
-        EditorView.lineWrapping,
-        tagPlugin,
-        wikiLinkPlugin,
-        autocompletion({
-          override: [slashCommandsPlugin(lineInfo.lineIdx)],
-        }),
-      ],
+      extensions,
     })
 
     const view = new EditorView({
