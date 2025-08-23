@@ -8,7 +8,7 @@ thinking.
 ## Note
 
 Meditations is in pure maintenance mode now -- development of the next application, Tekne, is
-ongoing in the [tekne](https://github.com/upvalue/meditations/tree/feature/tekne) branch and will
+ongoing in the [tekne](https://github.com/upvalue/meditations/tree/tekne) branch and will
 replace the main branch when it's a bit further along
 
 ## Intro
