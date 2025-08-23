@@ -16,11 +16,16 @@ export type LineTimerEvent = {
   lineIdx: number
 }
 
+export type LineCollapseToggleEvent = {
+  lineIdx: number
+}
+
 type CodemirrorEvents = {
   tagClick: TagClickEventDetail
   wikiLinkClick: WikiLinkClickEventDetail
   lineTimerAdd: LineTimerEvent
   lineTagToggle: LineStatusEvent
+  lineCollapseToggle: LineCollapseToggleEvent
 }
 
 const codemirrorEmitter = new TypedEventEmitter<CodemirrorEvents>()

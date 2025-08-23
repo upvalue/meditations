@@ -124,8 +124,27 @@ const useLineOperations = (
     return false
   }
 
+  const toggleCollapse = () => {
+    // If a line has no indented lines after it, it's not eligible
+    // to be collapsed
+    const nextLine = doc.children[lineIdx + 1]
+    if (!nextLine || nextLine.indent <= doc.children[lineIdx].indent) {
+      return false
+    }
+
+    setDoc((draft) => {
+      if (draft.children[lineIdx].collapsed) {
+        delete draft.children[lineIdx].collapsed
+      } else {
+        draft.children[lineIdx].collapsed = true
+      }
+    })
+
+    return true
+  }
   return {
     deleteLineIfEmpty,
+    toggleCollapse,
   }
 }
 
@@ -414,23 +433,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         return true
       },
 
-      Collapse: () => {
-        // If a line has no indented lines after it, it's not eligible
-        // to be collapsed
-        const nextLine = doc.children[lineIdx + 1]
-        if (!nextLine || nextLine.indent <= line.indent) {
-          return false
-        }
-
-        setDoc((draft) => {
-          if (draft.children[lineIdx].collapsed) {
-            delete draft.children[lineIdx].collapsed
-          } else {
-            draft.children[lineIdx].collapsed = true
-          }
-        })
-        return true
-      },
+      Collapse: () => lineOps.toggleCollapse(),
 
       contentUpdated: (content: string) => {
         console.log('Line', lineIdx, 'content updated', content)
@@ -515,6 +518,10 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     })
 
     console.log('Tag toggle event', event.lineIdx)
+  })
+
+  useLineEvent('lineCollapseToggle', lineInfo.lineIdx, (event) => {
+    lineOps.toggleCollapse()
   })
 
   return {

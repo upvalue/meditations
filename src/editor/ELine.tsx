@@ -12,6 +12,8 @@ type ELineProps = LineWithIdx & {
   collapseState: CollapseState
 }
 
+const INDENT_WIDTH_PIXELS = 20
+
 /**
  * The individual line editor React component. Note that the bulk of
  * the logic is contained in the line-editor.ts file which handles
@@ -43,7 +45,12 @@ export const ELine = (lineInfo: ELineProps) => {
       <div className="ELine-gutter text-zinc-600 text-sm flex-shrink-0 justify-end flex font-mono">
         {timestamp || ''}
       </div>
-      <div style={{ flex: 'none', width: `${line.indent * 16}px` }} />
+      <div
+        style={{
+          flex: 'none',
+          width: `${line.indent * INDENT_WIDTH_PIXELS}px`,
+        }}
+      />
       <div className="flex items-center">
         &nbsp;
         {collapseState === 'collapse-start' ? (

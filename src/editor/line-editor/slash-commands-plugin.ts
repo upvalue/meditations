@@ -75,6 +75,28 @@ export const slashCommandsPlugin = (lineIdx: number) => {
             })
           },
         },
+        {
+          label: '/collapse: Toggle whether line is collapsed',
+          type: 'text',
+          apply: (
+            view: EditorView,
+            _completion: Completion,
+            from: number,
+            to: number
+          ) => {
+            emitCodemirrorEvent('lineCollapseToggle', {
+              lineIdx,
+            })
+
+            view.dispatch({
+              changes: {
+                from,
+                to,
+                insert: '',
+              },
+            })
+          },
+        },
       ],
     }
   }

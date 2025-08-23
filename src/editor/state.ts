@@ -6,11 +6,7 @@ import { useCallback } from 'react'
 export const docAtom = withImmer(
   atom<ZDoc>({
     type: 'doc',
-    children: [
-      lineMake(0, 'The world is #test'),
-      lineMake(0, 'Number 2 #test'),
-      lineMake(1, '[[WikiLink]]'),
-    ],
+    children: [lineMake(0, 'Empty test document')],
   } as any as ZDoc)
 )
 
