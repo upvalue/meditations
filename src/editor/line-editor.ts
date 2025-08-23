@@ -1,6 +1,6 @@
 // line-editor.ts - Meat of the actual editor implementation
 // Wraps Codemirror with lots of custom behavior
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { EditorView, keymap} from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
@@ -255,12 +255,9 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     })
 
     const placeholderPlugin = placeholder('The world is your canvas', (view) => {
-      if(lineInfo.lineIdx === 1) {
-        return true;
-      }
       if(view.state.doc.length > 0) return false;
       if(lineInfo.lineIdx !== 0) return false;
-      if(store.get(docAtom).children.length === 1) return true;
+      if(store.get(docAtom).children.length === 1) return false;
       return false;
     });
 
@@ -290,15 +287,15 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     })
 
     cmView.current = view
+    setupCallbacks();
 
     return () => {
       view.destroy()
     }
   }
 
-  useEffect(() => {
-    if (!cmView.current) return
-    const { line, lineIdx } = lineInfo
+  const setupCallbacks = useCallback(() => {
+    const { lineIdx, line } = lineInfo;
     cmCallbacks.current = {
       // List sink and lift
       Tab: () => {
@@ -419,6 +416,8 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
         const prevLine = doc.children[lineIdx - 1]
 
         // Focus on previous line at same cursor position
+        console.log('Set focus line to', lineIdx - 1)
+        // wut
         setRequestFocusLine({
           lineIdx: lineIdx - 1,
           pos: Math.min(cursorPos, prevLine.mdContent.length),
@@ -456,9 +455,14 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
           draft.children[lineIdx].mdContent = content
           draft.children[lineIdx].timeUpdated = new Date().toISOString()
         })
-      },
-    }
+        },
+      }
+  }, [lineInfo]) // setupCallbacks
 
+  useEffect(() => {
+    if (!cmView.current) return
+    const { line } = lineInfo
+    
     const v = cmView.current
 
     // When the document itself is updated, we need to synchronize
