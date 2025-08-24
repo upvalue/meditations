@@ -26,3 +26,12 @@ To run a postgres database (via `docker-compose.yml`), the server and client all
 There's currently a very Docker image based on Alpine that can be used to deploy the application to
 production. The only required environment variable you'll need to set in that case is `DATABASE_URL`
 to a postgres database URL (see `package.json` for an example)
+
+Database access is with kysely; with `DATABASE_URL` set, use 
+
+> pnpm kysely
+
+To run database migrations or other database ops. Note that when running in client-only mode, all
+database migrations are already applied
+
+There's a bit more detail about the setup albeit scattered in `CLAUDE.md`

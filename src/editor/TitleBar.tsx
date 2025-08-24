@@ -83,6 +83,7 @@ export const TitleBar = ({
 
   const isDev = import.meta.env.DEV
   const isDemo = import.meta.env.TEKNE_DEMO
+  const isDevServer = import.meta.env.TEKNE_TRPC_URL.includes('localhost');
 
   return (
     <div className="flex py-2 px-4 items-center">
@@ -92,6 +93,9 @@ export const TitleBar = ({
         </div>
         <div className="text text-yellow-500">
           {isDemo && '[demo]'}
+        </div>
+        <div className="text text-yellow-500">
+          {isDevServer && '[server]'}
         </div>
       </div>
 

@@ -71,10 +71,10 @@ editor in isolation from other features from the application.
 
 # Running the application
 
-You can run the application with `pnpm run client:dev`. Although the application does have
-a server, it is also capable of running completely in the client, including fully
-functional TRPC endpoints and SQL queries. Prefer to do this unless the changes make it
-seem necessary to run the server.
+You can run the application with `pnpm run dev:client-only`. Although the application does have a
+server, it is also capable of running completely in the client, including fully functional TRPC
+endpoints and SQL queries. Prefer to do this unless the changes make it seem necessary to run the
+server.
 
 # Database structure
 
