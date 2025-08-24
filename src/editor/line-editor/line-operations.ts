@@ -7,34 +7,34 @@ import { keybindings } from '@/lib/keys'
 import type { LineWithIdx } from '../line-editor'
 import type { useStore } from 'jotai'
 
-export const toggleCollapse = (store: ReturnType<typeof useStore>, lineInfo: LineWithIdx) => {
+export const toggleCollapse = (store: ReturnType<typeof useStore>, lineIdx: number) => {
   const setDoc = (updater: (draft: ZDoc) => void) => store.set(docAtom, updater)
   const doc = store.get(docAtom)
 
-  const nextLine = doc.children[lineInfo.lineIdx + 1]
-  if (!nextLine || nextLine.indent <= doc.children[lineInfo.lineIdx].indent) {
+  const nextLine = doc.children[lineIdx + 1]
+  if (!nextLine || nextLine.indent <= doc.children[lineIdx].indent) {
     return false
   }
   
   setDoc((draft: ZDoc) => {
-    if (draft.children[lineInfo.lineIdx].collapsed) {
-      delete draft.children[lineInfo.lineIdx].collapsed
+    if (draft.children[lineIdx].collapsed) {
+      delete draft.children[lineIdx].collapsed
     } else {
-      draft.children[lineInfo.lineIdx].collapsed = true
+      draft.children[lineIdx].collapsed = true
     }
   })
 
   return true
 }
 
-export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWithIdx) => {
+export const makeKeymap = (store: ReturnType<typeof useStore>, lineIdx: number) => {
   let doc = store.get(docAtom)
   const unsubscribe = store.sub(docAtom, () => {
     doc = store.get(docAtom)
   })
   
-  const setDoc = (updater: (draft: ZDoc) => void) => store.set(docAtom, updater)
   const setRequestFocusLine = (value: { lineIdx: number; pos: number }) => store.set(requestFocusLineAtom, value)
+  const setDoc = (updater: (draft: ZDoc) => void) => store.set(docAtom, updater)
 
   const deleteLineIfEmpty = (view: EditorView) => {
     const { state } = view
@@ -47,13 +47,13 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
 
     if (r.from === 0 && r.to === 0) {
       
-      if (lineInfo.lineIdx === 0) {
+      if (lineIdx === 0) {
         if (doc.children.length === 1) {
           return false
         }
 
         setRequestFocusLine({
-          lineIdx: lineInfo.lineIdx,
+          lineIdx: lineIdx,
           pos: 0,
         })
 
@@ -63,21 +63,21 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
         return true
       }
 
-      const prevLine = doc.children[lineInfo.lineIdx - 1]
+      const prevLine = doc.children[lineIdx - 1]
 
       const endOfPrevLine = prevLine.mdContent.length
 
       setRequestFocusLine({
-        lineIdx: lineInfo.lineIdx - 1,
+        lineIdx: lineIdx - 1,
         pos: endOfPrevLine,
       })
 
       setDoc((draft: ZDoc) => {
-        draft.children[lineInfo.lineIdx - 1].mdContent = prevLine.mdContent.concat(
+        draft.children[lineIdx - 1].mdContent = prevLine.mdContent.concat(
           state.doc.slice(0, state.doc.length).toString()
         )
 
-        draft.children.splice(lineInfo.lineIdx, 1)
+        draft.children.splice(lineIdx, 1)
       })
       return true
     }
@@ -89,14 +89,15 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
     {
       key: 'Tab',
       run: () => {
-        if (lineInfo.lineIdx === 0) return false
-        if (lineInfo.lineIdx > 0 && lineInfo.line.indent > doc.children[lineInfo.lineIdx - 1].indent) {
+        if (lineIdx === 0) return false
+
+        if (lineIdx > 0 && doc.children[lineIdx].indent > doc.children[lineIdx - 1].indent) {
           return false
         }
 
         setDoc((draft: ZDoc) => {
-          draft.children[lineInfo.lineIdx].indent += 1
-          draft.children[lineInfo.lineIdx].timeUpdated = new Date().toISOString()
+          draft.children[lineIdx].indent += 1
+          draft.children[lineIdx].timeUpdated = new Date().toISOString()
         })
         return true
       },
@@ -104,15 +105,16 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
     {
       key: 'Enter',
       run: (view) => {
+        console.log('Enter key pressed')
         const { state } = view
         const { selection } = state
 
         const docEnd = state.doc.length
         const currentLineContent = state.doc.toString()
 
-        if (currentLineContent.trim() === '' && lineInfo.line.indent > 0) {
+        if (currentLineContent.trim() === '' && doc.children[lineIdx].indent > 0) {
           setDoc((draft: ZDoc) => {
-            draft.children[lineInfo.lineIdx].indent = Math.max(0, lineInfo.line.indent - 1)
+            draft.children[lineIdx].indent = Math.max(0, doc.children[lineIdx].indent - 1)
           })
           return true
         }
@@ -144,20 +146,20 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
           })
         }
 
-        console.log('After line addition, setting focus line to', lineInfo.lineIdx + 1)
+        console.log('After line addition, setting focus line to', lineIdx + 1)
         setRequestFocusLine({
-          lineIdx: lineInfo.lineIdx + 1,
+          lineIdx: lineIdx + 1,
           pos: 0,
         })
         setDoc((draft: ZDoc) => {
           const newLineObj = {
-            ...lineMake(lineInfo.line.indent),
+            ...lineMake(doc.children[lineIdx].indent),
             mdContent: newLine,
           }
-          if (draft.children[lineInfo.lineIdx].collapsed) {
-            delete draft.children[lineInfo.lineIdx].collapsed
+          if (draft.children[lineIdx].collapsed) {
+            delete draft.children[lineIdx].collapsed
           }
-          draft.children.splice(lineInfo.lineIdx + 1, 0, newLineObj)
+          draft.children.splice(lineIdx + 1, 0, newLineObj)
         })
 
         return true
@@ -166,11 +168,11 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
     {
       key: 'Shift-Tab',
       run: () => {
-        if (lineInfo.line.indent === 0) {
+        if (doc.children[lineIdx].indent === 0) {
           return false
         }
         setDoc((draft: ZDoc) => {
-          draft.children[lineInfo.lineIdx].indent -= 1
+          draft.children[lineIdx].indent -= 1
         })
         return true
       },
@@ -184,13 +186,13 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
       run: (view) => {
         const cursorPos = view.state.selection.main.head
 
-        if (lineInfo.lineIdx === 0) return false
+        if (lineIdx === 0) return false
 
-        const prevLine = doc.children[lineInfo.lineIdx - 1]
+        const prevLine = doc.children[lineIdx - 1]
 
-        console.log('Set focus line to', lineInfo.lineIdx - 1)
+        console.log('Set focus line to', lineIdx - 1)
         setRequestFocusLine({
-          lineIdx: lineInfo.lineIdx - 1,
+          lineIdx: lineIdx - 1,
           pos: Math.min(cursorPos, prevLine.mdContent.length),
         })
 
@@ -202,12 +204,12 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
       run: (view) => {
         const cursorPos = view.state.selection.main.head
 
-        if (lineInfo.lineIdx >= doc.children.length - 1) return false
+        if (lineIdx >= doc.children.length - 1) return false
 
-        const nextLine = doc.children[lineInfo.lineIdx + 1]
+        const nextLine = doc.children[lineIdx + 1]
 
         setRequestFocusLine({
-          lineIdx: lineInfo.lineIdx + 1,
+          lineIdx: lineIdx + 1,
           pos: Math.min(cursorPos, nextLine.mdContent.length),
         })
 
@@ -220,7 +222,7 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineInfo: LineWit
     },
     {
       key: keybindings.toggleCollapse.key,
-      run: () => toggleCollapse(store, lineInfo),
+      run: () => toggleCollapse(store, lineIdx),
     },
     {
       key: 'Alt-Backspace',

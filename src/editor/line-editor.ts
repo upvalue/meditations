@@ -81,7 +81,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
   const store = useStore()
 
   const makeEditor = () => {
-    const { keymap: customKeymap, cleanup: cleanupKeymap } = makeKeymap(store, lineInfo)
+    const { keymap: customKeymap, cleanup: cleanupKeymap } = makeKeymap(store, lineInfo.lineIdx)
 
     const updateListener = EditorView.updateListener.of((update) => {
       if (!update.docChanged) {
