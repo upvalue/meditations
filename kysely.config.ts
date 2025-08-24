@@ -5,18 +5,10 @@ import { Pool } from 'pg'
 export default defineConfig({
   dialect: new PostgresDialect({
     pool: new Pool({
-      host: 'localhost',
-      port: 5432,
-      database: 'tekne',
-      user: 'postgres',
-      password: 'password',
+      connectionString: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/tekne',
     }),
   }),
   migrations: {
     migrationFolder: 'src/db/migrations',
   },
-  //   plugins: [],
-  //   seeds: {
-  //     seedFolder: "seeds",
-  //   }
 })
