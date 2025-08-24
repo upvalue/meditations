@@ -19,6 +19,7 @@ import { DialogClose } from '@radix-ui/react-dialog'
 import { ClockIcon, PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/16/solid'
 import { useCallback, useRef } from 'react'
 import { setDetailTitle } from '@/lib/title'
+import { trpc } from '@/trpc/client'
 
 const useEventListener = (event: string, handler: (event: Event) => void) => {
   React.useEffect(() => {
@@ -79,6 +80,8 @@ export const TimerBadge = ({
   lineInfo: LineWithIdx
   time: number
 }) => {
+
+  const execHook = trpc.execHook.useMutation();
   const [, setLine] = useDocLine(lineInfo.lineIdx)
 
   const [timerState, setTimerState] = React.useState<TimerState>({
@@ -131,7 +134,13 @@ export const TimerBadge = ({
         return prev
       })
     }, 1000)
-  }, [lineContent])
+
+    execHook.mutate({
+      hook: 'timer-start', argument: {
+        line: lineInfo.line.mdContent,
+      }
+    })
+  }, [lineContent, execHook])
 
   const stopTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -139,7 +148,11 @@ export const TimerBadge = ({
       intervalRef.current = null
     }
 
-    console.log('stoptimer');
+    execHook.mutate({
+      hook: 'timer-stop', argument: {
+        line: lineInfo.line.mdContent,
+      }
+    })
 
     setDetailTitle(null);
 
@@ -165,7 +178,7 @@ export const TimerBadge = ({
         startTime: null,
       }
     })
-  }, [setLine])
+  }, [setLine, execHook])
 
   const resetTimer = useCallback(() => {
     if (intervalRef.current) {

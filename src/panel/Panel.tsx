@@ -30,6 +30,7 @@ export function Panel() {
               <WrenchScrewdriverIcon className="w-4 h-4" data-slot="icon" />
               <NavbarLabel>Dev</NavbarLabel>
             </NavbarItem>
+            {/*
             <NavbarItem
               current={activeTab === 'search'}
               onClick={() => setActiveTab('search')}
@@ -37,6 +38,7 @@ export function Panel() {
               <MagnifyingGlassIcon className="w-4 h-4" data-slot="icon" />
               <NavbarLabel>Search</NavbarLabel>
             </NavbarItem>
+            */}
             <NavbarItem
               current={activeTab === 'help'}
               onClick={() => setActiveTab('help')}

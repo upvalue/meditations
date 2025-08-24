@@ -6,6 +6,10 @@ import { sql, type Kysely } from 'kysely'
 import { documentNameSchema } from '@/lib/validation'
 import { makeTutorial } from '@/lib/tutorial'
 
+
+import fs from 'fs'
+import child_process from 'child_process'
+
 export const t = initTRPC.context<{ db: Kysely<Database> }>().create({
   allowOutsideOfServer: true,
 })
@@ -187,6 +191,33 @@ export const appRouter = router({
       })
 
       return { success: true, newName }
+    }),
+
+  execHook: proc
+    .input(
+      z.object({
+        hook: z.enum(['timer-start', 'timer-stop']),
+        argument: z.any(),
+      })
+    )
+    .mutation(async ({ input, ctx: { db } }) => {
+      console.log('execHook', input);
+      const { hook, argument } = input
+
+      // If running on server
+      if(typeof process !== 'undefined') {
+        if(input.hook === 'timer-start' || input.hook === 'timer-stop') {
+          const {line} = argument;
+          if(fs.existsSync('hooks/timer-start')) {
+            child_process.execSync('hooks/timer-start', { input: JSON.stringify({
+              type: 'timer-event',
+              line
+            })});
+          }
+        } 
+      } else {
+        console.log('[hook] client execHook', hook, argument)
+      }
     }),
 
   createDoc: proc

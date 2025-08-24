@@ -12,3 +12,7 @@ count.txt
 
 /Justfile
 ./dev/data
+
+# Ignore testing hooks
+/hooks/timer-start
+/hooks/timer-stop
