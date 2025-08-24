@@ -81,21 +81,35 @@ export const TitleBar = ({
     }
   }
 
+  const isDev = import.meta.env.DEV
+  const isDemo = import.meta.env.TEKNE_DEMO
+
   return (
-    <div className="py-2 pt-4 pl-[138px] pr-4 w-full">
-      <div className="flex justify-between w-full">
-        <div className="flex flex-col w-full">
-          <div
-            ref={editableRef}
-            contentEditable={allowTitleEdit}
-            suppressContentEditableWarning={true}
-            className="text-2xl text-zinc-500 outline-none w-full"
-            onInput={(e) => setProposedTitle(e.currentTarget.textContent || '')}
-            onBlur={handleSubmit}
-            onKeyDown={handleKeyDown}
-          />
+    <div className="flex py-2 px-4 items-center">
+      <div style={{ flexBasis: '138px' }} className="flex justify-end pr-4">
+        <div className="text text-yellow-500">
+          {isDev && '[dev]'}
+        </div>
+        <div className="text text-yellow-500">
+          {isDemo && '[demo]'}
         </div>
       </div>
-    </div>
+
+      <div className="w-full">
+        <div className="flex justify-between w-full">
+          <div className="flex flex-col w-full">
+            <div
+              ref={editableRef}
+              contentEditable={allowTitleEdit}
+              suppressContentEditableWarning={true}
+              className="text-2xl text-zinc-500 outline-none w-full"
+              onInput={(e) => setProposedTitle(e.currentTarget.textContent || '')}
+              onBlur={handleSubmit}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+        </div>
+      </div>
+    </div >
   )
 }
