@@ -1,0 +1,27 @@
+{
+  "name": "docs-build",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build system for compiling MD/MDX files to TSX components",
+  "scripts": {
+    "build": "tsx src/build.ts",
+    "watch": "tsx src/build.ts --watch",
+    "clean": "rm -rf generated"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "^3.1.0",
+    "gray-matter": "^4.0.3",
+    "remark": "^15.0.1",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.0",
+    "unified": "^11.0.5",
+    "vfile": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "chokidar": "^4.0.3",
+    "tsx": "^4.20.3",
+    "typescript": "^5.7.2"
+  }
+}
