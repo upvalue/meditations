@@ -20,7 +20,7 @@ ENV TEKNE_TRPC_URL=/api/trpc
 ENV GIT_HASH=$GIT_HASH
 ENV GIT_MESSAGE=$GIT_MESSAGE
 
-RUN pnpm run client:build-for-server
+RUN pnpm run client:build
 
 CMD ["pnpm", "run", "server:start"]
 
