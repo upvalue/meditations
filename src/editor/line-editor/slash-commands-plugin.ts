@@ -4,7 +4,7 @@ import { emitCodemirrorEvent } from './cm-events'
 
 export const slashCommandsPlugin = (lineIdx: number) => {
   return (context: CompletionContext) => {
-    let word = context.matchBefore(/\/\w*/)
+    const word = context.matchBefore(/\/\w*/)
     if (!word) return null
     if (word.from == word.to && !context.explicit) return null
 

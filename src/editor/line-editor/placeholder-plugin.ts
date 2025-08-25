@@ -9,7 +9,7 @@ class Placeholder extends WidgetType {
   constructor(readonly content: string | HTMLElement | ((view: EditorView) => HTMLElement)) { super() }
 
   toDOM(view: EditorView) {
-    let wrap = document.createElement("span")
+    const wrap = document.createElement("span")
     wrap.className = "cm-placeholder"
     wrap.style.pointerEvents = "none"
     wrap.appendChild(
@@ -21,11 +21,11 @@ class Placeholder extends WidgetType {
   }
 
   coordsAt(dom: HTMLElement) {
-    let rects = dom.firstChild ? clientRectsFor(dom.firstChild) : []
+    const rects = dom.firstChild ? clientRectsFor(dom.firstChild) : []
     if (!rects.length) return null
-    let style = window.getComputedStyle(dom.parentNode as HTMLElement)
-    let rect = flattenRect(rects[0], style.direction != "rtl")
-    let lineHeight = parseInt(style.lineHeight)
+    const style = window.getComputedStyle(dom.parentNode as HTMLElement)
+    const rect = flattenRect(rects[0], style.direction != "rtl")
+    const lineHeight = parseInt(style.lineHeight)
     if (rect.bottom - rect.top > lineHeight * 1.5)
       return {left: rect.left, right: rect.right, top: rect.top, bottom: rect.top + lineHeight}
     return rect
@@ -40,7 +40,7 @@ export function placeholder(
   content: string | HTMLElement | ((view: EditorView) => HTMLElement), 
   showPlaceholder: (view: EditorView) => boolean = () => true,
 ): Extension {
-  let plugin = ViewPlugin.fromClass(class {
+  const plugin = ViewPlugin.fromClass(class {
     placeholder: DecorationSet
 
     constructor(readonly view: EditorView) {

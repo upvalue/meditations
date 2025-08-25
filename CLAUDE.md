@@ -76,6 +76,8 @@ server, it is also capable of running completely in the client, including fully 
 endpoints and SQL queries. Prefer to do this unless the changes make it seem necessary to run the
 server.
 
+In that case, the whole dev setup can be run with `pnpm run dev:all`
+
 # Database structure
 
 The database is managed with Kysely, which can be run with `pnpm kysely` in server mode.

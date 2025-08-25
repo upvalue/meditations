@@ -7,7 +7,7 @@ export const docAtom = withImmer(
   atom<ZDoc>({
     type: 'doc',
     children: [lineMake(0, 'Empty test document')],
-  } as any as ZDoc)
+  } as ZDoc)
 )
 
 export const focusedLineAtom = atom<number | null>(null)
@@ -34,7 +34,7 @@ export const useDocLine = (
         callback(draft.children[lineIdx])
       })
     },
-    [lineIdx]
+    [lineIdx, setDoc]
   )
 
   return [doc.children[lineIdx], setLine]

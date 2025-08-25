@@ -1,10 +1,8 @@
 // line-operations.ts - line operations and key bindings
 import { keymap, EditorView } from '@codemirror/view'
-import { EditorSelection } from '@codemirror/state'
-import { docAtom, requestFocusLineAtom, focusedLineAtom } from '../state'
+import { docAtom, requestFocusLineAtom } from '../state'
 import { lineMake, type ZDoc } from '../schema'
 import { keybindings } from '@/lib/keys'
-import type { LineWithIdx } from '../line-editor'
 import type { useStore } from 'jotai'
 
 export const toggleCollapse = (store: ReturnType<typeof useStore>, lineIdx: number) => {

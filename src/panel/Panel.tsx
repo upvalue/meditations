@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/navbar'
 import {
   WrenchScrewdriverIcon,
-  MagnifyingGlassIcon,
   QuestionMarkCircleIcon,
 } from '@heroicons/react/24/solid'
 import { useState } from 'react'

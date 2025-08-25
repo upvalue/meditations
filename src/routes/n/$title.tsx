@@ -1,12 +1,12 @@
 import { TEditor } from '@/editor/TEditor'
 import { toast } from 'sonner'
 import { docAtom } from '@/editor/state'
-import { createStore, useAtom, useSetAtom } from 'jotai'
-import { analyzeDoc, type ZTreeLine } from '@/editor/schema'
-import { truncate, uniq } from 'lodash-es'
+import { createStore } from 'jotai'
+import '@/editor/schema'
+import { truncate } from 'lodash-es'
 import { Provider } from 'jotai'
 import { trpc } from '@/trpc'
-import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
 import { useCodemirrorEvent } from '@/editor/line-editor'
 import { EditorLayout } from '@/layout/EditorLayout'
@@ -64,13 +64,13 @@ function RouteComponent() {
     return () => {
       return unsub()
     }
-  }, [title, loadDocQuery.isLoading])
+  }, [title, loadDocQuery.isLoading, store, updateDocMutation, loadDocQuery.data])
 
   useEffect(() => {
     if (!loadDocQuery.isLoading && loadDocQuery.data) {
       store.set(docAtom, loadDocQuery.data)
     }
-  }, [loadDocQuery.data])
+  }, [loadDocQuery.data, store, loadDocQuery.isLoading])
 
   const navigate = useNavigate()
 

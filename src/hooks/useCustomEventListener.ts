@@ -23,5 +23,6 @@ export const useCustomEventListener = <T>(
     return () => {
       window.removeEventListener(type, handler)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, callback, ...deps])
 }

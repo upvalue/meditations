@@ -25,7 +25,7 @@ export function hasSelection(dom: HTMLElement, selection: SelectionRange): boole
     // properties of `sel.anchorNode` when it's in a generated CSS
     // element.
     return contains(dom, selection.anchorNode)
-  } catch(_) {
+  } catch {
     return false
   }
 }
@@ -48,7 +48,7 @@ export function isEquivalentPosition(node: Node, off: number, targetNode: Node |
 }
 
 export function domIndex(node: Node): number {
-  for (var index = 0;; index++) {
+  for (let index = 0;; index++) {
     node = node.previousSibling!
     if (!node) return index
   }
@@ -63,7 +63,7 @@ function scanFor(node: Node, off: number, targetNode: Node, targetOff: number, d
     if (node == targetNode && off == targetOff) return true
     if (off == (dir < 0 ? 0 : maxOffset(node))) {
       if (node.nodeName == "DIV") return false
-      let parent = node.parentNode
+      const parent = node.parentNode
       if (!parent || parent.nodeType != 1) return false
       off = domIndex(node) + (dir < 0 ? 0 : 1)
       node = parent
@@ -90,12 +90,12 @@ export interface Rect {
 }
 
 export function flattenRect(rect: Rect, left: boolean) {
-  let x = left ? rect.left : rect.right
+  const x = left ? rect.left : rect.right
   return {left: x, right: x, top: rect.top, bottom: rect.bottom}
 }
 
 function windowRect(win: Window): Rect {
-  let vp = win.visualViewport
+  const vp = win.visualViewport
   if (vp) return {
     left: 0, right: vp.width,
     top: 0, bottom: vp.height
@@ -117,11 +117,12 @@ export function getScale(elt: HTMLElement, rect: DOMRect) {
 export function scrollRectIntoView(dom: HTMLElement, rect: Rect, side: -1 | 1,
                                    x: ScrollStrategy, y: ScrollStrategy,
                                    xMargin: number, yMargin: number, ltr: boolean) {
-  let doc = dom.ownerDocument!, win = doc.defaultView || window
+  const doc = dom.ownerDocument!, win = doc.defaultView || window
 
   for (let cur: any = dom, stop = false; cur && !stop;) {
     if (cur.nodeType == 1) { // Element
-      let bounding: Rect, top = cur == doc.body
+      let bounding: Rect
+      const top = cur == doc.body
       let scaleX = 1, scaleY = 1
       if (top) {
         bounding = windowRect(win)
@@ -131,7 +132,7 @@ export function scrollRectIntoView(dom: HTMLElement, rect: Rect, side: -1 | 1,
           cur = cur.assignedSlot || cur.parentNode
           continue
         }
-        let rect = cur.getBoundingClientRect()
+        const rect = cur.getBoundingClientRect()
         ;({scaleX, scaleY} = getScale(cur, rect))
         // Make sure scrollbar width isn't included in the rectangle
         bounding = {left: rect.left, right: rect.left + cur.clientWidth * scaleX,
@@ -150,8 +151,8 @@ export function scrollRectIntoView(dom: HTMLElement, rect: Rect, side: -1 | 1,
             moveY = rect.top - (bounding.top + yMargin)
         }
       } else {
-        let rectHeight = rect.bottom - rect.top, boundingHeight = bounding.bottom - bounding.top
-        let targetTop =
+        const rectHeight = rect.bottom - rect.top, boundingHeight = bounding.bottom - bounding.top
+        const targetTop =
           y == "center" && rectHeight <= boundingHeight ? rect.top + rectHeight / 2 - boundingHeight / 2 :
           y == "start" || y == "center" && side < 0 ? rect.top - yMargin :
           rect.bottom - boundingHeight + yMargin
@@ -168,7 +169,7 @@ export function scrollRectIntoView(dom: HTMLElement, rect: Rect, side: -1 | 1,
             moveX = rect.left - (bounding.left + xMargin)
         }
       } else {
-        let targetLeft =
+        const targetLeft =
           x == "center" ? rect.left + (rect.right - rect.left) / 2 - (bounding.right - bounding.left) / 2 :
           (x == "start") == ltr ? rect.left - xMargin :
           rect.right - (bounding.right - bounding.left) + xMargin
@@ -180,12 +181,12 @@ export function scrollRectIntoView(dom: HTMLElement, rect: Rect, side: -1 | 1,
         } else {
           let movedX = 0, movedY = 0
           if (moveY) {
-            let start = cur.scrollTop
+            const start = cur.scrollTop
             cur.scrollTop += moveY / scaleY
             movedY = (cur.scrollTop - start) * scaleY
           }
           if (moveX) {
-            let start = cur.scrollLeft
+            const start = cur.scrollLeft
             cur.scrollLeft += moveX / scaleX
             movedX = (cur.scrollLeft - start) * scaleX
           }
@@ -210,7 +211,8 @@ export function scrollRectIntoView(dom: HTMLElement, rect: Rect, side: -1 | 1,
 }
 
 export function scrollableParents(dom: HTMLElement) {
-  let doc = dom.ownerDocument, x: HTMLElement | undefined, y: HTMLElement | undefined
+  const doc = dom.ownerDocument
+  let x: HTMLElement | undefined, y: HTMLElement | undefined
   for (let cur = dom.parentNode as HTMLElement | null; cur;) {
     if (cur == doc.body || (x && y)) {
       break
@@ -244,7 +246,7 @@ export class DOMSelectionState implements SelectionRange {
   }
 
   setRange(range: SelectionRange) {
-    let {anchorNode, focusNode} = range
+    const {anchorNode, focusNode} = range
     // Clip offsets to node size to avoid crashes when Safari reports bogus offsets (#1152)
     this.set(anchorNode, Math.min(range.anchorOffset, anchorNode ? maxOffset(anchorNode) : 0),
              focusNode, Math.min(range.focusOffset, focusNode ? maxOffset(focusNode) : 0))
@@ -263,7 +265,7 @@ export function focusPreventScroll(dom: HTMLElement) {
   if ((dom as any).setActive) return (dom as any).setActive() // in IE
   if (preventScrollSupported) return dom.focus(preventScrollSupported)
 
-  let stack = []
+  const stack = []
   for (let cur: Node | null = dom; cur; cur = cur.parentNode) {
     stack.push(cur, (cur as any).scrollTop, (cur as any).scrollLeft)
     if (cur == cur.ownerDocument) break
@@ -277,7 +279,7 @@ export function focusPreventScroll(dom: HTMLElement) {
   if (!preventScrollSupported) {
     preventScrollSupported = false
     for (let i = 0; i < stack.length;) {
-      let elt = stack[i++] as HTMLElement, top = stack[i++] as number, left = stack[i++] as number
+      const elt = stack[i++] as HTMLElement, top = stack[i++] as number, left = stack[i++] as number
       if (elt.scrollTop != top) elt.scrollTop = top
       if (elt.scrollLeft != left) elt.scrollLeft = left
     }
@@ -287,20 +289,20 @@ export function focusPreventScroll(dom: HTMLElement) {
 let scratchRange: Range | null
 
 export function textRange(node: Text, from: number, to = from) {
-  let range = scratchRange || (scratchRange = document.createRange())
+  const range = scratchRange || (scratchRange = document.createRange())
   range.setEnd(node, to)
   range.setStart(node, from)
   return range
 }
 
 export function dispatchKey(elt: HTMLElement, name: string, code: number, mods?: KeyboardEvent): boolean {
-  let options: KeyboardEventInit = {key: name, code: name, keyCode: code, which: code, cancelable: true}
+  const options: KeyboardEventInit = {key: name, code: name, keyCode: code, which: code, cancelable: true}
   if (mods)
     ({altKey: options.altKey, ctrlKey: options.ctrlKey, shiftKey: options.shiftKey, metaKey: options.metaKey} = mods)
-  let down = new KeyboardEvent("keydown", options)
+  const down = new KeyboardEvent("keydown", options)
   ;(down as any).synthetic = true
   elt.dispatchEvent(down)
-  let up = new KeyboardEvent("keyup", options)
+  const up = new KeyboardEvent("keyup", options)
   ;(up as any).synthetic = true
   elt.dispatchEvent(up)
   return down.defaultPrevented || up.defaultPrevented
@@ -327,7 +329,7 @@ export function atElementStart(doc: HTMLElement, selection: SelectionRange) {
   for (;;) {
     if (offset) {
       if (node.nodeType != 1) return false
-      let prev: Node = node.childNodes[offset - 1]
+      const prev: Node = node.childNodes[offset - 1]
       if ((prev as HTMLElement).contentEditable == "false") offset--
       else { node = prev; offset = maxOffset(node) }
     } else if (node == doc) {

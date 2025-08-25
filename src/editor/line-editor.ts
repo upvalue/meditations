@@ -1,11 +1,11 @@
 // line-editor.ts - Meat of the actual editor implementation
 // Wraps Codemirror with lots of custom behavior
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { EditorView, keymap} from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
 import { EditorSelection, EditorState, type Extension } from '@codemirror/state'
-import { lineMake, type ZLine } from './schema'
+import { type ZLine } from './schema'
 import { useAtom, useSetAtom, useStore } from 'jotai'
 import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
 import { autocompletion } from '@codemirror/autocomplete'
@@ -80,6 +80,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
   const setFocusedLine = useSetAtom(focusedLineAtom)
   const store = useStore()
 
+  // 
   const makeEditor = () => {
     const { keymap: customKeymap, cleanup: cleanupKeymap } = makeKeymap(store, lineInfo.lineIdx)
 
@@ -142,6 +143,10 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     }
   }
 
+  // This handles taking external updates, which might happen if e.g. 
+  // a user deletes a line, the remaining text is appending to the previous
+  // updates. In this case I've found it best to just destroy and recreate
+  // codemirror.
   useEffect(() => {
     if (!cmView.current) return
     const { line } = lineInfo
@@ -155,6 +160,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       cmView.current?.destroy()
       makeEditor()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lineInfo])
 
   /**
@@ -196,10 +202,15 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     }
 
     obtainFocus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestFocusLine, lineInfo, cmView.current])
 
+  // Sets up new editor on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(makeEditor, [])
 
+  // Line specific events, emitted by the event
+  // emitter. Could probably be moved one level up.
   useLineEvent('lineTimerAdd', lineInfo.lineIdx, (event) => {
     // If it's already got a time, don't do anything
     if (lineInfo.line.datumTime) {
@@ -222,8 +233,8 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     console.log('Tag toggle event', event.lineIdx)
   })
 
-  useLineEvent('lineCollapseToggle', lineInfo.lineIdx, (event) => {
-    toggleCollapse(store, lineInfo)
+  useLineEvent('lineCollapseToggle', lineInfo.lineIdx, () => {
+    toggleCollapse(store, lineInfo.lineIdx)
   })
 
   return {

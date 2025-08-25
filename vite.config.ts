@@ -4,7 +4,6 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { resolve } from 'node:path'
 import { execSync } from 'node:child_process'
-import fs from 'node:fs'
 
 function getGitInfo() {
   try {

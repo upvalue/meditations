@@ -5,7 +5,7 @@ import type { Express } from 'express'
 import path from 'node:path'
 
 // Static routes (exact matches)
-export const STATIC_ROUTES = [
+export const STATIC_ROUTES: string[] = [
   '/',
   '/404',
   '/demo',
@@ -14,7 +14,7 @@ export const STATIC_ROUTES = [
 ] as const
 
 // Dynamic routes (with parameters)
-export const DYNAMIC_ROUTES = [
+export const DYNAMIC_ROUTES: { tanstack: string; express: string }[] = [
   { tanstack: '/n/$title', express: '/n/:title' },
 ] as const
 
@@ -43,7 +43,7 @@ export function registerClientRoutes(app: Express, distPath: string) {
  */
 export function isValidClientRoute(pathname: string): boolean {
   // Check static routes
-  if (STATIC_ROUTES.includes(pathname as any)) {
+  if (STATIC_ROUTES.includes(pathname)) {
     return true
   }
   
@@ -65,7 +65,7 @@ function matchesDynamicRoute(pathname: string, pattern: string): boolean {
   // /n/$title -> /n/([^/]+)
   const regexPattern = pattern
     .replace(/$\w+/g, '([^/]+)')
-    .replace(/\//g, '\/')
+    .replace(/\//g, '/')
   
   const regex = new RegExp('^' + regexPattern + '$')
   return regex.test(pathname)

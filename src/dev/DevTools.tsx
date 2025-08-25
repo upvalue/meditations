@@ -6,9 +6,8 @@ import { useRouter } from '@tanstack/react-router'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useAtom } from 'jotai'
-import { analyzeDoc, type ZTreeLine, zdoc } from '@/editor/schema'
+import { zdoc } from '@/editor/schema'
 import { docAtom } from '@/editor/state'
-import { uniq } from 'lodash-es'
 import { Button } from '@/components/ui/button'
 
 export const PgliteRepl = () => {
@@ -37,7 +36,7 @@ const RawDocument = () => {
       await navigator.clipboard.writeText(JSON.stringify(doc, null, 2))
       setMessage('Document JSON copied to clipboard!')
       setTimeout(() => setMessage(''), 2000)
-    } catch (error) {
+    } catch {
       setMessage('Failed to copy to clipboard')
       setTimeout(() => setMessage(''), 2000)
     }
@@ -95,42 +94,7 @@ const TreeDocument = () => {
   )
 }
 
-type TagData = {
-  [name: string]: {
-    name: string
-    complete: number | undefined
-    incomplete: number | undefined
-  }
-}
 
-// Some experimental analysis code
-const diveLine = (line: ZTreeLine, tagData: TagData, tags: string[]) => {
-  for (const tag of tags) {
-    if (!tagData[tag]) {
-      tagData[tag] = {
-        name: tag,
-        complete: undefined,
-        incomplete: undefined,
-      }
-    }
-
-    if (line.datumTaskStatus === 'complete') {
-      if (tagData[tag].complete === undefined) {
-        tagData[tag].complete = 0
-      }
-      tagData[tag].complete += 1
-    } else if (line.datumTaskStatus) {
-      if (tagData[tag].incomplete === undefined) {
-        tagData[tag].incomplete = 0
-      }
-      tagData[tag].incomplete += 1
-    }
-  }
-
-  for (const child of line.children) {
-    diveLine(child, tagData, uniq([...tags, ...child.tags]))
-  }
-}
 
 export const DevTools = () => {
   const usingPglite = !!window.dbHandle;

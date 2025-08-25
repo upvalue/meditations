@@ -47,6 +47,7 @@ const ztreeLine: z.ZodType<ZTreeLine> = zline.extend({
   arrayIdx: z.number(),
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const zdocTree = zdoc.extend({
   children: z.array(ztreeLine),
 })

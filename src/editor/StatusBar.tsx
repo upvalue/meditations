@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
-import { docAtom } from './TEditor'
+import { docAtom } from './state'
 import { errorMessageAtom } from './state'
 import { Button } from '@headlessui/react'
 import { X } from 'lucide-react'

@@ -24,7 +24,7 @@ export const proc = t.procedure
  */
 const docMigrator = (doc: any): any => {
   doc.body.children = doc.body.children.map((child: any) => {
-    let mod = { ...child }
+    const mod = { ...child }
     if (!child.createdAt) {
       mod.createdAt = new Date().toISOString()
       mod.updatedAt = new Date().toISOString()
@@ -200,7 +200,7 @@ export const appRouter = router({
         argument: z.any(),
       })
     )
-    .mutation(async ({ input, ctx: { db } }) => {
+    .mutation(async ({ input }) => {
       console.log('execHook', input);
       const { hook, argument } = input
 
@@ -240,7 +240,7 @@ export const appRouter = router({
         throw new Error(`Document with name "${name}" already exists`)
       }
 
-      let newDoc: ZDoc = {
+      const newDoc: ZDoc = {
         type: 'doc',
         schemaVersion: 1,
         children: [

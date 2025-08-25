@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Badge, BadgeButton } from '@/components/ui/Badge'
+import { BadgeButton } from '@/components/ui/Badge'
 
 import {
   Dialog,
@@ -10,13 +10,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { LineWithIdx } from './line-editor'
-import { docAtom, useDocLine } from './state'
-import { useAtom, useSetAtom } from 'jotai'
+import { useDocLine } from './state'
 import { Input } from '@/components/ui/input'
 import parseDuration from 'parse-duration'
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@radix-ui/react-dialog'
-import { ClockIcon, PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/16/solid'
+import { ClockIcon, PlayIcon, StopIcon } from '@heroicons/react/16/solid'
 import { useCallback, useRef } from 'react'
 import { setDetailTitle } from '@/lib/title'
 import { trpc } from '@/trpc/client'
@@ -140,7 +139,7 @@ export const TimerBadge = ({
         line: lineInfo.line.mdContent,
       }
     })
-  }, [lineContent, execHook])
+  }, [lineContent, execHook, lineInfo.line.mdContent, setLine])
 
   const stopTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -178,7 +177,7 @@ export const TimerBadge = ({
         startTime: null,
       }
     })
-  }, [setLine, execHook])
+  }, [setLine, execHook, lineInfo.line.mdContent])
 
   const resetTimer = useCallback(() => {
     if (intervalRef.current) {

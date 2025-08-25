@@ -96,7 +96,7 @@ app.use(
 
 app.get('/api/healthcheck', async (_req: Request, res: Response) => {
   const db = await dbServer()
-  const q = await db
+  await db
     .selectFrom(sql`(select 1)`.as('subquery'))
     .selectAll()
     .execute()
