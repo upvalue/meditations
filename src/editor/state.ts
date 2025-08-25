@@ -19,6 +19,28 @@ export const requestFocusLineAtom = atom({
 
 export const errorMessageAtom = atom<string | null>(null)
 
+type GlobalTimerState = {
+  isActive: boolean
+  lineIdx: number | null
+  lineContent: string | null
+  mode: 'stopwatch' | 'countdown' | 'manual'
+  startTime: number | null
+  targetDuration: number
+  elapsedTime: number
+}
+
+export const globalTimerAtom = atom<GlobalTimerState>({
+  isActive: false,
+  lineIdx: null,
+  lineContent: null,
+  mode: 'stopwatch',
+  startTime: null,
+  targetDuration: 25 * 60,
+  elapsedTime: 0,
+})
+
+export const notificationPermissionAtom = atom<NotificationPermission | null>(null)
+
 /**
  * Allows reading or modifying a specific line
  * in the document

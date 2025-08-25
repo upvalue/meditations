@@ -2,6 +2,7 @@ import { Migrator } from 'kysely'
 import type { Kysely, Migration, MigrationProvider } from 'kysely'
 
 import { tmigration as initMigration } from './migrations/1752986809444_init'
+import { tmigration as addDocDatesMigration } from './migrations/1756085936353_add-doc-dates.ts'
 import type { Database } from './types'
 
 /**
@@ -16,7 +17,7 @@ class TekneMigrationProvider implements MigrationProvider {
     const migrations: Record<string, Migration> = {}
 
     migrations['1752986809444_init'] = initMigration
-
+    migrations['1756085936353_add-doc-dates'] = addDocDatesMigration
     return migrations
   }
 }
