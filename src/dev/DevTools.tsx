@@ -6,7 +6,7 @@ import { useRouter } from '@tanstack/react-router'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useAtom } from 'jotai'
-import { zdoc } from '@/editor/schema'
+import { analyzeDoc, zdoc } from '@/editor/schema'
 import { docAtom } from '@/editor/state'
 import { Button } from '@/components/ui/button'
 
