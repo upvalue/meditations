@@ -57,16 +57,6 @@ const formatTimeDisplay = (seconds: number): string => {
   return `${minutes}:${secs.toString().padStart(2, '0')}`
 }
 
-type TimerMode = 'stopwatch' | 'countdown' | 'manual'
-
-type TimerState = {
-  mode: TimerMode
-  isRunning: boolean
-  startTime: number | null
-  targetDuration: number
-  elapsedTime: number
-}
-
 const parseTime = (time: string) => parseDuration(time, 's')
 
 /**
