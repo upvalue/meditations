@@ -73,8 +73,9 @@ if (NODE_ENV === 'production') {
   )
 }
 
+const db = await dbServer();
+
 const createContext = async ({ req, res }: { req: Request; res: Response }) => {
-  const db = await dbServer()
   return { db, req, res }
 }
 
