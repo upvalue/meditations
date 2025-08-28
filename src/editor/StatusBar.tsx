@@ -96,8 +96,6 @@ export const StatusBar = () => {
     }
   }, [globalTimer.isActive, setGlobalTimerAtom])
 
-  console.log(globalTimer.lineContent)
-
   return (
     <div className="StatusBar w-full h-10 bg-zinc-900 px-[138px] flex items-center justify-between">
       <div className="flex items-center gap-4">
