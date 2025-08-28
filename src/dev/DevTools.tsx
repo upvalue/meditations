@@ -1,7 +1,4 @@
-import { dbMemory } from '@/db'
-import type { PGlite } from '@electric-sql/pglite'
-import { Repl } from '@electric-sql/pglite-repl'
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
@@ -9,23 +6,7 @@ import { useAtom } from 'jotai'
 import { analyzeDoc, zdoc } from '@/editor/schema'
 import { docAtom } from '@/editor/state'
 import { Button } from '@/components/ui/button'
-
-export const PgliteRepl = () => {
-  const dbHandleRef: RefObject<PGlite | null> = useRef(null)
-  const [haveDb, setHaveDb] = useState(false)
-  useEffect(() => {
-    dbMemory().then(({ dbHandle }) => {
-      dbHandleRef.current = dbHandle
-      setHaveDb(true)
-    })
-  }, [])
-
-  return (
-    <div>
-      {haveDb && dbHandleRef.current && <Repl pg={dbHandleRef.current} />}
-    </div>
-  )
-}
+import { PgliteDevtools } from './PgliteDevtools'
 
 const RawDocument = () => {
   const [doc, setDoc] = useAtom(docAtom)
@@ -106,7 +87,7 @@ export const DevTools = () => {
         <TabsTrigger value="raw">Document Content</TabsTrigger>
         <TabsTrigger value="tree">Tree Document</TabsTrigger>
         {usingPglite &&
-          <TabsTrigger value="dev">PG Repl</TabsTrigger>
+          <TabsTrigger value="pglite">pglite</TabsTrigger>
         }
         <TabsTrigger value="tanstackdev">TanStack Devtools</TabsTrigger>
       </TabsList>
@@ -117,8 +98,8 @@ export const DevTools = () => {
         <TreeDocument />
       </TabsContent>
       {usingPglite &&
-        <TabsContent value="dev">
-          <PgliteRepl />
+        <TabsContent value="pglite">
+          <PgliteDevtools />
         </TabsContent>
       }
       <TabsContent value="tanstackdev">

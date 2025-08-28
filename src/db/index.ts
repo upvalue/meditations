@@ -13,14 +13,25 @@ declare global {
   }
 }
 
+export const DEFAULT_DB_PATH = 'tekne-dev';
+export const DB_PATH_KEY = 'tekne/db-path';
+
 export const dbMemory = async () => {
   if (window.db)
     return {
-      db: window.db,
+      db: window.db ,
       dbHandle: window.dbHandle,
     }
 
-  const handle = new PGlite('idb://test1')
+  let dbPath = window.localStorage.getItem(DB_PATH_KEY)
+  if (!dbPath) {
+    dbPath = DEFAULT_DB_PATH
+    window.localStorage.setItem(DB_PATH_KEY, dbPath)
+  }
+
+  // Ensure path is in idb:// format for PGlite
+  const formattedPath = `idb://${dbPath.split('/pglite')[1]}`;
+  const handle = new PGlite(formattedPath)
 
   window.dbHandle = handle
 

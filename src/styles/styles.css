@@ -33,3 +33,8 @@ body {
 .Panel {
   background-color: color-mix(in srgb, var(--color-zinc-900) 98%, white);
 }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
