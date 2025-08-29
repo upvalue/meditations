@@ -1,5 +1,5 @@
 import { createTRPCReact } from '@trpc/react-query'
-import { createTRPCClient, httpLink, unstable_localLink } from '@trpc/client'
+import { createTRPCClient, httpLink, unstable_localLink, loggerLink } from '@trpc/client'
 import type { AppRouter } from './router'
 import { appRouter } from './router'
 import { dbHandle } from '@/db'
@@ -19,6 +19,11 @@ export const trpcClient = createTRPCClient<AppRouter>({
   links: trpcUrl
     ? [httpLink({ url: trpcUrl })]
     : [
+        loggerLink({
+          enabled: (opts) => {
+            return true
+          },
+        }),
         unstable_localLink({
           router: appRouter,
           createContext: async () => ({ db: await dbHandle() }),

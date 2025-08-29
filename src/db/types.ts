@@ -9,5 +9,8 @@ export type Database = {
   notes: {
     title: string
     body: ZodJsonColumn<ZDoc>
+    createdAt: ColumnType<Date, Date, Date>
+    updatedAt: ColumnType<Date, Date, Date>
+    revision: number
   }
 }

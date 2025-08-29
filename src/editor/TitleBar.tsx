@@ -3,6 +3,7 @@ import { useAtom } from 'jotai'
 import { trpc } from '@/trpc'
 import { useNavigate } from '@tanstack/react-router'
 import { errorMessageAtom } from './state'
+import { DocumentDetailsButton } from './DocumentDetails'
 
 /*
  * Title bar; allows user to change the title of a document
@@ -112,9 +113,8 @@ export const TitleBar = ({
               onKeyDown={handleKeyDown}
             />
           </div>
-          <div>
-
-
+          <div className="flex items-center">
+            <DocumentDetailsButton />
           </div>
         </div>
       </div>

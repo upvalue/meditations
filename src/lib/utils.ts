@@ -17,3 +17,11 @@ export function formatDate(date: Date) {
   const day = date.getDate()
   return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
 }
+
+export const getDocTitle = () => {
+  const path = window.location.pathname
+  if(path.startsWith('/n/')) {
+    return path.slice(3)
+  }
+  return null
+}

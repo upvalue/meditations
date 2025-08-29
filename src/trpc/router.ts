@@ -132,6 +132,30 @@ export const appRouter = router({
       return doc!.body
     }),
 
+  loadDocDetails: proc
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .query(async ({ input, ctx: { db } }) => {
+      const doc = await db
+        .selectFrom('notes')
+        .selectAll()
+        .where('title', '=', input.name)
+        .executeTakeFirst()
+
+        if(!doc) {
+          throw new Error(`Document "${input.name}" not found`)
+        }
+
+        return {
+          createdAt: doc.createdAt,
+          updatedAt: doc.updatedAt,
+          revision: doc.revision,
+        }
+    }),
+
   updateDoc: proc
     .input(
       z.object({
