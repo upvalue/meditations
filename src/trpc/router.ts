@@ -55,6 +55,8 @@ const upsertNote = (db: Kysely<Database>, name: string, body: ZDoc) => {
     .values({
       title: name,
       body,
+      revision: 0,
+      updatedAt: sql`now()`,
     })
     .onConflict((oc) => oc.column('title').doUpdateSet({ body }))
     .execute()
@@ -206,8 +208,9 @@ export const appRouter = router({
         await trx
           .insertInto('notes')
           .values({
+            ...oldDoc,
+            updatedAt: sql`now()`,
             title: newName,
-            body: oldDoc.body,
           })
           .execute()
 

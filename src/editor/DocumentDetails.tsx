@@ -4,9 +4,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
-    DialogFooter,
-    DialogClose,
     DialogTrigger,
 } from "@/components/vendor/Dialog"
 import { formatDate, getDocTitle } from "@/lib/utils";
@@ -45,10 +42,10 @@ export const DocumentDetailsButton = () => {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Document Details</DialogTitle>
-                    <DialogDescription>
-                        {open && <DocumentDetails />}
-                    </DialogDescription>
                 </DialogHeader>
+                <DialogContent>
+                    {open && <DocumentDetails />}
+                </DialogContent>
             </DialogContent>
         </Dialog>
     )
