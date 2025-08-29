@@ -1,10 +1,10 @@
 import React from 'react'
-import { Badge } from '@/components/ui/Badge'
+import { Badge } from '@/components/vendor/Badge'
 import {
   DescriptionDetails,
   DescriptionList,
   DescriptionTerm,
-} from '@/components/ui/description-list'
+} from '@/components/vendor/description-list'
 import { getAllKeybindings } from '@/lib/keys'
 import { LinkIcon } from '@heroicons/react/16/solid'
 const Keybindings = () => {

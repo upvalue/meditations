@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/vendor/tabs'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useAtom } from 'jotai'
 import { analyzeDoc, zdoc } from '@/editor/schema'
 import { docAtom } from '@/editor/state'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/vendor/button'
 import { PgliteDevtools } from './PgliteDevtools'
 
 const RawDocument = () => {

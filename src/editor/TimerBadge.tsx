@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BadgeButton } from '@/components/ui/Badge'
+import { BadgeButton } from '@/components/vendor/Badge'
 
 import {
   Dialog,
@@ -8,12 +8,12 @@ import {
   DialogOverlay,
   DialogContent,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/vendor/dialog'
 import type { LineWithIdx } from './line-editor'
 import { useDocLine, globalTimerAtom, notificationPermissionAtom } from './state'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/vendor/input'
 import parseDuration from 'parse-duration'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/vendor/button'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { ClockIcon, PlayIcon, StopIcon } from '@heroicons/react/16/solid'
 import { useCallback, useRef } from 'react'

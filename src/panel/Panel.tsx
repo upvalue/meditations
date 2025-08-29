@@ -7,7 +7,7 @@ import {
   NavbarSection,
   NavbarItem,
   NavbarLabel,
-} from '@/components/ui/navbar'
+} from '@/components/vendor/navbar'
 import {
   WrenchScrewdriverIcon,
   QuestionMarkCircleIcon,

@@ -112,6 +112,7 @@ export const TitleBar = ({
               onKeyDown={handleKeyDown}
             />
           </div>
+          <div>hey buddy</div>
         </div>
       </div>
     </div >

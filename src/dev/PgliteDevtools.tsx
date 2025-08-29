@@ -2,7 +2,7 @@ import { dbMemory, DB_PATH_KEY, DEFAULT_DB_PATH } from "@/db"
 import type { PGlite } from "@electric-sql/pglite"
 import { Repl } from "@electric-sql/pglite-repl"
 import { useEffect, useRef, useState, type RefObject } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/vendor/button"
 import {
     Dialog,
     DialogClose,
@@ -12,8 +12,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@/components/vendor/dialog"
+import { Input } from "@/components/vendor/input"
 
 interface DatabaseInfo {
     name: string

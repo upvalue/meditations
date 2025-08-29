@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { docAtom, focusedLineAtom } from './state'
-import { Checkbox } from '@/components/ui/Checkbox'
+import { Checkbox } from '@/components/vendor/Checkbox'
 import { Circle, CircleDot } from 'lucide-react'
 import { useCodeMirror, type LineWithIdx } from './line-editor'
 import { TimerBadge } from './TimerBadge'
