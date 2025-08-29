@@ -5,17 +5,17 @@ import { clientRectsFor, flattenRect } from "./vendor/dom"
 // This is the original placeholder plugin from CM
 // Modified to we can add more logic around whether to render a placeholder or not
 
+type ContentFn = (view: EditorView) => string
+
 class Placeholder extends WidgetType {
-  constructor(readonly content: string | HTMLElement | ((view: EditorView) => HTMLElement)) { super() }
+  constructor(readonly content: ContentFn) { super() }
 
   toDOM(view: EditorView) {
     const wrap = document.createElement("span")
     wrap.className = "cm-placeholder"
     wrap.style.pointerEvents = "none"
     wrap.appendChild(
-      typeof this.content == "string" ? document.createTextNode(this.content) :
-      typeof this.content == "function" ? this.content(view) :
-      this.content.cloneNode(true))
+      document.createTextNode(this.content(view)))
     wrap.setAttribute("aria-hidden", "true")
     return wrap
   }
@@ -37,19 +37,27 @@ class Placeholder extends WidgetType {
 /// Extension that enables a placeholder—a piece of example content
 /// to show when the editor is empty.
 export function placeholder(
-  content: string | HTMLElement | ((view: EditorView) => HTMLElement), 
+  content: ContentFn, 
+  // lineNumber: number, 
   showPlaceholder: (view: EditorView) => boolean = () => true,
 ): Extension {
   const plugin = ViewPlugin.fromClass(class {
     placeholder: DecorationSet
 
     constructor(readonly view: EditorView) {
+      const {doc} = view.state;
+      const docEnd = doc.length;
+
+      // console.log('placeholder constructor');
+
       this.placeholder = content
-        ? Decoration.set([Decoration.widget({widget: new Placeholder(content), side: 1}).range(0)])
+        ? Decoration.set([Decoration.widget({widget: new Placeholder(content), side: 1}).range(docEnd)])
         : Decoration.none
     }
 
-    declare update: () => void // Kludge to convince TypeScript that this is a plugin value
+    update() {
+
+    } // Kludge to convince TypeScript that this is a plugin value
 
     get decorations() { 
       return showPlaceholder(this.view) ? this.placeholder : Decoration.none;

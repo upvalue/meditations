@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import { EditorView, keymap} from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
-import { EditorSelection, EditorState, type Extension } from '@codemirror/state'
+import { EditorSelection, EditorState, Transaction, type Extension } from '@codemirror/state'
 import { type ZLine } from './schema'
 import { useAtom, useSetAtom, useStore } from 'jotai'
 import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
@@ -57,10 +57,6 @@ export type LineWithIdx = {
  *
  * On hook mount, a Codemirror view is set up with the markdown content of the line
  *
- * Within the hook, a "callbacks" ref is updated when the document changes.
- * This is because callbacks will need to update document state. (It's possible
- * that some of this can be done away now with thanks to the setState callback)
- *
  * There's bidirectional synchronization of codemirror view and document state;
  * updates to codemirror update the document, and updates to the document update
  * codemirror (if there are any changes). This is because lines can alter the state
@@ -103,11 +99,27 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       }
     })
 
-    const placeholderPlugin = placeholder('The world is your canvas', (view) => {
+    // Placeholder plugin: renders some grayed out text under
+    // certain circumstances
+    const placeholderPlugin = placeholder((view) => {
+      if(store.get(docAtom).children[lineInfo.lineIdx].collapsed) return ' + collasped lines';
+      return 'The world is your canvas';
+    }, (view) => {
+      // If line is collapsed, we show a placeholder indicating collapsed line details
+      if(store.get(docAtom).children[lineInfo.lineIdx].collapsed) return true;
+
+      // Don't show placeholder if:
+      // There's any content on the line
       if(view.state.doc.length > 0) return false;
+
+      // This isn't the first line of the doc
       if(lineInfo.lineIdx !== 0) return false;
-      if(store.get(docAtom).children.length === 1) return false;
-      return false;
+
+      // There's more than one line in the doc
+      if(store.get(docAtom).children.length > 1) return false;
+
+      // Otherwise, do show the placeholder
+      return true;
     });
 
     const extensions: Extension[] = [
@@ -233,8 +245,14 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     console.log('Tag toggle event', event.lineIdx)
   })
 
+  // Line collapse toggle -- note that this only handles
+  // the slash command, there is also a separate
+  // key binding 
   useLineEvent('lineCollapseToggle', lineInfo.lineIdx, () => {
-    toggleCollapse(store, lineInfo.lineIdx)
+    const view = cmView.current;
+    if(view) {
+      toggleCollapse(view, store, lineInfo.lineIdx)
+    }
   })
 
   return {

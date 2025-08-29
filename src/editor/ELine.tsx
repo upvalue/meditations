@@ -82,7 +82,6 @@ export const ELine = (lineInfo: ELineProps) => {
         ref={cmRef}
         data-line-idx={lineInfo.lineIdx}
       />
-      {/*</div>*/}
     </div>
   )
 }

@@ -4,8 +4,9 @@ import { docAtom, requestFocusLineAtom } from '../state'
 import { lineMake, type ZDoc } from '../schema'
 import { keybindings } from '@/lib/keys'
 import type { useStore } from 'jotai'
+import { Transaction } from '@codemirror/state'
 
-export const toggleCollapse = (store: ReturnType<typeof useStore>, lineIdx: number) => {
+export const toggleCollapse = (view: EditorView, store: ReturnType<typeof useStore>, lineIdx: number) => {
   const setDoc = (updater: (draft: ZDoc) => void) => store.set(docAtom, updater)
   const doc = store.get(docAtom)
 
@@ -20,6 +21,10 @@ export const toggleCollapse = (store: ReturnType<typeof useStore>, lineIdx: numb
     } else {
       draft.children[lineIdx].collapsed = true
     }
+  })
+
+  view.dispatch({
+    annotations: [Transaction.userEvent.of('tekne-lineCollapseToggle')],
   })
 
   return true
@@ -220,7 +225,7 @@ export const makeKeymap = (store: ReturnType<typeof useStore>, lineIdx: number) 
     },
     {
       key: keybindings.toggleCollapse.key,
-      run: () => toggleCollapse(store, lineIdx),
+      run: (view) => toggleCollapse(view, store, lineIdx),
     },
     {
       key: 'Alt-Backspace',

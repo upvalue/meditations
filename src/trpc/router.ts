@@ -116,7 +116,7 @@ export const appRouter = router({
         const mydoc: ZDoc = {
           type: 'doc',
           schemaVersion: 1,
-          children: [lineMake(0, 'Empty test document')],
+          children: [lineMake(0, '')],
         }
 
         if (input.name === 'Tutorial') {
