@@ -12,7 +12,7 @@ type ELineProps = LineWithIdx & {
   collapseState: CollapseState
 }
 
-const INDENT_WIDTH_PIXELS = 20
+const INDENT_WIDTH_PIXELS = 24
 
 /**
  * The individual line editor React component. Note that the bulk of

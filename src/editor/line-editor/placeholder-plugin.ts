@@ -48,8 +48,6 @@ export function placeholder(
       const {doc} = view.state;
       const docEnd = doc.length;
 
-      // console.log('placeholder constructor');
-
       this.placeholder = content
         ? Decoration.set([Decoration.widget({widget: new Placeholder(content), side: 1}).range(docEnd)])
         : Decoration.none

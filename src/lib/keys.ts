@@ -28,7 +28,7 @@ export const keybindings = {
   commandPalette: {
     key: 'meta+shift+k',
     name: 'command-palette',
-    description: 'Run a command',
+    description: 'Open command palette',
     displayKey: '⌘ Shift K',
     type: 'react' as const,
   },
