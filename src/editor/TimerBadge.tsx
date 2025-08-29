@@ -8,12 +8,12 @@ import {
   DialogOverlay,
   DialogContent,
   DialogTitle,
-} from '@/components/vendor/dialog'
+} from '@/components/vendor/Dialog'
 import type { LineWithIdx } from './line-editor'
 import { useDocLine, globalTimerAtom, notificationPermissionAtom } from './state'
-import { Input } from '@/components/vendor/input'
+import { Input } from '@/components/vendor/Input'
 import parseDuration from 'parse-duration'
-import { Button } from '@/components/vendor/button'
+import { Button } from '@/components/vendor/Button'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { ClockIcon, PlayIcon, StopIcon } from '@heroicons/react/16/solid'
 import { useCallback, useRef } from 'react'

@@ -4,7 +4,7 @@ import {
   DescriptionDetails,
   DescriptionList,
   DescriptionTerm,
-} from '@/components/vendor/description-list'
+} from '@/components/vendor/DescriptionList'
 import { getAllKeybindings } from '@/lib/keys'
 import { LinkIcon } from '@heroicons/react/16/solid'
 const Keybindings = () => {
