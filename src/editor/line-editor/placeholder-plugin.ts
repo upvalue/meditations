@@ -56,8 +56,11 @@ export function placeholder(
     }
 
     update() {
+      const {doc} = this.view.state;
+      const docEnd = doc.length;
 
-    } // Kludge to convince TypeScript that this is a plugin value
+      this.placeholder = content ? Decoration.set([Decoration.widget({widget: new Placeholder(content), side: 1}).range(docEnd)]) : Decoration.none
+    } 
 
     get decorations() { 
       return showPlaceholder(this.view) ? this.placeholder : Decoration.none;
