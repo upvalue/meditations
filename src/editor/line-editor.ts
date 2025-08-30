@@ -102,6 +102,8 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     // Placeholder plugin: renders some grayed out text under
     // certain circumstances
     const placeholderPlugin = placeholder((view) => {
+      const line = store.get(docAtom).children[lineInfo.lineIdx]
+      if(!line) return '';
       if(store.get(docAtom).children[lineInfo.lineIdx].collapsed) return ' + collasped lines';
       return 'The world is your canvas';
     }, (view) => {

@@ -54,7 +54,7 @@ const DocumentSearchContent = () => {
         name: `Create document titled ${query}`,
         subtitle: 'Create a new document',
         perform: () => {
-          navigate({ to: `/n/${query}` })
+          navigate({ to: `/n/${encodeURIComponent(query)}` })
         },
         keywords: `create ${query}`,
       })

@@ -35,20 +35,15 @@ const dailyNoteNavigate = (navigate: NavigateFn, delta: number) => {
   if (path.startsWith('/n/')) {
     // Try to parse as YYYY-MM-DD
     const day = parse(path.slice(3), 'yyyy-MM-dd', new Date())
-    console.log(path.slice(3));
     if (isNaN(day.getTime())) {
       return
     }
-    console.log('naviagting from day ', day)
-
-    console.log('path', delta, getDayNotePath(day, delta));
 
     navigate({ to: getDayNotePath(day, delta) })
   }
 }
 
 const openTodaysNote = (navigate: NavigateFn) => {
-  console.log(new Date());
   navigate({ to: getDayNotePath(new Date(), 0) })
 }
 

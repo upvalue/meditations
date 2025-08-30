@@ -65,6 +65,37 @@ const upsertNote = (db: Kysely<Database>, name: string, body: ZDoc) => {
   return r
 }
 
+const isDailyDocument = (name: string): boolean => {
+  return /^\d{4}-\d{2}-\d{2}$/.test(name)
+}
+
+const createNewDocument = async (db: Kysely<Database>, name: string): Promise<ZDoc> => {
+  let newDoc: ZDoc = {
+    type: 'doc',
+    schemaVersion: 1,
+    children: [lineMake(0, '')],
+  }
+
+  if (name === 'Tutorial') {
+    newDoc.children = makeTutorial()
+  } else if (isDailyDocument(name)) {
+    const dailyTemplate = await db
+      .selectFrom('notes')
+      .selectAll()
+      .where('title', '=', '$Daily')
+      .executeTakeFirst()
+    
+    if (dailyTemplate) {
+      const templateDoc = docMigrator(dailyTemplate)
+      newDoc.children = templateDoc.body.children
+    } else {
+      console.log('$Daily template not found, using default content')
+    }
+  }
+
+  return newDoc
+}
+
 export const appRouter = router({
   healthcheck: proc.query(async ({ ctx: { db } }) => {
     const q = await db
@@ -115,16 +146,7 @@ export const appRouter = router({
         .executeTakeFirst()
 
       if (!doc) {
-        const mydoc: ZDoc = {
-          type: 'doc',
-          schemaVersion: 1,
-          children: [lineMake(0, '')],
-        }
-
-        if (input.name === 'Tutorial') {
-          mydoc.children = makeTutorial()
-        }
-
+        const mydoc = await createNewDocument(db, input.name)
         await upsertNote(db, input.name, mydoc)
         return mydoc
       }
@@ -267,19 +289,7 @@ export const appRouter = router({
         throw new Error(`Document with name "${name}" already exists`)
       }
 
-      const newDoc: ZDoc = {
-        type: 'doc',
-        schemaVersion: 1,
-        children: [
-          {
-            type: 'line',
-            mdContent: 'The world is your canvas',
-            indent: 0,
-            timeCreated: new Date().toISOString(),
-            timeUpdated: new Date().toISOString(),
-          },
-        ],
-      }
+      const newDoc = await createNewDocument(db, name)
 
       await upsertNote(db, name, newDoc)
 
