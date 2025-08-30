@@ -1,0 +1,29 @@
+{
+  "buildTimestamp": 1756578122640,
+  "files": [
+    {
+      "sourceFile": "../docs/about.mdx",
+      "outputFile": "generated/about.tsx",
+      "metadata": {
+        "title": "About"
+      },
+      "sourceHash": "1346030a66b543b6edc5533ffc846e9bf19d3506c147d6b1c58a21578292a896",
+      "buildTimestamp": 1756578122641,
+      "lastModified": 1756421953726,
+      "size": 2323
+    },
+    {
+      "sourceFile": "../docs/development.mdx",
+      "outputFile": "generated/development.tsx",
+      "metadata": {
+        "title": "Development"
+      },
+      "sourceHash": "7281f2db1347acc338c89531cc56e0a84ebca0da30a290d5a9b457414d99c4a2",
+      "buildTimestamp": 1756578122653,
+      "lastModified": 1756421757075,
+      "size": 1375
+    }
+  ],
+  "totalFiles": 2,
+  "buildDuration": 17
+}

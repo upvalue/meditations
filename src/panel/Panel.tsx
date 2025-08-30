@@ -1,7 +1,6 @@
 import { DevTools } from '@/dev/DevTools'
 import { Help } from './Help'
 import { Search } from './Search'
-import { GitInfo } from './GitInfo'
 import {
   Navbar,
   NavbarSection,
@@ -56,9 +55,6 @@ export function Panel() {
             <DevTools />
           </div>
         )}
-      </div>
-      <div className="flex-shrink-0">
-        <GitInfo />
       </div>
     </div>
   )

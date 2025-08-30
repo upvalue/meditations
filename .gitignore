@@ -7,11 +7,13 @@ count.txt
 .env
 .nitro
 .tanstack
+
+# project specific ignores
 /dev
 /README.draft.md
-
 /Justfile
 ./dev/data
+/.playwright-mcp
 
 # Ignore testing hooks
 /hooks/timer-start

@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "kysely": "kysely",
     "generate:routes": "node scripts/generate-client-routes.js",
+    "docs:build": "node scripts/build-docs.js",
     "server:dev": "DATABASE_URL=postgres://postgres:password@localhost/tekne tsx --watch src/server/index.ts",
     "server:start": "NODE_ENV=production tsx src/server/index.ts",
     "build": "pnpm run generate:routes && pnpm run client:build",
@@ -82,6 +83,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
+    "@tailwindcss/typography": "^0.5.16",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/compression": "^1.8.1",

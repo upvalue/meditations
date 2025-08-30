@@ -18,7 +18,7 @@ export async function compileMdxToTsx(
   const compiled = await compile(mdxContent, {
     jsx: true,
     jsxRuntime: 'automatic',
-    outputFormat: 'function-body',
+    outputFormat: 'program',
     remarkPlugins: [remarkGfm, remarkFrontmatter],
     development: false
   });
@@ -45,8 +45,22 @@ function generateTsxComponent(
 ): string {
   const metadataExport = JSON.stringify(metadata, null, 2);
   
+  // Clean up the compiled MDX and extract the default export
+  const cleanedMdx = compiledMdx
+    .replace(/import.*from ['"]react\/jsx-runtime['"];?\n?/g, '')
+    .replace(/\/\*@jsxRuntime automatic\*\/\n?/g, '')
+    .replace(/\/\*@jsxImportSource react\*\/\n?/g, '')
+    .replace(/"use strict";\n?/g, '')
+    .replace(/export default function MDXContent/, `function ${componentName}`)
+    .replace(/export default MDXContent;?/, '')
+    .replace(/function _createMdxContent\(props\)/, `function _createMdxContent(props: any)`)
+    .replace(new RegExp(`function ${componentName}\\(props = \\{\\}\\)`), `function ${componentName}(props: ${componentName}Props = {})`)
+    .replace(/props\.components/g, `(props.components || {})`)
+    .replace(/\(props\.components \|\| \{\}\) \|\| \(\{\}\)/g, `(props.components || {})`);
+  
   return `import React from 'react';
 import { Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs } from 'react/jsx-runtime';
+import { ExternalLink } from '@/components/ExternalLink';
 
 export const metadata = ${metadataExport};
 
@@ -55,21 +69,23 @@ export interface ${componentName}Props {
   [key: string]: any;
 }
 
-export default function ${componentName}(props: ${componentName}Props) {
-  const { components = {}, ...rest } = props;
-  
-  const MDXContent = function(props: any) {
-    const _components = {
-      ...components,
-      ...props.components,
-    };
-    ${compiledMdx}
+${cleanedMdx}
+
+export default function ${componentName}Wrapper(props: ${componentName}Props = {}) {
+  const customComponents = {
+    a: ({ href, children, ...rest }: any) => {
+      // Check if it's an external link
+      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+        return <ExternalLink href={href} {...rest}>{children}</ExternalLink>;
+      }
+      // Internal links use regular anchor
+      return <a href={href} {...rest}>{children}</a>;
+    },
+    ...props.components
   };
   
-  return <MDXContent {...rest} components={components} />;
+  return <${componentName} {...props} components={customComponents} />;
 }
-
-${componentName}.displayName = '${componentName}';
 `;
 }
 

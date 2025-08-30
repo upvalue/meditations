@@ -38,12 +38,19 @@ function RouteComponent() {
         href: 'https://upvalue.github.io/kamas-web',
       }}
     >
-      <p className="max-w-[50%]  text-left">
-        This is a demo for a productivity app that's currently super alpha. The
-        demo saves data in your browser storage, doesn't persist it, probably
-        has horrible bugs and should not, under any circumstances, actually be
-        used.
-      </p>
+      <div className="max-w-[50%] text-left">
+
+        <p>
+          This is a demo for a productivity app that's currently super alpha. The
+          demo saves data in your browser storage, doesn't persist it, probably
+          has horrible bugs and should not, under any circumstances, actually be
+          used.
+        </p>
+        <p>
+          It's also currently targeting a Mac laptop -- key bindings aren't yet OS aware
+          and the design is not responsive for small screens.
+        </p>
+      </div>
     </CopyLayout>
   )
 }
