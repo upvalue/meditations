@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import { EditorView, keymap} from '@codemirror/view'
 import { emacsStyleKeymap } from '@codemirror/commands'
 import { EditorSelection, EditorState, Transaction, type Extension } from '@codemirror/state'
-import { type ZLine } from './schema'
+import { type ZLine, type LineColor } from './schema'
 import { useAtom, useSetAtom, useStore } from 'jotai'
 import { docAtom, focusedLineAtom, requestFocusLineAtom } from './state'
 import { autocompletion } from '@codemirror/autocomplete'
@@ -262,7 +262,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       if (event.color === null) {
         delete draft.children[event.lineIdx].color
       } else {
-        draft.children[event.lineIdx].color = event.color as 'yellow' | 'blue' | 'purple' | 'red' | 'green'
+        draft.children[event.lineIdx].color = event.color as LineColor
       }
     })
   })

@@ -1,6 +1,8 @@
 // schema.ts - schema definition and raw line operations (eg no external dependencies)
 import { z } from 'zod'
 
+const colorEnum = z.enum(['yellow', 'blue', 'purple', 'red', 'green'])
+
 const zline = z.object({
   type: z.literal('line'),
   mdContent: z.string(),
@@ -22,7 +24,7 @@ const zline = z.object({
   /**
    * Line background color
    */
-  color: z.optional(z.enum(['yellow', 'blue', 'purple', 'red', 'green'])),
+  color: z.optional(colorEnum),
 })
 
 type ZLine = z.infer<typeof zline>
@@ -126,3 +128,5 @@ export {
   type ZTreeLine as ZLineTree,
   type ZDocTree,
 }
+
+export type LineColor = z.infer<typeof colorEnum>
