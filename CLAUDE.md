@@ -31,7 +31,6 @@ Tekne is a freestyle productivity application structured as an outline editor
 
 # Editor
 
-Its primary interface is a document editor written on top of CodeMirror, and the code for
 this editor lives in `src/editor`.
 
 The editor edits a document, which is a collection of lines stored as a flat array. Lines
@@ -83,6 +82,12 @@ In that case, the whole dev setup can be run with `pnpm run dev:all`
 The database is managed with Kysely, which can be run with `pnpm kysely` in server mode.
 Note that when the application is run in client-only mode, migrations are automatically
 applied when the page is loaded.
+
+Migrations can be greated with
+
+> pnpm kysely migrate:make
+
+The resultant file should be filled out, and `src/db/migrations.ts` will need to be updated to account for the new migration.
 
 # Testing changes
 

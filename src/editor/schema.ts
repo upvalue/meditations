@@ -18,6 +18,11 @@ const zline = z.object({
    * Task completion status
    */
   datumTaskStatus: z.optional(z.enum(['complete', 'incomplete', 'unset'])),
+
+  /**
+   * Line background color
+   */
+  color: z.optional(z.enum(['yellow', 'blue', 'purple', 'red', 'green'])),
 })
 
 type ZLine = z.infer<typeof zline>

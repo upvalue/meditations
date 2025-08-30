@@ -257,6 +257,16 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
     }
   })
 
+  useLineEvent('lineColorChange', lineInfo.lineIdx, (event) => {
+    setDoc((draft) => {
+      if (event.color === null) {
+        delete draft.children[event.lineIdx].color
+      } else {
+        draft.children[event.lineIdx].color = event.color as 'yellow' | 'blue' | 'purple' | 'red' | 'green'
+      }
+    })
+  })
+
   return {
     cmRef,
     cmView,

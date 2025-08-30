@@ -20,12 +20,18 @@ export type LineCollapseToggleEvent = {
   lineIdx: number
 }
 
+export type LineColorChangeEvent = {
+  lineIdx: number
+  color: string | null
+}
+
 type CodemirrorEvents = {
   tagClick: TagClickEventDetail
   wikiLinkClick: WikiLinkClickEventDetail
   lineTimerAdd: LineTimerEvent
   lineTagToggle: LineStatusEvent
   lineCollapseToggle: LineCollapseToggleEvent
+  lineColorChange: LineColorChangeEvent
 }
 
 const codemirrorEmitter = new TypedEventEmitter<CodemirrorEvents>()

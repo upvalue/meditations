@@ -34,12 +34,17 @@ export const ELine = (lineInfo: ELineProps) => {
 
   const isFocused = useAtomValue(focusedLineAtom) === lineInfo.lineIdx
 
+  const getColorClass = (color?: string) => {
+    return `editor-line-${color}`
+  }
+
   return (
     <div
       className={cn(
         'ELine w-full py-1  flex items-baseline',
         collapseState === 'collapsed' && 'hidden',
-        isFocused && 'ELine-focused'
+        isFocused && 'ELine-focused',
+        getColorClass(line.color),
       )}
     >
       <div className="ELine-gutter text-zinc-600 text-sm flex-shrink-0 justify-end flex font-mono">

@@ -2,6 +2,54 @@ import { EditorView } from '@codemirror/view'
 import { type Completion, CompletionContext } from '@codemirror/autocomplete'
 import { emitCodemirrorEvent } from './cm-events'
 
+const colorCommand = (lineIdx: number, color: string) => ({
+  label: `/${color}: Set line background to ${color}`,
+  type: 'text' as const,
+  apply: (
+    view: EditorView,
+    _completion: Completion,
+    from: number,
+    to: number
+  ) => {
+    emitCodemirrorEvent('lineColorChange', {
+      lineIdx,
+      color,
+    })
+
+    view.dispatch({
+      changes: {
+        from,
+        to,
+        insert: '',
+      },
+    })
+  },
+})
+
+const noColorCommand = (lineIdx: number) => ({
+  label: '/nocolor: Remove line background color',
+  type: 'text' as const,
+  apply: (
+    view: EditorView,
+    _completion: Completion,
+    from: number,
+    to: number
+  ) => {
+    emitCodemirrorEvent('lineColorChange', {
+      lineIdx,
+      color: null,
+    })
+
+    view.dispatch({
+      changes: {
+        from,
+        to,
+        insert: '',
+      },
+    })
+  },
+})
+
 export const slashCommandsPlugin = (lineIdx: number) => {
   return (context: CompletionContext) => {
     const word = context.matchBefore(/\/\w*/)
@@ -97,6 +145,12 @@ export const slashCommandsPlugin = (lineIdx: number) => {
             })
           },
         },
+        colorCommand(lineIdx, 'red'),
+        colorCommand(lineIdx, 'yellow'),
+        colorCommand(lineIdx, 'blue'),
+        colorCommand(lineIdx, 'purple'),
+        colorCommand(lineIdx, 'green'),
+        noColorCommand(lineIdx),
       ],
     }
   }
