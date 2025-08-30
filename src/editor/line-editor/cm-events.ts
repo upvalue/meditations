@@ -1,4 +1,5 @@
 import { TypedEventEmitter, useEventListener } from '@/lib/events'
+import type { LineColor } from '../schema'
 
 export type TagClickEventDetail = {
   name: string
@@ -22,7 +23,7 @@ export type LineCollapseToggleEvent = {
 
 export type LineColorChangeEvent = {
   lineIdx: number
-  color: string | null
+  color: LineColor | null
 }
 
 type CodemirrorEvents = {

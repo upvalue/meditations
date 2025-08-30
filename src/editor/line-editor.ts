@@ -262,7 +262,7 @@ export const useCodeMirror = (lineInfo: LineWithIdx) => {
       if (event.color === null) {
         delete draft.children[event.lineIdx].color
       } else {
-        draft.children[event.lineIdx].color = event.color as LineColor
+        draft.children[event.lineIdx].color = event.color 
       }
     })
   })
